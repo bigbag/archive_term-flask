@@ -5,10 +5,21 @@ class Config(object):
 
 
 class ProductionConfig(Config):
-    DATABASE_URI = 'mysql://user@localhost/foo'
+    SQLALCHEMY_BINDS = {
+        'term':        'mysqldb://username:password@localhost/term',
+        'payment':     'mysqldb://username:password@localhost/payment',
+        'mobispot':    'mysqldb://username:password@localhost/mobispot'
+    }
+    SQLALCHEMY_ECHO = False
 
 
 class DevelopmentConfig(Config):
+    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_BINDS = {
+        'term':        'mysqldb://root:gjevebwtyf@localhost/term',
+        'payment':     'mysqldb://root:gjevebwtyf@localhost/payment',
+        'mobispot':    'mysqldb://root:gjevebwtyf@localhost/mobispot'
+    }
     DEBUG = True
 
 
