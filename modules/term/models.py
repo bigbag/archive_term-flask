@@ -1,4 +1,6 @@
-from app import db
+from app import app
+
+db = app.db
 
 
 class Term(db.Model):
@@ -8,6 +10,9 @@ class Term(db.Model):
 
     TYPE_POS = 0
     TYPE_VENDING = 1
+
+    __bind_key__ = 'term'
+    __tablename__ = 'term'
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.Integer)
