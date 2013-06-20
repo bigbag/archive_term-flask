@@ -1,6 +1,6 @@
 from flask import Flask
-from app import app
+from api import app
 
-app.config.from_object('config.ProductionConfig')
+app.config.from_object('api.config.ProductionConfig')
 
 app.run()
