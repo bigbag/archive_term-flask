@@ -6,13 +6,13 @@
     </ntp>
     <download force_on_restart="1">
         <period>{{ term.download_period }}</period>
-        <start time="{{ term.download_time }}"/>
-        <stop time="23:59:59"/>
+        <start time="{{ term.download['start'] }}"/>
+        <stop time="{{ term.download['stop'] }}"/>
     </download>
     <upload force_on_restart="1">
         <period>{{ term.upload_period }}</period>
-        <start time="{{ term.upload_time }}"/>
-        <stop time="23:59:59"/>
+        <start time="{{ term.upload['start'] }}"/>
+        <stop time="{{ term.upload['stop'] }}"/>
     </upload>
     <update force_on_restart="1">
         <period>1440</period>

@@ -6,6 +6,7 @@ class Config(object):
     CACHE_DIR = '/tmp/api'
     CACHE_DEFAULT_TIMEOUT = 50
     CACHE_THRESHOLD = 2048
+    TZ = 'Europe/Moscow'
 
 
 class ProductionConfig(Config):

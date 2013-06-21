@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
+import json
+from api.decorators.header import *
+from api.helpers.date_helper import *
 from api import auth, cache
 from api.models.term import Term
-from api.decorators.header import *
+
 
 term = Blueprint('term', __name__)
 
 
-#
 @term.route('/configs/config_<int:id>.xml', methods=['GET'])
 @xml_headers
-@cache.memoize(timeout=500)
+@cache.memoize(timeout=0)
 #@auth.login_required
 def get_config(id):
     """Возвращает конфигурационный файл для терминала"""
@@ -19,7 +21,9 @@ def get_config(id):
     if not term:
         abort(400)
 
-    sitemap_xml = render_template('term/config.xml', term=term)
-    response = make_response(sitemap_xml)
+    term.download = json.loads(term.download)
+    term.upload = json.loads(term.upload)
+    config_xml = render_template('term/config.xml', term=term)
+    response = make_response(config_xml)
 
     return response
