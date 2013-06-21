@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<config mode="Vending" blacklist="1">
+    <ntp>
+        <server>ntp1.vniiftri.ru</server>
+        <timezone>MSK-04:00:00</timezone>
+    </ntp>
+    <download force_on_restart="1">
+        <period>{{ term.download_period }}</period>
+        <start time="{{ term.download_time }}"/>
+        <stop time="23:59:59"/>
+    </download>
+    <upload force_on_restart="1">
+        <period>{{ term.upload_period }}</period>
+        <start time="{{ term.upload_time }}"/>
+        <stop time="23:59:59"/>
+    </upload>
+    <update force_on_restart="1">
+        <period>1440</period>
+    </update>
+    <server goal="download,upload">
+        <ip>5.9.50.180</ip>
+        <port>4000</port>
+        <proto upload_method="PUT">https</proto>
+        <link>2</link>
+    </server>
+    <server goal="logger,update">
+        <ip>80.90.125.219</ip>
+        <port>64141</port>
+        <proto upload_method="PUT">http</proto>
+        <link>2</link>
+    </server>
+    <event type="coffee" translation="Coffee" min_time="01:00:00" max_time="23:00:00">
+        <card timeout="0" price="1200"></card>
+        <card timeout="1800" price="1200">777810000000002308</card>
+        <card timeout="1800" price="1200">777810000000000930</card>
+    </event>
+</config>

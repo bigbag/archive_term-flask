@@ -1,6 +1,4 @@
-from api import app
-from flask.ext.sqlalchemy import SQLAlchemy
-db = SQLAlchemy(app)
+from api import db
 
 
 class Term(db.Model):

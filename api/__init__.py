@@ -1,7 +1,15 @@
 from flask import Flask, jsonify, abort, make_response
 
 app = Flask(__name__)
-app.config.from_object('api.config.DevelopmentConfig')
+app.config.from_object('api.configs.general.DevelopmentConfig')
+# app.config.from_object('api.configs.general.ProductionConfig')
+
+from flask.ext.cache import Cache
+
+cache = Cache(app)
+
+from flask.ext.sqlalchemy import SQLAlchemy
+db = SQLAlchemy(app)
 
 from flask.ext.httpauth import HTTPBasicAuth
 
