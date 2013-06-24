@@ -12,11 +12,7 @@ class Event(db.Model):
     __tablename__ = 'event'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(
-        db.String(150,
-                  collation='utf8',
-                  convert_unicode=False),
-        nullable=False)
+    name = db.Column(db.String(150), nullable=False)
     key = db.Column(db.String(150), nullable=False)
 
     def __repr__(self):

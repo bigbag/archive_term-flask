@@ -5,7 +5,6 @@ from flask import request, url_for
 
 
 def get_curent_date():
-    # tz = pytz.timezone(app.config['TZ'])
-    client_time = datetime.datetime.now()
+    client_time = datetime.datetime.utcnow()
 
     return client_time.strftime('%Y-%m-%d %H:%M:%S')

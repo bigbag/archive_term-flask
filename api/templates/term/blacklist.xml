@@ -1,0 +1,5 @@
+<blacklist>
+    {% for wallet in wallets %}
+    <card>{{wallet.payment_id}}</card>
+    {% endfor %}
+</blacklist>

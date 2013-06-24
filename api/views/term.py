@@ -12,6 +12,7 @@ from api.models.term import Term
 from api.models.term_event import TermEvent
 from api.models.event import Event
 from api.models.person_event import PersonEvent
+from api.models.wallet import Wallet
 from api.configs.general import TermConfig
 
 
@@ -44,6 +45,22 @@ def get_config(id):
         config=TermConfig,
         term_events=term_events,
         person_events=person_events)
+    response = make_response(config_xml.encode('cp1251'))
+
+    return response
+
+
+@term.route('/configs/blacklist.xml', methods=['GET'])
+@xml_headers
+#@cache.memoize(timeout=0)
+def blacklist():
+    """Возвращает черный список карт"""
+    wallets = Wallet.query.filter(
+        (Wallet.balance == 0) | (Wallet.status == -1)).all()
+
+    config_xml = render_template(
+        'term/blacklist.xml',
+        wallets=wallets)
     response = make_response(config_xml.encode('cp1251'))
 
     return response
