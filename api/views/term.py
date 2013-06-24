@@ -3,10 +3,11 @@
 Контролер для апи терминального проекта
 
 """
-from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
 import json
+from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
 from api.decorators.header import *
 from api.helpers.date_helper import *
+from api.helpers.hash_helper import *
 from api import auth, cache
 from api.models.term import Term
 from api.models.term_event import TermEvent
@@ -44,8 +45,9 @@ def get_config(id):
         term=term,
         config=TermConfig,
         term_events=term_events,
-        person_events=person_events)
-    response = make_response(config_xml.encode('cp1251'))
+        person_events=person_events).encode('cp1251')
+    response = make_response(config_xml)
+    response.headers["Content-MD5"] = get_content_md5(config_xml)
 
     return response
 
@@ -60,7 +62,9 @@ def blacklist():
 
     config_xml = render_template(
         'term/blacklist.xml',
-        wallets=wallets)
-    response = make_response(config_xml.encode('cp1251'))
+        wallets=wallets).encode('cp1251')
+
+    response = make_response(config_xml)
+    response.headers["Content-MD5"] = get_content_md5(config_xml)
 
     return response
