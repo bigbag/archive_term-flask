@@ -1,6 +1,6 @@
 from functools import wraps
-
 from flask import Flask, make_response
+from api.helpers.hash_helper import *
 
 
 def add_response_headers(headers={}):
@@ -18,4 +18,18 @@ def add_response_headers(headers={}):
 
 
 def xml_headers(f):
-    return add_response_headers({'Content-Type': 'application/xml; charset=windows-1251'})(f)
+    @wraps(f)
+    @add_response_headers({'Content-Type': 'application/xml; charset=windows-1251'})
+    def decorated_function(*args, **kwargs):
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def add_md5(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        resp = make_response(f(*args, **kwargs))
+        h = resp.headers
+        h['Content-MD5'] = get_content_md5(resp.response[0])
+        return resp
+    return decorated_function

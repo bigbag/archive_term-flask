@@ -6,8 +6,6 @@
 import json
 from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
 from api.decorators.header import *
-from api.helpers.date_helper import *
-from api.helpers.hash_helper import *
 from api import auth, cache
 from api.models.term import Term
 from api.models.term_event import TermEvent
@@ -21,9 +19,10 @@ term = Blueprint('term', __name__)
 
 
 @term.route('/configs/config_<int:id>.xml', methods=['GET'])
+#@cache.memoize(timeout=60)
+# @auth.login_required
 @xml_headers
-#@cache.memoize(timeout=0)
-#@auth.login_required
+@add_md5
 def get_config(id):
     """Возвращает конфигурационный файл для терминала"""
     term = Term(id).get_term()
@@ -47,14 +46,14 @@ def get_config(id):
         term_events=term_events,
         person_events=person_events).encode('cp1251')
     response = make_response(config_xml)
-    response.headers["Content-MD5"] = get_content_md5(config_xml)
 
     return response
 
 
 @term.route('/configs/blacklist.xml', methods=['GET'])
+#@cache.memoize(timeout=60)
 @xml_headers
-#@cache.memoize(timeout=0)
+@add_md5
 def blacklist():
     """Возвращает черный список карт"""
     wallets = Wallet.query.filter(
@@ -65,6 +64,5 @@ def blacklist():
         wallets=wallets).encode('cp1251')
 
     response = make_response(config_xml)
-    response.headers["Content-MD5"] = get_content_md5(config_xml)
 
     return response
