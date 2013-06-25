@@ -25,7 +25,7 @@ def xml_headers(f):
     return decorated_function
 
 
-def add_md5(f):
+def md5_content_headers(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         resp = make_response(f(*args, **kwargs))

@@ -3,9 +3,15 @@
 Контролер для апи терминального проекта
 
 """
+import datetime
+from time import mktime
+import time
+
+import re
 import json
 from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
 from api.decorators.header import *
+from api.helpers.date_helper import *
 from api import auth, cache
 from api.models.term import Term
 from api.models.term_event import TermEvent
@@ -19,10 +25,10 @@ term = Blueprint('term', __name__)
 
 
 @term.route('/configs/config_<int:id>.xml', methods=['GET'])
-#@cache.memoize(timeout=60)
+@cache.cached(timeout=60)
 # @auth.login_required
 @xml_headers
-@add_md5
+@md5_content_headers
 def get_config(id):
     """Возвращает конфигурационный файл для терминала"""
     term = Term(id).get_term()
@@ -51,10 +57,10 @@ def get_config(id):
 
 
 @term.route('/configs/blacklist.xml', methods=['GET'])
-#@cache.memoize(timeout=60)
+@cache.cached(timeout=60)
 @xml_headers
-@add_md5
-def blacklist():
+@md5_content_headers
+def get_blacklist():
     """Возвращает черный список карт"""
     wallets = Wallet.query.filter(
         (Wallet.balance == 0) | (Wallet.status == -1)).all()
@@ -66,3 +72,18 @@ def blacklist():
     response = make_response(config_xml)
 
     return response
+
+
+@term.route('/reports/report_<date_time>.xml', methods=['GET'])
+def set_report(date_time):
+    """Приём отчета"""
+
+    if not len(date_time) == 13:
+        abort(400)
+
+    m = re.search('\d{6}_\d{6}', str(date_time))
+
+    if not m:
+        abort(400)
+
+    return '1'

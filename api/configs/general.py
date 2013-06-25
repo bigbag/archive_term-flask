@@ -2,11 +2,13 @@ class Config(object):
     DEBUG = False
     TESTING = False
     SECRET_KEY = 'F\x03Dk\x1f@\xaa_5{\xf5m\xf2\x99\x9e\x1c\n\xe7{\xfb\x8aQ\xdae'
-    CACHE_TYPE = 'filesystem'
-    CACHE_DIR = '/tmp/api'
+    CACHE_TYPE = 'simple'
+    # CACHE_DIR = '/tmp/api'
     CACHE_DEFAULT_TIMEOUT = 50
     CACHE_THRESHOLD = 2048
     TZ = 'Europe/Moscow'
+    UPLOAD_FOLDER = './arch'
+    ALLOWED_EXTENSIONS = set(['xml'])
 
 
 class TermConfig(object):
