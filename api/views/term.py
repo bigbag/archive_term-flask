@@ -128,7 +128,7 @@ def set_report(term_id, report_datetime):
     return make_response(jsonify({'success': 'Report uploaded successfully'}), 201)
 
 
-@term.route('/uids/<int:term_id>_<payment_id>.uid', methods=['GET'])
+@term.route('/uids/<int:term_id>_<payment_id>.uid', methods=['PUT'])
 def add_card(term_id, payment_id):
     """Добавляем в базу карту для привязки"""
 

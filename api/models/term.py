@@ -50,6 +50,10 @@ class Term(db.Model):
 
         return term
 
+    def delete(self):
+        db.session.delete(me)
+        db.session.commit()
+
     def update(self):
         db.session.commit()
 

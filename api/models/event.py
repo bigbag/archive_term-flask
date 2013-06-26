@@ -18,7 +18,8 @@ class Event(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
-    def save(self):
+    def delete(self):
+        db.session.delete(me)
         db.session.commit()
 
     def update(self):

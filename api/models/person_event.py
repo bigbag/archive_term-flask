@@ -34,6 +34,10 @@ class PersonEvent(db.Model):
     def get_all_events(self):
         return Event.query.all()
 
+    def delete(self):
+        db.session.delete(me)
+        db.session.commit()
+
     def update(self):
         db.session.commit()
 
