@@ -1,5 +1,6 @@
 *.sublime*
+/api/configs/general.py
 *.pyc
 gunicorn.conf.py
 /venv/
-/arch/
+/arch/*/*

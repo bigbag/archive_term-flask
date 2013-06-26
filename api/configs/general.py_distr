@@ -7,7 +7,7 @@ class Config(object):
     CACHE_DEFAULT_TIMEOUT = 50
     CACHE_THRESHOLD = 2048
     TZ = 'Europe/Moscow'
-    UPLOAD_FOLDER = './arch'
+    UPLOAD_FOLDER = './archiv'
     ALLOWED_EXTENSIONS = set(['xml'])
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
@@ -43,9 +43,9 @@ class TermConfig(object):
 
 class ProductionConfig(Config):
     SQLALCHEMY_BINDS = {
-        'term': 'mysql://username:password@localhost/term?charset=utf8',
-        'payment': 'mysql://username:password@localhost/payment?charset=utf8',
-        'mobispot': 'mysql://username:password@localhost/mobispot?charset=utf8'
+        'term': 'mysql://user:pass@localhost/term?charset=utf8',
+        'payment': 'mysql://user:pass@localhost/payment?charset=utf8',
+        'mobispot': 'mysql://user:pass@localhost/mobispot?charset=utf8'
     }
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_RECORD_QUERIES = True
@@ -54,9 +54,9 @@ class ProductionConfig(Config):
 class DevelopmentConfig(Config):
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_BINDS = {
-        'term': 'mysql://root:gjevebwtyf@localhost/term?charset=utf8',
-        'payment': 'mysql://root:gjevebwtyf@localhost/payment?charset=utf8',
-        'mobispot': 'mysql://root:gjevebwtyf@localhost/mobispot?charset=utf8'
+        'term': 'mysql://user:pass@localhost/term?charset=utf8',
+        'payment': 'mysql://user:pass@localhost/payment?charset=utf8',
+        'mobispot': 'mysql://user:pass@localhost/mobispot?charset=utf8'
     }
     DEBUG = True
     SQLALCHEMY_RECORD_QUERIES = True
