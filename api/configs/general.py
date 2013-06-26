@@ -9,6 +9,7 @@ class Config(object):
     TZ = 'Europe/Moscow'
     UPLOAD_FOLDER = './arch'
     ALLOWED_EXTENSIONS = set(['xml'])
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
 
 class TermConfig(object):
@@ -47,6 +48,7 @@ class ProductionConfig(Config):
         'mobispot': 'mysql://username:password@localhost/mobispot?charset=utf8'
     }
     SQLALCHEMY_ECHO = False
+    SQLALCHEMY_RECORD_QUERIES = True
 
 
 class DevelopmentConfig(Config):
@@ -57,6 +59,7 @@ class DevelopmentConfig(Config):
         'mobispot': 'mysql://root:gjevebwtyf@localhost/mobispot?charset=utf8'
     }
     DEBUG = True
+    SQLALCHEMY_RECORD_QUERIES = True
 
 
 class TestingConfig(Config):
