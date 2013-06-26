@@ -3,4 +3,6 @@
 *.pyc
 gunicorn.conf.py
 /venv/
+/logs/
+/pids/
 /arch/*/*
