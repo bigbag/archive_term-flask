@@ -29,5 +29,9 @@ class TermEvent(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
+    def update(self):
+        db.session.commit()
+
     def save(self):
-        db.session.commit(te)
+        db.session.add(self)
+        db.session.commit()

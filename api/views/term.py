@@ -99,7 +99,7 @@ def set_report(term_id, report_datetime):
         abort(400)
 
     term.report_date = get_curent_date()
-    term.save()
+    term.update()
 
     report_datetime = str(report_datetime).split('_')
     report_date = report_datetime[0]

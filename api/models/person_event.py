@@ -34,5 +34,9 @@ class PersonEvent(db.Model):
     def get_all_events(self):
         return Event.query.all()
 
+    def update(self):
+        db.session.commit()
+
     def save(self):
+        db.session.add(self)
         db.session.commit()

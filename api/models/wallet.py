@@ -31,7 +31,11 @@ class Wallet(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
+    def update(self):
+        db.session.commit()
+
     def save(self):
         if not self.creation_date:
             self.creation_date = get_curent_date()
+        db.session.add(self)
         db.session.commit()
