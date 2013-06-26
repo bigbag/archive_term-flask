@@ -47,14 +47,7 @@ class Term(db.Model):
         term = Term.query.filter_by(
             id=self.id,
             status=self.STATUS_VALID).first()
-        if term:
-            term.download = json.loads(term.download)
-            term.upload = json.loads(term.upload)
 
-            if term.type == self.TYPE_VENDING:
-                term.type = 'Vending'
-            elif term.type == self.TYPE_POS:
-                term.type = 'Normal'
         return term
 
     def save(self):

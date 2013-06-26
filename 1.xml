@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="windows-1251" standalone="yes" ?>
+<Report>
+    <Event type="coffee">
+        <Card time="11:19:51" date="2013-06-21" summ="1200" type="0">777810000000000485</Card>
+        <Card time="11:20:41" date="2013-06-21" summ="1200" type="0">777810000000001772</Card>
+        <Card time="11:23:00" date="2013-06-21" summ="1200" type="0">777810000000002308</Card>
+    </Event>
+</Report>
