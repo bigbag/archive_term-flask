@@ -6,9 +6,9 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask.ext.script import Manager
-from api import app
-from api.console.report import Report
-from api.console.mail import Mail
+from console import app
+from console.view.report import Report
+from console.view.mail import Mail
 
 manager = Manager(app)
 

@@ -9,8 +9,8 @@ import pickle
 from flask import Flask, render_template
 from flask.ext.mail import Message
 from flask.ext.script import Command
-from api.models.mail_stack import MailStack
-from api import mail
+from console.models.mail_stack import MailStack
+from console import mail
 import json
 
 

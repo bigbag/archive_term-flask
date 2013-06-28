@@ -19,7 +19,7 @@ from api.models.event import Event
 from api.models.person_event import PersonEvent
 from api.models.card_stack import CardStack
 from api.models.wallet import Wallet
-from api.configs.general import TermConfig
+from api.configs.term import TermConfig
 
 
 term = Blueprint('term', __name__)
