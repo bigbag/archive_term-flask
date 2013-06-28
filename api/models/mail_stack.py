@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Модель очереди отправки писем
+    Модель для очереди почтовых сообщений
 
+    :copyright: (c) 2013 by Pavel Lyashkov.
+    :license: BSD, see LICENSE for more details.
 """
 from api import db
 

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Модель событий привязанных к терминалу
+    Модель событий привязанных к терминалу
 
+    :copyright: (c) 2013 by Pavel Lyashkov.
+    :license: BSD, see LICENSE for more details.
 """
 from api import db
 from api.models.term import Term
@@ -30,7 +32,7 @@ class TermEvent(db.Model):
         return '<id %r>' % (self.id)
 
     def delete(self):
-        db.session.delete(me)
+        db.session.delete(self)
         db.session.commit()
 
     def update(self):

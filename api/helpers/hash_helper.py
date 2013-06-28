@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+    Хелпер для работы с сигнатурами
+
+    :copyright: (c) 2013 by Pavel Lyashkov.
+    :license: BSD, see LICENSE for more details.
+"""
 import hashlib
 import base64
 

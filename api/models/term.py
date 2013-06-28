@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Модель Терминал
+    Модель для платежных и вендинговых терминалов
 
+
+    :copyright: (c) 2013 by Pavel Lyashkov.
+    :license: BSD, see LICENSE for more details.
 """
 import json
 from api import app
@@ -50,8 +53,25 @@ class Term(db.Model):
 
         return term
 
+    def get_xml_view(self):
+        self.download = json.loads(self.download)
+        self.upload = json.loads(self.upload)
+
+        if self.type == self.TYPE_VENDING:
+            self.type = 'Vending'
+        elif term.type == self.TYPE_POS:
+            self.type = 'Normal'
+        return self
+
+    def get_db_view(self):
+        if self.type == 'Vending':
+            self.type = self.TYPE_VENDING
+        elif term.type == 'Normal':
+            self.type = self.TYPE_POS
+        return self
+
     def delete(self):
-        db.session.delete(me)
+        db.session.delete(self)
         db.session.commit()
 
     def update(self):

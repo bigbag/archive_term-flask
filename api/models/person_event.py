@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Модель событий для которых установлены таймауты обслуживания для каждого пользователя
+    Модель событий для которых установлены
+    таймауты обслуживания для каждого пользователя
 
+
+    :copyright: (c) 2013 by Pavel Lyashkov.
+    :license: BSD, see LICENSE for more details.
 """
 
 from api import db
@@ -35,7 +39,7 @@ class PersonEvent(db.Model):
         return Event.query.all()
 
     def delete(self):
-        db.session.delete(me)
+        db.session.delete(self)
         db.session.commit()
 
     def update(self):

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Модель событий
+    Модель событий доступных для привязки
 
+    :copyright: (c) 2013 by Pavel Lyashkov.
+    :license: BSD, see LICENSE for more details.
 """
 from api import db
 
@@ -19,7 +21,7 @@ class Event(db.Model):
         return '<id %r>' % (self.id)
 
     def delete(self):
-        db.session.delete(me)
+        db.session.delete(self)
         db.session.commit()
 
     def update(self):

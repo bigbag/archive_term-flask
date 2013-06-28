@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+    Настройки проекта
+
+    :copyright: (c) 2013 by Pavel Lyashkov.
+    :license: BSD, see LICENSE for more details.
+"""
 class Config(object):
     DEBUG = False
     TESTING = False

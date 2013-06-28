@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+    Декоратор для HTTP заголовков
+
+    :copyright: (c) 2013 by Pavel Lyashkov.
+    :license: BSD, see LICENSE for more details.
+"""
 from functools import wraps
 from flask import Flask, make_response
 from api.helpers.hash_helper import *

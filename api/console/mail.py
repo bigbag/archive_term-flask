@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+    Консольное приложение для отправки писем
+
+    :copyright: (c) 2013 by Pavel Lyashkov.
+    :license: BSD, see LICENSE for more details.
+"""
 import pickle
 from flask import Flask, render_template
 from flask.ext.mail import Message

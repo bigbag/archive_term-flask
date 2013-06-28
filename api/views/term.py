@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Контролер для апи терминального проекта
+    Контролер реализующий апи для терминального проекта
 
+    :copyright: (c) 2013 by Pavel Lyashkov.
+    :license: BSD, see LICENSE for more details.
 """
 import re
 import os
@@ -35,13 +37,7 @@ def get_config(term_id):
     if not term:
         abort(400)
 
-    term.download = json.loads(term.download)
-    term.upload = json.loads(term.upload)
-
-    if term.type == Term.TYPE_VENDING:
-        term.type = 'Vending'
-    elif term.type == Term.TYPE_POS:
-        term.type = 'Normal'
+    term = term.get_xml_view()
 
     term_events = TermEvent.query.filter_by(
         term_id=term.id).all()
