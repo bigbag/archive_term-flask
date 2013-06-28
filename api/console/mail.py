@@ -1,0 +1,38 @@
+import pickle
+from flask import Flask, render_template
+from flask.ext.mail import Message
+from flask.ext.script import Command
+from api.models.mail_stack import MailStack
+from api import mail
+import json
+
+
+class Mail(Command):
+
+    "Sending mail"
+
+    def run(self):
+
+        emails = MailStack.query.filter_by(
+            lock=MailStack.LOCK_FREE).limit(
+                100).all()
+
+        with mail.connect() as conn:
+            for email in emails:
+                email.lock = MailStack.LOCK_SET
+                email.save()
+
+                senders = json.loads(email.senders)['email']
+                recipients = json.loads(email.recipients)['email']
+                for recipient in recipients:
+                    msg = Message(
+                        email.subject,
+                        sender=senders,
+                        recipients=[recipient])
+
+                    msg.html = email.body
+                    conn.send(msg)
+
+                email.delete()
+
+        return True

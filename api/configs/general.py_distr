@@ -1,12 +1,16 @@
 class Config(object):
     DEBUG = False
     TESTING = False
+
     SECRET_KEY = 'F\x03Dk\x1f@\xaa_5{\xf5m\xf2\x99\x9e\x1c\n\xe7{\xfb\x8aQ\xdae'
+
     CACHE_TYPE = 'simple'
     # CACHE_DIR = '/tmp/api'
     CACHE_DEFAULT_TIMEOUT = 50
     CACHE_THRESHOLD = 2048
+
     TZ = 'Europe/Moscow'
+
     UPLOAD_FOLDER = './archiv'
     ALLOWED_EXTENSIONS = set(['xml'])
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
@@ -44,6 +48,7 @@ class TermConfig(object):
 class ProductionConfig(Config):
     SQLALCHEMY_BINDS = {
         'term': 'mysql://user:pass@localhost/term?charset=utf8',
+        'mail': 'mysql://user:pass@localhost/mail?charset=utf8',
         'payment': 'mysql://user:pass@localhost/payment?charset=utf8',
         'mobispot': 'mysql://user:pass@localhost/mobispot?charset=utf8'
     }
@@ -55,6 +60,7 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_BINDS = {
         'term': 'mysql://user:pass@localhost/term?charset=utf8',
+        'mail': 'mysql://user:pass@localhost/mail?charset=utf8',
         'payment': 'mysql://user:pass@localhost/payment?charset=utf8',
         'mobispot': 'mysql://user:pass@localhost/mobispot?charset=utf8'
     }
