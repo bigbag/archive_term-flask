@@ -27,10 +27,11 @@ class PersonEvent(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     event = db.relationship('Event')
     firm_id = db.Column(db.Integer, index=True)
-    timeout = db.Column(db.Time, default="00:00:00")
+    timeout = db.Column(db.Time, nullable=False)
 
     def __init__(self, id):
         self.id = id
+        self.timeout = "00:00:00"
 
     def __repr__(self):
         return '<id %r>' % (self.id)

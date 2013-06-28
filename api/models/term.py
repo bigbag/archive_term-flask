@@ -25,23 +25,23 @@ class Term(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.Integer, default=TYPE_POS)
     name = db.Column(db.String(300), nullable=False)
-    tz = db.Column(db.String(300), default=app.config['TZ'])
-    blacklist = db.Column(db.Integer, default=0)
-    status = db.Column(db.Integer, index=True, default=STATUS_VALID)
-    report_date = db.Column(db.DateTime)
-    upload = db.Column(
-        db.String(256),
-        default={"start": "00:00:00",
-                 "stop": "23:59:59"})
-    upload_period = db.Column(db.Integer, default=0)
-    download = db.Column(
-        db.String(256),
-        default={"start": "00:00:00",
-                 "stop": "23:59:59"})
-    download_period = db.Column(db.Integer, default=0)
+    tz = db.Column(db.String(300), nullable=False)
+    blacklist = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, index=True)
+    report_date = db.Column(db.DateTime, nullable=False)
+    upload = db.Column(db.String(256), nullable=False)
+    upload_period = db.Column(db.Integer, nullable=False)
+    download = db.Column(db.String(256), nullable=False)
+    download_period = db.Column(db.Integer, nullable=False)
 
     def __init__(self, id):
         self.id = id
+        self.upload = {"start": "00:00:00", "stop": "23:59:59"}
+        self.upload_period = 0
+        self.download = {"start": "00:00:00", "stop": "23:59:59"}
+        self.tz = app.config['TZ']
+        self.blacklist = 0
+        self.status = self.STATUS_VALID
 
     def __repr__(self):
         return '<id %r>' % (self.id)

@@ -78,7 +78,7 @@ def get_blacklist():
 
 
 @term.route('/reports/report_<int:term_id>_<report_datetime>.xml', methods=['PUT'])
-def set_report(term_id, report_datetime):
+def upload_report(term_id, report_datetime):
     """Прием и сохранение отчета"""
 
     if not len(report_datetime) == 13:
@@ -102,7 +102,7 @@ def set_report(term_id, report_datetime):
     report_time = report_datetime[1]
 
     file = request.stream.read()
-    file_patch = app.config['UPLOAD_FOLDER'] + '/' + report_date
+    file_patch = app.config['UPLOAD_FOLDER'] + '/' + report_date + '.xml'
 
     if not request.headers.get('Content-MD5'):
         abort(400)

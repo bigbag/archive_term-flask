@@ -6,4 +6,4 @@ gunicorn.conf.py
 /venv/
 /logs/
 /pids/
-/arch/*/*
+/archiv/*/*

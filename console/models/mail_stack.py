@@ -23,7 +23,11 @@ class MailStack(db.Model):
     body = db.Column(db.Text, nullable=False)
     attach = db.Column(db.Text)
     creation_date = db.Column(db.DateTime, nullable=False)
-    lock = db.Column(db.Integer, index=True, default=LOCK_FREE)
+    lock = db.Column(db.Integer, index=True, nullable=False)
+
+    def __init__(self, id):
+        self.id = id
+        self.lock = self.LOCK_FREE
 
     def __repr__(self):
         return '<id %r>' % (self.id)

@@ -25,11 +25,13 @@ class Wallet(db.Model):
     user_id = db.Column(db.Integer(), index=True)
     discodes_id = db.Column(db.Integer(), index=True)
     creation_date = db.Column(db.DateTime, nullable=False)
-    balance = db.Column(db.Integer, default=0)
-    status = db.Column(db.Integer, default=0)
+    balance = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, nullable=False)
 
     def __init__(self, id):
         self.id = id
+        self.id = 0
+        self.id = self.STATUS_NOACTIVE
 
     def __repr__(self):
         return '<id %r>' % (self.id)

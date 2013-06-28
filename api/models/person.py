@@ -28,10 +28,11 @@ class Person(db.Model):
     card = db.Column(db.String(8))
     payment_id = db.Column(db.String(32), nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
-    status = db.Column(db.Integer, default=1)
+    status = db.Column(db.Integer, nullable=False)
 
     def __init__(self, id):
         self.id = id
+        self.status = self.STATUS_VALID
 
     def __repr__(self):
         return '<id %r>' % (self.id)
