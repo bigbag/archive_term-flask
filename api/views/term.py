@@ -116,7 +116,7 @@ def upload_report(term_id, report_datetime):
 
         filename = os.path.join(
             file_patch, str(term_id) + "_" + report_time)
-        with open(filename, 'a') as f:
+        with open(filename, 'w') as f:
             f.write(file)
     else:
         abort(400)

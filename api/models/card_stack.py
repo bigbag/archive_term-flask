@@ -12,8 +12,8 @@ from api.helpers.date_helper import *
 
 class CardStack(db.Model):
 
-    __bind_key__ = 'term'
-    __tablename__ = 'card_stack'
+    __bind_key__ = 'stack'
+    __tablename__ = 'card'
 
     id = db.Column(db.Integer, primary_key=True)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
