@@ -9,7 +9,7 @@ import pytz
 import datetime
 from datetime import datetime
 from pytz import timezone
-from api import app
+from web import app
 from flask import request, url_for
 
 

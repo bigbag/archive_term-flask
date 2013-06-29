@@ -36,11 +36,9 @@ def get_password(username):
 def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 403)
 
-from api.views.term import term  # , mail, report
+from web.views.api import api
 
-app.register_blueprint(term, url_prefix='/term/v1.0')
-# app.register_blueprint(mail, url_prefix='/mail/v1.0')
-# app.register_blueprint(report, url_prefix='/report/v1.0')
+app.register_blueprint(api, url_prefix='/term/v1.0')
 
 
 @app.errorhandler(400)

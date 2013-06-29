@@ -5,7 +5,7 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from api import app
+from web import app
 
 
 def allowed_file(filename):

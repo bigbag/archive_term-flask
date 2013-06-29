@@ -7,8 +7,8 @@
     :license: BSD, see LICENSE for more details.
 """
 import json
-from api import app
-from api import db
+from web import app
+from web import db
 
 
 class Term(db.Model):

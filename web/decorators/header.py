@@ -7,7 +7,7 @@
 """
 from functools import wraps
 from flask import Flask, make_response
-from api.helpers.hash_helper import *
+from web.helpers.hash_helper import *
 
 
 def add_response_headers(headers={}):

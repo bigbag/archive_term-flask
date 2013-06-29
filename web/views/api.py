@@ -9,23 +9,23 @@ import re
 import os
 import json
 from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
-from api.decorators.header import *
-from api.helpers.date_helper import *
-from api.helpers.hash_helper import *
-from api import auth, cache
-from api.models.term import Term
-from api.models.term_event import TermEvent
-from api.models.event import Event
-from api.models.person_event import PersonEvent
-from api.models.card_stack import CardStack
-from api.models.wallet import Wallet
-from api.configs.term import TermConfig
+from web.decorators.header import *
+from web.helpers.date_helper import *
+from web.helpers.hash_helper import *
+from web import auth, cache
+from web.models.term import Term
+from web.models.term_event import TermEvent
+from web.models.event import Event
+from web.models.person_event import PersonEvent
+from web.models.card_stack import CardStack
+from web.models.wallet import Wallet
+from web.configs.term import TermConfig
 
 
-term = Blueprint('term', __name__)
+api = Blueprint('api', __name__)
 
 
-@term.route('/configs/config_<int:term_id>.xml', methods=['GET'])
+@api.route('/configs/config_<int:term_id>.xml', methods=['GET'])
 @cache.cached(timeout=60)
 # @auth.login_required
 @xml_headers
@@ -59,7 +59,7 @@ def get_config(term_id):
     return response
 
 
-@term.route('/configs/blacklist.xml', methods=['GET'])
+@api.route('/configs/blacklist.xml', methods=['GET'])
 @cache.cached(timeout=60)
 @xml_headers
 @md5_content_headers
@@ -77,7 +77,7 @@ def get_blacklist():
     return response
 
 
-@term.route('/reports/report_<int:term_id>_<report_datetime>.xml', methods=['PUT'])
+@api.route('/reports/report_<int:term_id>_<report_datetime>.xml', methods=['PUT'])
 def upload_report(term_id, report_datetime):
     """Прием и сохранение отчета"""
 
@@ -124,7 +124,7 @@ def upload_report(term_id, report_datetime):
     return make_response(jsonify({'success': 'Report uploaded successfully'}), 201)
 
 
-@term.route('/uids/<int:term_id>_<payment_id>.uid', methods=['PUT'])
+@api.route('/uids/<int:term_id>_<payment_id>.uid', methods=['PUT'])
 def add_card(term_id, payment_id):
     """Добавляем в базу карту для привязки"""
 

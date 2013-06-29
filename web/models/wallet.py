@@ -6,8 +6,8 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from api import db
-from api.helpers.date_helper import *
+from web import db
+from web.helpers.date_helper import *
 
 
 class Wallet(db.Model):

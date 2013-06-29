@@ -5,9 +5,9 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from api import db
-from api.models.term import Term
-from api.helpers.date_helper import *
+from web import db
+from web.models.term import Term
+from web.helpers.date_helper import *
 
 
 class CardStack(db.Model):

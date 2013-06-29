@@ -8,10 +8,10 @@
     :license: BSD, see LICENSE for more details.
 """
 
-from api import db
-from api.models.term import Term
-from api.models.event import Event
-from api.models.person import Person
+from web import db
+from web.models.term import Term
+from web.models.event import Event
+from web.models.person import Person
 
 
 class PersonEvent(db.Model):
