@@ -1,36 +1,29 @@
 # -*- coding: utf-8 -*-
 """
-    Модель событий привязанных к терминалу
+    Модель реализующая принадлежность терминалов к фирмам и мультиаренду
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 from web import db
-from web.models.term import Term
-from web.models.event import Event
 
 
-class TermEvent(db.Model):
+class FirmTerm(db.Model):
 
     __bind_key__ = 'term'
-    __tablename__ = 'term_event'
+    __tablename__ = 'firm_term'
 
     id = db.Column(db.Integer, primary_key=True)
-    age_id = db.Column(db.Integer, nullable=False)
-    cost = db.Column(db.Integer, nullable=False)
-    start = db.Column(db.Time, nullable=False)
-    stop = db.Column(db.Time, nullable=False)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
-    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
-    event = db.relationship('Event')
+    firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
+    firm = db.relationship('Firm')
+    child_firm_id = db.Column(db.Integer, db.ForeignKey('child_firm_id.id'))
+    child_firm = db.relationship('Firm')
 
     def __init__(self, id):
         self.id = id
-        self.cost = 0
-        self.age_id = 1
-        self.start = "00:00:00"
-        self.stop = "23:59:59"
+        self.child_firm_id = 0
 
     def __repr__(self):
         return '<id %r>' % (self.id)

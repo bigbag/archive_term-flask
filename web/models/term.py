@@ -23,7 +23,7 @@ class Term(db.Model):
     TYPE_VENDING = 1
 
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.Integer, default=TYPE_POS)
+    type = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(300), nullable=False)
     tz = db.Column(db.String(300), nullable=False)
     blacklist = db.Column(db.Integer, nullable=False)
@@ -36,6 +36,7 @@ class Term(db.Model):
 
     def __init__(self, id):
         self.id = id
+        self.type = self.TYPE_POS
         self.upload = {"start": "00:00:00", "stop": "23:59:59"}
         self.upload_period = 0
         self.download = {"start": "00:00:00", "stop": "23:59:59"}

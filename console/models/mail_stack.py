@@ -32,6 +32,12 @@ class MailStack(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
+    def get_json(self):
+        self.senders = json.loads(self.senders)
+        self.recipients = json.loads(self.recipients)
+
+        return self
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

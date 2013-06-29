@@ -7,7 +7,7 @@
 """
 from flask import Flask, render_template
 from flask.ext.script import Command
-from api.models.term import Term
+from web.models.term import Term
 
 
 class Report(Command):
