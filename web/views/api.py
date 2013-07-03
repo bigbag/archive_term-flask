@@ -97,12 +97,11 @@ def upload_report(term_id, report_datetime):
     term.report_date = get_curent_date()
     term.update()
 
-    report_datetime = str(report_datetime).split('_')
-    report_date = report_datetime[0]
-    report_time = report_datetime[1]
-
     file = request.stream.read()
-    file_patch = app.config['UPLOAD_FOLDER'] + '/' + report_date + '.xml'
+    filename = (
+        "%s/$s_%s") % (app.config['UPLOAD_TMP'],
+                       str(term_id),
+                       report_datetime)
 
     if not request.headers.get('Content-MD5'):
         abort(400)
@@ -111,11 +110,6 @@ def upload_report(term_id, report_datetime):
         abort(400)
 
     if file:
-        if not os.path.exists(file_patch):
-            os.makedirs(file_patch)
-
-        filename = os.path.join(
-            file_patch, str(term_id) + "_" + report_time)
         with open(filename, 'w') as f:
             f.write(file)
     else:

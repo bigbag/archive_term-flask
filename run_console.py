@@ -7,11 +7,11 @@
 """
 from flask.ext.script import Manager
 from console import app
-from console.view.report import Report
-from console.view.mail import Mail
+from console.view.report_generation import ReportGeneration
+from console.view.mail_send import MailSend
 
 manager = Manager(app)
 
-manager.add_command('report', Report())
-manager.add_command('mail', Mail())
+manager.add_command('report', ReportGeneration())
+manager.add_command('mail', MailSend())
 manager.run()

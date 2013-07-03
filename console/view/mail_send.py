@@ -14,7 +14,7 @@ from console import mail
 import json
 
 
-class Mail(Command):
+class MailSend(Command):
 
     "Sending mail"
 

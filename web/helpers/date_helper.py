@@ -35,6 +35,6 @@ def from_utc(date, tz):
     return localetime
 
 
-def convert_date_to_utc(date, input, output):
+def convert_date_to_utc(date, tz, input, output):
     conv = datetime.strptime(date, input)
-    return to_utc(conv, app.config['TZ']).strftime(output)
+    return to_utc(conv, tz).strftime(output)

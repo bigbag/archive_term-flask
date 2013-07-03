@@ -5,6 +5,7 @@ virtualenv --prompt="<myenv>" ./env
 mkdir ./logs
 mkdir ./pids
 mkdir ./db
+mkdir ./tmp
 cp gunicorn.conf.py_distr gunicorn.conf.py
 cp api/configs/general.py_distr api/configs/general.py
 

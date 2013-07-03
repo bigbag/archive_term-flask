@@ -6,10 +6,14 @@
     :license: BSD, see LICENSE for more details.
 """
 import hashlib
+import time
 from web import db
 from web.models.term import Term
 from web.models.person import Person
 from web.models.firm import Firm
+from web.models.event import Event
+from web.models.firm_term import FirmTerm
+from web.helpers.date_helper import *
 
 
 class Report(db.Model):
@@ -23,6 +27,8 @@ class Report(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
+    event = db.relationship('Event')
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
     person = db.relationship('Person')
     payment_id = db.Column(db.String(150))
@@ -33,14 +39,58 @@ class Report(db.Model):
     creation_date = db.Column(db.DateTime, nullable=False)
     check_summ = db.Column(db.String(32), nullable=False)
 
-    def __init__(self, id):
-        self.id = id
+    def get_db_view(self, data):
+        self.payment_id = data.text
+
+        firm_terms = FirmTerm.query.filter_by(
+            term_id=self.term.id).all()
+        firm_id_list = []
+        for firm_term in firm_terms:
+            firm_id_list.append(firm_term.child_firm_id)
+
+        persons = Person.query.filter_by(
+            payment_id=data.text).all()
+
+        for person in persons:
+            if person.firm_id in firm_id_list:
+                self.person_id = person.id
+                self.firm_id = person.firm_id
+                break
+
+        if data.get('summ'):
+            self.amount = data.get('summ')
+
+        if data.get('type'):
+            self.type = data.get('type')
+
+        date_time = "%s %s" % (
+            data.get('date'),
+            data.get('time'))
+
+        date_time_utc = convert_date_to_utc(
+            date_time,
+            self.term.tz,
+            "%Y-%m-%d %H:%M:%S",
+            "%Y-%m-%d %H:%M:%S")
+        self.creation_date = date_time_utc
+        return self
+
+    def __init__(self):
         self.amount = 0
         self.person_id = 0
+        self.firm_id = 0
         self.type = self.TYPE_WHITE
 
     def __repr__(self):
         return '<id %r>' % (self.id)
+
+    def get_check_summ(self):
+        return hashlib.md5("%s%s%s%s%s" % (
+            str(self.term_id),
+            str(self.event_id),
+            str(self.type),
+            str(self.creation_date),
+            str(self.payment_id))).hexdigest()
 
     def delete(self):
         db.session.delete(self)
@@ -51,6 +101,6 @@ class Report(db.Model):
 
     def save(self):
         if not self.check_summ:
-            self.check_summ
+            self.check_summ = self.get_check_summ()
         db.session.add(self)
         db.session.commit()
