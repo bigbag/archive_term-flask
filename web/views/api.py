@@ -18,7 +18,7 @@ from web.models.term_event import TermEvent
 from web.models.event import Event
 from web.models.person_event import PersonEvent
 from web.models.card_stack import CardStack
-from web.models.wallet import Wallet
+from web.models.payment_wallet import PaymentWallet
 from web.configs.term import TermConfig
 
 
@@ -65,8 +65,8 @@ def get_config(term_id):
 @md5_content_headers
 def get_blacklist():
     """Возвращает черный список карт"""
-    wallets = Wallet.query.filter(
-        (Wallet.balance == 0) | (Wallet.status == -1)).all()
+    wallets = PaymentWallet.query.filter(
+        (Wallet.balance == 0) | (PaymentWallet.status == -1)).all()
 
     config_xml = render_template(
         'term/blacklist.xml',

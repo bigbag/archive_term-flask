@@ -6,6 +6,8 @@
     :license: BSD, see LICENSE for more details.
 """
 from web import db
+from web.models.term import Term
+from web.models.firm import Firm
 
 
 class FirmTerm(db.Model):

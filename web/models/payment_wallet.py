@@ -10,7 +10,7 @@ from web import db
 from web.helpers.date_helper import *
 
 
-class Wallet(db.Model):
+class PaymentWallet(db.Model):
 
     __bind_key__ = 'payment'
     __tablename__ = 'wallet'
@@ -29,9 +29,9 @@ class Wallet(db.Model):
     status = db.Column(db.Integer, nullable=False)
 
     def __init__(self, id):
-        self.id = id
-        self.id = 0
-        self.id = self.STATUS_NOACTIVE
+        self.discodes_id = 0
+        self.balance = 0
+        self.status = self.STATUS_NOACTIVE
 
     def __repr__(self):
         return '<id %r>' % (self.id)

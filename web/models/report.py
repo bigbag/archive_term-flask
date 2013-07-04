@@ -49,7 +49,7 @@ class Report(db.Model):
             firm_id_list.append(firm_term.child_firm_id)
 
         persons = Person.query.filter_by(
-            payment_id=data.text).all()
+            payment_id=self.payment_id).all()
 
         for person in persons:
             if person.firm_id in firm_id_list:

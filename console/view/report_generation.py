@@ -29,7 +29,7 @@ class ReportGeneration(Command):
             data = file.split('_')
 
             if not len(data) == 3:
-                continue
+                break
 
             term_id = data[0]
             report_date = data[1]
@@ -49,11 +49,11 @@ class ReportGeneration(Command):
                     event_type = event_node.get('type')
 
                     if not event_type:
-                        continue
+                        break
 
                     event = Event.query.filter_by(key=event_type).first()
                     if not event:
-                        continue
+                        break
 
                     term = Term.query.get(term_id)
                     if not term:
@@ -67,10 +67,16 @@ class ReportGeneration(Command):
                         report.event_id = event.id
                         report = report.get_db_view(card_node)
                         check_summ = report.get_check_summ()
+
                         old_report = Report.query.filter_by(
                             check_summ=check_summ).first()
+
+                        if int(report.type) == Report.TYPE_PAYMENT:
+                            print "payment"
+
                         if not old_report:
                             report.save()
+
             if not os.path.exists(new_file_patch):
                 os.makedirs(new_file_patch)
 
