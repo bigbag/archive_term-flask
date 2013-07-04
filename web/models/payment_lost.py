@@ -6,16 +6,14 @@
     :license: BSD, see LICENSE for more details.
 """
 import hashlib
-import time
 from web import db
 from web.models.term import Term
 from web.models.event import Event
-from web.helpers.date_helper import *
 
 
 class PaymentLost(db.Model):
 
-    __bind_key__ = 'payment'
+    __bind_key__ = 'stack'
     __tablename__ = 'lost'
 
     TYPE_WHITE = 0
@@ -30,7 +28,6 @@ class PaymentLost(db.Model):
     amount = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Integer, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
-    check_summ = db.Column(db.String(32), nullable=False)
 
     def __init__(self):
         self.amount = 0
@@ -39,13 +36,14 @@ class PaymentLost(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
-    def get_check_summ(self):
-        return hashlib.md5("%s%s%s%s%s" % (
-            str(self.term_id),
-            str(self.event_id),
-            str(self.type),
-            str(self.creation_date),
-            str(self.payment_id))).hexdigest()
+    def add_lost_payment(self, report):
+        self.term_id = report.term.id
+        self.event_id = report.event_id
+        self.payment_id = report.payment_id
+        self.amount = report.amount
+        self.type = report.type
+        self.creation_date = report.creation_date
+        self.save()
 
     def delete(self):
         db.session.delete(self)
@@ -55,7 +53,5 @@ class PaymentLost(db.Model):
         db.session.commit()
 
     def save(self):
-        if not self.check_summ:
-            self.check_summ = self.get_check_summ()
         db.session.add(self)
         db.session.commit()

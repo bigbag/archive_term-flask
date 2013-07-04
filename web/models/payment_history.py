@@ -12,7 +12,7 @@ from web.models.user import User
 from web.helpers.date_helper import *
 
 
-class PaymentWallet(db.Model):
+class PaymentHistory(db.Model):
 
     __bind_key__ = 'payment'
     __tablename__ = 'history'
@@ -31,16 +31,25 @@ class PaymentWallet(db.Model):
     wallet = db.relationship('PaymentWallet')
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
-    summ = db.Column(db.String(50))
+    amount = db.Column(db.String(50))
     creation_date = db.Column(db.DateTime, nullable=False)
     type = db.Column(db.Integer(), nullable=False)
     status = db.Column(db.Integer(), nullable=False)
 
-    def __init__(self, id):
+    def __init__(self):
         self.status = self.STATUS_NEW
 
     def __repr__(self):
         return '<id %r>' % (self.id)
+
+    def add_history(self, wallet, report):
+        self.user_id = wallet.user_id
+        self.wallet_id = wallet.id
+        self.term_id = report.term_id
+        self.amount = report.amount
+        self.type = PaymentHistory.TYPE_MINUS
+        self.status = PaymentHistory.STATUS_COMPLETE
+        self.save()
 
     def delete(self):
         db.session.delete(self)
