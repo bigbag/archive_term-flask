@@ -8,6 +8,8 @@
 """
 from web import db
 from web.models.term import Term
+from web.models.user import User
+from web.helpers.date_helper import *
 
 
 class PaymentWallet(db.Model):
@@ -23,7 +25,8 @@ class PaymentWallet(db.Model):
     TYPE_PLUS = 1
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer(), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User')
     wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
     wallet = db.relationship('PaymentWallet')
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
