@@ -6,7 +6,6 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
-import time
 from lxml import etree
 from flask import Flask, render_template
 from console import app
@@ -14,8 +13,7 @@ from flask.ext.script import Command
 from web.models.report import Report
 from web.models.event import Event
 from web.models.term import Term
-from web.models.firm_term import FirmTerm
-from web.models.person import Person
+from web.models.payment_wallet import PaymentWallet
 
 
 class ReportGeneration(Command):
@@ -60,6 +58,7 @@ class ReportGeneration(Command):
                         term = Term(term_id)
 
                     card_nodes = tree.xpath('/Report/Event/Card')
+
                     for card_node in card_nodes:
 
                         report = Report()
@@ -72,7 +71,9 @@ class ReportGeneration(Command):
                             check_summ=check_summ).first()
 
                         if int(report.type) == Report.TYPE_PAYMENT:
-                            print "payment"
+                            wallet = PaymentWallet.query.filter_by(
+                                payment_id=report.payment_id).first()
+                            print wallet
 
                         if not old_report:
                             report.save()
