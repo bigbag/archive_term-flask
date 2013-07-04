@@ -57,7 +57,9 @@ class ReportGeneration(Command):
                     if not term:
                         term = Term(term_id)
 
-                    card_nodes = tree.xpath('/Report/Event/Card')
+                    card_nodes = tree.xpath(
+                        '/Report/Event[@type="%s"]/Card' %
+                        event_type)
 
                     for card_node in card_nodes:
 
