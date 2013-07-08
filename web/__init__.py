@@ -38,8 +38,8 @@ def unauthorized():
 
 from web.views.api import api
 
-app.register_blueprint(api, url_prefix='/term/v1.0')
-
+#app.register_blueprint(api, url_prefix='/term/v1.0')
+app.register_blueprint(api, url_prefix='')
 
 @app.errorhandler(400)
 def not_found(error):
