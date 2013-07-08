@@ -60,14 +60,14 @@ class Term(db.Model):
 
         if self.type == self.TYPE_VENDING:
             self.type = 'Vending'
-        elif term.type == self.TYPE_POS:
+        elif self.type == self.TYPE_POS:
             self.type = 'Normal'
         return self
 
     def get_db_view(self):
         if self.type == 'Vending':
             self.type = self.TYPE_VENDING
-        elif term.type == 'Normal':
+        elif self.type == 'Normal':
             self.type = self.TYPE_POS
         return self
 
