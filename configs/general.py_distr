@@ -26,7 +26,7 @@ class Config(object):
 class ProductionConfig(Config):
     SQLALCHEMY_BINDS = {
         'term': 'mysql://user:pass@localhost/term?charset=utf8',
-        'mail': 'mysql://user:pass@localhost/mail?charset=utf8',
+        'stack': 'mysql://user:pass@localhost/stack?charset=utf8',
         'payment': 'mysql://user:pass@localhost/payment?charset=utf8',
         'mobispot': 'mysql://user:pass@localhost/mobispot?charset=utf8'
     }
@@ -38,7 +38,7 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_BINDS = {
         'term': 'mysql://user:pass@localhost/term?charset=utf8',
-        'mail': 'mysql://user:pass@localhost/mail?charset=utf8',
+        'stack': 'mysql://user:pass@localhost/stack?charset=utf8',
         'payment': 'mysql://user:pass@localhost/payment?charset=utf8',
         'mobispot': 'mysql://user:pass@localhost/mobispot?charset=utf8'
     }
