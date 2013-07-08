@@ -32,17 +32,17 @@ api = Blueprint('api', __name__)
 @md5_content_headers
 def get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
-    term = Term(term_id).get_term()
+    term_db = Term(term_id).get_term()
 
-    try:
-        term = term.get_xml_view()
-    except Exception as e:
+    if term_db is None:
         abort(400)
+
+    term = term_db.get_xml_view()
 
     term_events = TermEvent.query.filter_by(
         term_id=term.id).all()
 
-    if not term_events:
+    if term_events is None:
         abort(400)
 
     person_events = PersonEvent.query.filter_by(
@@ -91,7 +91,7 @@ def upload_report(term_id, report_datetime):
 
     term = Term(term_id).get_term()
 
-    if not term:
+    if term is None:
         abort(400)
 
     term.report_date = get_curent_date()
