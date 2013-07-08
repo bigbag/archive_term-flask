@@ -26,7 +26,7 @@ api = Blueprint('api', __name__)
 
 
 @api.route('/configs/config_<int:term_id>.xml', methods=['GET'])
-@cache.cached(timeout=60)
+#@cache.cached(timeout=60)
 # @auth.login_required
 @xml_headers
 @md5_content_headers
@@ -34,10 +34,10 @@ def get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
     term = Term(term_id).get_term()
 
-    if not term:
+    try:
+        term = term.get_xml_view()
+    except Exception as e:
         abort(400)
-
-    term = term.get_xml_view()
 
     term_events = TermEvent.query.filter_by(
         term_id=term.id).all()
