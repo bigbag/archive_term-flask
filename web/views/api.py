@@ -66,7 +66,7 @@ def get_config(term_id):
 def get_blacklist():
     """Возвращает черный список карт"""
     wallets = PaymentWallet.query.filter(
-        (Wallet.balance == 0) | (PaymentWallet.status == -1)).all()
+        (PaymentWallet.balance == 0) | (PaymentWallet.status == -1)).all()
 
     config_xml = render_template(
         'term/blacklist.xml',
