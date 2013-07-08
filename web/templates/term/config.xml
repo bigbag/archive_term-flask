@@ -60,7 +60,7 @@
         {% for person_event in person_events %}
             {% if person_event.event_id ==  term_event.event_id%}
             <card timeout="{{person_event.timeout}}" price="{{term_event.cost}}">
-            {{person_event.person_id}}{{person_event.person.payment_id}}</card>
+            {{person_event.person.payment_id}}</card>
             {% endif %}
         {% endfor %}
     </event>
