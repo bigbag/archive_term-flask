@@ -3,6 +3,7 @@ echo $0: Creating virtual environment
 virtualenv --prompt="<myenv>" ./env
 
 mkdir ./logs
+mkdir ./archiv
 mkdir ./pids
 mkdir ./db
 mkdir ./tmp
