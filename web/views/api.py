@@ -19,6 +19,7 @@ from web.models.event import Event
 from web.models.person_event import PersonEvent
 from web.models.card_stack import CardStack
 from web.models.payment_wallet import PaymentWallet
+from web.models.payment_lost import PaymentLost
 from web.configs.term import TermConfig
 
 
@@ -26,7 +27,7 @@ api = Blueprint('api', __name__)
 
 
 @api.route('/configs/config_<int:term_id>.xml', methods=['GET'])
-#@cache.cached(timeout=60)
+@cache.cached(timeout=60)
 # @auth.login_required
 @xml_headers
 @md5_content_headers
@@ -68,9 +69,13 @@ def get_blacklist():
     wallets = PaymentWallet.query.filter(
         (PaymentWallet.balance == 0) | (PaymentWallet.status == -1)).all()
 
+    lost_cards = PaymentLost.query.all()
+
     config_xml = render_template(
         'term/blacklist.xml',
-        wallets=wallets).encode('cp1251')
+        wallets=wallets,
+        lost_cards=lost_cards,
+    ).encode('cp1251')
 
     response = make_response(config_xml)
 
