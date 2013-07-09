@@ -5,6 +5,8 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+
+
 class Config(object):
     DEBUG = False
     TESTING = False
@@ -19,6 +21,7 @@ class Config(object):
     TZ = 'Europe/Moscow'
 
     UPLOAD_FOLDER = './archiv'
+    UPLOAD_TMP = './tmp'
     ALLOWED_EXTENSIONS = set(['xml'])
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
