@@ -8,6 +8,7 @@
 import re
 import os
 import json
+from web import app
 from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
 from web.decorators.header import *
 from web.helpers.date_helper import *
@@ -26,17 +27,17 @@ from web.configs.term import TermConfig
 api = Blueprint('api', __name__)
 
 
-@api.errorhandler(400)
+@app.errorhandler(400)
 def not_found(error):
     return make_response(jsonify({'error': 'Bad request'}), 400)
 
 
-@api.errorhandler(404)
+@app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
-@api.errorhandler(500)
+@app.errorhandler(500)
 def not_found(error):
     return make_response(jsonify({'error': 'Fail'}), 500)
 
