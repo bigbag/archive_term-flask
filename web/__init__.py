@@ -49,6 +49,10 @@ if app.debug is not True:
         log_name,
         maxBytes=1024 * 1024 * 100,
         backupCount=20)
+    file_handler.setFormatter(Formatter(
+        '%(asctime)s %(levelname)s: %(message)s '
+        '[in %(pathname)s:%(lineno)d]'
+    ))
     file_handler.setLevel(logging.WARNING)
     app.logger.setLevel(logging.WARNING)
     app.logger.addHandler(file_handler)
