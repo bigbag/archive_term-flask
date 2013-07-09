@@ -42,7 +42,9 @@ app.register_blueprint(api, url_prefix='/term/v1.0')
 
 if app.debug is not True:
     import logging
+    from logging import Formatter
     from logging.handlers import RotatingFileHandler
+
     log_name = '%s/%s' % (app.config['LOG_FOLDER'], 'error.log')
     file_handler = RotatingFileHandler(
         log_name,
