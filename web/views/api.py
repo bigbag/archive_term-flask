@@ -43,7 +43,7 @@ def not_found(error):
 
 
 @api.route('/configs/config_<int:term_id>.xml', methods=['GET'])
-@cache.cached(timeout=60)
+@cache.cached(timeout=120)
 # @auth.login_required
 @xml_headers
 @md5_content_headers
@@ -115,26 +115,27 @@ def upload_report(term_id, report_datetime):
     if term is None:
         abort(400)
 
-    term.report_date = get_curent_date()
-    term.update()
-
     file = request.stream.read()
     filename = "%s/%s_%s" % (
         app.config['UPLOAD_TMP'],
         str(term_id),
         str(report_datetime))
 
-    if not request.headers.get('Content-MD5'):
-        abort(400)
+    # if not request.headers.get('Content-MD5'):
+    #     abort(400)
 
-    if request.headers.get('Content-MD5') != get_content_md5(file):
-        abort(400)
+    # if request.headers.get('Content-MD5') != get_content_md5(file):
+    #     abort(400)
 
     if file:
         with open(filename, 'w') as f:
             f.write(file)
+            print '1'
     else:
         abort(400)
+
+    term.report_date = get_curent_date()
+    term.update()
 
     return make_response(jsonify({'success': 'Report uploaded successfully'}), 201)
 

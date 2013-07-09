@@ -38,3 +38,21 @@ def from_utc(date, tz):
 def convert_date_to_utc(date, tz, input, output):
     conv = datetime.strptime(date, input)
     return to_utc(conv, tz).strftime(output)
+
+
+def get_timezone(tzname):
+    now = datetime.utcnow()
+    tz = pytz.timezone(tzname)
+    utc = pytz.timezone('UTC')
+    utc.localize(datetime.now())
+
+    if utc.localize(now) > tz.localize(now):
+        delta = str(utc.localize(now) - tz.localize(now))
+        sign = '-'
+    else:
+        delta = str(tz.localize(now) - utc.localize(now))
+        sign = '+'
+
+    if len(delta) < 8:
+        delta = "0%s" % delta
+    return "%s%s%s" % (tz.tzname(now, is_dst=False), sign, delta)
