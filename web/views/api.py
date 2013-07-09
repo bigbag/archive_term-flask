@@ -119,7 +119,7 @@ def upload_report(term_id, report_datetime):
     term.update()
 
     file = request.stream.read()
-    filename = '%s/$s_%s' % (
+    filename = "%s/%s_%s" % (
         app.config['UPLOAD_TMP'],
         str(term_id),
         str(report_datetime))
