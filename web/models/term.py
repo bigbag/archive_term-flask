@@ -6,7 +6,7 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import json
+from flask import json
 from web import app
 from web import db
 from web.helpers.date_helper import *
