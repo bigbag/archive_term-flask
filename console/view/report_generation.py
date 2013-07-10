@@ -25,7 +25,7 @@ class ReportGeneration(Command):
     def run(self):
         files = os.listdir(app.config['UPLOAD_TMP'])
         for file in files:
-
+            error = False
             data = file.split('_')
 
             if not len(data) == 3:
@@ -92,7 +92,9 @@ class ReportGeneration(Command):
                             wallet.balance = int(
                                 wallet.balance) - int(
                                     report.amount)
-                            wallet.save()
+                            if not wallet.save():
+                                error = True
+                                continue
 
                             history = PaymentHistory()
                             history.add_history(wallet, report)
@@ -100,4 +102,5 @@ class ReportGeneration(Command):
             if not os.path.exists(new_file_patch):
                 os.makedirs(new_file_patch)
 
-            os.rename(file_name, new_file_name)
+            if not error:
+                os.rename(file_name, new_file_name)

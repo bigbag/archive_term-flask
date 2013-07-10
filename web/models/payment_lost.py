@@ -43,7 +43,7 @@ class PaymentLost(db.Model):
         self.amount = report.amount
         self.type = report.type
         self.creation_date = report.creation_date
-        self.save()
+        return self.save()
 
     def delete(self):
         db.session.delete(self)
@@ -53,5 +53,11 @@ class PaymentLost(db.Model):
         db.session.commit()
 
     def save(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return False
+        else:
+            return True
