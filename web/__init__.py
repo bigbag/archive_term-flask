@@ -15,27 +15,6 @@ mail = Mail(app)
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
 
-from flask.ext.httpauth import HTTPBasicAuth
-
-auth = HTTPBasicAuth()
-
-users = {
-    "john": "hello",
-    "susan": "bye"
-}
-
-
-@auth.get_password
-def get_password(username):
-    if username in users:
-        return users[username]
-    return None
-
-
-@auth.error_handler
-def unauthorized():
-    return make_response(jsonify({'error': 'Unauthorized access'}), 403)
-
 from web.views.api import api
 
 app.register_blueprint(api, url_prefix='/term/v1.0')
