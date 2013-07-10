@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, abort, make_response
+from flask import Flask
 
 app = Flask(__name__)
 app.config.from_object('configs.general.DevelopmentConfig')
@@ -14,27 +14,6 @@ mail = Mail(app)
 
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
-
-from flask.ext.httpauth import HTTPBasicAuth
-
-auth = HTTPBasicAuth()
-
-users = {
-    "john": "hello",
-    "susan": "bye"
-}
-
-
-@auth.get_password
-def get_password(username):
-    if username in users:
-        return users[username]
-    return None
-
-
-@auth.error_handler
-def unauthorized():
-    return make_response(jsonify({'error': 'Unauthorized access'}), 403)
 
 from web.views.api import api
 

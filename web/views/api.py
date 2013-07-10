@@ -7,13 +7,12 @@
 """
 import re
 import os
-import json
 from web import app
 from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
 from web.decorators.header import *
 from web.helpers.date_helper import *
 from web.helpers.hash_helper import *
-from web import auth, cache
+from web import cache
 from web.models.term import Term
 from web.models.term_event import TermEvent
 from web.models.event import Event
@@ -44,7 +43,6 @@ def not_found(error):
 
 @api.route('/configs/config_<int:term_id>.xml', methods=['GET'])
 @cache.cached(timeout=120)
-# @auth.login_required
 @xml_headers
 @md5_content_headers
 def get_config(term_id):
@@ -121,11 +119,11 @@ def upload_report(term_id, report_datetime):
         str(term_id),
         str(report_datetime))
 
-    # if not request.headers.get('Content-MD5'):
-    #     abort(400)
+    if not request.headers.get('Content-MD5'):
+        abort(400)
 
-    # if request.headers.get('Content-MD5') != get_content_md5(file):
-    #     abort(400)
+    if request.headers.get('Content-MD5') != get_content_md5(file):
+        abort(400)
 
     if file:
         with open(filename, 'w') as f:
