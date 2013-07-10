@@ -49,7 +49,7 @@ class PaymentHistory(db.Model):
         self.amount = report.amount
         self.type = PaymentHistory.TYPE_MINUS
         self.status = PaymentHistory.STATUS_COMPLETE
-        self.save()
+        return self.save()
 
     def delete(self):
         db.session.delete(self)
@@ -59,7 +59,13 @@ class PaymentHistory(db.Model):
         db.session.commit()
 
     def save(self):
-        if not self.creation_date:
-            self.creation_date = get_curent_date()
-        db.session.add(self)
-        db.session.commit()
+        try:
+            if not self.creation_date:
+                self.creation_date = get_curent_date()
+            db.session.add(self)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return False
+        else:
+            return True

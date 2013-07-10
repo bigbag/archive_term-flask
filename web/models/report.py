@@ -100,7 +100,13 @@ class Report(db.Model):
         db.session.commit()
 
     def save(self):
-        if not self.check_summ:
-            self.check_summ = self.get_check_summ()
-        db.session.add(self)
-        db.session.commit()
+        try:
+            if not self.check_summ:
+                self.check_summ = self.get_check_summ()
+            db.session.add(self)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return False
+        else:
+            return True

@@ -44,7 +44,13 @@ class User(db.Model):
         db.session.commit()
 
     def save(self):
-        if not self.creation_date:
-            self.creation_date = get_curent_date()
-        db.session.add(self)
-        db.session.commit()
+        try:
+            if not self.creation_date:
+                self.creation_date = get_curent_date()
+            db.session.add(self)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return False
+        else:
+            return True
