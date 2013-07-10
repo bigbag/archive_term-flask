@@ -4,6 +4,7 @@
 *.pyc
 gunicorn.conf.py
 /venv/
+/env/
 /logs/
 /pids/
 /archiv/
