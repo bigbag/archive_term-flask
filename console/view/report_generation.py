@@ -92,6 +92,7 @@ class ReportGeneration(Command):
                             wallet.balance = int(
                                 wallet.balance) - int(
                                     report.amount)
+
                             if not wallet.save():
                                 error = True
                                 continue

@@ -9,9 +9,11 @@ from flask.ext.script import Manager
 from console import app
 from console.view.report_generation import ReportGeneration
 from console.view.mail_send import MailSend
+from console.view.uniteller import Uniteller
 
 manager = Manager(app)
 
 manager.add_command('report', ReportGeneration())
 manager.add_command('mail', MailSend())
+manager.add_command('uniteller', Uniteller())
 manager.run()
