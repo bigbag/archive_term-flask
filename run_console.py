@@ -13,7 +13,7 @@ from console.view.uniteller import Uniteller
 
 manager = Manager(app)
 
-manager.add_command('report', ReportGeneration())
+manager.add_command('report_gen', ReportGeneration())
 manager.add_command('mail', MailSend())
 manager.add_command('uniteller', Uniteller())
 manager.run()

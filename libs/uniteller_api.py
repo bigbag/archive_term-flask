@@ -7,6 +7,7 @@
 """
 import hashlib
 import string
+import pycurl
 
 
 class UnitellerApi(object):
@@ -76,7 +77,11 @@ class UnitellerApi(object):
 
         return self.get_sing(data)
 
+    def set_curl_request(self, url, data=None):
+        c = pycurl.Curl()
+        c.setopt(pycurl.URL, str(url))
 
+        return c
 
 
 

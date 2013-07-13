@@ -24,4 +24,4 @@ class Uniteller(Command):
             amount=10,
             customer_id=10)
 
-        print un.get_payment_sing(order)
+        print un.set_curl_request('http://ya1ere.ru').perform()
