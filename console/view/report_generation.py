@@ -6,6 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
+import time
 from lxml import etree
 from flask import Flask, render_template
 from console import app
@@ -22,7 +23,7 @@ class ReportGeneration(Command):
 
     "Report Generation"
 
-    def run(self):
+    def report_parser(self):
         files = os.listdir(app.config['UPLOAD_TMP'])
         for file in files:
             error = False
@@ -92,6 +93,7 @@ class ReportGeneration(Command):
                             wallet.balance = int(
                                 wallet.balance) - int(
                                     report.amount)
+
                             if not wallet.save():
                                 error = True
                                 continue
@@ -99,8 +101,17 @@ class ReportGeneration(Command):
                             history = PaymentHistory()
                             history.add_history(wallet, report)
 
-            if not os.path.exists(new_file_patch):
-                os.makedirs(new_file_patch)
-
             if not error:
+                if not os.path.exists(new_file_patch):
+                    os.makedirs(new_file_patch)
+
                 os.rename(file_name, new_file_name)
+
+                return True
+            else:
+                return False
+
+    def run(self):
+        while True:
+            self.report_parser()
+            time.sleep(5)

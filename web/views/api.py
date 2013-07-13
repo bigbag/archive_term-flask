@@ -81,7 +81,7 @@ def get_config(term_id):
 def get_blacklist():
     """Возвращает черный список карт"""
     wallets = PaymentWallet.query.filter(
-        (PaymentWallet.balance == 0) | (PaymentWallet.status == -1)).all()
+        (PaymentWallet.balance < 10000) | (PaymentWallet.status == -1)).all()
 
     lost_cards = PaymentLost.query.all()
 
