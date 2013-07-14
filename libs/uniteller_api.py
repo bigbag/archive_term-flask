@@ -7,7 +7,9 @@
 """
 import hashlib
 import string
-import pycurl
+from console import app
+from grab import Grab
+from lxml import etree
 
 
 class UnitellerApi(object):
@@ -77,29 +79,59 @@ class UnitellerApi(object):
 
         return self.get_sing(data)
 
-    def set_curl_request(self, url, data=None):
-        c = pycurl.Curl()
-        c.setopt(pycurl.URL, str(url))
+    def set_request(self, url, data=None):
+        return_data = False
+        grab = Grab()
+        if data:
+            grab.setup(post=data)
 
-        return c
+        try:
+            grab.go(url)
+        except Exception as e:
+            app.logger.error(e)
+        else:
+            return_data = grab
 
+        return return_data
 
+    def get_payment_info(self, order_id):
+        return_data = False
 
- # public function getPaySign($order)  {
- #    $keys=array(
- #      $this->shopId,
- #      (!empty($order['orderId']))?$order['orderId']:'',
- #      (!empty($order['amount']))?$order['amount']:'',
- #      (!empty($order['meanType']))?$order['meanType']:'',
- #      (!empty($order['eMoneyType']))?$order['eMoneyType']:'',
- #      (!empty($order['lifeTime']))?$order['lifeTime']:'',
- #      (!empty($order['customerId']))?$order['customerId']:'',
- #      (!empty($order['cardId']))?$order['cardId']:'',
- #      (!empty($order['lData']))?$order['lData']:'',
- #      (!empty($order['paymenType']))?$order['paymenType']:'',
- #      $this->pass,
- #    );
+        keys = (
+            'response_code',
+            'total',
+            'currency',
+            'date',
+            'billnumber',
+            'status',
+            'cardnumber',
+            'phone',
+            'ipaddress',
+        )
+        data = dict(
+            ShopOrderNumber=order_id,
+            Shop_ID=self.shop_id,
+            Login=self.login,
+            Password=self.password,
+            Format=4
+        )
 
- #    foreach ($keys as $key => $value) {
- #      $keys[$key]=md5($value);
- #    }
+        result = self.set_request(self.get_result_url(), data)
+
+        if result:
+            try:
+                tree = etree.fromstring(result.response.body)
+            except Exception as e:
+                app.logger.error(e)
+            else:
+                event_nodes = tree.xpath(
+                    '/unitellerresult/orders/order')
+
+                return_data = {}
+                try:
+                    for key in keys:
+                        return_data[key] = event_nodes[0].find(key).text
+                except Exception as e:
+                    app.logger.error(e)
+
+        return return_data
