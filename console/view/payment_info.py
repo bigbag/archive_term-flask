@@ -63,5 +63,9 @@ class PaymentInfo(Command):
 
     def run(self):
         while True:
-            self.set_info()
+            try:
+                self.set_info()
+            except Exception as e:
+                app.logger.error(e)
+
             time.sleep(300)
