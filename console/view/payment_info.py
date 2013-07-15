@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Консольное приложение работы с Uniteller
+    Консольное приложение для получения информации об операциях с ПС
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
@@ -18,7 +18,7 @@ from web.models.payment_wallet import PaymentWallet
 
 class PaymentInfo(Command):
 
-    "Uniteller  interface"
+    "Return payment info"
 
     def set_info(self):
         request_date = datetime.utcnow() - timedelta(2)
