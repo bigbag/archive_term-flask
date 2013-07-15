@@ -10,10 +10,12 @@ from console import app
 from console.view.report_generation import ReportGeneration
 from console.view.mail_send import MailSend
 from console.view.payment_info import PaymentInfo
+from console.view.payment_recurrent import PaymentRecurrent
 
 manager = Manager(app)
 
 manager.add_command('report_gen', ReportGeneration())
 manager.add_command('mail', MailSend())
 manager.add_command('payment_info', PaymentInfo())
+manager.add_command('payment_recurrent', PaymentRecurrent())
 manager.run()

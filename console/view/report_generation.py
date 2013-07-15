@@ -17,6 +17,7 @@ from web.models.term import Term
 from web.models.payment_wallet import PaymentWallet
 from web.models.payment_lost import PaymentLost
 from web.models.payment_history import PaymentHistory
+from web.models.payment_auto import PaymentAuto
 
 
 class ReportGeneration(Command):
@@ -101,6 +102,13 @@ class ReportGeneration(Command):
                             history = PaymentHistory()
                             history.add_history(wallet, report)
 
+                            if wallet.balance > 10000:
+                                continue
+
+                            auto = PaymentAuto.query.get(wallet.id)
+                            if not auto:
+                                continue
+                            auto.status = PaymentAuto.STATUS_ON
             if not error:
                 if not os.path.exists(new_file_patch):
                     os.makedirs(new_file_patch)
@@ -113,5 +121,9 @@ class ReportGeneration(Command):
 
     def run(self):
         while True:
-            self.report_parser()
+            try:
+                self.report_parser()
+            except Exception as e:
+                app.logger.error(e)
+
             time.sleep(5)

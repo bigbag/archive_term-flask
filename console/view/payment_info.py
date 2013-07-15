@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Консольное приложение работы с Uniteller
+    Консольное приложение для получения информации об операциях с ПС
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
@@ -18,7 +18,7 @@ from web.models.payment_wallet import PaymentWallet
 
 class PaymentInfo(Command):
 
-    "Uniteller  interface"
+    "Return payment info"
 
     def set_info(self):
         request_date = datetime.utcnow() - timedelta(2)
@@ -42,7 +42,7 @@ class PaymentInfo(Command):
                     if not log:
                         log = PaymentLog()
                         log.history_id = history.id
-                        log.wallet_id = history.id
+                        log.wallet_id = history.wallet_id
                         log.rrn = info['billnumber']
                         log.card_pan = info['cardnumber']
                         log.save()
@@ -63,5 +63,9 @@ class PaymentInfo(Command):
 
     def run(self):
         while True:
-            self.set_info()
+            try:
+                self.set_info()
+            except Exception as e:
+                app.logger.error(e)
+
             time.sleep(300)
