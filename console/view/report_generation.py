@@ -43,7 +43,7 @@ class ReportGeneration(Command):
             try:
                 tree = etree.parse(file_name)
             except Exception as e:
-                raise e
+                app.logger.error(e)
             else:
                 event_nodes = tree.xpath('/Report/Event')
                 for event_node in event_nodes:

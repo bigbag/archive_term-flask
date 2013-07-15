@@ -1,6 +1,7 @@
 from flask import Flask
 
 app = Flask(__name__)
+
 #app.config.from_object('configs.general.DevelopmentConfig')
 app.config.from_object('configs.general.ProductionConfig')
 
@@ -24,7 +25,7 @@ if app.debug is not True:
     from logging import Formatter
     from logging.handlers import RotatingFileHandler
 
-    log_name = '%s/%s' % (app.config['LOG_FOLDER'], 'error.log')
+    log_name = '%s/%s' % (app.config['LOG_FOLDER'], 'web_error.log')
     file_handler = RotatingFileHandler(
         log_name,
         maxBytes=1024 * 1024 * 100,
