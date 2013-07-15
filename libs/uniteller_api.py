@@ -13,6 +13,7 @@ from lxml import etree
 
 
 class UnitellerApi(object):
+    STATUS_COMPLETE = 'AS000'
     EMPTY_ORDER = dict(
         order_id='',
         amount='',
@@ -53,6 +54,7 @@ class UnitellerApi(object):
         return string.upper(hashlib.md5(str('&'.join(result))).hexdigest())
 
     def get_recurrent_sing(self, order):
+        """Обязательные данные - order_id, amount, parent_order_id"""
         data = (
             self.shop_id,
             order['order_id'],
@@ -135,3 +137,41 @@ class UnitellerApi(object):
                     app.logger.error(e)
 
         return return_data
+
+    def recurrent_payment(self, order):
+        """Обязательные данные - order_id, amount, parent_order_id"""
+        return_data = False
+
+        data = dict(
+            Shop_IDP=self.shop_id,
+            Order_IDP=order['order_id'],
+            Subtotal_P=order['amount'],
+            Parent_Order_IDP=order['parent_order_id'],
+            Signature=self.get_recurrent_sing(order)
+        )
+
+        result = self.set_request(self.get_recurrent_url(), data)
+
+        if result:
+            return_data = result.response.body
+
+        return return_data
+
+  #    public function setAutoPay($order) {
+  #   $data=array(
+  #     'Shop_IDP'=>$this->shopId,
+  #     'Order_IDP'=>$order['orderId'],
+  #     'Subtotal_P'=>$order['amount'],
+  #     'Parent_Order_IDP'=>$order['parentOrderId'],
+  #     'Signature'=>$this->getAutoPaySign($order),
+  #     );
+  #   $result=$this->setCurlRequest($this->getAutoPayUrl(), $data);
+  #   $result=explode(';',$result);
+
+  #   if (isset($result[28]) and $result[28]==self::CODE_SUCCES)  {
+  #     return $result[1];
+  #   }
+  #   else {
+  #     return false;
+  #   }
+  # }

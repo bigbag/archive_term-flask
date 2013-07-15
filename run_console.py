@@ -9,11 +9,11 @@ from flask.ext.script import Manager
 from console import app
 from console.view.report_generation import ReportGeneration
 from console.view.mail_send import MailSend
-from console.view.uniteller import Uniteller
+from console.view.payment_info import PaymentUnfo
 
 manager = Manager(app)
 
 manager.add_command('report_gen', ReportGeneration())
 manager.add_command('mail', MailSend())
-manager.add_command('uniteller', Uniteller())
+manager.add_command('payment_info', PaymentInfo())
 manager.run()
