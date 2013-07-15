@@ -9,7 +9,7 @@ from flask.ext.script import Manager
 from console import app
 from console.view.report_generation import ReportGeneration
 from console.view.mail_send import MailSend
-from console.view.payment_info import PaymentUnfo
+from console.view.payment_info import PaymentInfo
 
 manager = Manager(app)
 
