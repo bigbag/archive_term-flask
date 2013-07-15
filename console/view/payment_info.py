@@ -42,7 +42,7 @@ class PaymentInfo(Command):
                     if not log:
                         log = PaymentLog()
                         log.history_id = history.id
-                        log.wallet_id = history.id
+                        log.wallet_id = history.wallet_id
                         log.rrn = info['billnumber']
                         log.card_pan = info['cardnumber']
                         log.save()
