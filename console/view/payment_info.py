@@ -32,6 +32,7 @@ class PaymentInfo(Command):
 
         un = UnitellerApi(UnitellerConfig)
 
+        log = None
         for history in payment_history:
 
             log = PaymentLog.query.get(history.id)
