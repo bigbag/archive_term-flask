@@ -33,31 +33,31 @@ class PaymentInfo(Command):
         un = UnitellerApi(UnitellerConfig)
 
         for history in payment_history:
+
+            log = PaymentLog.query.get(history.id)
+
+            if log:
+                continue
+
             info = un.get_payment_info(history.id)
 
             if history.status == PaymentHistory.STATUS_COMPLETE:
-
                 if info['response_code'] == UnitellerApi.STATUS_COMPLETE:
+                    log = PaymentLog()
+                    log.history_id = history.id
+                    log.wallet_id = history.wallet_id
+                    log.rrn = info['billnumber']
+                    log.card_pan = info['cardnumber']
+                    log.save()
 
-                    log = PaymentLog.query.get(history.id)
-                    if not log:
-                        log = PaymentLog()
-                        log.history_id = history.id
-                        log.wallet_id = history.wallet_id
-                        log.rrn = info['billnumber']
-                        log.card_pan = info['cardnumber']
-                        log.save()
-            else:
-                if info['response_code'] == UnitellerApi.STATUS_COMPLETE:
-
+            elif history.status == PaymentHistory.STATUS_NEW:
+                if info and info['response_code'] == UnitellerApi.STATUS_COMPLETE:
                     wallet = PaymentWallet.query.get(history.wallet_id)
                     wallet.balance = int(wallet.balance) + int(history.amount)
                     if not wallet.save():
                         continue
-
                     history.status = PaymentHistory.STATUS_COMPLETE
                     history.save()
-
                 else:
                     history.status = PaymentHistory.STATUS_FAILURE
                     history.save()
