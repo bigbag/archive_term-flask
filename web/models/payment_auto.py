@@ -8,6 +8,7 @@
 """
 from web import db
 from web.models.payment_wallet import PaymentWallet
+from web.models.payment_history import PaymentHistory
 from web.helpers.date_helper import *
 
 
@@ -27,7 +28,10 @@ class PaymentAuto(db.Model):
         db.ForeignKey('wallet.id'),
         primary_key=True)
     wallet = db.relationship('PaymentWallet')
-    parent_id = db.Column(db.Integer, nullable=False)
+    history_id = db.Column(
+        db.Integer,
+        db.ForeignKey('history.id'),
+        primary_key=True)
     card_pan = db.Column(db.String(32), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
@@ -39,7 +43,7 @@ class PaymentAuto(db.Model):
         self.status = self.STATUS_OFF
 
     def __repr__(self):
-        return '<id %r>' % (self.history_id)
+        return '<id %r>' % (self.wallet_id)
 
     def delete(self):
         db.session.delete(self)

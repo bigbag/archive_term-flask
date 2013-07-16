@@ -23,13 +23,13 @@ class PaymentInfo(Command):
     def set_info(self):
         request_date = datetime.utcnow() - timedelta(2)
 
-        un = UnitellerApi(UnitellerConfig)
-
         payment_history = PaymentHistory.query.filter(
             (PaymentHistory.type == PaymentHistory.TYPE_PLUS) &
             (PaymentHistory.status != PaymentHistory.STATUS_FAILURE) &
             (PaymentHistory.creation_date >= request_date)
         ).limit(100).all()
+
+        un = UnitellerApi(UnitellerConfig)
 
         for history in payment_history:
             info = un.get_payment_info(history.id)
