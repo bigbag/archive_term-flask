@@ -128,7 +128,6 @@ def upload_report(term_id, report_datetime):
     if file:
         with open(filename, 'w') as f:
             f.write(file)
-            print '1'
     else:
         abort(400)
 
