@@ -38,6 +38,7 @@ class PaymentHistory(db.Model):
     status = db.Column(db.Integer(), nullable=False)
 
     def __init__(self):
+        self.term_id = 0
         self.status = self.STATUS_NEW
 
     def __repr__(self):

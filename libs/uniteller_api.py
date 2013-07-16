@@ -7,6 +7,7 @@
 """
 import hashlib
 import string
+import csv
 from console import app
 from grab import Grab
 from lxml import etree
@@ -153,25 +154,11 @@ class UnitellerApi(object):
         result = self.set_request(self.get_recurrent_url(), data)
 
         if result:
-            return_data = result.response.body
+            data = result.response.body
+            reader = csv.reader(data.split('\n'), delimiter=';')
+            response_code = None
+            for row in reader:
+                response_code = row[1]
+            return_data = response_code
 
         return return_data
-
-  #    public function setAutoPay($order) {
-  #   $data=array(
-  #     'Shop_IDP'=>$this->shopId,
-  #     'Order_IDP'=>$order['orderId'],
-  #     'Subtotal_P'=>$order['amount'],
-  #     'Parent_Order_IDP'=>$order['parentOrderId'],
-  #     'Signature'=>$this->getAutoPaySign($order),
-  #     );
-  #   $result=$this->setCurlRequest($this->getAutoPayUrl(), $data);
-  #   $result=explode(';',$result);
-
-  #   if (isset($result[28]) and $result[28]==self::CODE_SUCCES)  {
-  #     return $result[1];
-  #   }
-  #   else {
-  #     return false;
-  #   }
-  # }
