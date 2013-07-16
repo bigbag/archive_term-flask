@@ -69,4 +69,4 @@ class PaymentInfo(Command):
             except Exception as e:
                 app.logger.error(e)
 
-            time.sleep(300)
+            time.sleep(15)
