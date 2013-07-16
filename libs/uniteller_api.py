@@ -137,6 +137,9 @@ class UnitellerApi(object):
                 except Exception as e:
                     app.logger.error(e)
 
+                if len(return_data) == 0:
+                    return_data = False
+
         return return_data
 
     def recurrent_payment(self, order):
