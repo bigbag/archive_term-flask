@@ -23,7 +23,7 @@ class PaymentInfo(Command):
 
     def set_info(self):
         date_start = datetime.utcnow() - timedelta(days=2)
-        date_stop = datetime.utcnow() - timedelta(minutes=15)
+        date_stop = datetime.utcnow() - timedelta(minutes=10)
 
         payment_history = PaymentHistory.query.filter(
             (PaymentHistory.type == PaymentHistory.TYPE_PLUS) &
@@ -31,8 +31,6 @@ class PaymentInfo(Command):
             (PaymentHistory.creation_date >= date_start) &
             (PaymentHistory.creation_date < date_stop)
         ).limit(100).all()
-
-        print payment_history
 
         un = UnitellerApi(UnitellerConfig)
 
