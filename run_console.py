@@ -14,8 +14,8 @@ from console.view.payment_recurrent import PaymentRecurrent
 
 manager = Manager(app)
 
-manager.add_command('report_gen', ReportGeneration())
 manager.add_command('mail', MailSend())
+manager.add_command('report_parser', ReportParser())
 manager.add_command('payment_info', PaymentInfo())
 manager.add_command('payment_recurrent', PaymentRecurrent())
 manager.run()
