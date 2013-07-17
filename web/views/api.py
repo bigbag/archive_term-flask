@@ -64,7 +64,7 @@ def get_config(term_id):
         term_id=term.id).all()
 
     config_xml = render_template(
-        'term/config.xml',
+        'api/config.xml',
         term=term,
         config=TermConfig,
         term_events=term_events,
@@ -86,7 +86,7 @@ def get_blacklist():
     lost_cards = PaymentLost.query.all()
 
     config_xml = render_template(
-        'term/blacklist.xml',
+        'api/blacklist.xml',
         wallets=wallets,
         lost_cards=lost_cards,
     ).encode('cp1251')
