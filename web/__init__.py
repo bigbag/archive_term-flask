@@ -16,9 +16,10 @@ from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
 
 from web.views.api import api
+from web.views.api_old import api_old
 
 app.register_blueprint(api, url_prefix='/term/v1.0')
-
+app.register_blueprint(api_old, url_prefix='/term/v0.0')
 
 if app.debug is not True:
     import logging

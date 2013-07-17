@@ -83,7 +83,7 @@ def get_blacklist():
     wallets = PaymentWallet.query.filter(
         (PaymentWallet.balance < 10000) | (PaymentWallet.status == -1)).all()
 
-    lost_cards = PaymentLost.query.all()
+    lost_cards = PaymentLost.query.distinct(PaymentLost.payment_id).all()
 
     config_xml = render_template(
         'api/blacklist.xml',
