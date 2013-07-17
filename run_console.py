@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Входной скрипт для запуска косольных приложений
+    Входной скрипт для запуска консольных приложений
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.

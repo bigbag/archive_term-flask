@@ -130,15 +130,10 @@ class UnitellerApi(object):
                 event_nodes = tree.xpath(
                     '/unitellerresult/orders/order')
 
-                return_data = {}
-                try:
+                for event_node in event_nodes:
+                    return_data = {}
                     for key in keys:
-                        return_data[key] = event_nodes[0].find(key).text
-                except Exception as e:
-                    app.logger.error(e)
-
-                if len(return_data) == 0:
-                    return_data = False
+                        return_data[key] = event_node.find(key).text
 
         return return_data
 
