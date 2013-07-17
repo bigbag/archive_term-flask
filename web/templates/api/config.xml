@@ -58,9 +58,12 @@
     {% for term_event in term_events %}
     <event type="{{term_event.event.key}}" translation="{{term_event.event.name}}" min_time="{{term_event.start}}" max_time="{{term_event.stop}}">
         {% for person_event in person_events %}
-            {% if person_event.event_id ==  term_event.event_id%}
-            <card timeout="{{person_event.timeout}}" price="{{term_event.cost}}">
-            {{person_event.person.payment_id}}</card>
+            {% if person_event.event_id == term_event.event_id %}
+            {% set payment_id = person_event.person.payment_id %}
+                {% if payment_id %}
+                <card timeout="{{person_event.timeout}}" price="{{term_event.cost}}">
+                {{ payment_id }}</card>
+                {% endif %}
             {% endif %}
         {% endfor %}
     </event>

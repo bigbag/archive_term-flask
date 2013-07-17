@@ -13,7 +13,7 @@ from web.models.event import Event
 
 class PaymentLost(db.Model):
 
-    __bind_key__ = 'stack'
+    __bind_key__ = 'payment'
     __tablename__ = 'lost'
 
     TYPE_WHITE = 0
