@@ -83,7 +83,3 @@ class PaymentRecurrent(Command):
                 self.set_recurrents()
             except Exception as e:
                 app.logger.error(e)
-
-            db.session.commit()
-            db.session.close()
-            time.sleep(30)

@@ -7,8 +7,8 @@
 """
 from flask.ext.script import Manager
 from console import app
-from console.view.report_generation import ReportGeneration
 from console.view.mail_send import MailSend
+from console.view.report_parser import ReportParser
 from console.view.payment_info import PaymentInfo
 from console.view.payment_recurrent import PaymentRecurrent
 

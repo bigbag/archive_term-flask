@@ -70,7 +70,3 @@ class PaymentInfo(Command):
                 self.set_info()
             except Exception as e:
                 app.logger.error(e)
-
-            db.session.commit()
-            db.session.close()
-            time.sleep(5)

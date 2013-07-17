@@ -21,9 +21,9 @@ from web.models.payment_history import PaymentHistory
 from web.models.payment_auto import PaymentAuto
 
 
-class ReportGeneration(Command):
+class ReportParser(Command):
 
-    "Report Generation"
+    "Report parser"
 
     def report_parser(self):
         files = os.listdir(app.config['UPLOAD_TMP'])
@@ -126,7 +126,3 @@ class ReportGeneration(Command):
                 self.report_parser()
             except Exception as e:
                 app.logger.error(e)
-
-            db.session.commit()
-            db.session.close()
-            time.sleep(5)
