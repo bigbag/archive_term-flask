@@ -121,8 +121,7 @@ class ReportParser(Command):
                 return False
 
     def run(self):
-        while True:
-            try:
-                self.report_parser()
-            except Exception as e:
-                app.logger.error(e)
+        try:
+            self.report_parser()
+        except Exception as e:
+            app.logger.error(e)

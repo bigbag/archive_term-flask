@@ -65,8 +65,7 @@ class PaymentInfo(Command):
                     history.save()
 
     def run(self):
-        while True:
-            try:
-                self.set_info()
-            except Exception as e:
-                app.logger.error(e)
+        try:
+            self.set_info()
+        except Exception as e:
+            app.logger.error(e)

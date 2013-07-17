@@ -78,8 +78,7 @@ class PaymentRecurrent(Command):
                 recurrent.save()
 
     def run(self):
-        while True:
-            try:
-                self.set_recurrents()
-            except Exception as e:
-                app.logger.error(e)
+        try:
+            self.set_recurrents()
+        except Exception as e:
+            app.logger.error(e)
