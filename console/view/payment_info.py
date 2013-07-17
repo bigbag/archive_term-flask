@@ -10,6 +10,7 @@ from datetime import datetime
 from datetime import timedelta
 from flask.ext.script import Command
 from console import app
+from console import db
 from console.configs.payment import UnitellerConfig
 from libs.uniteller_api import UnitellerApi
 from web.models.payment_history import PaymentHistory
@@ -69,4 +70,7 @@ class PaymentInfo(Command):
                 self.set_info()
             except Exception as e:
                 app.logger.error(e)
+
+            db.session.commit()
+            db.session.close()
             time.sleep(5)

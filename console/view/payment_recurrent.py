@@ -8,6 +8,7 @@
 import time
 from flask.ext.script import Command
 from console import app
+from console import db
 from console.configs.payment import UnitellerConfig
 from libs.uniteller_api import UnitellerApi
 from web.models.payment_wallet import PaymentWallet
@@ -83,4 +84,6 @@ class PaymentRecurrent(Command):
             except Exception as e:
                 app.logger.error(e)
 
+            db.session.commit()
+            db.session.close()
             time.sleep(30)

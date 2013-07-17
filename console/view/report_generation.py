@@ -10,6 +10,7 @@ import time
 from lxml import etree
 from flask import Flask, render_template
 from console import app
+from console import db
 from flask.ext.script import Command
 from web.models.report import Report
 from web.models.event import Event
@@ -126,4 +127,6 @@ class ReportGeneration(Command):
             except Exception as e:
                 app.logger.error(e)
 
+            db.session.commit()
+            db.session.close()
             time.sleep(5)
