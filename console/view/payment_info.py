@@ -22,18 +22,21 @@ class PaymentInfo(Command):
     "Return payment info"
 
     def set_info(self):
-        request_date = datetime.utcnow() - timedelta(2)
+        date_start = datetime.utcnow() - timedelta(days=2)
+        date_stop = datetime.utcnow() - timedelta(minutes=15)
 
         payment_history = PaymentHistory.query.filter(
             (PaymentHistory.type == PaymentHistory.TYPE_PLUS) &
             (PaymentHistory.status != PaymentHistory.STATUS_FAILURE) &
-            (PaymentHistory.creation_date >= request_date)
+            (PaymentHistory.creation_date >= date_start) &
+            (PaymentHistory.creation_date < date_stop)
         ).limit(100).all()
+
+        print payment_history
 
         un = UnitellerApi(UnitellerConfig)
 
         for history in payment_history:
-            log = None
             log = PaymentLog.query.get(history.id)
 
             if log:
@@ -68,5 +71,4 @@ class PaymentInfo(Command):
                 self.set_info()
             except Exception as e:
                 app.logger.error(e)
-
-            time.sleep(15)
+            time.sleep(5)

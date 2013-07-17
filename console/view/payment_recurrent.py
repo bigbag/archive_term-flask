@@ -7,6 +7,7 @@
 """
 import time
 from flask.ext.script import Command
+from console import app
 from console.configs.payment import UnitellerConfig
 from libs.uniteller_api import UnitellerApi
 from web.models.payment_wallet import PaymentWallet
