@@ -47,6 +47,7 @@ class PaymentInfo(Command):
                 if info['response_code'] == UnitellerApi.STATUS_COMPLETE:
                     log = PaymentLog()
                     log.history_id = history.id
+                    log.creation_date = history.creation_date
                     log.wallet_id = history.wallet_id
                     log.rrn = info['billnumber']
                     log.card_pan = info['cardnumber']
