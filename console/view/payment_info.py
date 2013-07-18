@@ -8,10 +8,11 @@
 import time
 from datetime import datetime
 from datetime import timedelta
+
 from flask.ext.script import Command
 from console import app
-from console import db
 from console.configs.payment import UnitellerConfig
+
 from libs.uniteller_api import UnitellerApi
 from web.models.payment_history import PaymentHistory
 from web.models.payment_log import PaymentLog
@@ -24,7 +25,7 @@ class PaymentInfo(Command):
 
     def set_info(self):
         date_start = datetime.utcnow() - timedelta(days=2)
-        date_stop = datetime.utcnow() - timedelta(minutes=10)
+        date_stop = datetime.utcnow() - timedelta(minutes=15)
 
         payment_history = PaymentHistory.query.filter(
             (PaymentHistory.type == PaymentHistory.TYPE_PLUS) &

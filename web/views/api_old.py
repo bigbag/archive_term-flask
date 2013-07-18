@@ -7,12 +7,16 @@
 """
 import re
 import os
-from web import app
 from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
+
+from web import app
+from web import cache
+
 from web.decorators.header import *
 from web.helpers.date_helper import *
 from web.helpers.hash_helper import *
-from web import cache
+from web.helpers.error_helper import *
+
 from web.models.term import Term
 from web.models.term_event import TermEvent
 from web.models.event import Event
@@ -24,21 +28,6 @@ from web.configs.term import TermOldConfig
 
 
 api_old = Blueprint('api_old', __name__)
-
-
-@app.errorhandler(400)
-def not_found(error):
-    return make_response(jsonify({'error': 'Bad request'}), 400)
-
-
-@app.errorhandler(404)
-def not_found(error):
-    return make_response(jsonify({'error': 'Not found'}), 404)
-
-
-@app.errorhandler(500)
-def not_found(error):
-    return make_response(jsonify({'error': 'Fail'}), 500)
 
 
 @api_old.route('/configs/config_<int:term_id>.xml', methods=['GET'])
