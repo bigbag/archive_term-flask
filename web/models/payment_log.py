@@ -9,6 +9,7 @@
 from web import db
 from web.models.payment_wallet import PaymentWallet
 from web.models.payment_history import PaymentHistory
+from web.helpers.date_helper import *
 
 
 class PaymentLog(db.Model):
@@ -25,6 +26,7 @@ class PaymentLog(db.Model):
     wallet = db.relationship('PaymentWallet')
     rrn = db.Column(db.String(32), nullable=False)
     card_pan = db.Column(db.String(32), nullable=False)
+    creation_date = db.Column(db.DateTime, nullable=False)
 
     def __repr__(self):
         return '<id %r>' % (self.history_id)
@@ -38,6 +40,9 @@ class PaymentLog(db.Model):
 
     def save(self):
         try:
+            if not self.creation_date:
+                self.creation_date = get_curent_date()
+            db.session.add(self)
             db.session.add(self)
             db.session.commit()
         except:
