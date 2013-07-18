@@ -2,7 +2,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
-#app.config.from_object('configs.general.DevelopmentConfig')
+# app.config.from_object('configs.general.DevelopmentConfig')
 app.config.from_object('configs.general.ProductionConfig')
 
 from flask.ext.cache import Cache
@@ -18,9 +18,11 @@ db = SQLAlchemy(app)
 
 from web.views.api import api
 from web.views.api_old import api_old
+# from web.views.api_admin import api_admin
 
 app.register_blueprint(api, url_prefix='/term/v1.0')
 app.register_blueprint(api_old, url_prefix='/term/v0.0')
+# app.register_blueprint(api_admin, url_prefix='/term/admin')
 
 if app.debug is not True:
     import logging

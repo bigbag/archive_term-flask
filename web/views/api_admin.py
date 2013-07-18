@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Контролер реализующий апи для терминального проекта
+    Контролер реализующий апи администрирования
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
@@ -9,7 +9,6 @@ import re
 import os
 
 from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
-
 from web import app
 from web import cache
 
@@ -28,10 +27,10 @@ from web.models.payment_lost import PaymentLost
 from web.configs.term import TermConfig
 
 
-api = Blueprint('api', __name__)
+api_admin = Blueprint('api_admin', __name__)
 
 
-@api.route('/configs/config_<int:term_id>.xml', methods=['GET'])
+@api_admin.route('/configs/config_<int:term_id>.xml', methods=['GET'])
 @cache.cached(timeout=120)
 @xml_headers
 @md5_content_headers
@@ -64,7 +63,7 @@ def get_config(term_id):
     return response
 
 
-@api.route('/configs/blacklist.xml', methods=['GET'])
+@api_admin.route('/configs/blacklist.xml', methods=['GET'])
 @cache.cached(timeout=60)
 @xml_headers
 @md5_content_headers
@@ -86,7 +85,7 @@ def get_blacklist():
     return response
 
 
-@api.route('/reports/report_<int:term_id>_<report_datetime>.xml', methods=['PUT'])
+@api_admin.route('/reports/report_<int:term_id>_<report_datetime>.xml', methods=['PUT'])
 def upload_report(term_id, report_datetime):
     """Прием и сохранение отчета"""
 
@@ -127,7 +126,7 @@ def upload_report(term_id, report_datetime):
     return make_response(jsonify({'success': 'Report uploaded successfully'}), 201)
 
 
-@api.route('/uids/<int:term_id>_<payment_id>.uid', methods=['PUT'])
+@api_admin.route('/uids/<int:term_id>_<payment_id>.uid', methods=['PUT'])
 def add_card(term_id, payment_id):
     """Добавляем в базу карту для привязки"""
 

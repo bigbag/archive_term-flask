@@ -9,9 +9,10 @@ import os
 import time
 from lxml import etree
 from flask import Flask, render_template
-from console import app
-from console import db
 from flask.ext.script import Command
+
+from console import app
+
 from web.models.report import Report
 from web.models.event import Event
 from web.models.term import Term
