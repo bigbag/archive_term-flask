@@ -67,14 +67,7 @@ class PaymentInfo(Command):
                     history.save()
 
     def run(self):
-        # try:
-        #     self.set_info()
-        # except Exception as e:
-        #     app.logger.error(e)
-        #
-        from web.models.spot import Spot
-
-        spot = Spot()
-        spot.discodes_id = '100000'
-        # print spots
-        print spot.get_code()
+        try:
+            self.set_info()
+        except Exception as e:
+            app.logger.error(e)
