@@ -26,7 +26,7 @@ api_admin = Blueprint('api_admin', __name__)
 
 @api_admin.route('/spot/<int:discodes_id>', methods=['GET'])
 @xml_headers
-#@cache.cached(timeout=120)
+@cache.cached(timeout=120)
 @md5_content_headers
 def get_config(discodes_id):
     """Возвращает информацию о споте"""

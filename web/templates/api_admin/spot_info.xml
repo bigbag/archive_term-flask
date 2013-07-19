@@ -3,8 +3,8 @@
     <name>{{spot.name}}</name>
     <url>{{spot.url}}</url>
     <barcode>{{spot.barcode}}</barcode>
-    <user_id>{{wallet.user_id}}</user_id>
-    <user_email>{{wallet.user.email}}</user_email>
+    <user_id>{{spot.user_id}}</user_id>
+    <user_email>{{spot.user.email}}</user_email>
     <generated_date>{{spot.generated_date}}</generated_date>
     <spot_status>{{spot.status}}</spot_status>
     {% if wallet: %}
