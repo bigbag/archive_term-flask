@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<info>
+    <name>{{spot.name}}</name>
+    <url>{{spot.url}}</url>
+    <barcode>{{spot.barcode}}</barcode>
+    <user_id>{{wallet.user_id}}</user_id>
+    <user_email>{{wallet.user.email}}</user_email>
+    <generated_date>{{spot.generated_date}}</generated_date>
+    <spot_status>{{spot.status}}</spot_status>
+    {% if wallet: %}
+    <pid>{{wallet.payment_id}}</pid>
+    <hid>{{wallet.hard_id}}</hid>
+    <balance>{{wallet.balance}}</balance>
+    <wallet_status>{{wallet.status}}</wallet_status>
+    {% endif %}
+</info>
