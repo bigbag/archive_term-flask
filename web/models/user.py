@@ -21,7 +21,7 @@ class User(db.Model):
     STATUS_BANNED = -1
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(128), index=True)
+    email = db.Column(db.String(128), nullable=False)
     password = db.Column(db.String(128), nullable=False)
     activkey = db.Column(db.String(128), nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)

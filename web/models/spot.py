@@ -13,6 +13,8 @@ from web import db
 from web.helpers.date_helper import *
 from web.helpers.hash_helper import *
 
+from web.models.user import User
+
 
 class Spot(db.Model):
 
@@ -41,7 +43,8 @@ class Spot(db.Model):
     barcode = db.Column(db.String(32), nullable=False, unique=True)
     spot_type_id = db.Column(db.Integer)
     lang = db.Column(db.String(10), nullable=False)
-    user_id = db.Column(db.Integer, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User')
     premium = db.Column(db.Integer, nullable=False)
     generated_date = db.Column(db.DateTime, nullable=False)
     registered_date = db.Column(db.DateTime)
