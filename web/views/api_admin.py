@@ -24,24 +24,24 @@ from web.models.payment_wallet import PaymentWallet
 api_admin = Blueprint('api_admin', __name__)
 
 
-@api_admin.route('/spot/<int:discodes_id>', methods=['GET'])
+@api_admin.route('/spot/<int:hard_id>', methods=['GET'])
 @xml_headers
-@cache.cached(timeout=120)
-@md5_content_headers
-def get_config(discodes_id):
-    """Возвращает информацию о споте"""
+def get_config(hard_id):
+    """Возвращает информацию о споте по его HID"""
 
-    if not len(str(discodes_id)) == 6:
-        abort(404)
+    hard_id = int(hard_id)
 
-    spot = Spot.query.filter_by(
-        discodes_id=discodes_id).first()
-
-    if not spot:
+    if not len(str(hard_id)) == 16:
         abort(404)
 
     wallet = PaymentWallet.query.filter_by(
-        discodes_id=discodes_id).first()
+        hard_id=hard_id).first()
+
+    if not wallet:
+        abort(404)
+
+    spot = Spot.query.filter_by(
+        discodes_id=wallet.discodes_id).first()
 
     info_xml = render_template(
         'api_admin/spot_info.xml',
@@ -50,5 +50,52 @@ def get_config(discodes_id):
     ).encode('cp1251')
 
     response = make_response(info_xml)
+
+    return response
+
+
+@api_admin.route('/spot/add', methods=['GET'])
+@xml_headers
+def add_spot():
+    """Добавялем спот и связанный с ним кошелёк"""
+
+    add_success = 0
+    hid = int(request.args['hid'])
+    pids = int(request.args['pids'])
+
+    if not hid or not pids:
+        abort(400)
+
+    if not len(str(hid)) == 16 or not len(str(pids)) == 10:
+        abort(400)
+
+    wallet = PaymentWallet.query.filter_by(
+        hard_id=hid).first()
+
+    if wallet:
+        spot = Spot.query.filter_by(
+            discodes_id=wallet.discodes_id).first()
+
+        if not spot:
+            abort(500)
+    else:
+        wallet = PaymentWallet()
+        spot = Spot.query.filter_by(
+            status=Spot.STATUS_ACTIVATED).first()
+
+        wallet.discodes_id = spot.discodes_id
+        wallet.hard_id = hid
+        wallet.payment_id = wallet.get_pid(pids)
+
+        add_success = 1
+
+    add_xml = render_template(
+        'api_admin/add_info.xml',
+        spot=spot,
+        wallet=wallet,
+        add_success=add_success,
+    ).encode('cp1251')
+
+    response = make_response(add_xml)
 
     return response

@@ -6,9 +6,14 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import hashlib
+import random
+
 from web import db
 from web.models.user import User
+
 from web.helpers.date_helper import *
+from web.helpers.hash_helper import *
 
 
 class PaymentWallet(db.Model):
@@ -31,13 +36,23 @@ class PaymentWallet(db.Model):
     balance = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, id):
+    def __init__(self):
         self.discodes_id = 0
         self.balance = 0
         self.status = self.STATUS_NOACTIVE
 
     def __repr__(self):
         return '<id %r>' % (self.id)
+
+    def get_pid(self, pids):
+        pid = "%s%s" % (pids, random.randint(100000000, 999999999))
+        pid = "%s%s" % (pid, get_isin_checksum(pid))
+
+        wallet = self.query.filter_by(payment_id=pid).first()
+        if wallet:
+            self.get_pid(self, pids)
+        else:
+            return pid
 
     def delete(self):
         db.session.delete(self)
