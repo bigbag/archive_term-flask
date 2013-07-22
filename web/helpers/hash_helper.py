@@ -47,3 +47,30 @@ def get_ean_barcode(ean):
         code += CODES['C'][int(number)]
     code += EDGE
     return [code]
+
+
+def get_isin_checksum(isin):
+    """Calculate and return the check digit"""
+    # Convert alpha characters to digits
+    isin2 = []
+    for char in isin[:-1]:
+        if char.isalpha():
+            isin2.append((string.ascii_uppercase.index(char.upper()) + 9 + 1))
+        else:
+            isin2.append(char)
+    # Convert each int into string and join
+    isin2 = ''.join([str(i) for i in isin2])
+    # Gather every second digit (even)
+    even = isin2[::2]
+    # Gather the other digits (odd)
+    odd = isin2[1::2]
+    # If len(isin2) is odd, multiply evens by 2, else multiply odds by 2
+    if len(isin2) % 2 > 0:
+        even = ''.join([str(int(i) * 2) for i in list(even)])
+    else:
+        odd = ''.join([str(int(i) * 2) for i in list(odd)])
+    even_sum = sum([int(i) for i in even])
+    # then add each single int in both odd and even
+    odd_sum = sum([int(i) for i in odd])
+    mod = (even_sum + odd_sum) % 10
+    return 10 - mod

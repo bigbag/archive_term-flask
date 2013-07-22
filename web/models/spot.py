@@ -90,7 +90,8 @@ class Spot(db.Model):
         if not self.barcode:
             self.barcode = self.get_barcode()
 
-        url = hashlib.sha1(self.barcode).hexdigest()
+        data = self.barcode + random.randint(1000000000, 9999999999)
+        url = hashlib.sha1(data).hexdigest()
         url = url[:15]
 
         spot = self.query.filter_by(url=url).first()
