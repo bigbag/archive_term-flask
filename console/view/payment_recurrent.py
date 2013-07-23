@@ -66,8 +66,10 @@ class PaymentRecurrent(Command):
 
             result = un.recurrent_payment(order)
 
+            if result == UnitellerApi.STATUS_COMPLETE:
+                recurrent.history_id = history.id
+
             recurrent.status = PaymentAuto.STATUS_OFF
-            recurrent.history_id = history.id
             recurrent.save()
 
     def run(self):
