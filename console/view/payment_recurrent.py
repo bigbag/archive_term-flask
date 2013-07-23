@@ -69,7 +69,7 @@ class PaymentRecurrent(Command):
             if result != UnitellerApi.STATUS_COMPLETE:
                 continue
 
-            wallet.balance = wallet.balance + amount
+            wallet.balance = int(wallet.balance) + amount
             if (wallet.save()):
                 history.status = PaymentHistory.STATUS_COMPLETE
                 history.save()
