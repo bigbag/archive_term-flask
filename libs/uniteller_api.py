@@ -14,6 +14,9 @@ from lxml import etree
 
 
 class UnitellerApi(object):
+    # CODE_SUCCESS = 'AS000'
+    # STATUS_COMPLETE = 'Paid'
+    # STATUS_CANCEL = 'Canceled'
     STATUS_COMPLETE = 'AS000'
     EMPTY_ORDER = dict(
         order_id='',
