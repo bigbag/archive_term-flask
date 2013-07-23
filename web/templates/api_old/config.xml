@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="windows-1251" standalone="yes" ?>
 <Config>
-    <AppMode>Vending</AppMode>
+    <AppMode>{{ term.type }}</AppMode>
     <Server>
         <Number>1</Number>
         <QID>O,OK,OC</QID>
