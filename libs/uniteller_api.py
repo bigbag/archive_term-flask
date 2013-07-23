@@ -159,7 +159,8 @@ class UnitellerApi(object):
             reader = csv.reader(data.split('\n'), delimiter=';')
             response_code = None
             for row in reader:
-                response_code = row[1]
+                if len(row) > 1:
+                    response_code = row[1]
             return_data = response_code
 
         return return_data
