@@ -31,7 +31,7 @@ api_old = Blueprint('api_old', __name__)
 
 
 @api_old.route('/configs/config_<int:term_id>.xml', methods=['GET'])
-@cache.cached(timeout=120)
+#@cache.cached(timeout=120)
 @xml_headers
 def get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
