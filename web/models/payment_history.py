@@ -63,6 +63,8 @@ class PaymentHistory(db.Model):
 
     def save(self):
         try:
+            if not self.creation_date:
+                self.creation_date = get_curent_date()
             db.session.add(self)
             db.session.commit()
         except:
