@@ -47,7 +47,7 @@ class PaymentAuto(Command):
             else:
                 continue
 
-            if amount < 1:
+            if amount < 10000:
                 continue
 
             history = PaymentHistory()
