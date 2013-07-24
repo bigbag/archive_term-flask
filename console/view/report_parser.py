@@ -19,7 +19,7 @@ from web.models.term import Term
 from web.models.payment_wallet import PaymentWallet
 from web.models.payment_lost import PaymentLost
 from web.models.payment_history import PaymentHistory
-from web.models.payment_auto import PaymentAuto
+from web.models.payment_reccurent import PaymentReccurent
 
 
 class ReportParser(Command):
@@ -104,13 +104,6 @@ class ReportParser(Command):
                             history = PaymentHistory()
                             history.add_history(wallet, report)
 
-                            if wallet.balance > 10000:
-                                continue
-
-                            auto = PaymentAuto.query.get(wallet.id)
-                            if not auto:
-                                continue
-                            auto.status = PaymentAuto.STATUS_ON
             if not error:
                 if not os.path.exists(new_file_patch):
                     os.makedirs(new_file_patch)
@@ -121,8 +114,31 @@ class ReportParser(Command):
             else:
                 return False
 
+    def set_reccurent_on(self):
+        reccurents = PaymentReccurent.query.filter_by(
+            status=PaymentReccurent.STATUS_OFF).all()
+
+        for reccurent in reccurents:
+
+            if not reccurent.wallet:
+                continue
+            if int(reccurent.wallet.balance) > 10100:
+                continue
+
+            history = PaymentHistory.query.filter_by(
+                status=PaymentHistory.STATUS_NEW,
+                wallet_id=reccurent.wallet.id,
+            ).first()
+
+            if history:
+                continue
+
+            reccurent.status = PaymentReccurent.STATUS_ON
+            reccurent.save()
+
     def run(self):
         try:
             self.report_parser()
+            self.set_reccurent_on()
         except Exception as e:
             app.logger.error(e)

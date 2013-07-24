@@ -6,6 +6,8 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import hashlib
+
 from web import db
 from web.models.term import Term
 from web.models.payment_wallet import PaymentWallet
@@ -21,6 +23,7 @@ class PaymentHistory(db.Model):
     STATUS_NEW = 0
     STATUS_COMPLETE = 1
     STATUS_FAILURE = -1
+    STATUS_NO_PAYMENT = -2
 
     TYPE_MINUS = -1
     TYPE_PLUS = 1
