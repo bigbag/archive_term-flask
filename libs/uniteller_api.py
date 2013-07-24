@@ -15,8 +15,10 @@ from lxml import etree
 
 class UnitellerApi(object):
     CODE_SUCCESS = 'AS000'
+
     STATUS_COMPLETE = 'Paid'
     STATUS_AUTH = 'Authorized'
+    STATUS_CANCELED = 'Canceled'
 
     SUCCESS_NO = 0
     SUCCESS_YES = 1

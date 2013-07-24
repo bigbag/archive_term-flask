@@ -83,16 +83,41 @@ class PaymentInfo(Command):
         info = un.get_payment_info()
 
         for history in payment_history:
-            if not str(history.id) in info and history.status == PaymentHistory.STATUS_NEW:
-                history.status = PaymentHistory.STATUS_MISSING
-                history.save()
+            if not str(history.id) in info:
+                if history.status == PaymentHistory.STATUS_NEW:
+                    history.status = PaymentHistory.STATUS_MISSING
+                    history.save()
 
-            # else:
+            else:
+                payment_info = info[str(history.id)]
+                if history.status == PaymentHistory.STATUS_FAILURE:
+                    if payment_info['status'] == UnitellerApi.STATUS_COMPLETE:
+
+                        wallet = PaymentWallet.query.get(history.wallet_id)
+                        wallet.balance = int(
+                            wallet.balance) + int(
+                                history.amount)
+
+                        if not wallet.save():
+                            continue
+
+                        history.status = PaymentHistory.STATUS_COMPLETE
+                        history.save()
+                elif history.status == PaymentHistory.STATUS_COMPLETE:
+                    if payment_info['status'] == UnitellerApi.STATUS_CANCELED:
+
+                        wallet = PaymentWallet.query.get(history.wallet_id)
+                        wallet.balance = int(
+                            wallet.balance) - int(
+                                history.amount)
+
+                        if not wallet.save():
+                            continue
+
+                        history.status = PaymentHistory.STATUS_FAILURE
+                        history.save()
 
     def run(self):
-        # un = UnitellerApi(UnitellerConfig)
-        # un.order_id = 1186
-        # print un.get_payment_info()
         try:
             self.set_new_payment()
             self.set_missing_payment()
