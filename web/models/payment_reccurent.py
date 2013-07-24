@@ -12,10 +12,10 @@ from web.models.payment_history import PaymentHistory
 from web.helpers.date_helper import *
 
 
-class PaymentAuto(db.Model):
+class PaymentReccurent(db.Model):
 
     __bind_key__ = 'payment'
-    __tablename__ = 'auto'
+    __tablename__ = 'reccurent'
 
     STATUS_ON = 1
     STATUS_OFF = 0
@@ -35,6 +35,7 @@ class PaymentAuto(db.Model):
     card_pan = db.Column(db.String(32), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
+    run_date = db.Column(db.DateTime)
     type = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Integer, nullable=False)
 

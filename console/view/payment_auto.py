@@ -12,35 +12,36 @@ from console import app
 from console.configs.payment import UnitellerConfig
 from libs.uniteller_api import UnitellerApi
 
+from web.helpers.date_helper import *
+
 from web.models.payment_wallet import PaymentWallet
 from web.models.payment_history import PaymentHistory
-from web.models.payment_auto import PaymentAuto
+from web.models.payment_reccurent import PaymentReccurent
 
 
-class PaymentRecurrent(Command):
+class PaymentAuto(Command):
 
     "Run auto payment"
 
-    def set_recurrents(self):
-        recurrents = PaymentAuto.query.filter_by(
-            status=PaymentAuto.STATUS_ON).all()
+    def run_recurrents(self):
+        recurrents = PaymentReccurent.query.filter_by(
+            status=PaymentReccurent.STATUS_ON).all()
 
         un = UnitellerApi(UnitellerConfig)
 
         for recurrent in recurrents:
 
-            wallet = PaymentWallet.query.get(recurrent.wallet_id)
-            amount = 0
-
-            if not wallet:
+            if not reccurent.wallet:
                 continue
 
-            if recurrent.type == PaymentAuto.TYPE_CEILING:
-                amount = int(recurrent.amount) - int(wallet.balance)
+            amount = 0
 
-            elif recurrent.type == PaymentAuto.TYPE_LIMIT:
+            if recurrent.type == PaymentReccurent.TYPE_CEILING:
+                amount = int(recurrent.amount) - int(reccurent.wallet.balance)
+
+            elif recurrent.type == PaymentReccurent.TYPE_LIMIT:
                 i = 1
-                while int(wallet.balance) + amount < 11000:
+                while int(reccurent.wallet.balance) + amount < 11000:
                     amount = int(recurrent.amount) * i
                     i = i + 1
             else:
@@ -50,7 +51,7 @@ class PaymentRecurrent(Command):
                 continue
 
             history = PaymentHistory()
-            history.user_id = wallet.user_id
+            history.user_id = reccurent.wallet.user_id
             history.wallet_id = recurrent.wallet_id
             history.amount = amount
             history.type = PaymentHistory.TYPE_PLUS
@@ -69,11 +70,12 @@ class PaymentRecurrent(Command):
             if result == UnitellerApi.STATUS_COMPLETE:
                 recurrent.history_id = history.id
 
-            recurrent.status = PaymentAuto.STATUS_OFF
+            recurrent.status = PaymentReccurent.STATUS_OFF
+            recurrent.run_date = get_curent_date()
             recurrent.save()
 
     def run(self):
         try:
-            self.set_recurrents()
+            self.run_recurrents()
         except Exception as e:
             app.logger.error(e)

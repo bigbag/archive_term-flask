@@ -39,7 +39,7 @@ class TermConfig(object):
 class TermOldConfig(object):
 
     COMM_IP = '5.9.50.180'
-    COMM_PORT = 5000
+    COMM_PORT = 4001
     COMM_PROTO = 'https'
     COMM_LINK_TYPE = 2
 

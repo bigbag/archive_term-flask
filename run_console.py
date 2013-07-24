@@ -10,12 +10,12 @@ from console import app
 from console.view.mail_send import MailSend
 from console.view.report_parser import ReportParser
 from console.view.payment_info import PaymentInfo
-from console.view.payment_recurrent import PaymentRecurrent
+from console.view.payment_auto import PaymentAuto
 
 manager = Manager(app)
 
 manager.add_command('mail', MailSend())
 manager.add_command('report_parser', ReportParser())
 manager.add_command('payment_info', PaymentInfo())
-manager.add_command('payment_recurrent', PaymentRecurrent())
+manager.add_command('payment_auto', PaymentAuto())
 manager.run()

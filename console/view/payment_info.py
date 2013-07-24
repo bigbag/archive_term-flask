@@ -25,7 +25,7 @@ class PaymentInfo(Command):
 
     def set_info(self):
         date_start = datetime.utcnow() - timedelta(days=2)
-        date_stop = datetime.utcnow() - timedelta(minutes=15)
+        date_stop = datetime.utcnow() - timedelta(minutes=10)
 
         payment_history = PaymentHistory.query.filter(
             (PaymentHistory.type == PaymentHistory.TYPE_PLUS) &
@@ -67,7 +67,46 @@ class PaymentInfo(Command):
                     history.save()
 
     def run(self):
-        try:
-            self.set_info()
-        except Exception as e:
-            app.logger.error(e)
+        # try:
+        #     self.set_info()
+        # except Exception as e:
+        #     app.logger.error(e)
+        #
+        date_start = datetime.utcnow() - timedelta(days=2)
+        date_stop = datetime.utcnow() - timedelta(minutes=5)
+
+        payment_history = PaymentHistory.query.filter(
+            (PaymentHistory.type == PaymentHistory.TYPE_PLUS) &
+            (PaymentHistory.status != PaymentHistory.STATUS_NO_PAYMENT) &
+            (PaymentHistory.creation_date >= date_start) &
+            (PaymentHistory.creation_date < date_stop)
+        ).limit(8).all()
+
+        un = UnitellerApi(UnitellerConfig)
+
+        for history in payment_history:
+            info = un.get_payment_info(history.id)
+
+            if not info:
+                history.status = PaymentHistory.STATUS_NO_PAYMENT
+                history.save()
+
+            else:
+
+                if history.status == PaymentHistory.STATUS_COMPLETE:
+                    if info['response_code'] != UnitellerApi.CODE_SUCCESS:
+                        print "re false"
+
+                elif history.status == PaymentHistory.STATUS_NEW:
+                    if info['response_code'] == UnitellerApi.CODE_SUCCESS:
+                        print "true"
+                    else:
+                        print "false"
+
+                elif history.status == PaymentHistory.STATUS_FAILURE:
+                    if info['response_code'] == UnitellerApi.CODE_SUCCESS:
+                        print "re true"
+
+                # else
+
+                # print info
