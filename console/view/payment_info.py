@@ -23,90 +23,75 @@ class PaymentInfo(Command):
 
     "Return payment info"
 
-    def set_info(self):
-        date_start = datetime.utcnow() - timedelta(days=2)
-        date_stop = datetime.utcnow() - timedelta(minutes=10)
+    def set_new_payment_info(self):
+        date_start = datetime.utcnow() - timedelta(days=1)
+        date_stop = datetime.utcnow() - timedelta(minutes=1)
 
         payment_history = PaymentHistory.query.filter(
             (PaymentHistory.type == PaymentHistory.TYPE_PLUS) &
-            (PaymentHistory.status != PaymentHistory.STATUS_FAILURE) &
+            (PaymentHistory.status == PaymentHistory.STATUS_NEW) &
             (PaymentHistory.creation_date >= date_start) &
             (PaymentHistory.creation_date < date_stop)
-        ).limit(100).all()
+        ).all()
 
         un = UnitellerApi(UnitellerConfig)
+        un.success = UnitellerApi.SUCCESS_ALL
+        info = un.get_payment_info()
 
         for history in payment_history:
-            log = PaymentLog.query.get(history.id)
-
-            if log:
+            if not str(history.id) in info:
                 continue
 
-            info = un.get_payment_info(history.id)
+            payment_info = info[str(history.id)]
 
-            if history.status == PaymentHistory.STATUS_COMPLETE:
-                if info['response_code'] == UnitellerApi.STATUS_COMPLETE:
-                    log = PaymentLog()
-                    log.history_id = history.id
-                    log.creation_date = history.creation_date
-                    log.wallet_id = history.wallet_id
-                    log.rrn = info['billnumber']
-                    log.card_pan = info['cardnumber']
-                    log.save()
+            if payment_info['status'] == UnitellerApi.STATUS_COMPLETE:
 
-            elif history.status == PaymentHistory.STATUS_NEW:
-                if info and info['response_code'] == UnitellerApi.STATUS_COMPLETE:
-                    wallet = PaymentWallet.query.get(history.wallet_id)
-                    wallet.balance = int(wallet.balance) + int(history.amount)
-                    if not wallet.save():
-                        continue
-                    history.status = PaymentHistory.STATUS_COMPLETE
-                    history.save()
-                else:
-                    history.status = PaymentHistory.STATUS_FAILURE
-                    history.save()
+                history.status = PaymentHistory.STATUS_COMPLETE
+                if not history.save():
+                    continue
 
-    def run(self):
-        # try:
-        #     self.set_info()
-        # except Exception as e:
-        #     app.logger.error(e)
-        #
-        date_start = datetime.utcnow() - timedelta(days=2)
-        date_stop = datetime.utcnow() - timedelta(minutes=5)
+                log = PaymentLog.query.get(history.id)
+                if log:
+                    continue
+
+                log = PaymentLog()
+                log.history_id = history.id
+                log.creation_date = history.creation_date
+                log.wallet_id = history.wallet_id
+                log.rrn = payment_info['billnumber']
+                log.card_pan = payment_info['cardnumber']
+                log.save()
+
+                wallet = PaymentWallet.query.get(history.wallet_id)
+                wallet.balance = int(wallet.balance) + int(history.amount)
+                wallet.save()
+            else:
+                history.status = PaymentHistory.STATUS_FAILURE
+                history.save()
+
+    def set_missing_payment_info(self):
+        date_start = datetime.utcnow() - timedelta(days=1)
+        date_stop = datetime.utcnow() - timedelta(minutes=15)
 
         payment_history = PaymentHistory.query.filter(
             (PaymentHistory.type == PaymentHistory.TYPE_PLUS) &
-            (PaymentHistory.status != PaymentHistory.STATUS_NO_PAYMENT) &
+            (PaymentHistory.status == PaymentHistory.STATUS_NEW) &
             (PaymentHistory.creation_date >= date_start) &
             (PaymentHistory.creation_date < date_stop)
-        ).limit(8).all()
+        ).all()
 
         un = UnitellerApi(UnitellerConfig)
+        un.success = UnitellerApi.SUCCESS_ALL
+        info = un.get_payment_info()
 
         for history in payment_history:
-            info = un.get_payment_info(history.id)
-
-            if not info:
-                history.status = PaymentHistory.STATUS_NO_PAYMENT
+            if not str(history.id) in info:
+                history.status = PaymentHistory.STATUS_MISSING
                 history.save()
 
-            else:
-
-                if history.status == PaymentHistory.STATUS_COMPLETE:
-                    if info['response_code'] != UnitellerApi.CODE_SUCCESS:
-                        print "re false"
-
-                elif history.status == PaymentHistory.STATUS_NEW:
-                    if info['response_code'] == UnitellerApi.CODE_SUCCESS:
-                        print "true"
-                    else:
-                        print "false"
-
-                elif history.status == PaymentHistory.STATUS_FAILURE:
-                    if info['response_code'] == UnitellerApi.CODE_SUCCESS:
-                        print "re true"
-
-                # else
-
-                # print info
+    def run(self):
+        try:
+            self.set_new_payment_info()
+            self.set_missing_payment_info()
+        except Exception as e:
+            app.logger.error(e)

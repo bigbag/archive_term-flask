@@ -17,6 +17,10 @@ class UnitellerApi(object):
     CODE_SUCCESS = 'AS000'
     STATUS_COMPLETE = 'Paid'
 
+    SUCCESS_NO = 0
+    SUCCESS_YES = 1
+    SUCCESS_ALL = 2
+
     EMPTY_ORDER = dict(
         order_id='',
         amount='',
@@ -31,6 +35,8 @@ class UnitellerApi(object):
 
     def __init__(self, const):
         self.const = const
+        self.order_id = None
+        self.success = self.SUCCESS_ALL
         self.shop_id = self.const.SHOP_ID
         self.password = self.const.PASSWORD
         self.login = self.const.LOGIN
@@ -99,7 +105,7 @@ class UnitellerApi(object):
 
         return return_data
 
-    def get_payment_info(self, order_id):
+    def get_payment_info(self):
         return_data = False
 
         keys = (
@@ -115,12 +121,15 @@ class UnitellerApi(object):
             'ipaddress',
         )
         data = dict(
-            ShopOrderNumber=order_id,
             Shop_ID=self.shop_id,
             Login=self.login,
             Password=self.password,
-            Format=4
+            Format=4,
+            Success=self.success
         )
+
+        if self.order_id:
+            data['ShopOrderNumber'] = self.order_id
 
         result = self.set_request(self.get_result_url(), data)
 
@@ -133,10 +142,15 @@ class UnitellerApi(object):
                 event_nodes = tree.xpath(
                     '/unitellerresult/orders/order')
 
+                return_data = {}
                 for event_node in event_nodes:
-                    return_data = {}
+
+                    data = {}
                     for key in keys:
-                        return_data[key] = event_node.find(key).text
+                        data[key] = event_node.find(key).text
+
+                    if 'ordernumber' in data:
+                        return_data[data['ordernumber']] = data
 
         return return_data
 

@@ -23,7 +23,7 @@ class PaymentHistory(db.Model):
     STATUS_NEW = 0
     STATUS_COMPLETE = 1
     STATUS_FAILURE = -1
-    STATUS_NO_PAYMENT = -2
+    STATUS_MISSING = -2
 
     TYPE_MINUS = -1
     TYPE_PLUS = 1
