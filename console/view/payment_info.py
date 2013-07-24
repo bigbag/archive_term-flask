@@ -23,7 +23,7 @@ class PaymentInfo(Command):
 
     "Return payment info"
 
-    def set_new_payment_info(self):
+    def set_new_payment(self):
         date_start = datetime.utcnow() - timedelta(days=1)
         date_stop = datetime.utcnow() - timedelta(minutes=1)
 
@@ -44,8 +44,7 @@ class PaymentInfo(Command):
 
             payment_info = info[str(history.id)]
 
-            if payment_info['status'] == UnitellerApi.STATUS_COMPLETE:
-
+            if payment_info['status'] == UnitellerApi.STATUS_COMPLETE or payment_info['status'] == UnitellerApi.STATUS_AUTH:
                 history.status = PaymentHistory.STATUS_COMPLETE
                 if not history.save():
                     continue
@@ -69,13 +68,12 @@ class PaymentInfo(Command):
                 history.status = PaymentHistory.STATUS_FAILURE
                 history.save()
 
-    def set_missing_payment_info(self):
+    def set_missing_payment(self):
         date_start = datetime.utcnow() - timedelta(days=1)
         date_stop = datetime.utcnow() - timedelta(minutes=15)
 
         payment_history = PaymentHistory.query.filter(
             (PaymentHistory.type == PaymentHistory.TYPE_PLUS) &
-            (PaymentHistory.status == PaymentHistory.STATUS_NEW) &
             (PaymentHistory.creation_date >= date_start) &
             (PaymentHistory.creation_date < date_stop)
         ).all()
@@ -85,13 +83,18 @@ class PaymentInfo(Command):
         info = un.get_payment_info()
 
         for history in payment_history:
-            if not str(history.id) in info:
+            if not str(history.id) in info and history.status == PaymentHistory.STATUS_NEW:
                 history.status = PaymentHistory.STATUS_MISSING
                 history.save()
 
+            # else:
+
     def run(self):
+        # un = UnitellerApi(UnitellerConfig)
+        # un.order_id = 1186
+        # print un.get_payment_info()
         try:
-            self.set_new_payment_info()
-            self.set_missing_payment_info()
+            self.set_new_payment()
+            self.set_missing_payment()
         except Exception as e:
             app.logger.error(e)
