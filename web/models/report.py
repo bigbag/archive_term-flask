@@ -23,6 +23,7 @@ class Report(db.Model):
 
     TYPE_WHITE = 0
     TYPE_PAYMENT = 1
+    TYPE_MPS = 2
 
     id = db.Column(db.Integer, primary_key=True)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
