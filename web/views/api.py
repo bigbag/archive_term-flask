@@ -24,6 +24,7 @@ from web.models.event import Event
 from web.models.person_event import PersonEvent
 from web.models.card_stack import CardStack
 from web.models.payment_wallet import PaymentWallet
+from web.models.payment_reccurent import PaymentReccurent
 from web.models.payment_lost import PaymentLost
 from web.configs.term import TermConfig
 
@@ -71,7 +72,7 @@ def get_config(term_id):
 def get_blacklist():
     """Возвращает черный список карт"""
     wallets = PaymentWallet.query.filter(
-        (PaymentWallet.balance < 10000) | (PaymentWallet.status == -1)).all()
+        (PaymentWallet.balance < PaymentReccurent.BALANCE_MIN) | (PaymentWallet.status == -1)).all()
 
     lost_cards = PaymentLost.query.distinct(PaymentLost.payment_id).all()
 
