@@ -54,7 +54,7 @@ def get_config(hard_id):
     return response
 
 
-@api_admin.route('/spot/add', methods=['GET'])
+@api_admin.route('/spot/add', methods=['POST'])
 @xml_headers
 def add_spot():
     """Добавялем спот и связанный с ним кошелёк"""
