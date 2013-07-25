@@ -122,7 +122,7 @@ class ReportParser(Command):
 
             if not reccurent.wallet:
                 continue
-            if int(reccurent.wallet.balance) > 10000:
+            if int(reccurent.wallet.balance) > PaymentReccurent.BALANCE_MIN:
                 continue
 
             history = PaymentHistory.query.filter_by(

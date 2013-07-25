@@ -41,13 +41,15 @@ class PaymentAuto(Command):
 
             elif recurrent.type == PaymentReccurent.TYPE_LIMIT:
                 i = 1
-                while int(reccurent.wallet.balance) + amount < 11000:
+                limit = PaymentReccurent.PAYMENT_MIN + \
+                    PaymentReccurent.BALANCE_MIN
+                while int(reccurent.wallet.balance) + amount <= limit:
                     amount = int(recurrent.amount) * i
                     i = i + 1
             else:
                 continue
 
-            if amount < 10000:
+            if amount < PaymentReccurent.PAYMENT_MIN:
                 continue
 
             history = PaymentHistory()
