@@ -38,6 +38,9 @@ class PaymentInfo(Command):
         un.success = UnitellerApi.SUCCESS_ALL
         info = un.get_payment_info()
 
+        if not info:
+            return
+
         for history in payment_history:
             if not str(history.id) in info:
                 continue
@@ -81,6 +84,9 @@ class PaymentInfo(Command):
         un = UnitellerApi(UnitellerConfig)
         un.success = UnitellerApi.SUCCESS_ALL
         info = un.get_payment_info()
+
+        if not info:
+            return
 
         for history in payment_history:
             if not str(history.id) in info:
