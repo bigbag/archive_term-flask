@@ -31,7 +31,7 @@ class PaymentAuto(Command):
 
         for recurrent in recurrents:
 
-            if not reccurent.wallet:
+            if not recurent.wallet:
                 continue
 
             amount = 0
