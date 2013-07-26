@@ -65,7 +65,7 @@ class UnitellerApi(object):
 
         return string.upper(hashlib.md5(str('&'.join(result))).hexdigest())
 
-    def get_recurrent_sing(self, order):
+    def get_reccurent_sing(self, order):
         """Обязательные данные - order_id, amount, parent_order_id"""
         data = (
             self.shop_id,
@@ -157,7 +157,7 @@ class UnitellerApi(object):
 
         return return_data
 
-    def recurrent_payment(self, order):
+    def reccurent_payment(self, order):
         """Обязательные данные - order_id, amount, parent_order_id"""
         return_data = False
 
@@ -166,7 +166,7 @@ class UnitellerApi(object):
             Order_IDP=order['order_id'],
             Subtotal_P=order['amount'],
             Parent_Order_IDP=order['parent_order_id'],
-            Signature=self.get_recurrent_sing(order)
+            Signature=self.get_reccurent_sing(order)
         )
 
         result = self.set_request(self.get_recurrent_url(), data)
