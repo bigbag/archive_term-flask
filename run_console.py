@@ -11,6 +11,7 @@ from console.view.mail_send import MailSend
 from console.view.report_parser import ReportParser
 from console.view.payment_info import PaymentInfo
 from console.view.payment_auto import PaymentAuto
+from console.view.test import TestCommand
 
 manager = Manager(app)
 
@@ -18,4 +19,5 @@ manager.add_command('mail', MailSend())
 manager.add_command('report_parser', ReportParser())
 manager.add_command('payment_info', PaymentInfo())
 manager.add_command('payment_auto', PaymentAuto())
+manager.add_command('test', TestCommand())
 manager.run()
