@@ -12,11 +12,10 @@ from flask.ext.script import Command
 class TestCommand(Command):
 
     def rate(self, count, all):
-        rate = []
-        while len(rate) < count:
-            val = random.randint(1, all)
-            if not val in rate:
-                rate.append(val)
+        data = range(1, all + 1)
+        random.shuffle(data)
+        rate = sorted(random.sample(data, count))
+
         return rate
 
     def run(self):
