@@ -60,8 +60,8 @@ def add_spot():
     """Добавялем спот и связанный с ним кошелёк"""
 
     add_success = 0
-    hid = int(request.args['hid'])
-    pids = int(request.args['pids'])
+    hid = int(request.form['hid'])
+    pids = int(request.form['pids'])
 
     if not hid or not pids:
         abort(400)
