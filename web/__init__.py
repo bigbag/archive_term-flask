@@ -2,8 +2,8 @@ from flask import Flask
 
 app = Flask(__name__)
 
-# app.config.from_object('configs.general.DevelopmentConfig')
-app.config.from_object('configs.general.ProductionConfig')
+app.config.from_object('configs.general.DevelopmentConfig')
+# app.config.from_object('configs.general.ProductionConfig')
 
 from flask.ext.cache import Cache
 
