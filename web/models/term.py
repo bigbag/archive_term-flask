@@ -34,6 +34,7 @@ class Term(db.Model):
     upload_period = db.Column(db.Integer, nullable=False)
     download = db.Column(db.String(256), nullable=False)
     download_period = db.Column(db.Integer, nullable=False)
+    version = db.Column(db.String(128))
 
     def __init__(self, id):
         self.id = id

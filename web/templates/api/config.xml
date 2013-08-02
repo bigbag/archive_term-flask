@@ -19,10 +19,12 @@
     </upload>
     {% endif %}
     {% if config.UPDATE %}
+    {% if term.version %}
     <update force_on_restart="1">
         <period>{{ config.UPDATE_PERIOD }}</period>
-        <qid>MOBISPOT</qid>
+        <qid>{{term.version}}</qid>
     </update>
+    {% endif %}
     {% endif %}
     {% if config.DOWNLOAD %}
     <server goal="download">
