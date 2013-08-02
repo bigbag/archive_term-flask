@@ -21,6 +21,7 @@
     {% if config.UPDATE %}
     <update force_on_restart="1">
         <period>{{ config.UPDATE_PERIOD }}</period>
+        <qid>MOBISPOT</qid>
     </update>
     {% endif %}
     {% if config.DOWNLOAD %}
