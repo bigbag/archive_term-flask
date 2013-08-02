@@ -15,7 +15,7 @@ from web import cache
 from web.decorators.header import *
 from web.helpers.date_helper import *
 from web.helpers.hash_helper import *
-from web.helpers.error_helper import *
+from web.helpers.error_xml_helper import *
 
 from web.models.spot import Spot
 from web.models.payment_wallet import PaymentWallet

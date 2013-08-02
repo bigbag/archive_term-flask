@@ -32,6 +32,14 @@ def xml_headers(f):
     return decorated_function
 
 
+def json_headers(f):
+    @wraps(f)
+    @add_response_headers({'Content-Type': 'application/json'})
+    def decorated_function(*args, **kwargs):
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 def md5_content_headers(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):

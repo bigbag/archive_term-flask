@@ -8,7 +8,7 @@
 import re
 import os
 
-from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
+from flask import Flask, Blueprint, abort, request, make_response, url_for, render_template
 
 from web import app
 from web import cache
@@ -16,7 +16,7 @@ from web import cache
 from web.decorators.header import *
 from web.helpers.date_helper import *
 from web.helpers.hash_helper import *
-from web.helpers.error_helper import *
+from web.helpers.error_xml_helper import *
 
 from web.models.term import Term
 from web.models.term_event import TermEvent
@@ -125,7 +125,7 @@ def upload_report(term_id, report_datetime):
     term.report_date = get_curent_date()
     term.update()
 
-    return make_response(jsonify({'success': 'Report uploaded successfully'}), 201)
+    return set_message('success', 'Report uploaded successfully', 201)
 
 
 @api.route('/uids/<int:term_id>_<payment_id>.uid', methods=['PUT'])
@@ -145,4 +145,4 @@ def add_card(term_id, payment_id):
     card.payment_id = payment_id
     card.save()
 
-    return make_response(jsonify({'success': 'Card added'}), 201)
+    return set_message('success', 'Card added', 201)
