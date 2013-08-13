@@ -62,8 +62,9 @@ class PaymentReccurent(db.Model):
                 self.creation_date = get_curent_date()
             db.session.add(self)
             db.session.commit()
-        except:
+        except Exception as e:
             db.session.rollback()
+            app.logger.error(e)
             return False
         else:
             return True

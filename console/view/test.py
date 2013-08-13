@@ -6,7 +6,10 @@
     :license: BSD, see LICENSE for more details.
 """
 import random
+import csv
+
 from flask.ext.script import Command
+from web.models.person import Person
 
 
 class TestCommand(Command):
@@ -18,7 +21,22 @@ class TestCommand(Command):
 
         return rate
 
+    def importCsv(self, file):
+        spamreader = False
+        with open(file, 'rb') as csvfile:
+            spamreader = csv.reader(csvfile)
+
+        return spamreader
+
     def run(self):
         print self.rate(5, 36)
         print self.rate(6, 45)
         print self.rate(7, 49)
+        #
+        # for row in spamreader:
+                # person = Person.query.filter_by(
+                #     payment_id=row[1]).first()
+
+                # if person.payment_id == person.hard_id:
+                #     person.hard_id = row[0]
+                #     print person.save()

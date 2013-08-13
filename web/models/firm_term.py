@@ -41,8 +41,9 @@ class FirmTerm(db.Model):
         try:
             db.session.add(self)
             db.session.commit()
-        except:
+        except Exception as e:
             db.session.rollback()
+            app.logger.error(e)
             return False
         else:
             return True

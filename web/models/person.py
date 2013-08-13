@@ -31,8 +31,7 @@ class Person(db.Model):
     creation_date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, id):
-        self.id = id
+    def __init__(self):
         self.status = self.STATUS_VALID
 
     def __repr__(self):
@@ -51,8 +50,9 @@ class Person(db.Model):
                 self.creation_date = get_curent_date()
             db.session.add(self)
             db.session.commit()
-        except:
+        except Exception as e:
             db.session.rollback()
+            app.logger.error(e)
             return False
         else:
             return True

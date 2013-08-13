@@ -52,5 +52,12 @@ class ReportStack(db.Model):
         db.session.commit()
 
     def save(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(e)
+            return False
+        else:
+            return True
