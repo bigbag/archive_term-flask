@@ -57,17 +57,20 @@ def get_config(hard_id):
 @api_admin.route('/spot/add', methods=['POST'])
 @xml_headers
 def add_spot():
-    """Добавялем спот и связанный с ним кошелёк"""
+    """Добавляем спот и связанный с ним кошелёк"""
 
     add_success = 0
-    hid = int(request.form['hid'])
-    pids = int(request.form['pids'])
+    hid = request.form['hid']
+    pids = request.form['pids']
 
     if not hid or not pids:
         abort(400)
 
     if not len(str(hid)) == 16 or not len(str(pids)) == 10:
         abort(400)
+
+    hid = int(hid)
+    pids = int(pids)
 
     wallet = PaymentWallet.query.filter_by(
         hard_id=hid).first()
