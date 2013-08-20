@@ -11,6 +11,9 @@ import csv
 from flask.ext.script import Command
 from web.models.person import Person
 
+from console.configs.payment import UnitellerConfig
+from libs.uniteller_api import UnitellerApi
+
 
 class TestCommand(Command):
 

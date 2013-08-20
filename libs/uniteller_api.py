@@ -38,6 +38,7 @@ class UnitellerApi(object):
 
     def __init__(self, const):
         self.const = const
+        self.grab = None
         self.order_id = None
         self.success = self.SUCCESS_ALL
         self.shop_id = self.const.SHOP_ID
@@ -48,17 +49,8 @@ class UnitellerApi(object):
     def __repr__(self):
         return "%s" % self.const
 
-    def get_payment_url(self):
-        return "%s%s" % (self.prefix, self.const.PAYMENT_URL)
-
-    def get_result_url(self):
-        return "%s%s" % (self.prefix, self.const.RESULT_URL)
-
-    def get_unblock_url(self):
-        return "%s%s" % (self.prefix, self.const.UNBLOCK_URL)
-
-    def get_recurrent_url(self):
-        return "%s%s" % (self.prefix, self.const.RECURRENT_URL)
+    def get_url(self, method):
+        return "%s%s/%s/" % (self.prefix, self.const.GENERAL_URL, method)
 
     def get_sing(self, order):
         result = [hashlib.md5(str(value)).hexdigest() for value in order]
@@ -95,16 +87,19 @@ class UnitellerApi(object):
 
     def set_request(self, url, data=None):
         return_data = False
-        grab = Grab()
+
+        if not self.grab:
+            self.grab = Grab()
+
         if data:
-            grab.setup(post=data)
+            self.grab.setup(post=data)
 
         try:
-            grab.go(url)
+            self.grab.go(url)
         except Exception as e:
             app.logger.error(e)
         else:
-            return_data = grab
+            return_data = self.grab
 
         return return_data
 
@@ -134,7 +129,7 @@ class UnitellerApi(object):
         if self.order_id:
             data['ShopOrderNumber'] = self.order_id
 
-        result = self.set_request(self.get_result_url(), data)
+        result = self.set_request(self.get_url('results'), data)
 
         if result:
             try:
@@ -169,7 +164,7 @@ class UnitellerApi(object):
             Signature=self.get_reccurent_sing(order)
         )
 
-        result = self.set_request(self.get_recurrent_url(), data)
+        result = self.set_request(self.get_url('recurrent'), data)
 
         if result:
             data = result.response.body

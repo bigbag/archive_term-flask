@@ -8,10 +8,15 @@
 
 
 class UnitellerConfig(object):
-    PAYMENT_URL = 'wpay.uniteller.ru/pay/'
-    RESULT_URL = 'wpay.uniteller.ru/results/'
-    UNBLOCK_URL = 'wpay.uniteller.ru/unblock/'
-    RECURRENT_URL = 'wpay.uniteller.ru/recurrent/'
+    GENERAL_URL = 'wpay.uniteller.ru'
+
+    METHOD = (
+        'pay',
+        'results',
+        'unblock',
+        'recurrent',
+
+    )
 
     TEST = False
     TEST_PREFIX = 'https://test.'
