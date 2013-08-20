@@ -51,12 +51,14 @@
     </server>
     {% endif %}
     {% if config.UPDATE %}
+    {% if term.version %}
     <server goal="update">
         <ip>{{ config.UPDATE_IP }}</ip>
         <port>{{ config.UPDATE_PORT }}</port>
         <proto upload_method="PUT">{{ config.UPDATE_PROTO }}</proto>
         <link>{{ config.UPDATE_LINK_TYPE }}</link>
     </server>
+    {% endif %}
     {% endif %}
     {% for term_event in term_events %}
     <event type="{{term_event.event.key}}" translation="{{term_event.event.name}}" min_time="{{term_event.start}}" max_time="{{term_event.stop}}">
