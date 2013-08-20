@@ -16,16 +16,20 @@ from web.models.mail_stack import MailStack
 
 class MailSend(Command):
 
+    MAIL_COUNT = 100
+
     "Sending mail"
 
     def run(self):
 
-        emails = MailStack.query.filter_by(
-            lock=MailStack.LOCK_FREE).limit(
-                100).all()
-
         with mail.connect() as conn:
-            for email in emails:
+            for i in xrange(0, self.MAIL_COUNT):
+                email = MailStack.query.filter_by(
+                    lock=MailStack.LOCK_FREE).first()
+
+                if not email:
+                    return False
+
                 email.lock = MailStack.LOCK_SET
                 email.save()
 
