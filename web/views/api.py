@@ -20,6 +20,7 @@ from web.helpers.error_xml_helper import *
 
 from web.models.term import Term
 from web.models.term_event import TermEvent
+from web.models.person import Person
 from web.models.event import Event
 from web.models.person_event import PersonEvent
 from web.models.card_stack import CardStack
@@ -72,13 +73,20 @@ def get_config(term_id):
 def get_blacklist():
     """Возвращает черный список карт"""
     wallets = PaymentWallet.query.filter(
-        (PaymentWallet.balance < PaymentReccurent.BALANCE_MIN) | (PaymentWallet.status == -1)).all()
+        (PaymentWallet.balance > PaymentReccurent.BALANCE_MIN) & (PaymentWallet.status == 1)).all()
 
     lost_cards = PaymentLost.query.distinct(PaymentLost.payment_id).all()
 
+    persons = Person.query.group_by(Person.payment_id).all()
+
+    valid_payment_id = []
+    for wallet in wallets:
+        valid_payment_id.append(wallet.payment_id)
+
     config_xml = render_template(
         'api/blacklist.xml',
-        wallets=wallets,
+        valid_payment_id=valid_payment_id,
+        persons=persons,
         lost_cards=lost_cards,
     ).encode('cp1251')
 
