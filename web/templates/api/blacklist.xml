@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <blacklist>
-    {% for person in persons %}
-    {% if person.payment_id %}
-    {% if person.payment_id not in valid_payment_id %}
-    <card>{{person.payment_id}}</card>
-    {% endif %}
-    {% endif %}
+    {% for row in blacklist %}
+    <card>{{row}}</card>
     {% endfor %}
     {% for lost_card in lost_cards %}
     <card>{{lost_card.payment_id}}</card>
