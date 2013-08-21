@@ -6,6 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from console import db
+from web import app
 
 
 class MailStack(db.Model):

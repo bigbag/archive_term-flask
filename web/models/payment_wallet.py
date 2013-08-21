@@ -10,6 +10,7 @@ import hashlib
 import random
 
 from web import db
+from web import app
 from web.models.user import User
 
 from web.helpers.date_helper import *

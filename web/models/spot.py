@@ -10,6 +10,7 @@ import string
 import hashlib
 
 from web import db
+from web import app
 from web.helpers.date_helper import *
 from web.helpers.hash_helper import *
 

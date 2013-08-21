@@ -7,6 +7,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from web import db
+from web import app
 from web.models.payment_wallet import PaymentWallet
 from web.models.payment_history import PaymentHistory
 from web.helpers.date_helper import *

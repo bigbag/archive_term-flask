@@ -9,6 +9,7 @@
 """
 
 from web import db
+from web import app
 from web.models.term import Term
 from web.models.event import Event
 from web.models.person import Person
@@ -29,8 +30,7 @@ class PersonEvent(db.Model):
     firm_id = db.Column(db.Integer, index=True)
     timeout = db.Column(db.Time, nullable=False)
 
-    def __init__(self, id):
-        self.id = id
+    def __init__(self):
         self.timeout = "00:00:00"
 
     def __repr__(self):

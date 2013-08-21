@@ -9,6 +9,7 @@
 import hashlib
 
 from web import db
+from web import app
 from web.models.term import Term
 from web.models.payment_wallet import PaymentWallet
 from web.models.user import User
