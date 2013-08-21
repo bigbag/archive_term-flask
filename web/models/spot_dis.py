@@ -6,6 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from web import db
+from web import app
 from web.helpers.date_helper import *
 
 

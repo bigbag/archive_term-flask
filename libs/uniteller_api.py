@@ -64,7 +64,8 @@ class UnitellerApi(object):
             order['order_id'],
             order['amount'],
             order['parent_order_id'],
-            self.password)
+            self.password
+        )
 
         return self.get_sing(data)
 
@@ -81,7 +82,8 @@ class UnitellerApi(object):
             full_order['card_id'],
             full_order['l_data'],
             full_order['paymen_type'],
-            self.password)
+            self.password
+        )
 
         return self.get_sing(data)
 
