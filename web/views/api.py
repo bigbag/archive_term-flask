@@ -72,21 +72,33 @@ def get_config(term_id):
 @md5_content_headers
 def get_blacklist():
     """Возвращает черный список карт"""
-    wallets = PaymentWallet.query.filter(
-        (PaymentWallet.balance > PaymentReccurent.BALANCE_MIN) & (PaymentWallet.status == 1)).all()
+    wallets = PaymentWallet.query.group_by(PaymentWallet.payment_id).all()
+
+    valid_payment_id = []
+    invalid_payment_id = []
+    for wallet in wallets:
+        if (wallet.balance < PaymentReccurent.BALANCE_MIN) | (wallet.status != 1):
+            invalid_payment_id.append(wallet.payment_id)
+        else:
+            valid_payment_id.append(wallet.payment_id)
 
     lost_cards = PaymentLost.query.group_by(PaymentLost.payment_id).all()
 
     persons = Person.query.group_by(Person.payment_id).all()
 
-    valid_payment_id = []
-    for wallet in wallets:
-        valid_payment_id.append(wallet.payment_id)
+    blacklist = []
+    for person in persons:
+        if not person.payment_id:
+            continue
+
+        if person.payment_id not in valid_payment_id:
+            blacklist.append(person.payment_id)
+
+    blacklist = sorted(blacklist + invalid_payment_id)
 
     config_xml = render_template(
         'api/blacklist.xml',
-        valid_payment_id=valid_payment_id,
-        persons=persons,
+        blacklist=blacklist,
         lost_cards=lost_cards,
     ).encode('cp1251')
 
