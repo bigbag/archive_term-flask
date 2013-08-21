@@ -5,6 +5,9 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import gzip
+import StringIO
+
 from functools import wraps
 from flask import Flask, make_response
 from web.helpers.hash_helper import *
@@ -46,5 +49,27 @@ def md5_content_headers(f):
         resp = make_response(f(*args, **kwargs))
         h = resp.headers
         h['Content-MD5'] = get_content_md5(resp.response[0])
+        return resp
+    return decorated_function
+
+
+def gzip_content(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        resp = make_response(f(*args, **kwargs))
+
+        gzip_buffer = StringIO.StringIO()
+        gzip_file = gzip.GzipFile(
+            mode='wb',
+            compresslevel=6,
+            fileobj=gzip_buffer)
+        gzip_file.write(resp.data)
+        gzip_file.close()
+        resp.data = gzip_buffer.getvalue()
+
+        h = resp.headers
+        h['Content-Encoding'] = 'gzip'
+        h['Content-Length'] = len(resp.data)
+
         return resp
     return decorated_function
