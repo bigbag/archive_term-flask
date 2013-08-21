@@ -75,7 +75,7 @@ def get_blacklist():
     wallets = PaymentWallet.query.filter(
         (PaymentWallet.balance > PaymentReccurent.BALANCE_MIN) & (PaymentWallet.status == 1)).all()
 
-    lost_cards = PaymentLost.query.distinct(PaymentLost.payment_id).all()
+    lost_cards = PaymentLost.query.group_by(PaymentLost.payment_id).all()
 
     persons = Person.query.group_by(Person.payment_id).all()
 
