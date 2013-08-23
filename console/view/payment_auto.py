@@ -12,11 +12,11 @@ from console import app
 from console.configs.payment import UnitellerConfig
 from libs.uniteller_api import UnitellerApi
 
-from web.helpers.date_helper import *
+from helpers.date_helper import *
 
-from web.models.payment_wallet import PaymentWallet
-from web.models.payment_history import PaymentHistory
-from web.models.payment_reccurent import PaymentReccurent
+from models.payment_wallet import PaymentWallet
+from models.payment_history import PaymentHistory
+from models.payment_reccurent import PaymentReccurent
 
 
 class PaymentAuto(Command):

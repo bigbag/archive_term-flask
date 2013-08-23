@@ -9,8 +9,8 @@ import random
 import csv
 
 from flask.ext.script import Command
-from web.models.person import Person
-from web.models.person_event import PersonEvent
+from models.person import Person
+from models.person_event import PersonEvent
 
 from console.configs.payment import UnitellerConfig
 from libs.uniteller_api import UnitellerApi

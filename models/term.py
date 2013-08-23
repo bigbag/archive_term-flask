@@ -9,7 +9,7 @@
 from flask import json
 from web import app
 from web import db
-from web.helpers.date_helper import *
+from helpers.date_helper import *
 
 
 class Term(db.Model):

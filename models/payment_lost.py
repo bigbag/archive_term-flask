@@ -8,8 +8,8 @@
 import hashlib
 from web import db
 from web import app
-from web.models.term import Term
-from web.models.event import Event
+from models.term import Term
+from models.event import Event
 
 
 class PaymentLost(db.Model):

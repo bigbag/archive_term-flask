@@ -1,35 +1,43 @@
 # -*- coding: utf-8 -*-
 """
-    Модель реализующая принадлежность терминалов к фирмам и мультиаренду
+    Модель событий для которых установлены
+    таймауты обслуживания для каждого пользователя
+
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+
 from web import db
 from web import app
-from web.models.term import Term
-from web.models.firm import Firm
+from models.term import Term
+from models.event import Event
+from models.person import Person
 
 
-class FirmTerm(db.Model):
+class PersonEvent(db.Model):
 
     __bind_key__ = 'term'
-    __tablename__ = 'firm_term'
+    __tablename__ = 'person_event'
 
     id = db.Column(db.Integer, primary_key=True)
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
+    person = db.relationship('Person')
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
-    firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
-    firm = db.relationship('Firm')
-    child_firm_id = db.Column(db.Integer, db.ForeignKey('child_firm_id.id'))
-    child_firm = db.relationship('Firm')
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
+    event = db.relationship('Event')
+    firm_id = db.Column(db.Integer, index=True)
+    timeout = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, id):
-        self.id = id
-        self.child_firm_id = 0
+    def __init__(self):
+        self.timeout = "0"
 
     def __repr__(self):
         return '<id %r>' % (self.id)
+
+    def get_all_events(self):
+        return Event.query.all()
 
     def delete(self):
         db.session.delete(self)

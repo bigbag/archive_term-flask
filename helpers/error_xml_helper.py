@@ -7,7 +7,7 @@
 """
 from web import app
 from flask import Flask, make_response, render_template_string
-from web.decorators.header import *
+from decorators.header import *
 
 message_template = """
     <?xml version="1.0" encoding="windows-1251"?>

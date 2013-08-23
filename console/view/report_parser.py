@@ -13,13 +13,13 @@ from flask.ext.script import Command
 
 from console import app
 
-from web.models.report import Report
-from web.models.event import Event
-from web.models.term import Term
-from web.models.payment_wallet import PaymentWallet
-from web.models.payment_lost import PaymentLost
-from web.models.payment_history import PaymentHistory
-from web.models.payment_reccurent import PaymentReccurent
+from models.report import Report
+from models.event import Event
+from models.term import Term
+from models.payment_wallet import PaymentWallet
+from models.payment_lost import PaymentLost
+from models.payment_history import PaymentHistory
+from models.payment_reccurent import PaymentReccurent
 
 
 class ReportParser(Command):

@@ -12,13 +12,13 @@ from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_
 from web import app
 from web import cache
 
-from web.decorators.header import *
-from web.helpers.date_helper import *
-from web.helpers.hash_helper import *
-from web.helpers.error_xml_helper import *
+from decorators.header import *
+from helpers.date_helper import *
+from helpers.hash_helper import *
+from helpers.error_xml_helper import *
 
-from web.models.spot import Spot
-from web.models.payment_wallet import PaymentWallet
+from models.spot import Spot
+from models.payment_wallet import PaymentWallet
 
 
 api_admin = Blueprint('api_admin', __name__)

@@ -10,10 +10,10 @@ import hashlib
 
 from web import db
 from web import app
-from web.models.term import Term
-from web.models.payment_wallet import PaymentWallet
-from web.models.user import User
-from web.helpers.date_helper import *
+from models.term import Term
+from models.payment_wallet import PaymentWallet
+from models.user import User
+from helpers.date_helper import *
 
 
 class PaymentHistory(db.Model):
