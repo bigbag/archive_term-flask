@@ -9,12 +9,12 @@ import hashlib
 import time
 from web import db
 from web import app
-from web.models.term import Term
-from web.models.person import Person
-from web.models.firm import Firm
-from web.models.event import Event
-from web.models.firm_term import FirmTerm
-from web.helpers.date_helper import *
+from models.term import Term
+from models.person import Person
+from models.firm import Firm
+from models.event import Event
+from models.firm_term import FirmTerm
+from helpers.date_helper import *
 
 
 class Report(db.Model):

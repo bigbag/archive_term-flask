@@ -1,32 +1,32 @@
 # -*- coding: utf-8 -*-
 """
-    Модель для ДИС
+    Модель реализующая принадлежность терминалов к фирмам и мультиаренду
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 from web import db
 from web import app
-from web.helpers.date_helper import *
+from models.term import Term
+from models.firm import Firm
 
 
-class SpotDis(db.Model):
+class FirmTerm(db.Model):
 
-    __bind_key__ = 'mobispot'
-    __tablename__ = 'discodes'
-
-    PREMIUM_NO = 0
-    PREMIUM_YES = 1
-
-    STATUS_INIT = 0
-    STATUS_GENERATED = 1
+    __bind_key__ = 'term'
+    __tablename__ = 'firm_term'
 
     id = db.Column(db.Integer, primary_key=True)
-    premium = db.Column(db.Integer, nullable=False, index=True)
-    status = db.Column(db.Integer, nullable=False)
+    term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
+    term = db.relationship('Term')
+    firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
+    firm = db.relationship('Firm')
+    child_firm_id = db.Column(db.Integer, db.ForeignKey('child_firm_id.id'))
+    child_firm = db.relationship('Firm')
 
-    def __init__(self):
-        self.status = self.STATUS_GENERATED
+    def __init__(self, id):
+        self.id = id
+        self.child_firm_id = 0
 
     def __repr__(self):
         return '<id %r>' % (self.id)

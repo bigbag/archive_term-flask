@@ -1,29 +1,36 @@
 # -*- coding: utf-8 -*-
 """
-    Модель стека карт ожидающих привязки
+    Модель для истории пополнений
+
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 from web import db
 from web import app
-from web.models.term import Term
-from web.helpers.date_helper import *
+from models.payment_wallet import PaymentWallet
+from models.payment_history import PaymentHistory
+from helpers.date_helper import *
 
 
-class CardStack(db.Model):
+class PaymentLog(db.Model):
 
-    __bind_key__ = 'stack'
-    __tablename__ = 'card'
+    __bind_key__ = 'payment'
+    __tablename__ = 'log'
 
-    id = db.Column(db.Integer, primary_key=True)
-    term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
-    term = db.relationship('Term')
-    payment_id = db.Column(db.Integer, nullable=False)
+    history_id = db.Column(
+        db.Integer,
+        db.ForeignKey('history.id'),
+        primary_key=True)
+    history = db.relationship('PaymentHistory')
+    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
+    wallet = db.relationship('PaymentWallet')
+    rrn = db.Column(db.String(32), nullable=False)
+    card_pan = db.Column(db.String(32), nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
 
     def __repr__(self):
-        return '<id %r>' % (self.id)
+        return '<id %r>' % (self.history_id)
 
     def delete(self):
         db.session.delete(self)
@@ -36,6 +43,7 @@ class CardStack(db.Model):
         try:
             if not self.creation_date:
                 self.creation_date = get_curent_date()
+            db.session.add(self)
             db.session.add(self)
             db.session.commit()
         except Exception as e:

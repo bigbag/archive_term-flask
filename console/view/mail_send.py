@@ -11,7 +11,7 @@ from flask.ext.mail import Message
 from flask.ext.script import Command
 
 from console import mail
-from web.models.mail_stack import MailStack
+from models.mail_stack import MailStack
 
 
 class MailSend(Command):

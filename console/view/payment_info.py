@@ -14,9 +14,9 @@ from console import app
 from console.configs.payment import UnitellerConfig
 
 from libs.uniteller_api import UnitellerApi
-from web.models.payment_history import PaymentHistory
-from web.models.payment_log import PaymentLog
-from web.models.payment_wallet import PaymentWallet
+from models.payment_history import PaymentHistory
+from models.payment_log import PaymentLog
+from models.payment_wallet import PaymentWallet
 
 
 class PaymentInfo(Command):

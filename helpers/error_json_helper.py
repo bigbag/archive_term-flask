@@ -7,7 +7,7 @@
 """
 from web import app
 from flask import Flask, jsonify, make_response
-from web.decorators.header import *
+from decorators.header import *
 
 
 @app.errorhandler(400)

@@ -11,10 +11,10 @@ import random
 
 from web import db
 from web import app
-from web.models.user import User
+from models.user import User
 
-from web.helpers.date_helper import *
-from web.helpers.hash_helper import *
+from helpers.date_helper import *
+from helpers.hash_helper import *
 
 
 class PaymentWallet(db.Model):
