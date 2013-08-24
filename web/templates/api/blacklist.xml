@@ -3,7 +3,4 @@
     {% for row in blacklist %}
     <card>{{row}}</card>
     {% endfor %}
-    {% for lost_card in lost_cards %}
-    <card>{{lost_card.payment_id}}</card>
-    {% endfor %}
 </blacklist>
