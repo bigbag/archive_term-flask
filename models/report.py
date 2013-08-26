@@ -42,7 +42,7 @@ class Report(db.Model):
     check_summ = db.Column(db.String(32), nullable=False)
 
     def get_db_view(self, data):
-        self.payment_id = data.text
+        self.payment_id = data.text.rjust(20, '0')
 
         firm_terms = FirmTerm.query.filter_by(
             term_id=self.term.id).all()
@@ -57,7 +57,7 @@ class Report(db.Model):
             if person.firm_id in firm_id_list:
                 self.person_id = person.id
                 self.firm_id = person.firm_id
-                break
+                continue
 
         if data.get('summ'):
             self.amount = data.get('summ')

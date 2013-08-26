@@ -68,7 +68,7 @@ def get_config(term_id):
 
 
 @api.route('/configs/blacklist.xml', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=60)
 @xml_headers
 @gzip_content
 @md5_content_headers
