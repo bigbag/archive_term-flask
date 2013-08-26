@@ -88,7 +88,7 @@ def add_spot():
 
         wallet.discodes_id = spot.discodes_id
         wallet.hard_id = hid
-        wallet.payment_id = wallet.get_pid(pids)
+        wallet.payment_id = str(wallet.get_pid(pids)).rjust(20, '0')
 
         add_success = 1
 

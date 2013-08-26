@@ -80,9 +80,9 @@ def get_blacklist():
     invalid_payment_id = []
     for wallet in wallets:
         if (wallet.balance < PaymentReccurent.BALANCE_MIN) | (wallet.status != 1):
-            invalid_payment_id.append(wallet.payment_id)
+            invalid_payment_id.append(str(wallet.payment_id))
         else:
-            valid_payment_id.append(wallet.payment_id)
+            valid_payment_id.append(str(wallet.payment_id))
 
     lost_cards = PaymentLost.query.group_by(PaymentLost.payment_id).all()
 

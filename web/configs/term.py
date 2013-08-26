@@ -24,7 +24,7 @@ class TermConfig(object):
 
     LOGGER = True
     LOGGER_IP = '80.90.125.219'
-    LOGGER_PORT = 64141
+    LOGGER_PORT = 7880
     LOGGER_PROTO = 'http'
     LOGGER_LINK_TYPE = 2
 

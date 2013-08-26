@@ -27,7 +27,7 @@ class PaymentWallet(db.Model):
     STATUS_BANNED = -1
 
     id = db.Column(db.Integer, primary_key=True)
-    payment_id = db.Column(db.Integer(150), index=True)
+    payment_id = db.Column(db.String(20), index=True)
     hard_id = db.Column(db.Integer(150), index=True)
     name = db.Column(db.Integer(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
