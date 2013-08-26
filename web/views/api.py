@@ -68,7 +68,7 @@ def get_config(term_id):
 
 
 @api.route('/configs/blacklist.xml', methods=['GET'])
-@cache.cached(timeout=60)
+@cache.cached(timeout=0)
 @xml_headers
 #@gzip_content
 @md5_content_headers
@@ -79,7 +79,7 @@ def get_blacklist():
     valid_payment_id = []
     invalid_payment_id = []
     for wallet in wallets:
-        if (wallet.balance < PaymentReccurent.BALANCE_MIN) | (wallet.status != 1):
+        if (int(wallet.balance) < PaymentReccurent.BALANCE_MIN) | (wallet.status != 1):
             invalid_payment_id.append(str(wallet.payment_id))
         else:
             valid_payment_id.append(str(wallet.payment_id))
@@ -94,7 +94,8 @@ def get_blacklist():
             continue
 
         if person.payment_id not in valid_payment_id:
-            blacklist.append(person.payment_id)
+            if not person.payment_id in blacklist:
+                blacklist.append(person.payment_id)
 
     blacklist = sorted(blacklist + invalid_payment_id)
 

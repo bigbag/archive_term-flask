@@ -7,9 +7,10 @@
 """
 import random
 import csv
-
+import uuid
 from flask.ext.script import Command
 from models.person import Person
+from models.payment_wallet import PaymentWallet
 from models.person_event import PersonEvent
 
 from console.configs.payment import UnitellerConfig
@@ -76,6 +77,6 @@ class TestCommand(Command):
         #     if person.payment_id == person.hard_id:
         #         person.hard_id = row[0]
         #         print person.save()
-        print self.rate(5, 36)
-        print self.rate(6, 45)
-        print self.rate(7, 49)
+        # print self.rate(5, 36)
+        # print self.rate(6, 45)
+        # print self.rate(7, 49)
