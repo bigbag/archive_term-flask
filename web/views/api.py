@@ -34,9 +34,9 @@ api = Blueprint('api', __name__)
 
 
 @api.route('/configs/config_<int:term_id>.xml', methods=['GET'])
-@cache.cached(timeout=120)
+@cache.cached(timeout=60)
 @xml_headers
-@gzip_content
+#@gzip_content
 @md5_content_headers
 def get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
@@ -70,7 +70,7 @@ def get_config(term_id):
 @api.route('/configs/blacklist.xml', methods=['GET'])
 @cache.cached(timeout=60)
 @xml_headers
-@gzip_content
+#@gzip_content
 @md5_content_headers
 def get_blacklist():
     """Возвращает черный список карт"""
@@ -84,8 +84,8 @@ def get_blacklist():
         else:
             valid_payment_id.append(str(wallet.payment_id))
 
-    lost_cards = PaymentLost.query.group_by(PaymentLost.payment_id).all()
-
+    #lost_cards = PaymentLost.query.group_by(PaymentLost.payment_id).all()
+    lost_cards = None
     persons = Person.query.group_by(Person.payment_id).all()
 
     blacklist = []
@@ -94,7 +94,7 @@ def get_blacklist():
             continue
 
         if person.payment_id not in valid_payment_id:
-            if not person.payment_id in blacklist:
+            if not person.payment_id in invalid_payment_id:
                 blacklist.append(person.payment_id)
 
     blacklist = sorted(blacklist + invalid_payment_id)
