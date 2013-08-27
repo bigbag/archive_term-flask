@@ -34,7 +34,7 @@ api = Blueprint('api', __name__)
 
 
 @api.route('/configs/config_<int:term_id>.xml', methods=['GET'])
-@cache.cached(timeout=120)
+@cache.cached(timeout=60)
 @xml_headers
 #@gzip_content
 @md5_content_headers
@@ -68,7 +68,7 @@ def get_config(term_id):
 
 
 @api.route('/configs/blacklist.xml', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=60)
 @xml_headers
 #@gzip_content
 @md5_content_headers
@@ -94,7 +94,7 @@ def get_blacklist():
             continue
 
         if person.payment_id not in valid_payment_id:
-            if not person.payment_id in blacklist:
+            if not person.payment_id in invalid_payment_id:
                 blacklist.append(person.payment_id)
 
     blacklist = sorted(blacklist + invalid_payment_id)
