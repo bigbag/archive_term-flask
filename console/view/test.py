@@ -36,6 +36,7 @@ class TestCommand(Command):
         return spamreader
 
     def run(self):
+        print True
 
         # with open('tmp/import.csv', 'rb') as csvfile:
         #     spamreader = csv.reader(csvfile)
