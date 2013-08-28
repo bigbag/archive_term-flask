@@ -32,7 +32,6 @@ class ReportStack(db.Model):
     lock = db.Column(db.Integer, index=True, nullable=False)
 
     def __init__(self, id):
-        self.id = id
         self.lock = self.LOCK_FREE
         self.excel = self.EXCEL_NO
 

@@ -61,7 +61,8 @@ class ReportParser(Command):
 
                     term = Term.query.get(term_id)
                     if not term:
-                        term = Term(term_id)
+                        term = Term()
+                        term.id = term_id
 
                     card_nodes = tree.xpath(
                         '/Report/Event[@type="%s"]/Card' %

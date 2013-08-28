@@ -24,8 +24,7 @@ class FirmTerm(db.Model):
     child_firm_id = db.Column(db.Integer, db.ForeignKey('child_firm_id.id'))
     child_firm = db.relationship('Firm')
 
-    def __init__(self, id):
-        self.id = id
+    def __init__(self):
         self.child_firm_id = 0
 
     def __repr__(self):

@@ -36,8 +36,7 @@ class Term(db.Model):
     download_period = db.Column(db.Integer, nullable=False)
     version = db.Column(db.String(128))
 
-    def __init__(self, id):
-        self.id = id
+    def __init__(self):
         self.type = self.TYPE_POS
         self.upload = {"start": "00:00:00", "stop": "23:59:59"}
         self.upload_period = 0

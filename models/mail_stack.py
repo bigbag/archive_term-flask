@@ -26,8 +26,7 @@ class MailStack(db.Model):
     creation_date = db.Column(db.DateTime, nullable=False)
     lock = db.Column(db.Integer, index=True, nullable=False)
 
-    def __init__(self, id):
-        self.id = id
+    def __init__(self):
         self.lock = self.LOCK_FREE
 
     def __repr__(self):

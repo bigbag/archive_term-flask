@@ -26,8 +26,7 @@ class TermEvent(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     event = db.relationship('Event')
 
-    def __init__(self, id):
-        self.id = id
+    def __init__(self):
         self.cost = 0
         self.age_id = 1
         self.start = "00:00:00"

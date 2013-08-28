@@ -21,7 +21,6 @@ from web.views.api_old import api_old
 from web.views.api_admin import api_admin
 
 app.register_blueprint(api, url_prefix='/term/v1.0')
-app.register_blueprint(api_old, url_prefix='/term/v0.0')
 app.register_blueprint(api_admin, url_prefix='/term/admin')
 
 if app.debug is not True:
