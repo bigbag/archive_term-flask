@@ -10,6 +10,8 @@ from web import app
 from models.term import Term
 from models.firm import Firm
 
+from helpers.date_helper import *
+
 
 class FirmTerm(db.Model):
 
@@ -20,12 +22,18 @@ class FirmTerm(db.Model):
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
     firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
-    firm = db.relationship('Firm')
-    child_firm_id = db.Column(db.Integer, db.ForeignKey('child_firm_id.id'))
-    child_firm = db.relationship('Firm')
+    firm = db.relationship(
+        'Firm',
+        primaryjoin="Firm.id==FirmTerm.firm_id")
+    child_firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
+    child_firm = db.relationship(
+        'Firm',
+        primaryjoin="Firm.id==FirmTerm.child_firm_id")
+
+    creation_date = db.Column(db.DateTime, nullable=False)
 
     def __init__(self):
-        self.child_firm_id = 0
+        self.creation_date = get_curent_date()
 
     def __repr__(self):
         return '<id %r>' % (self.id)

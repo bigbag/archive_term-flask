@@ -13,6 +13,7 @@ from web import app
 from models.term import Term
 from models.payment_wallet import PaymentWallet
 from models.user import User
+
 from helpers.date_helper import *
 
 
@@ -36,7 +37,7 @@ class PaymentHistory(db.Model):
     wallet = db.relationship('PaymentWallet')
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
-    amount = db.Column(db.String(50))
+    amount = db.Column(db.String(50), nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
     type = db.Column(db.Integer(), nullable=False)
     status = db.Column(db.Integer(), nullable=False)
@@ -44,6 +45,7 @@ class PaymentHistory(db.Model):
     def __init__(self):
         self.term_id = 0
         self.status = self.STATUS_NEW
+        self.creation_date = get_curent_date()
 
     def __repr__(self):
         return '<id %r>' % (self.id)
@@ -67,8 +69,6 @@ class PaymentHistory(db.Model):
 
     def save(self):
         try:
-            if not self.creation_date:
-                self.creation_date = get_curent_date()
             db.session.add(self)
             db.session.commit()
         except Exception as e:

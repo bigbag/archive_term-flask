@@ -17,17 +17,17 @@ class Firm(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(300), nullable=False)
     inn = db.Column(db.String(300), index=True)
-    sub_domain = db.Column(db.Text())
+    sub_domain = db.Column(db.Text(), nullable=False)
     logo = db.Column(db.Text())
     address = db.Column(db.Text())
     email = db.Column(db.Text())
-    report_email = db.Column(db.Text(), nullable=False)
-    report_excel = db.Column(db.Time, nullable=False)
+    report_email = db.Column(db.Text())
+    report_excel = db.Column(db.Text(), nullable=False)
     report_time = db.Column(db.Time, nullable=False)
-    sending_date = db.Column(db.DateTime, nullable=False)
+    sending_date = db.Column(db.DateTime)
 
     def __init__(self):
-        self.report_excel = {"day": 0, "month": 0, "singl": 0}
+        self.report_excel = str({"day": 0, "month": 0, "singl": 0})
         self.report_time = "23:10:00"
 
     def get_json(self):

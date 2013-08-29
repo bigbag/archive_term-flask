@@ -22,6 +22,9 @@ class CardStack(db.Model):
     payment_id = db.Column(db.String, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
 
+    def __init__(self):
+        self.creation_date = get_curent_date()
+
     def __repr__(self):
         return '<id %r>' % (self.id)
 
@@ -34,8 +37,6 @@ class CardStack(db.Model):
 
     def save(self):
         try:
-            if not self.creation_date:
-                self.creation_date = get_curent_date()
             db.session.add(self)
             db.session.commit()
         except Exception as e:

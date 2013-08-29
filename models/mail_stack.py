@@ -5,8 +5,9 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from console import db
+from web import db
 from web import app
+from helpers.date_helper import *
 
 
 class MailStack(db.Model):
@@ -28,6 +29,7 @@ class MailStack(db.Model):
 
     def __init__(self):
         self.lock = self.LOCK_FREE
+        self.creation_date = get_curent_date()
 
     def __repr__(self):
         return '<id %r>' % (self.id)
@@ -47,8 +49,6 @@ class MailStack(db.Model):
 
     def save(self):
         try:
-            if not self.creation_date:
-                self.creation_date = get_curent_date()
             db.session.add(self)
             db.session.commit()
         except Exception as e:

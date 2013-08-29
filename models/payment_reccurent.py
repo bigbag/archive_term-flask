@@ -27,15 +27,11 @@ class PaymentReccurent(db.Model):
     TYPE_CEILING = 0
     TYPE_LIMIT = 1
 
-    wallet_id = db.Column(
-        db.Integer,
-        db.ForeignKey('wallet.id'),
-        primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
     wallet = db.relationship('PaymentWallet')
-    history_id = db.Column(
-        db.Integer,
-        db.ForeignKey('history.id'),
-        primary_key=True)
+    history_id = db.Column(db.Integer, db.ForeignKey('history.id'))
+    history = db.relationship('PaymentHistory')
     card_pan = db.Column(db.String(32), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)

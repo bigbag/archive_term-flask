@@ -18,16 +18,17 @@ class PaymentLog(db.Model):
     __bind_key__ = 'payment'
     __tablename__ = 'log'
 
-    history_id = db.Column(
-        db.Integer,
-        db.ForeignKey('history.id'),
-        primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    history_id = db.Column(db.Integer, db.ForeignKey('history.id'))
     history = db.relationship('PaymentHistory')
     wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
     wallet = db.relationship('PaymentWallet')
     rrn = db.Column(db.String(32), nullable=False)
     card_pan = db.Column(db.String(32), nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
+
+    def __init__(self):
+        self.creation_date = get_curent_date()
 
     def __repr__(self):
         return '<id %r>' % (self.history_id)
@@ -41,9 +42,6 @@ class PaymentLog(db.Model):
 
     def save(self):
         try:
-            if not self.creation_date:
-                self.creation_date = get_curent_date()
-            db.session.add(self)
             db.session.add(self)
             db.session.commit()
         except Exception as e:
