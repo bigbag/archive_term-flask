@@ -40,7 +40,9 @@ api = Blueprint('api', __name__)
 @md5_content_headers
 def get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
-    term_db = Term(term_id).get_term()
+    term = Term()
+    term.id = term_id
+    term_db = term.get_term()
 
     if term_db is None:
         abort(400)
@@ -84,7 +86,7 @@ def get_blacklist():
         else:
             valid_payment_id.append(str(wallet.payment_id))
 
-    #lost_cards = PaymentLost.query.group_by(PaymentLost.payment_id).all()
+    # lost_cards = PaymentLost.query.group_by(PaymentLost.payment_id).all()
     lost_cards = None
     persons = Person.query.group_by(Person.payment_id).all()
 

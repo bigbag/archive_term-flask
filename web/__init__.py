@@ -17,7 +17,6 @@ from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
 
 from web.views.api import api
-from web.views.api_old import api_old
 from web.views.api_admin import api_admin
 
 app.register_blueprint(api, url_prefix='/term/v1.0')

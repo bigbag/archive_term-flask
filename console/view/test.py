@@ -20,6 +20,7 @@ from libs.uniteller_api import UnitellerApi
 class TestCommand(Command):
 
     def rate(self, count, all):
+        random.seed()
         data = range(1, all + 1)
         random.shuffle(data)
         rate = sorted(random.sample(data, count))
@@ -36,7 +37,9 @@ class TestCommand(Command):
         return spamreader
 
     def run(self):
-        print True
+        print self.rate(5, 36)
+        print self.rate(6, 45)
+        print self.rate(7, 49)
         # with open('tmp/import.csv', 'rb') as csvfile:
         #     spamreader = csv.reader(csvfile)
         #     for row in spamreader:

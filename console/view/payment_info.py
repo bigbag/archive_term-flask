@@ -52,7 +52,7 @@ class PaymentInfo(Command):
                 if not history.save():
                     continue
 
-                log = PaymentLog.query.get(history.id)
+                log = PaymentLog.query.filter_by(history_id=history.id).first()
                 if log:
                     continue
 
