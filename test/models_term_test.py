@@ -15,6 +15,8 @@ from models.firm_term import FirmTerm
 from models.person import Person
 from models.person_event import PersonEvent
 from models.report import Report
+from models.spot import Spot
+from models.spot_dis import SpotDis
 
 from helpers import date_helper
 
@@ -30,6 +32,9 @@ class ModelsTermCase(unittest.TestCase):
     EVENT_ID = 3
     HARD_ID = '9995749700230784'
     PAYMENT_ID = '99999999999999999999'
+    PERSON_ID = 1
+    USER_ID = 1
+    DISCODES_ID = 999999
 
     def model_test(self, Model, data):
         old = Model()
@@ -92,3 +97,29 @@ class ModelsTermCase(unittest.TestCase):
             creation_date=date_helper.get_curent_date(),
         )
         self.model_test(Report, data)
+
+    def test_spot(self):
+        data = dict(
+            discodes_id=999999,
+            user_id=self.USER_ID,
+            premium=0,
+        )
+        old = Spot()
+        old.__dict__.update(data)
+
+        assert old.save()
+        new = Spot.query.get(old.discodes_id)
+        old.delete()
+        assert not Spot.query.get(new.discodes_id)
+
+    def test_func_get_code(self):
+        spot = Spot()
+        assert spot.get_code(self.DISCODES_ID)
+
+    def test_func_get_barcode(self):
+        spot = Spot()
+        assert spot.get_barcode()
+
+    def test_func_get_url(self):
+        spot = Spot()
+        assert spot.get_url()
