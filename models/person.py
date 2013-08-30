@@ -7,7 +7,7 @@
 """
 from web import db
 from web import app
-from helpers.date_helper import *
+from helpers import date_helper
 
 
 class Person(db.Model):
@@ -34,7 +34,7 @@ class Person(db.Model):
 
     def __init__(self):
         self.status = self.STATUS_VALID
-        self.creation_date = get_curent_date()
+        self.creation_date = date_helper.get_curent_date()
 
     def __repr__(self):
         return '<id %r>' % (self.id)

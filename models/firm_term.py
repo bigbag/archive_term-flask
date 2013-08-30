@@ -10,7 +10,7 @@ from web import app
 from models.term import Term
 from models.firm import Firm
 
-from helpers.date_helper import *
+from helpers import date_helper
 
 
 class FirmTerm(db.Model):
@@ -33,7 +33,7 @@ class FirmTerm(db.Model):
     creation_date = db.Column(db.DateTime, nullable=False)
 
     def __init__(self):
-        self.creation_date = get_curent_date()
+        self.creation_date = date_helper.get_curent_date()
 
     def __repr__(self):
         return '<id %r>' % (self.id)

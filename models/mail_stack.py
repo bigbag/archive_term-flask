@@ -7,7 +7,7 @@
 """
 from web import db
 from web import app
-from helpers.date_helper import *
+from helpers import date_helper
 
 
 class MailStack(db.Model):
@@ -29,7 +29,7 @@ class MailStack(db.Model):
 
     def __init__(self):
         self.lock = self.LOCK_FREE
-        self.creation_date = get_curent_date()
+        self.creation_date = date_helper.get_curent_date()
 
     def __repr__(self):
         return '<id %r>' % (self.id)

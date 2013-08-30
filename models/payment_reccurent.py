@@ -10,7 +10,7 @@ from web import db
 from web import app
 from models.payment_wallet import PaymentWallet
 from models.payment_history import PaymentHistory
-from helpers.date_helper import *
+from helpers import date_helper
 
 
 class PaymentReccurent(db.Model):
@@ -40,7 +40,7 @@ class PaymentReccurent(db.Model):
     status = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
-        self.creation_date = get_curent_date()
+        self.creation_date = date_helper.get_curent_date()
         self.type = self.TYPE_CEILING
         self.status = self.STATUS_OFF
 

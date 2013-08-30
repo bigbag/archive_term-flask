@@ -11,8 +11,7 @@ import hashlib
 
 from web import db
 from web import app
-from helpers.date_helper import *
-from helpers.hash_helper import *
+from helpers import date_helper, hash_helper
 
 from models.user import User
 
@@ -57,6 +56,7 @@ class Spot(db.Model):
         self.name = 'No name'
         self.status = self.STATUS_GENERATED
         self.spot_type_id = self.TYPE_PERSONAL
+        self.creation_date = date_helper.get_curent_date()
 
     def __repr__(self):
         return '<discodes_id %r>' % (self.discodes_id)
@@ -79,7 +79,7 @@ class Spot(db.Model):
 
     def get_barcode(self):
         rnd = str(random.randint(1000000000, 9999999999))
-        ean = "00%s%s" % (rnd, get_ean_checksum(rnd))
+        ean = "00%s%s" % (rnd, hash_helper.get_ean_checksum(rnd))
 
         spot = self.query.filter_by(barcode=ean).first()
         if spot:
@@ -110,15 +110,12 @@ class Spot(db.Model):
 
     def save(self):
         try:
-            if not self.creation_date:
-                self.creation_date = get_curent_date()
-
             if not self.registered_date and self.status == self.STATUS_REGISTERED:
-                self.registered_date = get_curent_date()
+                self.registered_date = date_helper.get_curent_date()
 
             if not self.removed_date:
                 if self.status == self.STATUS_REMOVED_USER or self.status == self.STATUS_REMOVED_SYS:
-                    self.removed_date = get_curent_date()
+                    self.removed_date = date_helper.get_curent_date()
 
             if not self.url:
                 self.url = self.get_url()

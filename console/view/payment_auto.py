@@ -12,7 +12,7 @@ from console import app
 from console.configs.payment import UnitellerConfig
 from libs.uniteller_api import UnitellerApi
 
-from helpers.date_helper import *
+from helpers import date_helper
 
 from models.payment_wallet import PaymentWallet
 from models.payment_history import PaymentHistory
@@ -73,7 +73,7 @@ class PaymentAuto(Command):
                 reccurent.history_id = history.id
 
             reccurent.status = PaymentReccurent.STATUS_OFF
-            reccurent.run_date = get_curent_date()
+            reccurent.run_date = date_helper.get_curent_date()
             reccurent.save()
 
     def run(self):

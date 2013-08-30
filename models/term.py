@@ -9,7 +9,7 @@
 from flask import json
 from web import app
 from web import db
-from helpers.date_helper import *
+from helpers import date_helper
 
 
 class Term(db.Model):
@@ -58,7 +58,7 @@ class Term(db.Model):
     def get_xml_view(self):
         self.download = json.loads(self.download)
         self.upload = json.loads(self.upload)
-        self.tz = get_timezone(self.tz)
+        self.tz = date_helper.get_timezone(self.tz)
 
         if self.type == self.TYPE_VENDING:
             self.type = 'Vending'
