@@ -103,6 +103,7 @@ class Report(db.Model):
 
     def save(self):
         try:
+            self.payment_id = str(self.payment_id).rjust(20, '0')
             if not self.check_summ:
                 self.check_summ = self.get_check_summ()
             db.session.add(self)

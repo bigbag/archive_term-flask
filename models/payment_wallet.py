@@ -65,6 +65,7 @@ class PaymentWallet(db.Model):
 
     def save(self):
         try:
+            self.payment_id = str(self.payment_id).rjust(20, '0')
             db.session.add(self)
             db.session.commit()
         except Exception as e:
