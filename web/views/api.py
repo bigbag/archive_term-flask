@@ -124,9 +124,11 @@ def upload_report(term_id, report_datetime):
     if not m:
         abort(400)
 
-    term = Term(term_id).get_term()
+    term = Term()
+    term.id = term_id
+    term_db = term.get_term()
 
-    if term is None:
+    if term_db is None:
         abort(400)
 
     file = request.stream.read()
@@ -147,8 +149,8 @@ def upload_report(term_id, report_datetime):
     else:
         abort(400)
 
-    term.report_date = get_curent_date()
-    term.update()
+    term_db.report_date = get_curent_date()
+    term_db.update()
 
     return set_message('success', 'Report uploaded successfully', 201)
 
@@ -157,9 +159,11 @@ def upload_report(term_id, report_datetime):
 def add_card(term_id, payment_id):
     """Добавляем в базу карту для привязки"""
 
-    term = Term(term_id).get_term()
+    term = Term()
+    term.id = term_id
+    term_db = term.get_term()
 
-    if not term:
+    if not term_db:
         abort(400)
 
     if CardStack.query.filter_by(payment_id=payment_id).first():
