@@ -27,7 +27,7 @@ class Person(db.Model):
     birthday = db.Column(db.Date())
     firm_id = db.Column(db.Integer, nullable=False)
     card = db.Column(db.String(8))
-    payment_id = db.Column(db.String(32), nullable=False)
+    payment_id = db.Column(db.String(20), nullable=False)
     hard_id = db.Column(db.String(32), nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.Integer, nullable=False)

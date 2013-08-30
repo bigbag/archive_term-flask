@@ -28,9 +28,9 @@ class PaymentReccurent(db.Model):
     TYPE_LIMIT = 1
 
     id = db.Column(db.Integer, primary_key=True)
-    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
+    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'), index=True)
     wallet = db.relationship('PaymentWallet')
-    history_id = db.Column(db.Integer, db.ForeignKey('history.id'))
+    history_id = db.Column(db.Integer, db.ForeignKey('history.id'), index=True)
     history = db.relationship('PaymentHistory')
     card_pan = db.Column(db.String(32), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
@@ -40,6 +40,7 @@ class PaymentReccurent(db.Model):
     status = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
+        self.creation_date = get_curent_date()
         self.type = self.TYPE_CEILING
         self.status = self.STATUS_OFF
 
@@ -55,8 +56,6 @@ class PaymentReccurent(db.Model):
 
     def save(self):
         try:
-            if not self.creation_date:
-                self.creation_date = get_curent_date()
             db.session.add(self)
             db.session.commit()
         except Exception as e:

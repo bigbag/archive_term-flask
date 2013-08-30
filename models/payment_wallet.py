@@ -40,6 +40,7 @@ class PaymentWallet(db.Model):
     def __init__(self):
         self.discodes_id = 0
         self.balance = 0
+        self.creation_date = get_curent_date()
         self.status = self.STATUS_NOACTIVE
 
     def __repr__(self):
@@ -64,8 +65,6 @@ class PaymentWallet(db.Model):
 
     def save(self):
         try:
-            if not self.creation_date:
-                self.creation_date = get_curent_date()
             db.session.add(self)
             db.session.commit()
         except Exception as e:

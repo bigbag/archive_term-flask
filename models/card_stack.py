@@ -19,7 +19,7 @@ class CardStack(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
-    payment_id = db.Column(db.String, nullable=False)
+    payment_id = db.Column(db.String(20), nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
 
     def __init__(self):

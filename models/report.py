@@ -33,7 +33,7 @@ class Report(db.Model):
     event = db.relationship('Event')
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
     person = db.relationship('Person')
-    payment_id = db.Column(db.String(150))
+    payment_id = db.Column(db.String(20))
     firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
     firm = db.relationship('Firm')
     amount = db.Column(db.Integer, nullable=False)

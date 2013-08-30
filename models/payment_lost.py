@@ -25,7 +25,7 @@ class PaymentLost(db.Model):
     term = db.relationship('Term')
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     event = db.relationship('Event')
-    payment_id = db.Column(db.String(150))
+    payment_id = db.Column(db.String(20))
     amount = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Integer, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)

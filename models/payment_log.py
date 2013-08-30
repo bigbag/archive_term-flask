@@ -19,9 +19,9 @@ class PaymentLog(db.Model):
     __tablename__ = 'log'
 
     id = db.Column(db.Integer, primary_key=True)
-    history_id = db.Column(db.Integer, db.ForeignKey('history.id'))
+    history_id = db.Column(db.Integer, db.ForeignKey('history.id'), index=True)
     history = db.relationship('PaymentHistory')
-    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
+    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'), index=True)
     wallet = db.relationship('PaymentWallet')
     rrn = db.Column(db.String(32), nullable=False)
     card_pan = db.Column(db.String(32), nullable=False)
