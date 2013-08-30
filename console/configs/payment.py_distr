@@ -25,6 +25,6 @@ class UnitellerConfig(object):
     TIME_PAID_CHANGE = 14
     CODE_SUCCES = 'AS000'
 
-    SHOP_ID = '00001623'
-    PASSWORD = 'kl9Gu1PJyE0yKfNdhCOiTtQnBPFlNNnirGhaw1qY8cm4zVbZXKg79QAvUPnrZqydvcOBua6t1En1Fl3E'
-    LOGIN = 813
+    SHOP_ID = ''
+    PASSWORD = ''
+    LOGIN =
