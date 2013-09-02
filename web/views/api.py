@@ -81,13 +81,12 @@ def get_blacklist():
     valid_payment_id = []
     invalid_payment_id = []
     for wallet in wallets:
-        if (int(wallet.balance) < PaymentReccurent.BALANCE_MIN) | (wallet.status != 1):
+        if (int(wallet.balance) < PaymentReccurent.BALANCE_MIN) | (int(wallet.status) != 1):
             invalid_payment_id.append(str(wallet.payment_id))
         else:
             valid_payment_id.append(str(wallet.payment_id))
 
-    # lost_cards = PaymentLost.query.group_by(PaymentLost.payment_id).all()
-    lost_cards = None
+    lost_cards = PaymentLost.query.group_by(PaymentLost.payment_id).all()
     persons = Person.query.group_by(Person.payment_id).all()
 
     blacklist = []
@@ -101,10 +100,13 @@ def get_blacklist():
 
     blacklist = sorted(blacklist + invalid_payment_id)
 
+    for card in lost_cards:
+        if not card.payment_id in blacklist:
+            blacklist.append(card.payment_id)
+
     config_xml = render_template(
         'api/blacklist.xml',
         blacklist=blacklist,
-        lost_cards=lost_cards,
     ).encode('cp1251')
 
     response = make_response(config_xml)

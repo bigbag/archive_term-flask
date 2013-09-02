@@ -30,7 +30,7 @@ class TermConfig(object):
 
     UPDATE = True
     UPDATE_IP = '80.90.125.219'
-    UPDATE_PORT = 64141
+    UPDATE_PORT = 7880
     UPDATE_PROTO = 'http'
     UPDATE_LINK_TYPE = 2
     UPDATE_PERIOD = 1440
