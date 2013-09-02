@@ -13,8 +13,7 @@ from web import db
 from web import app
 from models.user import User
 
-from helpers.date_helper import *
-from helpers.hash_helper import *
+from helpers import date_helper, hash_helper
 
 
 class PaymentWallet(db.Model):
@@ -40,15 +39,16 @@ class PaymentWallet(db.Model):
     def __init__(self):
         self.discodes_id = 0
         self.balance = 0
-        self.creation_date = get_curent_date()
+        self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_NOACTIVE
 
     def __repr__(self):
         return '<id %r>' % (self.id)
 
     def get_pid(self, pids):
+        pids = str(pids).rjust(10, '0')
         pid = "%s%s" % (pids, random.randint(100000000, 999999999))
-        pid = "%s%s" % (pid, get_isin_checksum(pid))
+        pid = "%s%s" % (pid, hash_helper.get_isin_checksum(pid))
 
         wallet = self.query.filter_by(payment_id=pid).first()
         if wallet:

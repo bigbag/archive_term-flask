@@ -38,7 +38,7 @@ class PaymentLost(db.Model):
         return '<id %r>' % (self.id)
 
     def add_lost_payment(self, report):
-        self.term_id = report.term.id
+        self.term_id = report.term_id
         self.event_id = report.event_id
         self.payment_id = report.payment_id
         self.amount = report.amount

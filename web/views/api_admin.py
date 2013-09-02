@@ -13,8 +13,6 @@ from web import app
 from web import cache
 
 from decorators.header import *
-from helpers.date_helper import *
-from helpers.hash_helper import *
 from helpers.error_xml_helper import *
 
 from models.spot import Spot

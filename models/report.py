@@ -14,7 +14,7 @@ from models.person import Person
 from models.firm import Firm
 from models.event import Event
 from models.firm_term import FirmTerm
-from helpers.date_helper import *
+from helpers import date_helper
 
 
 class Report(db.Model):
@@ -41,11 +41,19 @@ class Report(db.Model):
     creation_date = db.Column(db.DateTime, nullable=False)
     check_summ = db.Column(db.String(32), nullable=False)
 
-    def get_db_view(self, data):
-        self.payment_id = data.text.rjust(20, '0')
+    def __init__(self):
+        self.amount = 0
+        self.person_id = 0
+        self.firm_id = 0
+        self.type = self.TYPE_WHITE
 
+    def __repr__(self):
+        return '<id %r>' % (self.id)
+
+    def get_db_view(self, data):
         firm_terms = FirmTerm.query.filter_by(
             term_id=self.term.id).all()
+
         firm_id_list = []
         for firm_term in firm_terms:
             firm_id_list.append(firm_term.child_firm_id)
@@ -69,22 +77,13 @@ class Report(db.Model):
             data.get('date'),
             data.get('time'))
 
-        date_time_utc = convert_date_to_utc(
+        date_time_utc = date_helper.convert_date_to_utc(
             date_time,
             self.term.tz,
             "%Y-%m-%d %H:%M:%S",
             "%Y-%m-%d %H:%M:%S")
         self.creation_date = date_time_utc
         return self
-
-    def __init__(self):
-        self.amount = 0
-        self.person_id = 0
-        self.firm_id = 0
-        self.type = self.TYPE_WHITE
-
-    def __repr__(self):
-        return '<id %r>' % (self.id)
 
     def get_check_summ(self):
         return hashlib.md5("%s%s%s%s%s" % (

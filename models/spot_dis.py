@@ -7,7 +7,6 @@
 """
 from web import db
 from web import app
-from helpers.date_helper import *
 
 
 class SpotDis(db.Model):

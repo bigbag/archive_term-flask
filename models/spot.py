@@ -11,10 +11,10 @@ import hashlib
 
 from web import db
 from web import app
-from helpers.date_helper import *
-from helpers.hash_helper import *
+from helpers import date_helper, hash_helper
 
 from models.user import User
+from models.spot_dis import SpotDis
 
 
 class Spot(db.Model):
@@ -57,6 +57,7 @@ class Spot(db.Model):
         self.name = 'No name'
         self.status = self.STATUS_GENERATED
         self.spot_type_id = self.TYPE_PERSONAL
+        self.generated_date = date_helper.get_curent_date()
 
     def __repr__(self):
         return '<discodes_id %r>' % (self.discodes_id)
@@ -64,22 +65,21 @@ class Spot(db.Model):
     def get_random_string(self, char=string.letters, size=CODE_SIZE):
         return ''.join(random.choice(char) for x in range(size))
 
-    def get_code(self):
-        id_ = self.discodes_id
-
+    def get_code(self, discodes_id):
+        discodes_id = str(discodes_id)
         rnd_letters = list(self.get_random_string())
         rnd_order = range(10)
         random.shuffle(rnd_order)
         rnd_order = sorted(rnd_order[:6])
 
         for x in xrange(0, 6):
-            rnd_letters[rnd_order[x]] = id_[x]
+            rnd_letters[rnd_order[x]] = discodes_id[x]
 
         return ''.join(rnd_letters)
 
     def get_barcode(self):
         rnd = str(random.randint(1000000000, 9999999999))
-        ean = "00%s%s" % (rnd, get_ean_checksum(rnd))
+        ean = "00%s%s" % (rnd, hash_helper.get_ean_checksum(rnd))
 
         spot = self.query.filter_by(barcode=ean).first()
         if spot:
@@ -91,7 +91,8 @@ class Spot(db.Model):
         if not self.barcode:
             self.barcode = self.get_barcode()
 
-        data = self.barcode + random.randint(1000000000, 9999999999)
+        random_part = random.randint(1000000000, 9999999999)
+        data = "%s%s" % (str(self.barcode), str(random_part))
         url = hashlib.sha1(data).hexdigest()
         url = url[:15]
 
@@ -100,6 +101,9 @@ class Spot(db.Model):
             self.get_url
         else:
             return url
+
+    def gen_spot():
+        return 1
 
     def delete(self):
         db.session.delete(self)
@@ -110,21 +114,18 @@ class Spot(db.Model):
 
     def save(self):
         try:
-            if not self.creation_date:
-                self.creation_date = get_curent_date()
-
             if not self.registered_date and self.status == self.STATUS_REGISTERED:
-                self.registered_date = get_curent_date()
+                self.registered_date = date_helper.get_curent_date()
 
             if not self.removed_date:
                 if self.status == self.STATUS_REMOVED_USER or self.status == self.STATUS_REMOVED_SYS:
-                    self.removed_date = get_curent_date()
+                    self.removed_date = date_helper.get_curent_date()
 
             if not self.url:
                 self.url = self.get_url()
 
             if not self.code:
-                self.code = self.get_code()
+                self.code = self.get_code(self.discodes_id)
 
             db.session.add(self)
             db.session.commit()

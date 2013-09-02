@@ -8,7 +8,7 @@
 """
 from web import db
 from web import app
-from helpers.date_helper import *
+from helpers import date_helper, hash_helper
 
 
 class User(db.Model):
@@ -30,8 +30,9 @@ class User(db.Model):
     status = db.Column(db.Integer, index=True)
     lang = db.Column(db.String(128), nullable=False)
 
-    def __init__(self, id):
+    def __init__(self):
         self.lang = "en"
+        self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_NOACTIVE
 
     def __repr__(self):
@@ -46,8 +47,8 @@ class User(db.Model):
 
     def save(self):
         try:
-            if not self.creation_date:
-                self.creation_date = get_curent_date()
+            if not self.activkey:
+                self.activkey = hash_helper.get_activkey(self.password)
             db.session.add(self)
             db.session.commit()
         except Exception as e:

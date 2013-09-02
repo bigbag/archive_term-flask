@@ -1,5 +1,6 @@
 *.sublime*
 /configs/general.py
+/console/configs/payment.py
 /api/configs/term.py
 *.pyc
 gunicorn.conf.py

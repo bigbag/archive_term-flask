@@ -14,7 +14,7 @@ from models.term import Term
 from models.payment_wallet import PaymentWallet
 from models.user import User
 
-from helpers.date_helper import *
+from helpers import date_helper
 
 
 class PaymentHistory(db.Model):
@@ -45,7 +45,7 @@ class PaymentHistory(db.Model):
     def __init__(self):
         self.term_id = 0
         self.status = self.STATUS_NEW
-        self.creation_date = get_curent_date()
+        self.creation_date = date_helper.get_curent_date()
 
     def __repr__(self):
         return '<id %r>' % (self.id)

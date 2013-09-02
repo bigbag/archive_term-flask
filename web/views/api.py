@@ -14,8 +14,8 @@ from web import app
 from web import cache
 
 from decorators.header import *
-from helpers.date_helper import *
-from helpers.hash_helper import *
+from helpers import date_helper
+from helpers import hash_helper
 from helpers.error_xml_helper import *
 
 from models.term import Term
@@ -142,7 +142,7 @@ def upload_report(term_id, report_datetime):
     if not request.headers.get('Content-MD5'):
         abort(400)
 
-    if request.headers.get('Content-MD5') != get_content_md5(file):
+    if request.headers.get('Content-MD5') != hash_helper.get_content_md5(file):
         abort(400)
 
     if file:
@@ -151,7 +151,7 @@ def upload_report(term_id, report_datetime):
     else:
         abort(400)
 
-    term_db.report_date = get_curent_date()
+    term_db.report_date = date_helper.get_curent_date()
     term_db.update()
 
     return set_message('success', 'Report uploaded successfully', 201)
@@ -160,6 +160,12 @@ def upload_report(term_id, report_datetime):
 @api.route('/uids/<int:term_id>_<payment_id>.uid', methods=['PUT'])
 def add_card(term_id, payment_id):
     """Добавляем в базу карту для привязки"""
+
+    if not request.headers.get('Content-MD5'):
+        abort(400)
+
+    if request.headers.get('Content-MD5') != hash_helper.get_content_md5(file):
+        abort(400)
 
     term = Term()
     term.id = term_id

@@ -6,6 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import hashlib
+import time
 import base64
 from functools import reduce
 
@@ -74,3 +75,8 @@ def get_isin_checksum(isin):
     odd_sum = sum([int(i) for i in odd])
     mod = (even_sum + odd_sum) % 10
     return 10 - mod
+
+
+def get_activkey(data):
+    data = str(time.time()) + data
+    return hashlib.sha1(data).hexdigest()
