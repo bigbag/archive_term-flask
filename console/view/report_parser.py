@@ -41,8 +41,7 @@ class ReportParser(Command):
 
             file_name = app.config['UPLOAD_TMP'] + '/' + file
             new_file_patch = app.config['UPLOAD_FOLDER'] + '/' + report_date
-            new_file_name = new_file_patch + '/' + term_id + '_' +
-            report_time
+            new_file_name = new_file_patch + '/' + term_id + '_' + report_time
 
             try:
                 tree = etree.parse(file_name)
