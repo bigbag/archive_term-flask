@@ -51,6 +51,8 @@ class Report(db.Model):
         return '<id %r>' % (self.id)
 
     def get_db_view(self, data):
+        self.payment_id = data.text
+
         firm_terms = FirmTerm.query.filter_by(
             term_id=self.term.id).all()
 

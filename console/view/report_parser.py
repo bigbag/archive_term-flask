@@ -41,7 +41,8 @@ class ReportParser(Command):
 
             file_name = app.config['UPLOAD_TMP'] + '/' + file
             new_file_patch = app.config['UPLOAD_FOLDER'] + '/' + report_date
-            new_file_name = new_file_patch + '/' + term_id + '_' + report_time
+            new_file_name = new_file_patch + '/' + term_id + '_' +
+            report_time
 
             try:
                 tree = etree.parse(file_name)
@@ -89,6 +90,8 @@ class ReportParser(Command):
 
                         wallet = PaymentWallet.query.filter_by(
                             payment_id=report.payment_id).first()
+
+                        print wallet.payment_id
 
                         if not wallet or wallet.user_id == 0:
                             lost = PaymentLost()

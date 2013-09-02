@@ -37,9 +37,12 @@ class TestCommand(Command):
         return spamreader
 
     def run(self):
-        print self.rate(5, 36)
-        print self.rate(6, 45)
-        print self.rate(7, 49)
+        un = UnitellerApi(UnitellerConfig)
+
+        print un.get_payment_info(6360)
+        # print self.rate(5, 36)
+        # print self.rate(6, 45)
+        # print self.rate(7, 49)
         # with open('tmp/import.csv', 'rb') as csvfile:
         #     spamreader = csv.reader(csvfile)
         #     for row in spamreader:
