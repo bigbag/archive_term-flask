@@ -9,6 +9,7 @@
 from flask import json
 from web import app
 from web import db
+from web import cache
 from helpers import date_helper
 
 
@@ -54,6 +55,9 @@ class Term(db.Model):
             status=self.STATUS_VALID).first()
 
         return term
+
+    def get_term_by_id(self, id):
+        return self.query.get(id)
 
     def get_xml_view(self):
         self.download = json.loads(self.download)

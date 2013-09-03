@@ -38,6 +38,16 @@ class FirmTerm(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
+    def get_list_by_term_id(self, term_id):
+        firm_terms = self.query.filter_by(
+            term_id=term_id).all()
+
+        firm_id_list = []
+        for firm_term in firm_terms:
+            firm_id_list.append(firm_term.child_firm_id)
+
+        return firm_id_list
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

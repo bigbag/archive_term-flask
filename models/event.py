@@ -7,6 +7,7 @@
 """
 from web import db
 from web import app
+from web import cache
 
 
 class Event(db.Model):
@@ -20,6 +21,9 @@ class Event(db.Model):
 
     def __repr__(self):
         return '<id %r>' % (self.id)
+
+    def get_event_by_key(self, key):
+        return self.query.filter_by(key=key).first()
 
     def delete(self):
         db.session.delete(self)

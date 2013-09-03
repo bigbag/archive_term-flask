@@ -26,6 +26,8 @@ class Report(db.Model):
     TYPE_PAYMENT = 1
     TYPE_MPS = 2
 
+    DATE_PATTERN = "%Y-%m-%d %H:%M:%S"
+
     id = db.Column(db.Integer, primary_key=True)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
@@ -51,18 +53,12 @@ class Report(db.Model):
         return '<id %r>' % (self.id)
 
     def get_db_view(self, data):
-        self.payment_id = data.text
-
-        firm_terms = FirmTerm.query.filter_by(
-            term_id=self.term.id).all()
-
-        firm_id_list = []
-        for firm_term in firm_terms:
-            firm_id_list.append(firm_term.child_firm_id)
+        self.payment_id = str(data.text).rjust(20, '0')
 
         persons = Person.query.filter_by(
             payment_id=self.payment_id).all()
 
+        firm_id_list = FirmTerm().get_list_by_term_id(self.term.id)
         for person in persons:
             if person.firm_id in firm_id_list:
                 self.person_id = person.id
@@ -82,9 +78,10 @@ class Report(db.Model):
         date_time_utc = date_helper.convert_date_to_utc(
             date_time,
             self.term.tz,
-            "%Y-%m-%d %H:%M:%S",
-            "%Y-%m-%d %H:%M:%S")
+            self.DATE_PATTERN,
+            self.DATE_PATTERN)
         self.creation_date = date_time_utc
+        self.check_summ = self.get_check_summ()
         return self
 
     def get_check_summ(self):

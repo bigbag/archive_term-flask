@@ -28,6 +28,7 @@ class ReportParser(Command):
 
     def report_parser(self):
         files = os.listdir(app.config['UPLOAD_TMP'])
+
         for file in files:
             error = False
             data = file.split('_')
@@ -40,8 +41,13 @@ class ReportParser(Command):
             report_time = data[2]
 
             file_name = app.config['UPLOAD_TMP'] + '/' + file
-            new_file_patch = app.config['UPLOAD_FOLDER'] + '/' + report_date
-            new_file_name = new_file_patch + '/' + term_id + '_' + report_time
+            new_file_patch = "%s/%s" % (
+                app.config['UPLOAD_FOLDER'],
+                report_date)
+            new_file_name = "%s/%s_%s" % (
+                new_file_patch,
+                term_id,
+                report_time)
 
             try:
                 tree = etree.parse(file_name)
@@ -50,34 +56,37 @@ class ReportParser(Command):
             else:
                 event_nodes = tree.xpath('/Report/Event')
                 for event_node in event_nodes:
-                    event_type = event_node.get('type')
+                    event_key = event_node.get('type')
 
-                    if not event_type:
+                    if not event_key:
                         continue
 
-                    event = Event.query.filter_by(key=event_type).first()
+                    event = Event().get_event_by_key(event_key)
                     if not event:
                         continue
 
-                    term = Term.query.get(term_id)
+                    term = Term().get_term_by_id(term_id)
+
                     if not term:
                         term = Term()
                         term.id = term_id
 
                     card_nodes = tree.xpath(
                         '/Report/Event[@type="%s"]/Card' %
-                        event_type)
+                        event_key)
 
                     for card_node in card_nodes:
 
                         report = Report()
                         report.term = term
                         report.event_id = event.id
+
                         report = report.get_db_view(card_node)
-                        check_summ = report.get_check_summ()
 
                         old_report = Report.query.filter_by(
-                            check_summ=check_summ).first()
+                            check_summ=report.check_summ).first()
+
+                        print old_report.id
 
                         if old_report:
                             continue
@@ -89,8 +98,6 @@ class ReportParser(Command):
 
                         wallet = PaymentWallet.query.filter_by(
                             payment_id=report.payment_id).first()
-
-                        print wallet.payment_id
 
                         if not wallet or wallet.user_id == 0:
                             lost = PaymentLost()
