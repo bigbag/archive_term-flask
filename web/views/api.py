@@ -179,4 +179,6 @@ def set_callback():
 
     data = request.data
 
+    app.logger.error(data)
+
     return set_message('success', 'Success', 201)

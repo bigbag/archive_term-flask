@@ -86,8 +86,6 @@ class ReportParser(Command):
                         old_report = Report.query.filter_by(
                             check_summ=report.check_summ).first()
 
-                        print old_report.id
-
                         if old_report:
                             continue
 
