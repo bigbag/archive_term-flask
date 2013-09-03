@@ -24,13 +24,13 @@ class TermConfig(object):
 
     LOGGER = True
     LOGGER_IP = '80.90.125.219'
-    LOGGER_PORT = 7880
+    LOGGER_PORT = 64141
     LOGGER_PROTO = 'http'
     LOGGER_LINK_TYPE = 2
 
     UPDATE = True
     UPDATE_IP = '80.90.125.219'
-    UPDATE_PORT = 7880
+    UPDATE_PORT = 64141
     UPDATE_PROTO = 'http'
     UPDATE_LINK_TYPE = 2
     UPDATE_PERIOD = 1440

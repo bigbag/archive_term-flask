@@ -155,8 +155,6 @@ class TestCommand(Command):
 
             print "%s,%s,%s,%s" % data
 
-
-
         # print self.rate(5, 36)
         # print self.rate(6, 45)
         # print self.rate(7, 49)
