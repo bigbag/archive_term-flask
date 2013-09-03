@@ -49,14 +49,14 @@ class Term(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
-    def get_term(self):
+    def get_valid_term(self, term_id):
         term = Term.query.filter_by(
-            id=self.id,
+            id=term_id,
             status=self.STATUS_VALID).first()
 
         return term
 
-    def get_term_by_id(self, id):
+    def get_by_id(self, id):
         return self.query.get(id)
 
     def get_xml_view(self):

@@ -61,11 +61,11 @@ class ReportParser(Command):
                     if not event_key:
                         continue
 
-                    event = Event().get_event_by_key(event_key)
+                    event = Event().get_by_key(event_key)
                     if not event:
                         continue
 
-                    term = Term().get_term_by_id(term_id)
+                    term = Term().get_by_id(term_id)
 
                     if not term:
                         term = Term()

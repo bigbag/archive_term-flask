@@ -10,7 +10,7 @@ import StringIO
 
 from functools import wraps
 from flask import Flask, make_response
-from helpers.hash_helper import *
+from helpers import hash_helper
 
 
 def add_response_headers(headers={}):
@@ -48,7 +48,7 @@ def md5_content_headers(f):
     def decorated_function(*args, **kwargs):
         resp = make_response(f(*args, **kwargs))
         h = resp.headers
-        h['Content-MD5'] = get_content_md5(resp.response[0])
+        h['Content-MD5'] = hash_helper.get_content_md5(resp.response[0])
         return resp
     return decorated_function
 

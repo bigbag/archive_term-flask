@@ -36,8 +36,8 @@ class PersonEvent(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
-    def get_all_events(self):
-        return Event.query.all()
+    def get_by_term_id(self, term_id):
+        return self.query.filter_by(term_id=term_id).all()
 
     def delete(self):
         db.session.delete(self)

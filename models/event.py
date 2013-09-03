@@ -22,7 +22,7 @@ class Event(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
-    def get_event_by_key(self, key):
+    def get_by_key(self, key):
         return self.query.filter_by(key=key).first()
 
     def delete(self):

@@ -36,27 +36,22 @@ api = Blueprint('api', __name__)
 @api.route('/configs/config_<int:term_id>.xml', methods=['GET'])
 @cache.cached(timeout=60)
 @xml_headers
-#@gzip_content
 @md5_content_headers
 def get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
-    term = Term()
-    term.id = term_id
-    term_db = term.get_term()
+    term = Term().get_valid_term(term_id)
 
-    if term_db is None:
+    if term is None:
         abort(400)
 
-    term = term_db.get_xml_view()
+    term = term.get_xml_view()
 
-    term_events = TermEvent.query.filter_by(
-        term_id=term.id).all()
+    term_events = TermEvent().get_by_term_id(term.id)
 
     if term_events is None:
         abort(400)
 
-    person_events = PersonEvent.query.filter_by(
-        term_id=term.id).all()
+    person_events = PersonEvent().get_by_term_id(term.id)
 
     config_xml = render_template(
         'api/config.xml',
@@ -72,7 +67,6 @@ def get_config(term_id):
 @api.route('/configs/blacklist.xml', methods=['GET'])
 @cache.cached(timeout=60)
 @xml_headers
-#@gzip_content
 @md5_content_headers
 def get_blacklist():
     """Возвращает черный список карт"""
@@ -121,16 +115,12 @@ def upload_report(term_id, report_datetime):
     if not len(report_datetime) == 13:
         abort(400)
 
-    m = re.search('\d{6}_\d{6}', str(report_datetime))
-
-    if not m:
+    if not re.search('\d{6}_\d{6}', str(report_datetime)):
         abort(400)
 
-    term = Term()
-    term.id = term_id
-    term_db = term.get_term()
+    term = Term().get_valid_term(term_id)
 
-    if term_db is None:
+    if term is None:
         abort(400)
 
     file = request.stream.read()
@@ -151,8 +141,8 @@ def upload_report(term_id, report_datetime):
     else:
         abort(400)
 
-    term_db.report_date = date_helper.get_curent_date()
-    term_db.update()
+    term.report_date = date_helper.get_curent_date()
+    term.update()
 
     return set_message('success', 'Report uploaded successfully', 201)
 
@@ -167,11 +157,9 @@ def add_card(term_id, payment_id):
     if request.headers.get('Content-MD5') != hash_helper.get_content_md5(file):
         abort(400)
 
-    term = Term()
-    term.id = term_id
-    term_db = term.get_term()
+    term = Term().get_valid_term(term_id)
 
-    if not term_db:
+    if not term:
         abort(400)
 
     if CardStack.query.filter_by(payment_id=payment_id).first():
@@ -183,3 +171,12 @@ def add_card(term_id, payment_id):
     card.save()
 
     return set_message('success', 'Card added', 201)
+
+
+@api.route('/configs/callback', methods=['POST'])
+def set_callback():
+    """Сообщение об удачной загрузки отчета"""
+
+    data = request.data
+
+    return set_message('success', 'Success', 201)
