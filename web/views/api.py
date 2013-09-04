@@ -147,12 +147,12 @@ def upload_report(term_id, report_datetime):
     return set_message('success', hash_helper.get_content_md5(file), 201)
 
 
-@api.route('/configs/callback', methods=['POST'])
-def set_callback():
+@api.route('/configs/callback/<int:term_id>_<type>', methods=['POST'])
+def set_callback(term_id, type):
     """Сообщение об удачной загрузки отчета"""
 
     data = request.stream.read()
 
-    app.logger.error(data)
+    app.logger.error("%s_%s" % (term_id, type))
 
     return set_message('success', 'Success', 201)
