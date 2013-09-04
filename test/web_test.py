@@ -13,9 +13,13 @@ import web
 class WebTestCase(unittest.TestCase):
 
     API_URL = '/term/v1.0'
+    GARBAGE_URL = '/123456'
+    CALLBACK_URL = '/term/v1.0/configs/callback'
     BLACKLIST_URL = '/term/v1.0/configs/blacklist.xml'
     TERM_URL = '/term/v1.0/configs/config_0000000021.xml'
+    FAIL_TERM_URL = '/term/v1.0/configs/config_9999999999.xml'
     REPORT_URL = '/term/v1.0/reports/report_0000000021_130903_164649.xml'
+    TERM = '0000000021'
 
     REPORT_FILE = """<?xml version="1.0" encoding="windows-1251" standalone="yes" ?>
         <Report>
@@ -28,30 +32,59 @@ class WebTestCase(unittest.TestCase):
         </Report>
         """
 
-    FILE_SIGN = 'jGM1aVidBxLjUmKajs4PuQ=='
+    FILE_SIGN = 'ivWdYrnPYTrNQ8J4lWiW2A=='
 
     def setUp(self):
         self.app = web.app.test_client()
 
-    def assert_status_code(self, url, code):
-        rv = self.app.get(url)
+    def test_404(self):
+        rv = self.app.get(self.GARBAGE_URL)
+        self.assertEqual(rv.status_code, 404)
+
+    def test_config(self):
+        rv = self.app.get(self.TERM_URL)
         self.assertEqual(rv.status_code, 200)
 
-    def test_config(self):
-        self.assert_status_code(self.TERM_URL, 200)
+    def test_config_method(self):
+        rv = self.app.post(self.TERM_URL)
+        self.assertEqual(rv.status_code, 405)
+
+    def test_config_fail_term_id(self):
+        rv = self.app.post(self.FAIL_TERM_URL)
+        self.assertEqual(rv.status_code, 405)
 
     def test_blacklist(self):
-        self.assert_status_code(self.BLACKLIST_URL, 200)
+        rv = self.app.get(self.BLACKLIST_URL)
+        self.assertEqual(rv.status_code, 200)
 
-    def test_config(self):
-        data = dict(
-            username=1,
-            password=2,
-            upload_var=self.REPORT_FILE,
-        )
+    def test_blacklist_method(self):
+        rv = self.app.post(self.BLACKLIST_URL)
+        self.assertEqual(rv.status_code, 405)
+
+    def test_report(self):
+        data = dict(upload_var=self.REPORT_FILE)
         headers = [('Content-MD5', self.FILE_SIGN)]
 
         rv = self.app.put(self.REPORT_URL, data=data, headers=headers)
         self.assertEqual(rv.status_code, 201)
 
-        print rv.data
+    def test_report_metod(self):
+        data = dict(upload_var=self.REPORT_FILE)
+        headers = [('Content-MD5', self.FILE_SIGN)]
+
+        rv = self.app.get(self.REPORT_URL, data=data, headers=headers)
+        self.assertEqual(rv.status_code, 405)
+
+    def test_report_headers(self):
+        data = dict(upload_var=self.REPORT_FILE)
+        rv = self.app.get(self.REPORT_URL, data=data)
+        self.assertEqual(rv.status_code, 405)
+
+    def test_callback(self):
+        data = dict(
+            type='config',
+            term=self.TERM,
+        )
+
+        rv = self.app.post(self.CALLBACK_URL, data=data)
+        self.assertEqual(rv.status_code, 201)

@@ -39,7 +39,7 @@ api = Blueprint('api', __name__)
 @md5_content_headers
 def get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
-    term = Term().get_valid_term(term_id)
+    term = Term().get_valid_term(int(term_id))
 
     if term is None:
         abort(400)
@@ -144,40 +144,14 @@ def upload_report(term_id, report_datetime):
     term.report_date = date_helper.get_curent_date()
     term.update()
 
-    return set_message('success', 'Report uploaded successfully', 201)
-
-
-@api.route('/uids/<int:term_id>_<payment_id>.uid', methods=['PUT'])
-def add_card(term_id, payment_id):
-    """Добавляем в базу карту для привязки"""
-
-    if not request.headers.get('Content-MD5'):
-        abort(400)
-
-    if request.headers.get('Content-MD5') != hash_helper.get_content_md5(file):
-        abort(400)
-
-    term = Term().get_valid_term(term_id)
-
-    if not term:
-        abort(400)
-
-    if CardStack.query.filter_by(payment_id=payment_id).first():
-        abort(400)
-
-    card = CardStack()
-    card.term_id = term_id
-    card.payment_id = payment_id
-    card.save()
-
-    return set_message('success', 'Card added', 201)
+    return set_message('success', hash_helper.get_content_md5(file), 201)
 
 
 @api.route('/configs/callback', methods=['POST'])
 def set_callback():
     """Сообщение об удачной загрузки отчета"""
 
-    data = request.data
+    data = request.stream.read()
 
     app.logger.error(data)
 
