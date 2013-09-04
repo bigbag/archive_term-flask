@@ -151,8 +151,16 @@ def upload_report(term_id, report_datetime):
 def set_callback(term_id, type):
     """Сообщение об удачной загрузки отчета"""
 
-    data = request.stream.read()
+    term = Term().get_valid_term(term_id)
 
-    app.logger.error("%s_%s" % (term_id, type))
+    if term is None:
+        abort(400)
+
+    if type == 'config':
+        term.config_date = date_helper.get_curent_date()
+    elif type == 'blacklist':
+        term.blacklist_date = date_helper.get_curent_date()
+
+    term.update()
 
     return set_message('success', 'Success', 201)

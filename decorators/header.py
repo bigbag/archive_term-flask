@@ -27,6 +27,14 @@ def add_response_headers(headers={}):
     return decorator
 
 
+def csv_headers(f):
+    @wraps(f)
+    @add_response_headers({'Content-Type': 'text/csv'})
+    def decorated_function(*args, **kwargs):
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 def xml_headers(f):
     @wraps(f)
     @add_response_headers({'Content-Type': 'application/xml; charset=windows-1251'})
