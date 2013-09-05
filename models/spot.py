@@ -55,6 +55,7 @@ class Spot(db.Model):
     def __init__(self):
         self.lang = 'en'
         self.name = 'No name'
+        self.premium = 0
         self.status = self.STATUS_GENERATED
         self.spot_type_id = self.TYPE_PERSONAL
         self.generated_date = date_helper.get_curent_date()

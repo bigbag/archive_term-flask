@@ -14,6 +14,8 @@ from models.payment_wallet import PaymentWallet
 from models.payment_history import PaymentHistory
 from models.report import Report
 from models.person_event import PersonEvent
+from models.spot import Spot
+from models.spot_dis import SpotDis
 
 from console.configs.payment import UnitellerConfig
 from libs.uniteller_api import UnitellerApi
@@ -129,9 +131,7 @@ class TestCommand(Command):
 
                 false_wallet.save()
 
-    def run(self):
-
-        wallet_id = 128
+    def get_person_balance_info(self, wallet_id):
         history = PaymentHistory.query.filter_by(
             wallet_id=wallet_id,
             status=1,
@@ -154,6 +154,16 @@ class TestCommand(Command):
             )
 
             print "%s,%s,%s,%s" % data
+
+    def run(self):
+
+        spots = Spot.query.all()
+        for spot in spots:
+            dis = SpotDis.query.get(spot.discodes_id)
+            if dis.status == 1:
+                continue
+            dis.status = 1
+            dis.save()
 
         # print self.rate(5, 36)
         # print self.rate(6, 45)

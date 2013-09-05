@@ -10,11 +10,11 @@ import unittest
 import web
 
 
-class WebTestCase(unittest.TestCase):
+class WebApiTestCase(unittest.TestCase):
 
     API_URL = '/term/v1.0'
     GARBAGE_URL = '/123456'
-    CALLBACK_URL = '/term/v1.0/configs/callback'
+    CALLBACK_URL = '/term/v1.0/configs/callback/0000000021_config'
     BLACKLIST_URL = '/term/v1.0/configs/blacklist.xml'
     TERM_URL = '/term/v1.0/configs/config_0000000021.xml'
     FAIL_TERM_URL = '/term/v1.0/configs/config_9999999999.xml'
@@ -85,6 +85,5 @@ class WebTestCase(unittest.TestCase):
             type='config',
             term=self.TERM,
         )
-
         rv = self.app.post(self.CALLBACK_URL, data=data)
         self.assertEqual(rv.status_code, 201)

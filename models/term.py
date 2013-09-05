@@ -52,11 +52,9 @@ class Term(db.Model):
         return '<id %r>' % (self.id)
 
     def get_valid_term(self, term_id):
-        term = Term.query.filter_by(
+        return self.query.filter_by(
             id=term_id,
             status=self.STATUS_VALID).first()
-
-        return term
 
     def get_by_id(self, id):
         return self.query.get(id)

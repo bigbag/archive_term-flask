@@ -38,7 +38,9 @@ class PaymentWallet(db.Model):
 
     def __init__(self):
         self.discodes_id = 0
+        self.name = 'No name'
         self.balance = 0
+        self.user_id = 0
         self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_NOACTIVE
 

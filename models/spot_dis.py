@@ -30,6 +30,11 @@ class SpotDis(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
+    def get_new_list(self, count=10, premium=0):
+        return self.query.filter_by(
+            premium=premium,
+            status=self.STATUS_INIT).limit(count).all()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
