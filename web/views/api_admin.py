@@ -28,10 +28,10 @@ api_admin = Blueprint('api_admin', __name__)
 def spot_generate():
     """Генерация спотов"""
 
+    count = 10
     if 'count' in request.form:
         count = int(request.form['count'])
-    else:
-        count = 10
+        count = 1 if count > 100 else count
 
     dis = SpotDis().get_new_list(count)
 
@@ -140,6 +140,24 @@ def get_info(hard_id):
         'api_admin/spot_info.xml',
         spot=spot,
         wallet=wallet,
+    ).encode('cp1251')
+
+    response = make_response(info_xml)
+
+    return response
+
+
+@api_admin.route('/spot/free', methods=['GET'])
+@xml_headers
+def get_free():
+    """Возвращает информацию неактивированых спотах"""
+
+    spot = Spot.query.filter_by(
+        status=Spot.STATUS_GENERATED).all()
+
+    info_xml = render_template(
+        'api_admin/spot_free.xml',
+        spot=spot,
     ).encode('cp1251')
 
     response = make_response(info_xml)

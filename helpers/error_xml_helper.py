@@ -11,7 +11,9 @@ from decorators.header import *
 
 message_template = """
     <?xml version="1.0" encoding="windows-1251"?>
+    <error>
     <message type="{{type}}">{{message}}</message>
+    </error>
     """
 
 

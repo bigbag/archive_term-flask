@@ -14,6 +14,7 @@ class WebApiAdminTestCase(unittest.TestCase):
 
     GENERATE_URL = '/term/admin/spot/generate'
     LINKING_URL = '/term/admin/spot/linking'
+    FREE_URL = '/term/admin/spot/free'
     INFO_URL = '/term/admin/spot/1259038160727942'
     EAN = '0076969992007'
     PIDS = '0077781000'
@@ -47,4 +48,8 @@ class WebApiAdminTestCase(unittest.TestCase):
 
     def test_spot_info(self):
         rv = self.app.get(self.INFO_URL)
+        self.assertEqual(rv.status_code, 200)
+
+    def test_spot_info(self):
+        rv = self.app.get(self.FREE_URL)
         self.assertEqual(rv.status_code, 200)

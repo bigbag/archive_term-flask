@@ -157,17 +157,7 @@ class TestCommand(Command):
 
     def run(self):
 
-        spots = Spot.query.all()
-        for spot in spots:
-            dis = SpotDis.query.get(spot.discodes_id)
-            if dis.status == 1:
-                continue
-            dis.status = 1
-            dis.save()
-
-        # print self.rate(5, 36)
-        # print self.rate(6, 45)
-        # print self.rate(7, 49)
+        print 1
         # with open('tmp/import.csv', 'rb') as csvfile:
         #     spamreader = csv.reader(csvfile)
         #     for row in spamreader:
@@ -211,6 +201,3 @@ class TestCommand(Command):
         #     if person.payment_id == person.hard_id:
         #         person.hard_id = row[0]
         #         print person.save()
-        # print self.rate(5, 36)
-        # print self.rate(6, 45)
-        # print self.rate(7, 49)

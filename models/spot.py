@@ -103,9 +103,6 @@ class Spot(db.Model):
         else:
             return url
 
-    def gen_spot():
-        return 1
-
     def delete(self):
         db.session.delete(self)
         db.session.commit()
