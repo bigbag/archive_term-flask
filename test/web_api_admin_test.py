@@ -12,10 +12,10 @@ import web
 
 class WebApiAdminTestCase(unittest.TestCase):
 
-    GENERATE_URL = '/term/admin/spot/generate'
-    LINKING_URL = '/term/admin/spot/linking'
-    FREE_URL = '/term/admin/spot/free'
-    INFO_URL = '/term/admin/spot/1259038160727942'
+    GENERATE_URL = '/api/admin/spot/generate'
+    LINKING_URL = '/api/admin/spot/linking'
+    FREE_URL = '/api/admin/spot/free'
+    INFO_URL = '/api/admin/spot/1259038160727942'
     EAN = '0076969992007'
     PIDS = '0077781000'
     HID = 1259038160727942

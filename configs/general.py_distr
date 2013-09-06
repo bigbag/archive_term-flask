@@ -42,6 +42,8 @@ class Config(object):
         'mobispot': 'mysql://user:pass@localhost/mobispot?charset=utf8'
     }
 
+    SECRET_KEY = 'test'
+
 
 class ProductionConfig(Config):
     SQLALCHEMY_ECHO = False

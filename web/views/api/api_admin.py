@@ -52,7 +52,7 @@ def spot_generate():
         result[row.id] = spot.barcode
 
     spot_list = render_template(
-        'api_admin/spot_list.xml',
+        'api/admin/spot_list.xml',
         result=result,
     ).encode('cp1251')
     response = make_response(spot_list)
@@ -106,7 +106,7 @@ def linking_spot():
         abort(400)
 
     add_xml = render_template(
-        'api_admin/add_info.xml',
+        'api/admin/add_info.xml',
         spot=spot,
         wallet=wallet,
         add_success=add_success,
@@ -137,7 +137,7 @@ def get_info(hard_id):
         discodes_id=wallet.discodes_id).first()
 
     info_xml = render_template(
-        'api_admin/spot_info.xml',
+        'api/admin/spot_info.xml',
         spot=spot,
         wallet=wallet,
     ).encode('cp1251')
@@ -156,7 +156,7 @@ def get_free():
         status=Spot.STATUS_GENERATED).all()
 
     info_xml = render_template(
-        'api_admin/spot_free.xml',
+        'api/admin/spot_free.xml',
         spot=spot,
     ).encode('cp1251')
 

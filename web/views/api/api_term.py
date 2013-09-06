@@ -54,7 +54,7 @@ def get_config(term_id):
     person_events = PersonEvent().get_by_term_id(term.id)
 
     config_xml = render_template(
-        'api/config.xml',
+        'api/term/config.xml',
         term=term,
         config=TermConfig,
         term_events=term_events,
@@ -99,7 +99,7 @@ def get_blacklist():
             blacklist.append(card.payment_id)
 
     config_xml = render_template(
-        'api/blacklist.xml',
+        'api/term/blacklist.xml',
         blacklist=blacklist,
     ).encode('cp1251')
 

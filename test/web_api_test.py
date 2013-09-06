@@ -14,11 +14,11 @@ class WebApiTestCase(unittest.TestCase):
 
     API_URL = '/term/v1.0'
     GARBAGE_URL = '/123456'
-    CALLBACK_URL = '/term/v1.0/configs/callback/0000000021_config'
-    BLACKLIST_URL = '/term/v1.0/configs/blacklist.xml'
-    TERM_URL = '/term/v1.0/configs/config_0000000021.xml'
-    FAIL_TERM_URL = '/term/v1.0/configs/config_9999999999.xml'
-    REPORT_URL = '/term/v1.0/reports/report_0000000021_130903_164649.xml'
+    CALLBACK_URL = '/api/term/configs/callback/0000000021_config'
+    BLACKLIST_URL = '/api/term/configs/blacklist.xml'
+    TERM_URL = '/api/term/configs/config_0000000021.xml'
+    FAIL_TERM_URL = '/api/term/configs/config_9999999999.xml'
+    REPORT_URL = '/api/term/reports/report_0000000021_130903_164649.xml'
     TERM = '0000000021'
 
     REPORT_FILE = """<?xml version="1.0" encoding="windows-1251" standalone="yes" ?>
