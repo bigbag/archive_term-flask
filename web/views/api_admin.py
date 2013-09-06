@@ -74,7 +74,7 @@ def linking_spot():
     if not hid or not ean or not pids:
         abort(400)
 
-    if not len(str(hid)) == 16 or not len(str(pids)) == 10 or not len(str(ean)) == 13:
+    if not len(str(pids)) == 10 or not len(str(ean)) == 13:
         abort(400)
 
     hid = int(hid)

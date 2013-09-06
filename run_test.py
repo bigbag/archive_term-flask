@@ -16,14 +16,14 @@ web_api_admin_test = loader.loadTestsFromModule(web_api_admin_test)
 models_test = loader.loadTestsFromModule(models_test)
 models_term_test = loader.loadTestsFromModule(models_term_test)
 models_payment_test = loader.loadTestsFromModule(models_payment_test)
-# tests = [
-#     web_api_admin_test,
-#     web_api_test,
-#     models_test,
-#     models_payment_test,
-#     models_term_test]
+tests = [
+    web_api_admin_test,
+    web_api_test,
+    models_test,
+    models_payment_test,
+    models_term_test]
 
-tests = [web_api_admin_test]
+# tests = [web_api_admin_test]
 
 alltests = unittest.TestSuite(tests)
 
