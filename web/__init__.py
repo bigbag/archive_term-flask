@@ -14,11 +14,10 @@ mail = Mail(app)
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
 
-from web.views.api import api
-from web.views.api_admin import api_admin
+from web.views.api import *
 
-app.register_blueprint(api, url_prefix='/term/v1.0')
-app.register_blueprint(api_admin, url_prefix='/term/admin')
+app.register_blueprint(api_term, url_prefix='/api/term')
+app.register_blueprint(api_admin, url_prefix='/api/admin')
 
 if app.debug is not True:
     import logging
