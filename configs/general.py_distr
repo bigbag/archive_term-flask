@@ -35,29 +35,20 @@ class Config(object):
     MAIL_PASSWORD = None
     DEFAULT_MAIL_SENDER = None
 
-
-class ProductionConfig(Config):
     SQLALCHEMY_BINDS = {
         'term': 'mysql://user:pass@localhost/term?charset=utf8',
         'stack': 'mysql://user:pass@localhost/stack?charset=utf8',
         'payment': 'mysql://user:pass@localhost/payment?charset=utf8',
         'mobispot': 'mysql://user:pass@localhost/mobispot?charset=utf8'
     }
+
+
+class ProductionConfig(Config):
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_RECORD_QUERIES = True
 
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_ECHO = True
-    SQLALCHEMY_BINDS = {
-        'term': 'mysql://user:pass@localhost/term?charset=utf8',
-        'stack': 'mysql://user:pass@localhost/stack?charset=utf8',
-        'payment': 'mysql://user:pass@localhost/payment?charset=utf8',
-        'mobispot': 'mysql://user:pass@localhost/mobispot?charset=utf8'
-    }
     DEBUG = True
     SQLALCHEMY_RECORD_QUERIES = True
-
-
-class TestingConfig(Config):
-    TESTING = True

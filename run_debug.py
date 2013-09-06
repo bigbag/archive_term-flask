@@ -6,5 +6,5 @@
     :license: BSD, see LICENSE for more details.
 """
 from web import app
-app.config.from_object('configs.general.ProductionConfig')
-app.run(host='127.0.0.1', port=4000)
+app.config.from_object('configs.general.DevelopmentConfig')
+app.run(host='127.0.0.1', port=4001)
