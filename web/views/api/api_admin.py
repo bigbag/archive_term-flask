@@ -33,16 +33,12 @@ def api_admin_access(request):
 
     term_user = TermUser().get_by_api_key(headers['Key']);
 
-    app.logger.error(term_user)
-
     if not term_user:
         abort(403)
     true_sign = hash_helper.get_api_sign(
         str(term_user.api_secret),
         request.form)
 
-    app.logger.error(true_sign)
-    app.logger.error(headers['Sign'])
     if not true_sign == headers['Sign']:
         abort(403)
 
@@ -74,7 +70,7 @@ def spot_generate():
             row.save()
             continue
 
-        result[row.id] = spot.barcode
+        result[spot.code] = spot.barcode
 
     spot_list = render_template(
         'api/admin/spot_list.xml',
