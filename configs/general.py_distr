@@ -44,6 +44,11 @@ class Config(object):
 
     SECRET_KEY = 'test'
 
+    LANGUAGES = {
+        'en': 'English',
+        'ru': 'Russian'
+    }
+
 
 class ProductionConfig(Config):
     SQLALCHEMY_ECHO = False

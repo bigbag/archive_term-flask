@@ -8,11 +8,13 @@ from flask.ext.cache import Cache
 cache = Cache(app)
 
 from flask.ext.mail import Mail
-
 mail = Mail(app)
 
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
+
+from flask.ext.babel import Babel
+babel = Babel(app)
 
 from web.views.api import *
 from web.views.term import *
