@@ -6,6 +6,8 @@
     :license: BSD, see LICENSE for more details.
 """
 import hashlib
+import hmac
+import urllib
 import time
 import base64
 from functools import reduce
@@ -80,3 +82,12 @@ def get_isin_checksum(isin):
 def get_activkey(data):
     data = str(time.time()) + data
     return hashlib.sha1(data).hexdigest()
+
+
+def get_api_sign(secret, data):
+    post = urllib.urlencode(data)
+
+    H = hmac.new(secret, digestmod=hashlib.sha512)
+    H.update(post)
+
+    return H.hexdigest()

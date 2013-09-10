@@ -8,6 +8,7 @@
 import unittest
 
 import web
+from helpers import hash_helper
 
 
 class WebApiAdminTestCase(unittest.TestCase):
@@ -20,6 +21,9 @@ class WebApiAdminTestCase(unittest.TestCase):
     PIDS = '0077781000'
     HID = 1259038160727942
 
+    ADMIN_KEY = '7131b1e8722240660480dfbb99592cb030debfa9'
+    ADMIN_SECRET = 'cb81b4036eb381e528062a582725b1ec4d91650664e78a26c30a8147'
+
     def setUp(self):
         self.app = web.app.test_client()
 
@@ -27,7 +31,12 @@ class WebApiAdminTestCase(unittest.TestCase):
         data = dict(
             count=1,
         )
-        rv = self.app.post(self.GENERATE_URL, data=data)
+        sign = hash_helper.get_api_sign(self.ADMIN_SECRET, data)
+        headers = [
+            ('Key', self.ADMIN_KEY),
+            ('Sign', sign)
+        ]
+        rv = self.app.post(self.GENERATE_URL, headers=headers, data=data)
         self.assertEqual(rv.status_code, 200)
 
     def test_spot_generate_metod(self):
@@ -43,13 +52,22 @@ class WebApiAdminTestCase(unittest.TestCase):
             pids=self.PIDS,
             ean=self.EAN
         )
-        rv = self.app.post(self.LINKING_URL, data=data)
+        sign = hash_helper.get_api_sign(self.ADMIN_SECRET, data)
+        headers = [
+            ('Key', self.ADMIN_KEY),
+            ('Sign', sign)
+        ]
+        rv = self.app.post(self.LINKING_URL, headers=headers, data=data)
         self.assertEqual(rv.status_code, 200)
 
     def test_spot_info(self):
-        rv = self.app.get(self.INFO_URL)
-        self.assertEqual(rv.status_code, 200)
 
-    def test_spot_info(self):
-        rv = self.app.get(self.FREE_URL)
+        data = dict()
+        sign = hash_helper.get_api_sign(self.ADMIN_SECRET, data)
+        headers = [
+            ('Key', self.ADMIN_KEY),
+            ('Sign', sign)
+        ]
+
+        rv = self.app.get(self.INFO_URL, headers=headers)
         self.assertEqual(rv.status_code, 200)

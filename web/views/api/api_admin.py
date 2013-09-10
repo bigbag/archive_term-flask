@@ -15,18 +15,39 @@ from web import cache
 from decorators.header import *
 from helpers.error_xml_helper import *
 
+from helpers import hash_helper
+
 from models.spot import Spot
 from models.spot_dis import SpotDis
 from models.payment_wallet import PaymentWallet
+from models.term_user import TermUser
 
 
 api_admin = Blueprint('api_admin', __name__)
+
+
+def api_admin_access(request):
+    headers = request.headers
+    if not 'Key' in headers or 'Sign' not in headers:
+        abort(400)
+
+    term_user = TermUser().get_by_api_key(headers['Key']);
+
+    if not term_user:
+        abort(403)
+    true_sign = hash_helper.get_api_sign(
+        str(term_user.api_secret),
+        request.form)
+
+    if not true_sign == headers['Sign']:
+        abort(403)
 
 
 @api_admin.route('/spot/generate', methods=['POST'])
 @xml_headers
 def spot_generate():
     """Генерация спотов"""
+    api_admin_access(request)
 
     count = 10
     if 'count' in request.form:
@@ -64,7 +85,7 @@ def spot_generate():
 @xml_headers
 def linking_spot():
     """Добавляем спот и связанный с ним кошелёк"""
-
+    api_admin_access(request)
     add_success = 0
 
     hid = request.form['hid']
@@ -121,6 +142,7 @@ def linking_spot():
 @xml_headers
 def get_info(hard_id):
     """Возвращает информацию о споте по его HID"""
+    api_admin_access(request)
 
     hard_id = int(hard_id)
 
