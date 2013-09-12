@@ -200,8 +200,9 @@ def spot_delete():
     if not len(str(ean)) == 13:
         abort(400)
 
-    spot = Spot.query.filter((Spot.status == Spot.STATUS_GENERATED) |
-                            (Spot.barcode == ean)).first()
+    spot = Spot.query.filter(((Spot.status == Spot.STATUS_GENERATED) |
+                            (Spot.status == Spot.STATUS_ACTIVATED)) &
+        (Spot.barcode == ean)).first()
 
     if not spot:
         abort(404)
