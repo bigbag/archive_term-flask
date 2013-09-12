@@ -9,6 +9,7 @@ import unittest
 
 import web
 from helpers import hash_helper
+from models.spot import Spot
 
 
 class WebApiAdminTestCase(unittest.TestCase):
@@ -16,6 +17,7 @@ class WebApiAdminTestCase(unittest.TestCase):
     GENERATE_URL = '/api/admin/spot/generate'
     LINKING_URL = '/api/admin/spot/linking'
     FREE_URL = '/api/admin/spot/free'
+    DELETE_URL = '/api/admin/spot/delete'
     INFO_URL = '/api/admin/spot/1259038160727942'
     EAN = '0076969992007'
     PIDS = '0077781000'
@@ -71,3 +73,18 @@ class WebApiAdminTestCase(unittest.TestCase):
 
         rv = self.app.get(self.INFO_URL, headers=headers)
         self.assertEqual(rv.status_code, 200)
+
+    def test_spot_delete(self):
+        spot = Spot.query.filter((Spot.status == Spot.STATUS_GENERATED) |
+                                (Spot.status == Spot.STATUS_ACTIVATED)).first()
+
+        data = dict(ean=spot.barcode)
+        sign = hash_helper.get_api_sign(self.ADMIN_SECRET, data)
+
+        headers = [
+            ('Key', self.ADMIN_KEY),
+            ('Sign', sign)
+        ]
+
+        rv = self.app.post(self.DELETE_URL, headers=headers, data=data)
+        self.assertEqual(rv.status_code, 201)
