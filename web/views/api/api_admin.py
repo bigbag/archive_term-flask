@@ -28,13 +28,14 @@ api_admin = Blueprint('api_admin', __name__)
 
 def api_admin_access(request):
     headers = request.headers
+
     if not 'Key' in headers or 'Sign' not in headers:
         abort(400)
 
     term_user = TermUser().get_by_api_key(headers['Key']);
-
     if not term_user:
         abort(403)
+
     true_sign = hash_helper.get_api_sign(
         str(term_user.api_secret),
         request.form)
@@ -205,7 +206,7 @@ def spot_delete():
         (Spot.barcode == ean)).first()
 
     if not spot:
-        abort(404)
+        abort(405)
 
     if spot.delete():
         wallet = PaymentWallet.query.filter_by(

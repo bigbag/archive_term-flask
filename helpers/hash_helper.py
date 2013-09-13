@@ -7,7 +7,6 @@
 """
 import hashlib
 import hmac
-import urllib
 import time
 import base64
 from functools import reduce
@@ -85,9 +84,13 @@ def get_activkey(data):
 
 
 def get_api_sign(secret, data):
-    post = urllib.urlencode(data)
+    keys = sorted(data.keys())
+
+    post = []
+    for key in keys:
+        post.append('%s=%s' % (key, data[key]))
 
     H = hmac.new(secret, digestmod=hashlib.sha512)
-    H.update(post)
+    H.update('&'.join(post))
 
     return H.hexdigest()
