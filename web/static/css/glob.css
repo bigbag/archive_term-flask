@@ -1,0 +1,117 @@
+html,body{
+	height: 100%;
+}
+body{
+	font-size: 100%;
+	background: #E9EDF2;
+}
+
+@font-face {
+	font-family: Mobispot;
+	src: url('../fonts/mobispot-webfont.eot');
+	src: url('../fonts/mobispot-webfont.eot?iefix') format('eot'),
+	url('../fonts/mobispot-webfont.woff') format('woff'),
+	url('../fonts/mobispot-webfont.ttf') format('truetype'),
+	url('../fonts/mobispot-webfont.svg#webfontjSpbZQRv') format('svg');
+}
+@font-face {
+	font-family: Mobispot-icon;
+	src: url('../fonts/mobispot-icon.eot');
+	src: url('../fonts/mobispot-icon.eot?iefix') format('eot'),
+	url('../fonts/mobispot-icon.woff') format('woff'),
+	url('../fonts/mobispot-icon.ttf') format('truetype'),
+	url('../fonts/mobispot-icon.svg#webfontjSpbZQRv') format('svg');
+}
+.bg-white{
+	background: #fff;
+}
+.bg-black{
+	background: #000;
+}
+.bg-blue{
+	background: #2b46ff;
+}
+.bg-red{
+	background: #ff0050 !important;
+}
+.bg-yellow{
+	background: #c5f900;
+}
+.bg-green{
+	background: #00d1c3;
+}
+.bg-gray{
+	background: #E9EDF2;
+}
+.g-color-blue{
+	color: #0063ff !important;
+}
+.g-color-red{
+	color: #f00;
+}
+li{
+	list-style: none;
+}
+.logo a{
+	display: block;
+	max-width: 207px;
+}
+
+::-webkit-input-placeholder {color:#000 !important;}
+::-moz-placeholder {color:#000 !important;}
+:-ms-input-placeholder { color:#000!important; }
+input:-moz-placeholder { color:#000!important; }
+
+.g-clearfix:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+
+.g-clearfix {
+	display: inline-block;
+}
+
+html[xmlns] .clearfix {
+	display: block;
+}
+
+* html .clearfix {
+	height: 1%;
+}
+.g-round{
+	-webkit-border-radius: 50%;
+	-moz-border-radius: 50%;
+	border-radius: 50%;
+}
+.g-slow{
+	-webkit-transition: all linear .2s;
+	-moz-transition: all linear .2s;
+	-o-transition: all linear .2s;
+	transition: all linear .2s;
+}
+.g-hide{
+	display: none;
+}
+.g-overflow-h{
+	overflow: hidden;
+}
+.g-radius-main{
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+.g-clear-b{
+	clear: both;
+	overflow: hidden;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	display: none;
+	-webkit-appearance: none;
+	margin: 0;
+}
