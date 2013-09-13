@@ -30,11 +30,19 @@ class PaymentAuto(Command):
         un = UnitellerApi(UnitellerConfig)
 
         for reccurent in reccurents:
+            amount = 0
+            reccurent.count = reccurent.count + 1
 
             if not reccurent.wallet:
                 continue
 
-            amount = 0
+            count = int(reccurent.count)
+            if count > PaymentReccurent.MAX_COUNT:
+                factor = count % PaymentReccurent.PERIOD
+                if not factor == 0:
+                    reccurent.status = PaymentReccurent.STATUS_OFF
+                    reccurent.save()
+                    continue
 
             if reccurent.type == PaymentReccurent.TYPE_CEILING:
                 amount = int(reccurent.amount) - int(reccurent.wallet.balance)
@@ -68,9 +76,9 @@ class PaymentAuto(Command):
             )
 
             result = un.reccurent_payment(order)
-
             if result == UnitellerApi.STATUS_COMPLETE:
                 reccurent.history_id = history.id
+                reccurent.count = 0
 
             reccurent.status = PaymentReccurent.STATUS_OFF
             reccurent.run_date = date_helper.get_curent_date()

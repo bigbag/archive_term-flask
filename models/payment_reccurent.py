@@ -27,6 +27,9 @@ class PaymentReccurent(db.Model):
     TYPE_CEILING = 0
     TYPE_LIMIT = 1
 
+    MAX_COUNT = 10
+    PERIOD = 20
+
     id = db.Column(db.Integer, primary_key=True)
     wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'), index=True)
     wallet = db.relationship('PaymentWallet')
@@ -38,11 +41,13 @@ class PaymentReccurent(db.Model):
     run_date = db.Column(db.DateTime)
     type = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Integer, nullable=False)
+    count = db.Column(db.Integer)
 
     def __init__(self):
         self.creation_date = date_helper.get_curent_date()
         self.type = self.TYPE_CEILING
         self.status = self.STATUS_OFF
+        self.count = 0
 
     def __repr__(self):
         return '<id %r>' % (self.wallet_id)
