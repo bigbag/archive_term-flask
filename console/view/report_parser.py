@@ -66,7 +66,6 @@ class ReportParser(Command):
                         continue
 
                     term = Term().get_by_id(term_id)
-
                     if not term:
                         term = Term()
                         term.id = term_id
@@ -83,9 +82,8 @@ class ReportParser(Command):
 
                         report = report.get_db_view(card_node)
 
-                        old_report = Report.query.filter_by(
-                            check_summ=report.check_summ).first()
-
+                        old_report = Report().get_by_check_summ(
+                            report.check_summ)
                         if old_report:
                             continue
 
@@ -94,9 +92,8 @@ class ReportParser(Command):
                         if not int(report.type) == Report.TYPE_PAYMENT:
                             continue
 
-                        wallet = PaymentWallet.query.filter_by(
-                            payment_id=report.payment_id).first()
-
+                        wallet = PaymentWallet().get_by_payment_id(
+                            report.payment_id)
                         if not wallet or wallet.user_id == 0:
                             lost = PaymentLost()
                             lost.add_lost_payment(report)
@@ -133,10 +130,8 @@ class ReportParser(Command):
             if int(reccurent.wallet.balance) > PaymentReccurent.BALANCE_MIN:
                 continue
 
-            history = PaymentHistory.query.filter_by(
-                status=PaymentHistory.STATUS_NEW,
-                wallet_id=reccurent.wallet.id,
-            ).first()
+            history = PaymentHistory().get_new_by_wallet_id(
+                reccurent.wallet.id)
 
             if history:
                 continue

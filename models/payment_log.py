@@ -33,6 +33,9 @@ class PaymentLog(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.history_id)
 
+    def get_by_history_id(self, history_id):
+        return self.query.filter_by(history_id=history_id).first()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

@@ -60,6 +60,9 @@ class PaymentHistory(db.Model):
         self.status = PaymentHistory.STATUS_COMPLETE
         return self.save()
 
+    def get_new_by_wallet_id(self, wallet_id):
+        return self.query.filter_by(status=self.STATUS_NEW, wallet_id=wallet_id ).first()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

@@ -84,6 +84,9 @@ class Report(db.Model):
         self.check_summ = self.get_check_summ()
         return self
 
+    def get_by_check_summ(self, check_summ):
+        return self.query.filter_by(check_summ=check_summ).first()
+
     def get_check_summ(self):
         return hashlib.md5("%s%s%s%s%s" % (
             str(self.term_id),
