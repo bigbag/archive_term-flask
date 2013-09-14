@@ -25,6 +25,9 @@ class PaymentWallet(db.Model):
     STATUS_ACTIVE = 1
     STATUS_BANNED = -1
 
+    BLACKLIST_ON = 1
+    BLACKLIST_OFF = 0
+
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.String(20), index=True)
     hard_id = db.Column(db.Integer(128), index=True)
@@ -35,10 +38,12 @@ class PaymentWallet(db.Model):
     creation_date = db.Column(db.DateTime, nullable=False)
     balance = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Integer, nullable=False)
+    blacklist = db.Column(db.Integer(), index=True)
 
     def __init__(self):
         self.discodes_id = 0
-        self.name = 'No name'
+        self.name = 'My spot'
+        self.blacklist = self.BLACKLIST_ON
         self.balance = 0
         self.user_id = 0
         self.creation_date = date_helper.get_curent_date()
@@ -57,6 +62,9 @@ class PaymentWallet(db.Model):
             self.get_pid(self, pids)
         else:
             return pid
+
+    def get_by_payment_id(self, payment_id):
+        return self.query.filter_by(payment_id=payment_id).first()
 
     def delete(self):
         db.session.delete(self)
