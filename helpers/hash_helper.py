@@ -9,6 +9,8 @@ import hashlib
 import hmac
 import time
 import base64
+from flaskext.bcrypt import check_password_hash, generate_password_hash
+
 from functools import reduce
 
 EDGE = '101'
@@ -23,6 +25,8 @@ CODES = {
 }
 LEFT_PATTERN = ('AAAAAA', 'AABABB', 'AABBAB', 'AABBBA', 'ABAABB',
                 'ABBAAB', 'ABBBAA', 'ABABAB', 'ABABBA', 'ABBABA')
+
+CRYPT_ROUND = 10
 
 
 def get_content_md5(data):
@@ -94,3 +98,9 @@ def get_api_sign(secret, data):
     H.update('&'.join(post))
 
     return H.hexdigest()
+
+def get_password_hash(password):
+    return generate_password_hash(password, CRYPT_ROUND)
+
+def check_password(password_hash, password):
+    return check_password_hash(password_hash, password)
