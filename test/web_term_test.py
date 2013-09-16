@@ -15,6 +15,8 @@ class WebTermTestCase(unittest.TestCase):
 
     GARBAGE_URL = '/term/123456'
     LOGIN_URL = '/term/login'
+    LOGOUT_URL = '/term/logout'
+    FORGOT_URL = '/term/forgot'
     EMAIL = 'test@test.ru'
     PASSWORD = '12345678'
     BAD_EMAIL = 'test123@test.ru'
@@ -32,45 +34,44 @@ class WebTermTestCase(unittest.TestCase):
         user = TermUser().get_by_email(self.EMAIL)
         user.delete()
 
+    def login(self, email, password):
+        headers = [
+            ('Content-Type', 'application/json;charset=utf-8'),
+        ]
+        data = '{"email":"' + email + \
+            '","password":"' + password + '"}'
+        return self.app.post(self.LOGIN_URL,
+                             data=data,
+                             headers=headers,
+                             follow_redirects=True)
+
+    def logout(self):
+        return self.app.get(self.LOGOUT_URL, follow_redirects=True)
+
     def test_404(self):
         rv = self.app.get(self.GARBAGE_URL)
         self.assertEqual(rv.status_code, 404)
 
-    def test_login(self):
-        rv = self.app.get(self.LOGIN_URL)
+    def test_login_form(self):
+        rv = self.app.get(self.LOGIN_URL, follow_redirects=True)
         self.assertEqual(rv.status_code, 200)
 
-    def test_login_request_empty_email(self):
-        data = '"password":"' + self.PASSWORD + '"}'
-        headers = [
-            ('Content-Type', 'application/json;charset=utf-8'),
-        ]
-        rv = self.app.post(self.LOGIN_URL, data=data)
-        self.assertEqual(rv.status_code, 400)
+    def test_forgot(self):
+        rv = self.app.get(self.FORGOT_URL)
+        self.assertEqual(rv.status_code, 200)
 
-    def test_login_request_bad_password(self):
-        data = '{"email":"' + self.EMAIL + \
-            '","password":"' + self.BAD_PASSWORD + '"}'
-        headers = [
-            ('Content-Type', 'application/json;charset=utf-8'),
-        ]
-        rv = self.app.post(self.LOGIN_URL, data=data)
+    def test_login_logout(self):
+        rv = self.login('', self.PASSWORD)
         self.assertEqual(rv.status_code, 403)
 
-    def test_login_request_bad_email(self):
-        data = '{"email":"' + self.BAD_EMAIL + \
-            '","password":"' + self.PASSWORD + '"}'
-        headers = [
-            ('Content-Type', 'application/json;charset=utf-8'),
-        ]
-        rv = self.app.post(self.LOGIN_URL, data=data)
+        rv = self.login(self.EMAIL, self.BAD_PASSWORD)
         self.assertEqual(rv.status_code, 403)
 
-    def test_login_request(self):
-        data = '{"email":"' + self.EMAIL + \
-            '","password":"' + self.PASSWORD + '"}'
-        headers = [
-            ('Content-Type', 'application/json;charset=utf-8'),
-        ]
-        rv = self.app.post(self.LOGIN_URL, data=data)
+        rv = self.login(self.BAD_EMAIL, self.PASSWORD)
+        self.assertEqual(rv.status_code, 403)
+
+        rv = self.login(self.EMAIL, self.PASSWORD)
+        self.assertEqual(rv.status_code, 200)
+
+        rv = self.logout()
         self.assertEqual(rv.status_code, 200)
