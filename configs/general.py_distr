@@ -49,6 +49,11 @@ class Config(object):
         'ru': 'Russian'
     }
 
+    COOKIE_NAME = ""
+    COOKIE_HTTPONLY = True
+    COOKIE_SECURE = "strong"
+    REMEMBER_COOKIE_NAME = ""
+
 
 class ProductionConfig(Config):
     SQLALCHEMY_ECHO = False

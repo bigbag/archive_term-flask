@@ -9,11 +9,8 @@ from web import app
 from flask import Flask, make_response, render_template_string
 from decorators.header import *
 
-message_template = """
-    <?xml version="1.0" encoding="windows-1251"?>
-    <error>
+message_template = """<?xml version="1.0" encoding="windows-1251"?>
     <message type="{{type}}">{{message}}</message>
-    </error>
     """
 
 

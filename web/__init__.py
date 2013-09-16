@@ -16,6 +16,10 @@ db = SQLAlchemy(app)
 from flask.ext.babel import Babel
 babel = Babel(app)
 
+from flask.ext.login import LoginManager
+lm = LoginManager()
+lm.init_app(app)
+
 from web.views.api import *
 from web.views.term import *
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Тест веб интерфейса
+    Тест веб интерфейса api
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.

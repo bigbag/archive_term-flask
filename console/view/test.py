@@ -8,6 +8,7 @@
 import random
 import csv
 import uuid
+import urllib
 from flask.ext.script import Command
 from models.person import Person
 from models.payment_wallet import PaymentWallet
@@ -19,6 +20,8 @@ from models.spot_dis import SpotDis
 
 from console.configs.payment import UnitellerConfig
 from libs.uniteller_api import UnitellerApi
+
+from helpers import hash_helper
 
 
 class TestCommand(Command):
@@ -156,7 +159,6 @@ class TestCommand(Command):
             print "%s,%s,%s,%s" % data
 
     def run(self):
-
         print 1
         # with open('tmp/import.csv', 'rb') as csvfile:
         #     spamreader = csv.reader(csvfile)

@@ -6,8 +6,7 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db
-from web import app
+from web import db, app
 from helpers import date_helper, hash_helper
 
 
@@ -35,8 +34,20 @@ class User(db.Model):
         self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_NOACTIVE
 
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
+
     def __repr__(self):
-        return '<id %r>' % (self.id)
+        return '<User %r>' % (self.email)
 
     def delete(self):
         db.session.delete(self)
@@ -48,7 +59,8 @@ class User(db.Model):
     def save(self):
         try:
             if not self.activkey:
-                self.activkey = hash_helper.get_activkey(self.password)
+                self.password = hash_helper.get_password_hash(self.password)
+            self.activkey = hash_helper.get_activkey(self.password)
             db.session.add(self)
             db.session.commit()
         except Exception as e:
