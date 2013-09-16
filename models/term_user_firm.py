@@ -1,0 +1,46 @@
+# -*- coding: utf-8 -*-
+"""
+    Модель для доступных администраторам терминалов
+
+
+    :copyright: (c) 2013 by Pavel Lyashkov.
+    :license: BSD, see LICENSE for more details.
+"""
+from web import db, app
+from helpers import date_helper, hash_helper
+
+from models.term import User
+from models.firm import Firm
+
+
+class TermUserFirm(db.Model):
+
+    __bind_key__ = 'term'
+    __tablename__ = 'user_firm'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User')
+    firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
+    firm = db.relationship('Firm')
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def save(self):
+        try:
+            if not self.activkey:
+                self.password = hash_helper.get_password_hash(self.password)
+            self.activkey = hash_helper.get_activkey(self.password)
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(e)
+            return False
+        else:
+            return True
