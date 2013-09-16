@@ -62,13 +62,13 @@ class WebTermTestCase(unittest.TestCase):
 
     def test_login_logout(self):
         rv = self.login('', self.PASSWORD)
-        self.assertEqual(rv.status_code, 403)
+        assert 'error' in rv.data
 
         rv = self.login(self.EMAIL, self.BAD_PASSWORD)
-        self.assertEqual(rv.status_code, 403)
+        assert 'error' in rv.data
 
         rv = self.login(self.BAD_EMAIL, self.PASSWORD)
-        self.assertEqual(rv.status_code, 403)
+        assert 'error' in rv.data
 
         rv = self.login(self.EMAIL, self.PASSWORD)
         self.assertEqual(rv.status_code, 200)

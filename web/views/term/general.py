@@ -49,7 +49,8 @@ def get_firm_name(request):
         host = headers['Host']
         host_name = host.split('.')
         firm = Firm().get_by_sub_domain(host_name[0])
-        name = firm.name
+        if firm:
+            name = firm.name
     return name
 
 
