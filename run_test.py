@@ -26,7 +26,7 @@ tests = [
     models_payment_test,
     models_term_test]
 
-# tests = [web_term_test]
+# tests = [web_api_admin_test]
 
 alltests = unittest.TestSuite(tests)
 
