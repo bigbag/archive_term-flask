@@ -16,6 +16,7 @@ from web import app, cache, lm
 from helpers import hash_helper
 
 from models.term_user import TermUser
+from models.term_user_firm import TermUserFirm
 from models.firm import Firm
 
 term = Blueprint('term', __name__)
@@ -59,13 +60,13 @@ def get_firm_name(request):
 def login_form():
     """Форма логина"""
 
-    result = get_firm_name(request)
-    if not result:
+    firm_info = get_firm_name(request)
+    if not firm_info:
         abort(403)
 
     return render_template(
         'term/login.html',
-        name=result['name'])
+        name=firm_info['name'])
 
 
 @term.route('/login', methods=['POST'])
@@ -74,12 +75,12 @@ def login():
     answer = dict(error='yes', message='')
     user = request.get_json()
 
-    result = get_firm_name(request)
-    if not result:
-        abort(403)
-
     if not 'email' in user or not 'password' in user:
         abort(400)
+
+    firm_info = get_firm_name(request)
+    if not firm_info:
+        abort(403)
 
     term_user = TermUser().get_by_email(user['email'])
 
@@ -98,6 +99,12 @@ def login():
 
     if not hash_helper.check_password(term_user.password, user['password']):
         answer['message'] = u'Пароль не верен'
+        return set_json_response(answer)
+
+    user_firm = TermUserFirm.query.filter_by(
+        user_id=term_user.id, firm_id=firm_info['firm_id']).first()
+    if not user_firm:
+        answer['message'] = u'У вас нет доступа к данной фирме'
         return set_json_response(answer)
 
     login_user(term_user, True)

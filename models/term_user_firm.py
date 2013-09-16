@@ -9,7 +9,7 @@
 from web import db, app
 from helpers import date_helper, hash_helper
 
-from models.term import User
+from models.term_user import TermUser
 from models.firm import Firm
 
 
@@ -19,10 +19,14 @@ class TermUserFirm(db.Model):
     __tablename__ = 'user_firm'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship('User')
+    user_id = db.Column(db.Integer, db.ForeignKey('term_user.id'))
+    user = db.relationship(
+        'TermUser',
+        primaryjoin="TermUser.id==TermUserFirm.user_id")
     firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
-    firm = db.relationship('Firm')
+    firm = db.relationship(
+        'Firm',
+        primaryjoin="Firm.id==TermUserFirm.firm_id")
 
     def delete(self):
         db.session.delete(self)
