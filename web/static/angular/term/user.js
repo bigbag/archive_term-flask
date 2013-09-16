@@ -20,13 +20,16 @@ function UserCtrl($scope, $http, $compile, $timeout) {
   $scope.login = function(user, valid) {
     if (!valid) return false;
     $http.post('/login', user).success(function(data) {
+      console.log(data);
       if (data.error == 'yes') {
-        $scope.setModal(data.content, 'error');
+        $scope.setModal(data.message, 'error');
 
         angular.element('.f-login input[name=email]').addClass('error');
         angular.element('.f-login input[name=password]').addClass('error');
       }
-      $(location).attr('href','/');
+      else {
+        $(location).attr('href','/');
+      }
     });
   };
 

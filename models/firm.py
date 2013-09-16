@@ -37,6 +37,9 @@ class Firm(db.Model):
 
         return self
 
+    def get_by_sub_domain(self, sub_domain):
+        return self.query.filter_by(sub_domain=sub_domain).first()
+
     def __repr__(self):
         return '<id %r>' % (self.id)
 
