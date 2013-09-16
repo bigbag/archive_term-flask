@@ -16,6 +16,7 @@ from web import app, cache, lm
 from helpers import hash_helper
 
 from models.term_user import TermUser
+from models.firm import Firm
 
 term = Blueprint('term', __name__)
 
@@ -35,21 +36,36 @@ def unauthorized():
     return login_form()
 
 
-def get_json_response(data, code=200):
+def set_json_response(data, code=200):
     return make_response(jsonify(data), code)
+
+
+def get_firm_name(request):
+    """Определяем название фирмы по субдомену"""
+    name = 'Mobispot'
+
+    headers = request.headers
+    if 'Host' in headers:
+        host = headers['Host']
+        host_name = host.split('.')
+        firm = Firm().get_by_sub_domain(host_name[0])
+        name = firm.name
+    return name
 
 
 @term.route('/login', methods=['GET'])
 def login_form():
     """Форма логина"""
     return render_template(
-        'term/login.html')
+        'term/login.html',
+        name=get_firm_name(request))
 
 
 @term.route('/login', methods=['POST'])
 def login():
     """Логин"""
-    user = request.get_json(True)
+    answer = dict(error='yes', message='')
+    user = request.get_json()
 
     if not 'email' in user or not 'password' in user:
         abort(400)
@@ -57,10 +73,21 @@ def login():
     term_user = TermUser().get_by_email(user['email'])
 
     if not term_user:
-        abort(403)
+        answer['message'] = u"""У нас на сайте нет пользователя с такой парой "логин - пароль".
+                            Пожалуйста, проверьте введенные данные или
+                            воспользуйтесь функцией восстановления пароля."""
+        return set_json_response(answer)
+
+    if term_user.status == TermUser.STATUS_NOACTIVE:
+        answer['message'] = u'Пользователь не активирован'
+        return set_json_response(answer,)
+    elif term_user.status == TermUser.STATUS_BANNED:
+        answer['message'] = u'Пользователь заблокирован'
+        return set_json_response(answer)
 
     if not hash_helper.check_password(term_user.password, user['password']):
-        abort(403)
+        answer['message'] = u'Пароль не верен'
+        return set_json_response(answer)
 
     login_user(term_user, True)
 
