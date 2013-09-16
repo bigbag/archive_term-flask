@@ -72,7 +72,7 @@ def login():
 def logout():
     """Выход из системы"""
     logout_user()
-    return redirect(url_for('/'))
+    return redirect(url_for('.login'))
 
 
 @term.route('/', methods=['GET'])
@@ -81,3 +81,10 @@ def get_index():
     """Главная страница"""
     return render_template(
         'term/general.html')
+
+
+@term.route('/forgot', methods=['GET'])
+def get_forgot():
+    """Страница востановления пароля"""
+    return render_template(
+        'term/forgot.html')
