@@ -1,0 +1,39 @@
+{% extends "term/layout.html" %}
+{% block header %}
+{% endblock %}
+{% block body %}
+<div class="row m-content" ng-controller="UserCtrl">
+    <div class="f-login">
+        <form class="f-login_box" name="signForm">
+            <hgroup>
+                <h5>Кварц-Транс</h5>
+                <span></span>
+            </hgroup>
+            <input 
+                type="email" 
+                placeholder="Email"
+                ng-model="user.email"
+                autocomplete="off"
+                maxlength="300"
+                required >
+            <input 
+                type="password" 
+                placeholder="Пароль"
+                ng-model="user.password"
+                autocomplete="off"
+                maxlength="300"
+                required >
+            <a href="javascript:;" class="f-spot-button" ng-click="login(user, signForm.$valid)">
+               Войти
+            </a>
+            <a href="javascript:;" class="right f-link f-link__pd" href="/forgot">
+                Забыли пароль?
+            </a>
+        </form>
+        <div class="f-login_box">
+            У вас ещё нет аккаунта?
+            <a href="/register" class="f-link f-link__bl">Отправьте заявку на регистрацию!</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

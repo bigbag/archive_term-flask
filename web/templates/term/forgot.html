@@ -1,0 +1,26 @@
+{% extends "term/layout.html" %}
+{% block header %}
+{% endblock %}
+{% block body %}
+<div class="row m-content" ng-controller="UserCtrl">
+    <div class="f-login">
+        <form class="f-login_box" name="recoveryForm">
+            <hgroup>
+                <h5>Восстановление пароля</h5>
+            </hgroup>
+            <input 
+                type="email" 
+                placeholder="Email"
+                ng-model="recovery.email"
+                autocomplete="off"
+                maxlength="300"
+                required >
+            <a href="javascript:;" class="f-spot-button" ng-click="recovery(recovery, recoveryForm.$valid)">
+                Отправить
+            </a>
+            <a class="right f-link f-link__pd" href="/">Отмена</a>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

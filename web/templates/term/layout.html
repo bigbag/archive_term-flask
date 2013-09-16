@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<!--[if IE 8]><html class="no-js lt-ie9" ng-app="term" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" ng-app="term" lang="en"> <!--<![endif]-->
+{% block head %}
+<head>
+    <meta charset="utf-8" />
+     <meta name="viewport" content="width=device-width" />
+     <title>{% block title %}Mobispot{% endblock %}</title>
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon16.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon32.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon48.png') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/foundation.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+    <script src="{{ url_for('static', filename='js/vendor/custom.modernizr.js') }}"></script>
+    {% block head_script %}
+    {% endblock %}
+
+{% endblock %}
+</head>
+<body ng-app>
+{% block header %}
+<header class="m-header-page">
+    <div class="row">
+        <div class="large-12 columns">
+            <h1 class="left"><a class="m-logo g-color-blue" href="index.html">Кварц-Транс</a></h1>
+            <a class="right" href="#">ilya.radaev@gmail.com</a>
+        </div>
+    </div>
+</header>
+{% endblock %}
+{% block body %}{% endblock %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/date.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/daterangepicker.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/foundation.min.js') }}"></script> 
+    <script src="{{ url_for('static', filename='term/angular/app.js') }}"></script>  
+    <script src="{{ url_for('static', filename='term/angular/user.js') }}"></script>  
+    
+    {% block footer_script %}
+    {% endblock %}
+
+    <script>
+        $(document).foundation();
+        $(document).ready(function() {
+            $('#datepicker').daterangepicker();
+        });
+    </script>
+</body>
+</html>
