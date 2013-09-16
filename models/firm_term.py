@@ -5,8 +5,7 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db
-from web import app
+from web import db, app
 from models.term import Term
 from models.firm import Firm
 

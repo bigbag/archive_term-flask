@@ -7,9 +7,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask import json
-from web import app
-from web import db
-from web import cache
+from web import app, db
 from helpers import date_helper
 
 

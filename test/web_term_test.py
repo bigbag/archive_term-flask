@@ -37,6 +37,7 @@ class WebTermTestCase(unittest.TestCase):
     def login(self, email, password):
         headers = [
             ('Content-Type', 'application/json;charset=utf-8'),
+            ('Host', 'sodexo.mobispot.com')
         ]
         data = '{"email":"' + email + \
             '","password":"' + password + '"}'
@@ -46,14 +47,23 @@ class WebTermTestCase(unittest.TestCase):
                              follow_redirects=True)
 
     def logout(self):
-        return self.app.get(self.LOGOUT_URL, follow_redirects=True)
+        headers = [
+            ('Host', 'sodexo.mobispot.com')
+        ]
+        return self.app.get(self.LOGOUT_URL, headers=headers, follow_redirects=True)
 
     def test_404(self):
         rv = self.app.get(self.GARBAGE_URL)
         self.assertEqual(rv.status_code, 404)
 
     def test_login_form(self):
-        rv = self.app.get(self.LOGIN_URL, follow_redirects=True)
+        headers = [
+            ('Host', 'sodexo.mobispot.com')
+        ]
+        rv = self.app.get(
+            self.LOGIN_URL,
+            headers=headers,
+            follow_redirects=True)
         self.assertEqual(rv.status_code, 200)
 
     def test_forgot(self):

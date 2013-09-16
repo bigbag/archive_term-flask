@@ -9,8 +9,7 @@
 import hashlib
 import random
 
-from web import db
-from web import app
+from web import db, app
 from models.user import User
 
 from helpers import date_helper, hash_helper

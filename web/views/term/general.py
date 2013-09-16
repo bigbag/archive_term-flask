@@ -42,24 +42,30 @@ def set_json_response(data, code=200):
 
 def get_firm_name(request):
     """Определяем название фирмы по субдомену"""
-    name = 'Mobispot'
+    result = False
 
     headers = request.headers
     if 'Host' in headers:
-        host = headers['Host']
+        host = request.headers['Host']
         host_name = host.split('.')
         firm = Firm().get_by_sub_domain(host_name[0])
         if firm:
             name = firm.name
-    return name
+            result = dict(name=firm.name, firm_id=firm.id)
+    return result
 
 
 @term.route('/login', methods=['GET'])
 def login_form():
     """Форма логина"""
+
+    result = get_firm_name(request)
+    if not result:
+        abort(403)
+
     return render_template(
         'term/login.html',
-        name=get_firm_name(request))
+        name=result['name'])
 
 
 @term.route('/login', methods=['POST'])
@@ -67,6 +73,10 @@ def login():
     """Логин"""
     answer = dict(error='yes', message='')
     user = request.get_json()
+
+    result = get_firm_name(request)
+    if not result:
+        abort(403)
 
     if not 'email' in user or not 'password' in user:
         abort(400)

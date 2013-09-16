@@ -7,8 +7,7 @@
 """
 import hashlib
 import time
-from web import db
-from web import app
+from web import db, app
 from models.term import Term
 from models.person import Person
 from models.firm import Firm
