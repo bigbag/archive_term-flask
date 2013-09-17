@@ -13,8 +13,8 @@ mail = Mail(app)
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
 
-from flask.ext.babel import Babel
-babel = Babel(app)
+from libs.redis_sessions import RedisSessionInterface
+app.session_interface = RedisSessionInterface()
 
 from flask.ext.login import LoginManager
 lm = LoginManager()
