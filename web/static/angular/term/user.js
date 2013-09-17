@@ -9,6 +9,7 @@ function UserCtrl($scope, $http, $compile, $timeout) {
     if (type == 'error') {
         resultModal.addClass('m-negative');
     }
+    resultModal.hide();
     resultModal.show();
     resultContent.text(content);
     setTimeout(function(){
@@ -20,7 +21,6 @@ function UserCtrl($scope, $http, $compile, $timeout) {
   $scope.login = function(user, valid) {
     if (!valid) return false;
     $http.post('/login', user).success(function(data) {
-      console.log(data);
       if (data.error == 'yes') {
         $scope.setModal(data.message, 'error');
 
@@ -32,6 +32,15 @@ function UserCtrl($scope, $http, $compile, $timeout) {
       }
     });
   };
+
+  //Удаляем класс error при изменении поля
+  $scope.$watch('user.email + user.password', function(user) {
+
+    if ($scope.user) {
+      angular.element('.f-login input[name=email]').removeClass('error');
+      angular.element('.f-login input[name=password]').removeClass('error');
+    }
+  });
 
   // Восстановление пароля
   $scope.recovery = function(recovery, valid){

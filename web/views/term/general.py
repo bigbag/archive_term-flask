@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Контролер реализующий веб интерфейс терминального проекта
+    Веб интерфейс терминального проекта, фасад
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
@@ -18,6 +18,8 @@ from helpers import hash_helper
 from models.term_user import TermUser
 from models.term_user_firm import TermUserFirm
 from models.firm import Firm
+
+from web.views.term import firm as firm_view
 
 term = Blueprint('term', __name__)
 
@@ -92,7 +94,7 @@ def login():
 
     if term_user.status == TermUser.STATUS_NOACTIVE:
         answer['message'] = u'Пользователь не активирован'
-        return set_json_response(answer,)
+        return set_json_response(answer)
     elif term_user.status == TermUser.STATUS_BANNED:
         answer['message'] = u'Пользователь заблокирован'
         return set_json_response(answer)
@@ -108,8 +110,8 @@ def login():
         return set_json_response(answer)
 
     login_user(term_user, True)
-
-    return 'True'
+    answer['error'] = 'no'
+    return set_json_response(answer)
 
 
 @term.route('/logout')
@@ -117,15 +119,7 @@ def login():
 def logout():
     """Выход из системы"""
     logout_user()
-    return redirect(url_for('.login'))
-
-
-@term.route('/', methods=['GET'])
-@login_required
-def get_index():
-    """Главная страница"""
-    return render_template(
-        'term/general.html')
+    return redirect('/')
 
 
 @term.route('/forgot', methods=['GET'])
@@ -133,3 +127,6 @@ def get_forgot():
     """Страница востановления пароля"""
     return render_template(
         'term/forgot.html')
+
+term.add_url_rule('/', view_func=firm_view.get_index, methods=['GET', ])
+term.add_url_rule('/index', view_func=firm_view.get_index, methods=['GET', ])
