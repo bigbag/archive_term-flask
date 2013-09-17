@@ -9,7 +9,7 @@ import re
 import os
 
 from flask import Flask, Blueprint, render_template, redirect, url_for
-from flask import request, g, abort, make_response, jsonify
+from flask import session, request, g, abort, make_response, jsonify
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from web import app, cache, lm
 
@@ -19,7 +19,7 @@ from models.term_user import TermUser
 from models.term_user_firm import TermUserFirm
 from models.firm import Firm
 
-from web.views.term import firm as firm_view
+from web.views.term import person_view
 
 term = Blueprint('term', __name__)
 
@@ -45,17 +45,21 @@ def set_json_response(data, code=200):
 
 def get_firm_name(request):
     """Определяем название фирмы по субдомену"""
-    result = False
 
-    headers = request.headers
-    if 'Host' in headers:
-        host = request.headers['Host']
-        host_name = host.split('.')
-        firm = Firm().get_by_sub_domain(host_name[0])
-        if firm:
-            name = firm.name
-            result = dict(name=firm.name, firm_id=firm.id)
-    return result
+    if 'firm_info' in session:
+        return session['firm_info']
+    else:
+        result = False
+        headers = request.headers
+        if 'Host' in headers:
+            host = request.headers['Host']
+            host_name = host.split('.')
+            firm = Firm().get_by_sub_domain(host_name[0])
+            if firm:
+                name = firm.name
+                result = dict(name=firm.name, firm_id=firm.id)
+                session['firm_info'] = result
+        return result
 
 
 @term.route('/login', methods=['GET'])
@@ -68,7 +72,7 @@ def login_form():
 
     return render_template(
         'term/login.html',
-        name=firm_info['name'])
+        firm_name=firm_info['name'])
 
 
 @term.route('/login', methods=['POST'])
@@ -119,6 +123,7 @@ def login():
 def logout():
     """Выход из системы"""
     logout_user()
+    del session['firm_info']
     return redirect('/')
 
 
@@ -128,5 +133,5 @@ def get_forgot():
     return render_template(
         'term/forgot.html')
 
-term.add_url_rule('/', view_func=firm_view.get_index, methods=['GET', ])
-term.add_url_rule('/index', view_func=firm_view.get_index, methods=['GET', ])
+term.add_url_rule('/', view_func=person_view.get_index, methods=['GET', ])
+term.add_url_rule('/index', view_func=person_view.get_index, methods=['GET', ])
