@@ -4,7 +4,6 @@ app = Flask(__name__)
 app.config.from_object('configs.general.Config')
 
 from flask.ext.cache import Cache
-
 cache = Cache(app)
 
 from flask.ext.mail import Mail

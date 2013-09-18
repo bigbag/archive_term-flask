@@ -20,7 +20,6 @@ class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(150), nullable=False)
     midle_name = db.Column(db.String(150))
-    first_name = db.Column(db.String(150))
     last_name = db.Column(db.String(150))
     tabel_id = db.Column(db.String(150))
     birthday = db.Column(db.Date())

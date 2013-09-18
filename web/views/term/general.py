@@ -10,7 +10,7 @@ import os
 
 from flask import Flask, Blueprint, render_template, redirect, url_for
 from flask import session, request, g, abort, make_response, jsonify
-from flask.ext.login import login_user, logout_user, current_user, login_required
+from flask.ext.login import login_user, logout_user, current_user, login_required, make_secure_token
 from web import app, cache, lm
 
 from helpers import hash_helper
@@ -19,7 +19,7 @@ from models.term_user import TermUser
 from models.term_user_firm import TermUserFirm
 from models.firm import Firm
 
-from web.views.term import person_view
+from web.views.term import firm_view, person_view, report_view, term_view
 
 term = Blueprint('term', __name__)
 
@@ -133,5 +133,14 @@ def get_forgot():
     return render_template(
         'term/forgot.html')
 
-term.add_url_rule('/', view_func=person_view.get_index, methods=['GET', ])
-term.add_url_rule('/index', view_func=person_view.get_index, methods=['GET', ])
+term.add_url_rule('/', view_func=report_view.report_person, methods=['GET', ])
+term.add_url_rule(
+    '/report',
+    view_func=report_view.report_person,
+    methods=['GET', ]
+)
+term.add_url_rule(
+    '/report/person',
+    view_func=report_view.report_person,
+    methods=['GET', ]
+)
