@@ -7,13 +7,16 @@
 """
 import re
 import os
+import json
 
 from flask import Flask, Blueprint, render_template, redirect, url_for
 from flask import session, request, g, abort, make_response, jsonify
 from flask.ext.login import login_user, logout_user, current_user, login_required, make_secure_token
 from web import app, cache, lm
 
-from helpers import hash_helper
+from helpers import hash_helper, date_helper
+
+from decorators.header import *
 
 from models.term_user import TermUser
 from models.term_user_firm import TermUserFirm
@@ -26,12 +29,13 @@ term = Blueprint('term', __name__)
 
 @lm.user_loader
 def load_user(id):
-    return TermUser.query.get(int(id))
+    return TermUser().get_by_id(id)
 
 
 @term.before_request
 def before_request():
     g.user = current_user
+    g.firm_info = get_firm_name(request)
 
 
 @lm.unauthorized_handler
@@ -57,7 +61,7 @@ def get_firm_name(request):
             firm = Firm().get_by_sub_domain(host_name[0])
             if firm:
                 name = firm.name
-                result = dict(name=firm.name, firm_id=firm.id)
+                result = dict(name=firm.name, id=firm.id)
                 session['firm_info'] = result
         return result
 
@@ -108,7 +112,7 @@ def login():
         return set_json_response(answer)
 
     user_firm = TermUserFirm.query.filter_by(
-        user_id=term_user.id, firm_id=firm_info['firm_id']).first()
+        user_id=term_user.id, firm_id=firm_info['id']).first()
     if not user_firm:
         answer['message'] = u'У вас нет доступа к данной фирме'
         return set_json_response(answer)
@@ -133,14 +137,24 @@ def get_forgot():
     return render_template(
         'term/forgot.html')
 
-term.add_url_rule('/', view_func=report_view.report_person, methods=['GET', ])
+term.add_url_rule(
+    '/',
+    view_func=report_view.report_by_person,
+    methods=['GET',
+             ])
 term.add_url_rule(
     '/report',
-    view_func=report_view.report_person,
+    view_func=report_view.report_by_person,
     methods=['GET', ]
 )
 term.add_url_rule(
     '/report/person',
-    view_func=report_view.report_person,
+    view_func=report_view.report_by_person,
     methods=['GET', ]
+)
+
+term.add_url_rule(
+    '/report/person/select',
+    view_func=report_view.select_person_report,
+    methods=['POST', ]
 )

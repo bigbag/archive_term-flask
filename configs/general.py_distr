@@ -52,6 +52,7 @@ class Config(object):
     COOKIE_NAME = ""
     COOKIE_HTTPONLY = True
     COOKIE_SECURE = "strong"
+    SESSION_PROTECTION = "strong"
     REMEMBER_COOKIE_NAME = ""
 
 

@@ -6,7 +6,7 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db, app
+from web import db, app, cache
 from helpers import date_helper, hash_helper
 
 
@@ -58,6 +58,9 @@ class TermUser(db.Model):
 
     def get_by_email(self, email):
         return self.query.filter_by(email=email).first()
+
+    def get_by_id(self, id):
+        return self.query.get(int(id))
 
     def delete(self):
         db.session.delete(self)

@@ -86,6 +86,61 @@ class Report(db.Model):
     def get_by_check_summ(self, check_summ):
         return self.query.filter_by(check_summ=check_summ).first()
 
+    def select_person(self, firm_id, **kwargs):
+        tz = app.config['TZ']
+        date_pattern = '%H:%M %d.%m.%y'
+        order = 'creation_date desc'
+        if 'order' in kwargs:
+            order = kwargs['order']
+
+        limit = 10
+        if 'limit' in kwargs:
+            limit = kwargs['limit']
+
+        page = 1
+        if 'page' in kwargs:
+            page = kwargs['page']
+
+        query = Report.query.filter(
+            Report.firm_id == firm_id).order_by(order)
+
+        reports_count = query.count()
+        reports = query.paginate(page, limit, False).items
+
+        result = {}
+        for report in reports:
+
+            creation_date = date_helper.from_utc(
+                report.creation_date,
+                tz)
+            creation_date = creation_date.strftime(date_pattern)
+
+            data = dict(
+                id=report.id,
+                term=int(report.term_id),
+                creation_date=creation_date,
+            )
+            if not report.person:
+                data['first_name'] = ''
+                data['midle_name'] = ''
+                data['last_name'] = 'Anonim'
+            else:
+                data['first_name'] = report.person.first_name
+                data['midle_name'] = report.person.midle_name
+                data['last_name'] = report.person.last_name
+
+            if not report.event:
+                data['event'] = 'Empty'
+            else:
+                data['event'] = report.event.name
+
+            result[report.id] = data
+
+        return dict(
+            report=result,
+            count=reports_count,
+        )
+
     def get_check_summ(self):
         return hashlib.md5("%s%s%s%s%s" % (
             str(self.term_id),
