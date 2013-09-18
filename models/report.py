@@ -107,7 +107,7 @@ class Report(db.Model):
         reports_count = query.count()
         reports = query.paginate(page, limit, False).items
 
-        result = {}
+        result = []
         for report in reports:
 
             creation_date = date_helper.from_utc(
@@ -134,7 +134,7 @@ class Report(db.Model):
             else:
                 data['event'] = report.event.name
 
-            result[report.id] = data
+            result.append(data)
 
         return dict(
             report=result,
