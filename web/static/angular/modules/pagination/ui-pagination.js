@@ -5,24 +5,24 @@ angular.module("ui.pagination", [])
             replace: true,
             template:
                     '<ul>' +
-                        '<li ng-class="{disabled: firstPage()}" ng-click="goToFirstPage()">' +
-                            '<a><i class="icon-step-backward"></i></a>' +
-                        '</li>' +
-                        '<li ng-class="{disabled: !hasPrev()}" ng-click="prev()">' +
-                            '<a><i class="icon-caret-left"></i></a>' +
-                        '</li>' +
+                        // '<li ng-class="{disabled: firstPage()}" ng-click="goToFirstPage()">' +
+                        //     '<a><<</a>' +
+                        // '</li>' +
+                        // '<li ng-class="{disabled: !hasPrev()}" ng-click="prev()">' +
+                        //     '<a><</a>' +
+                        // '</li>' +
                         '<li ng-repeat="page in pages"' +
                             'ng-class="{current: isCurrent(page)}"' +
                             'ng-click="setCurrent(page)"' +
                         '>' +
                             '<a>{{page}}</a>' +
                         '</li>' +
-                        '<li ng-class="{disabled: !hasNext()}" ng-click="next()">' +
-                            '<a><i class="icon-caret-right"></i></a>' +
-                        '</li>' +
-                        '<li ng-class="{disabled: lastPage()}" ng-click="goToLastPage()">' +
-                            '<a><i class="icon-step-forward"></i></a>' +
-                        '</li>' +
+                        // '<li ng-class="{disabled: !hasNext()}" ng-click="next()">' +
+                        //     '<a>></a>' +
+                        // '</li>' +
+                        // '<li ng-class="{disabled: lastPage()}" ng-click="goToLastPage()">' +
+                        //     '<a>>></a>' +
+                        // '</li>' +
                     '</ul>',
             scope: {
                 cur: '=',

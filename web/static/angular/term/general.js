@@ -31,8 +31,8 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     if (search.page == undefined) search.page = 1;
 
     $http.post('/report/person/select', search).success(function(data) {
-        $scope.reports = data.report;
-        $scope.page_count = data.count;
+      $scope.reports = data.report;
+      $scope.page_count = data.count;
     });
   };
 
