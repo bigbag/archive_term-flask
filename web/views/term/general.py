@@ -29,7 +29,11 @@ term = Blueprint('term', __name__)
 
 @lm.user_loader
 def load_user(id):
-    return TermUser().get_by_id(id)
+    key = 'term_user_%s' % str(id)
+    if not cache.get(key):
+        user = TermUser().get_by_id(id)
+        cache.set(key, user, 3600)
+    return cache.get(key)
 
 
 @term.before_request
