@@ -53,7 +53,7 @@ class FirmTerm(db.Model):
 
         firm_id_list = []
         for firm_term in firm_terms:
-            firm_id_list.append(firm_term.id)
+            firm_id_list.append(firm_term.term_id)
 
         return firm_id_list
 
