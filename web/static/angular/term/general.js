@@ -3,10 +3,6 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
   var resultModal = angular.element('.m-result');
   var resultContent = resultModal.find('p');
 
-  $scope.search = {};
-  $scope.search.limit = 20;
-  $scope.search.type = 'online';
-
   $scope.setModal = function(content, type){
     resultModal.removeClass('m-negative');
     if (type == 'error') {
@@ -22,7 +18,6 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
 
   $scope.$watch('pagination.cur', function(pagination) {
     var search = $scope.search;
-    console.log(search.type);
     search.page = $scope.pagination.cur;
     if (search.type == 'online'){
       $scope.getReport(search);
@@ -36,17 +31,14 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     var url = window.location.pathname;
     $http.post(url, search).success(function(data) {
       $scope.reports = data.report;
-      $scope.page_count = data.count;
+      $scope.search.page_count = data.count;
+      $scope.pagination.total = Math.ceil(data.count/$scope.search.limit);
     });
   };
 
-  //Пагинация
-  $scope.maxPages=function(){
-    return Math.ceil($scope.page_count/$scope.search.limit);                
-  }
   $scope.pagination = {
     cur: 1,
-    total: $scope.maxPages(),
+    total: 10,
     display: 15
   }
 }
