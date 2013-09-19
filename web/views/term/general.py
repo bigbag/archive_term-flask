@@ -141,24 +141,45 @@ def get_forgot():
     return render_template(
         'term/forgot.html')
 
-term.add_url_rule(
-    '/',
-    view_func=report_view.report_by_person,
-    methods=['GET',
-             ])
-term.add_url_rule(
-    '/report',
-    view_func=report_view.report_by_person,
-    methods=['GET', ]
-)
+
+@term.route('/', methods=['GET'])
+@term.route('/report', methods=['GET'])
+def get_default():
+    """Перенаправление на вид по умолчанию"""
+    return redirect('/report/person')
+
 term.add_url_rule(
     '/report/person',
-    view_func=report_view.report_by_person,
+    view_func=report_view.report_person,
     methods=['GET', ]
 )
 
 term.add_url_rule(
-    '/report/person/select',
+    '/report/person',
     view_func=report_view.select_person_report,
+    methods=['POST', ]
+)
+
+term.add_url_rule(
+    '/report/terminal',
+    view_func=report_view.report_term,
+    methods=['GET', ]
+)
+
+term.add_url_rule(
+    '/report/terminal',
+    view_func=report_view.select_term_report,
+    methods=['POST', ]
+)
+
+term.add_url_rule(
+    '/report/summ',
+    view_func=report_view.report_summ,
+    methods=['GET', ]
+)
+
+term.add_url_rule(
+    '/report/summ',
+    view_func=report_view.select_summ_report,
     methods=['POST', ]
 )

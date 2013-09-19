@@ -8,12 +8,14 @@
 import hashlib
 import time
 from web import db, app, cache
+
+from helpers import date_helper
+
 from models.term import Term
 from models.person import Person
 from models.firm import Firm
 from models.event import Event
 from models.firm_term import FirmTerm
-from helpers import date_helper
 
 
 class Report(db.Model):
@@ -87,6 +89,7 @@ class Report(db.Model):
         return self.query.filter_by(check_summ=check_summ).first()
 
     def select_person(self, firm_id, **kwargs):
+        kwargs['key'] = 'report_person'
         key = cache.get_key(firm_id, **kwargs)
         if not cache.get(key):
 
@@ -131,6 +134,64 @@ class Report(db.Model):
                     data['first_name'] = report.person.first_name
                     data['midle_name'] = report.person.midle_name
                     data['last_name'] = report.person.last_name
+
+                if not report.event:
+                    data['event'] = 'Empty'
+                else:
+                    data['event'] = report.event.name
+
+                result.append(data)
+
+            value = dict(
+                report=result,
+                count=reports_count,
+            )
+
+            cache.set(key=key, value=value, timeout=120)
+
+        return cache.get(key)
+
+    def select_summ(self, firm_id, **kwargs):
+        kwargs['key'] = 'report_summ'
+        key = cache.get_key(firm_id, **kwargs)
+        if not cache.get(key):
+
+            tz = app.config['TZ']
+            date_pattern = '%H:%M %d.%m.%y'
+            order = 'creation_date desc'
+            if 'order' in kwargs:
+                order = kwargs['order']
+
+            limit = 10
+            if 'limit' in kwargs:
+                limit = kwargs['limit']
+
+            page = 1
+            if 'page' in kwargs:
+                page = kwargs['page']
+            firm_term = FirmTerm().get_list_by_firm_id(firm_id)
+
+            query = Report.query.filter(Report.term_id.in_(firm_term)).filter(
+                Report.type == self.TYPE_PAYMENT).order_by(
+                    order)
+
+            reports_count = query.count()
+            reports = query.paginate(page, limit, False).items
+
+            result = []
+            for report in reports:
+
+                creation_date = date_helper.from_utc(
+                    report.creation_date,
+                    tz)
+                creation_date = creation_date.strftime(date_pattern)
+
+                data = dict(
+                    id=report.id,
+                    term=int(report.term_id),
+                    creation_date=creation_date,
+                    amount=int(report.amount / 100),
+                )
 
                 if not report.event:
                     data['event'] = 'Empty'

@@ -4,6 +4,8 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
   var resultContent = resultModal.find('p');
 
   $scope.search = {};
+  $scope.search.limit = 20;
+  $scope.search.type = 'online';
 
   $scope.setModal = function(content, type){
     resultModal.removeClass('m-negative');
@@ -20,17 +22,19 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
 
   $scope.$watch('pagination.cur', function(pagination) {
     var search = $scope.search;
+    console.log(search.type);
     search.page = $scope.pagination.cur;
-    if (search.type == 'person'){
-      $scope.getReportbyPerson(search);
+    if (search.type == 'online'){
+      $scope.getReport(search);
     }
   });
 
-  //Отчет по сотрудникам
-  $scope.getReportbyPerson = function(search) {
+  //запрос отчета
+  $scope.getReport = function(search) {
     if (search.page == undefined) search.page = 1;
-
-    $http.post('/report/person/select', search).success(function(data) {
+    
+    var url = window.location.pathname;
+    $http.post(url, search).success(function(data) {
       $scope.reports = data.report;
       $scope.page_count = data.count;
     });

@@ -7,15 +7,16 @@
 
 {% block content %}
 <h2 class="g-color-blue m-page-name">По сотрудникам</h2>
-<span ng-init="search.type='person';search.limit=20"></span>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
     <section class="section active">
-        <p class="title"><a href="#panel1">Он-лайн</a></p>
-        <div class="content" data-slug="panel1">
+        <p class="title">
+            <a ng-click="search.type='online'">Он-лайн</a>
+        </p>
+        <div class="content" data-slug="online">
             <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
                 <div class="m-content-page">
                     <div class="content-row">
-                        <p class="m-hint">Здесь Вы можете посмотреть детальный отчет по действиям Ваших сотрудников за все время работы бесконтактных терминалов в Вашей компании.</p>
+                        <p class="m-hint">Здесь вы можете посмотреть детальный отчет по действиям Ваших сотрудников.</p>
                     </div>
                     <!-- <div class="m-grid-search">
                         <input type="text" ng-model="search" placeholder="Поиск по сотрудникам или по терминалам">
@@ -51,7 +52,6 @@
                             </td>
                         </tr>
                         <tr class="m-t-cont-row" ng-hide="page_count">
-                    
                             <td colspan="6" class="m-t-nothing">
                                 В Вашей компании нет сотрудников, пользующихся бесконтактными картами Mobispot.
                                 Добавьте сотрудников в Вашу компанию, и получайте подробный отчет об их действиях в Вашей сети терминалов.
@@ -64,8 +64,10 @@
         </div>
     </section>
     <section class="sections">
-    <p class="title"><a href="#panel2">Разовый</a></p>
-    <div class="content" data-slug="panel2">
+    <p class="title">
+        <a ng-click="search.type='singl'">Разовый</a>
+    </p>
+    <div class="content" data-slug="singl">
         <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
             <div class="m-content-page">
                 <div class="content-row">
@@ -121,8 +123,10 @@
     </div>
 </section>
     <section class="section">
-        <p class="title"><a href="#panel3">Периодический</a></p>
-        <div class="content" data-slug="panel3">
+        <p class="title">
+            <a ng-click="search.type='regular'">Периодический</a>
+        </p>
+        <div class="content" data-slug="regular">
             <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
                 <div class="m-content-page">
                     <div class="content-row">

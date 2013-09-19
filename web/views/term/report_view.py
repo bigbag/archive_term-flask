@@ -24,7 +24,7 @@ def to_json(model):
 
 
 @login_required
-def report_by_person():
+def report_person():
     """Отчеты по сотрудникам"""
     firm_info = g.firm_info
 
@@ -40,6 +40,50 @@ def select_person_report():
     firm_info = g.firm_info
     arg = json.loads(request.stream.read())
     answer = Report().select_person(
+        firm_info['id'], **arg)
+
+    return jsonify(answer)
+
+
+@login_required
+def report_term():
+    """Отчеты по терминалам"""
+    firm_info = g.firm_info
+
+    return render_template(
+        'term/report/term.html',
+        firm_name=firm_info['name'],
+        user_email=g.user.email)
+
+
+@login_required
+@json_headers
+def select_term_report():
+    firm_info = g.firm_info
+    arg = json.loads(request.stream.read())
+    answer = Report().select_person(
+        firm_info['id'], **arg)
+
+    return jsonify(answer)
+
+
+@login_required
+def report_summ():
+    """Отчеты по суммам"""
+    firm_info = g.firm_info
+
+    return render_template(
+        'term/report/summ.html',
+        firm_name=firm_info['name'],
+        user_email=g.user.email)
+
+
+@login_required
+@json_headers
+def select_summ_report():
+    firm_info = g.firm_info
+    arg = json.loads(request.stream.read())
+    answer = Report().select_summ(
         firm_info['id'], **arg)
 
     return jsonify(answer)
