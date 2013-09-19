@@ -7,7 +7,7 @@
 """
 import hashlib
 import time
-from web import db, app
+from web import db, app, cache
 from models.term import Term
 from models.person import Person
 from models.firm import Firm
@@ -87,6 +87,10 @@ class Report(db.Model):
         return self.query.filter_by(check_summ=check_summ).first()
 
     def select_person(self, firm_id, **kwargs):
+        key = cache.get_key(firm_id, **kwargs)
+        if cache.get(key):
+            return cache.get(key)
+
         tz = app.config['TZ']
         date_pattern = '%H:%M %d.%m.%y'
         order = 'creation_date desc'
@@ -102,7 +106,7 @@ class Report(db.Model):
             page = kwargs['page']
 
         query = Report.query.filter(
-            Report.firm_id == firm_id).order_by(order)
+            (Report.firm_id == firm_id) & (Report.type == self.TYPE_WHITE)).order_by(order)
 
         reports_count = query.count()
         reports = query.paginate(page, limit, False).items
@@ -136,10 +140,14 @@ class Report(db.Model):
 
             result.append(data)
 
-        return dict(
+        value = dict(
             report=result,
             count=reports_count,
         )
+
+        cache.set(key=key, value=value, timeout=120)
+
+        return value
 
     def get_check_summ(self):
         return hashlib.md5("%s%s%s%s%s" % (

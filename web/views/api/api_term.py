@@ -10,12 +10,10 @@ import os
 
 from flask import Flask, Blueprint, abort, request, make_response, url_for, render_template
 
-from web import app
-from web import cache
+from web import app, cache
 
 from decorators.header import *
-from helpers import date_helper
-from helpers import hash_helper
+from helpers import date_helper, hash_helper
 from helpers.error_xml_helper import *
 
 from models.term import Term
@@ -34,7 +32,7 @@ api_term = Blueprint('api_term', __name__)
 
 
 @api_term.route('/configs/config_<int:term_id>.xml', methods=['GET'])
-@cache.cached(timeout=60)
+@cache.cached(timeout=120)
 @xml_headers
 @md5_content_headers
 def get_config(term_id):
@@ -65,7 +63,7 @@ def get_config(term_id):
 
 
 @api_term.route('/configs/blacklist.xml', methods=['GET'])
-@cache.cached(timeout=60)
+@cache.cached(timeout=120)
 @xml_headers
 @md5_content_headers
 def get_blacklist():

@@ -3,8 +3,8 @@ from flask import Flask
 app = Flask(__name__)
 app.config.from_object('configs.general.Config')
 
-from flask.ext.cache import Cache
-cache = Cache(app)
+from libs.redis_cache import SimpleRedisCache
+cache = SimpleRedisCache(app)
 
 from flask.ext.mail import Mail
 mail = Mail(app)
