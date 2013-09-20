@@ -16,7 +16,7 @@ class TermEvent(db.Model):
     __tablename__ = 'term_event'
 
     id = db.Column(db.Integer, primary_key=True)
-    age_id = db.Column(db.Integer, nullable=False)
+    age = db.Column(db.Integer, nullable=False)
     cost = db.Column(db.Integer, nullable=False)
     start = db.Column(db.Time, nullable=False)
     stop = db.Column(db.Time, nullable=False)
@@ -27,7 +27,7 @@ class TermEvent(db.Model):
 
     def __init__(self):
         self.cost = 0
-        self.age_id = 1
+        self.age = 0
         self.start = "00:00:00"
         self.stop = "23:59:59"
 
