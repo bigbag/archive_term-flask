@@ -6,10 +6,8 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from flask import json
-from web import app
-from web import db
-from helpers import date_helper
+from web import db, app, cache
+from helpers import date_helper, hash_helper
 
 
 class TermUser(db.Model):
@@ -36,15 +34,33 @@ class TermUser(db.Model):
     status = db.Column(db.Integer, index=True)
 
     def __init__(self):
-        self.group = self.GROUP_API
+        self.group = self.GROUP_DEFAULT
         self.status = self.STATUS_NOACTIVE
         self.creation_date = date_helper.get_curent_date()
 
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
+
     def __repr__(self):
-        return '<id %r>' % (self.id)
+        return '<User %r>' % (self.email)
 
     def get_by_api_key(self, api_key):
         return self.query.filter_by(api_key=api_key).first()
+
+    def get_by_email(self, email):
+        return self.query.filter_by(email=email).first()
+
+    def get_by_id(self, id):
+        return self.query.get(int(id))
 
     def delete(self):
         db.session.delete(self)
@@ -55,6 +71,9 @@ class TermUser(db.Model):
 
     def save(self):
         try:
+            if not self.activkey:
+                self.password = hash_helper.get_password_hash(self.password)
+            self.activkey = hash_helper.get_activkey(self.password)
             db.session.add(self)
             db.session.commit()
         except Exception as e:

@@ -212,11 +212,9 @@ form input.f-input-small{
 	text-align: center;
 }
 .f-login{
-	position: absolute;
-	left: 50%;
-	margin-left: -172px;
-	top: 50%;
-	margin-top: -177px;
+	height: 100%;
+	display: table-cell;
+	vertical-align: middle;
 }
 .f-login_box{
 	background: #fff;
@@ -225,6 +223,7 @@ form input.f-input-small{
 	border-radius: 5px;
 	padding: 14px 40px;
 	width: 344px;
+	margin: 0 auto 1em;
 }
 .f-login form input{
 	margin-right: 0;
@@ -306,3 +305,12 @@ form input.f-input-small{
 	background: none repeat scroll 0 0 #0061FF;
 	color: #FFFFFF;
 }
+form .error input,form input.error,form .error textarea,form textarea.error {
+	border-color: #C60F13;
+	background-color: rgba(198, 15, 19, 0.1);
+}
+
+.error::-webkit-input-placeholder {color:#C60F13; !important;}
+.error::-moz-placeholder {color:#C60F13; !important;}
+.error:-ms-input-placeholder { color:#C60F13;!important; }
+input.error:-moz-placeholder { color:#C60F13;!important; }

@@ -9,8 +9,7 @@ import re
 import os
 
 from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
-from web import app
-from web import cache
+from web import app, cache
 
 from decorators.header import *
 from helpers.error_xml_helper import *
@@ -194,25 +193,23 @@ def spot_delete():
     """Удаление спотов"""
     api_admin_access(request)
 
-    ean = request.form['ean']
-    if not ean:
+    hid = request.form['hid']
+    if not hid:
         abort(400)
 
-    if not len(str(ean)) == 13:
-        abort(400)
+    wallet = PaymentWallet.query.filter_by(
+        hard_id=hid).first()
 
-    spot = Spot.query.filter(((Spot.status == Spot.STATUS_GENERATED) |
-                            (Spot.status == Spot.STATUS_ACTIVATED)) &
-        (Spot.barcode == ean)).first()
+    if not wallet:
+        abort(404)
 
-    if not spot:
-        abort(405)
+    wallet.delete()
 
-    if spot.delete():
-        wallet = PaymentWallet.query.filter_by(
-            discodes_id=spot.discodes_id).first()
+    spot = Spot.query.filter_by(
+        discodes_id=wallet.discodes_id).first()
 
-        if wallet:
-            wallet.delete()
+    spot.status = Spot.STATUS_GENERATED
+    if not spot.save():
+        abort(500)
 
     return set_message('success', 'Success', 201)

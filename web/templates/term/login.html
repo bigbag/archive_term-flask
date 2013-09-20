@@ -1,0 +1,46 @@
+{% extends "term/layout.html" %}
+{% block title %}Мобиспот - {{firm_name}}{% endblock %}
+{% block body %}
+<div class="row m-content block-center" ng-controller="UserCtrl">
+    <div class="f-login">
+        <form class="f-login_box" name="signForm">
+            <hgroup>
+                <h5>{{firm_name}}</h5>
+                <span></span>
+            </hgroup>
+            <input
+                name="email"
+                type="email" 
+                placeholder="Email"
+                ng-model="user.email"
+                ui-keypress="{enter: 'login(user, signForm.$valid)'}"
+                autocomplete="off"
+                maxlength="300"
+                required >
+            <input 
+                name="password"
+                type="password" 
+                placeholder="Пароль"
+                ng-model="user.password"
+                ui-keypress="{enter: 'login(user, signForm.$valid)'}"
+                autocomplete="off"
+                maxlength="300"
+                required >
+            <a href="javascript:;" class="f-spot-button" ng-click="login(user, signForm.$valid)">
+               Войти
+            </a>
+            <a href="/forgot" class="right f-link f-link__pd">
+                Забыли пароль?
+            </a>
+        </form>
+        <div class="f-login_box">
+            У вас ещё нет аккаунта?
+            <a href="/register" class="f-link f-link__bl">Отправьте заявку на регистрацию!</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer_script %}
+<script type="text/javascript" src="/static/angular/term/user.js"></script>  
+{% endblock %}

@@ -6,8 +6,7 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db
-from web import app
+from web import db, app
 from models.payment_wallet import PaymentWallet
 from models.payment_history import PaymentHistory
 from helpers import date_helper

@@ -82,11 +82,6 @@ def get_isin_checksum(isin):
     return 10 - mod
 
 
-def get_activkey(data):
-    data = str(time.time()) + data
-    return hashlib.sha1(data).hexdigest()
-
-
 def get_api_sign(secret, data):
     keys = sorted(data.keys())
 
@@ -98,6 +93,10 @@ def get_api_sign(secret, data):
     H.update('&'.join(post))
 
     return H.hexdigest()
+
+def get_activkey(data):
+    data = str(time.time()) + data
+    return hashlib.sha1(data).hexdigest()
 
 def get_password_hash(password):
     return generate_password_hash(password, CRYPT_ROUND)

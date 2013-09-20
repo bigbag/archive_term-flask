@@ -296,3 +296,9 @@ form.custom{
 	font-size: 44px !important;
 	line-height: 24px;
 }
+.block-center{
+	display: table;
+	height: 100%;
+	padding-bottom: 0;
+	padding-top: 1em;
+}

@@ -9,7 +9,7 @@ import unittest
 
 import web
 from helpers import hash_helper
-from models.spot import Spot
+from models.payment_wallet import PaymentWallet
 
 
 class WebApiAdminTestCase(unittest.TestCase):
@@ -75,10 +75,10 @@ class WebApiAdminTestCase(unittest.TestCase):
         self.assertEqual(rv.status_code, 200)
 
     def test_spot_delete(self):
-        spot = Spot.query.filter((Spot.status == Spot.STATUS_GENERATED) |
-                                (Spot.status == Spot.STATUS_ACTIVATED)).first()
+        wallet = PaymentWallet.query.filter_by(
+            user_id=0).first()
 
-        data = dict(ean=spot.barcode)
+        data = dict(hid=wallet.hard_id)
         sign = hash_helper.get_api_sign(self.ADMIN_SECRET, data)
 
         headers = [

@@ -5,8 +5,7 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db
-from web import app
+from web import db, app
 from helpers import date_helper
 
 
@@ -21,7 +20,6 @@ class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(150), nullable=False)
     midle_name = db.Column(db.String(150))
-    first_name = db.Column(db.String(150))
     last_name = db.Column(db.String(150))
     tabel_id = db.Column(db.String(150))
     birthday = db.Column(db.Date())

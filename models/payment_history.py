@@ -8,8 +8,7 @@
 """
 import hashlib
 
-from web import db
-from web import app
+from web import db, app
 from models.term import Term
 from models.payment_wallet import PaymentWallet
 from models.user import User

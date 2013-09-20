@@ -1,0 +1,12 @@
+{% macro header(firm_name, user_email) -%}
+<header class="m-header-page">
+    <div class="row">
+        <div class="large-12 columns">
+            <h1 class="left">
+            	<a class="m-logo g-color-blue" href="/">{{firm_name}}</a>
+            </h1>
+            <a class="right" href="/logout">{{user_email}} (Выйти)</a>
+        </div>
+    </div>
+</header>
+{%- endmacro %}

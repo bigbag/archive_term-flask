@@ -5,8 +5,7 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db
-from web import app
+from web import db, app
 from models.term import Term
 from models.firm import Firm
 
@@ -45,6 +44,16 @@ class FirmTerm(db.Model):
         firm_id_list = []
         for firm_term in firm_terms:
             firm_id_list.append(firm_term.child_firm_id)
+
+        return firm_id_list
+
+    def get_list_by_firm_id(self, firm_id):
+        firm_terms = self.query.filter_by(
+            child_firm_id=firm_id).all()
+
+        firm_id_list = []
+        for firm_term in firm_terms:
+            firm_id_list.append(firm_term.term_id)
 
         return firm_id_list
 

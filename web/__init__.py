@@ -3,9 +3,8 @@ from flask import Flask
 app = Flask(__name__)
 app.config.from_object('configs.general.Config')
 
-from flask.ext.cache import Cache
-
-cache = Cache(app)
+from libs.redis_cache import SimpleRedisCache
+cache = SimpleRedisCache(app)
 
 from flask.ext.mail import Mail
 mail = Mail(app)
@@ -13,8 +12,12 @@ mail = Mail(app)
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
 
-from flask.ext.babel import Babel
-babel = Babel(app)
+from libs.redis_sessions import RedisSessionInterface
+app.session_interface = RedisSessionInterface()
+
+from flask.ext.login import LoginManager
+lm = LoginManager()
+lm.init_app(app)
 
 from web.views.api import *
 from web.views.term import *

@@ -5,8 +5,7 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db
-from web import app
+from web import db, app
 
 
 class Firm(db.Model):
@@ -36,6 +35,9 @@ class Firm(db.Model):
         self.report_time = json.loads(self.upload)
 
         return self
+
+    def get_by_sub_domain(self, sub_domain):
+        return self.query.filter_by(sub_domain=sub_domain).first()
 
     def __repr__(self):
         return '<id %r>' % (self.id)
