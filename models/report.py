@@ -107,8 +107,8 @@ class Report(db.Model):
             if 'page' in kwargs:
                 page = kwargs['page']
 
-            query = Report.query.filter(
-                (Report.firm_id == firm_id) & (Report.type == self.TYPE_WHITE)).order_by(order)
+            query = Report.query.filter(Report.firm_id == firm_id).filter(
+                Report.type == self.TYPE_WHITE).order_by(order)
 
             reports_count = query.count()
             reports = query.paginate(page, limit, False).items
