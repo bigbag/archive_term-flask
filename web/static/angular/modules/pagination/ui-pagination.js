@@ -4,25 +4,25 @@ angular.module("ui.pagination", [])
             restrict: 'EA',
             replace: true,
             template:
-                    '<ul>' +
-                        // '<li ng-class="{disabled: firstPage()}" ng-click="goToFirstPage()">' +
-                        //     '<a><<</a>' +
-                        // '</li>' +
-                        // '<li ng-class="{disabled: !hasPrev()}" ng-click="prev()">' +
-                        //     '<a><</a>' +
-                        // '</li>' +
+                    '<ul class="pagination">' +
+                        '<li class="arrow" ng-hide="firstPage()" ng-click="goToFirstPage()">' +
+                            '<a>&laquo;</a>' +
+                        '</li>' +
+                        '<li ng-hide="!hasPrev()" ng-click="prev()">' +
+                            '<a>&lt;</a>' +
+                        '</li>' +
                         '<li ng-repeat="page in pages"' +
                             'ng-class="{current: isCurrent(page)}"' +
                             'ng-click="setCurrent(page)"' +
                         '>' +
                             '<a>{{page}}</a>' +
                         '</li>' +
-                        // '<li ng-class="{disabled: !hasNext()}" ng-click="next()">' +
-                        //     '<a>></a>' +
-                        // '</li>' +
-                        // '<li ng-class="{disabled: lastPage()}" ng-click="goToLastPage()">' +
-                        //     '<a>>></a>' +
-                        // '</li>' +
+                        '<li ng-hide="!hasNext()" ng-click="next()">' +
+                            '<a>&gt;</a>' +
+                        '</li>' +
+                        '<li class="arrow" ng-hide="lastPage()" ng-click="goToLastPage()">' +
+                            '<a>&raquo;</a>' +
+                        '</li>' +
                     '</ul>',
             scope: {
                 cur: '=',
