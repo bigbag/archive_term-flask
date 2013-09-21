@@ -16,13 +16,20 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     }, 5000);
   };
 
-  $scope.$watch('pagination.cur', function(pagination) {
+  $scope.$watch('pagination.cur + search.period', function() {
     var search = $scope.search;
     search.page = $scope.pagination.cur;
-    if (search.type == 'online'){
+    if (search.action_type == 'online'){
       $scope.getReport(search);
     }
   });
+
+  $scope.online_periods = [
+    {name:'День', value:'day'},
+    {name:'Неделю', value:'week'},
+    {name:'Месяц', value:'month'},
+    {name:'Год', value:'year'},
+  ];
 
   //запрос отчета
   $scope.getReport = function(search) {

@@ -27,6 +27,48 @@
 	background-color: #ff2400;
 }
 
+.1sub-nav .active{
+	display: inline-block;
+	height: 50px;
+	background: #0061FF;
+	color: #fff;
+	font-family: Mobispot,Arial, sans-serif;
+	font-size: 18px;
+}
+
+.sub-nav {
+  display: block;
+  width: auto;
+  overflow: hidden;
+  margin: -0.25em 0 1.125em;
+  padding-top: 0.25em;
+  margin-right: 0;
+  margin-left: -0.5625em; 
+  font-size: 18px;}
+  .sub-nav dt,
+  .sub-nav dd {
+    float: left;
+    display: inline;
+    margin-left: 0.5625em;
+    margin-bottom: 0.625em;
+    font-weight: normal;
+    font-size: 0.875em; }
+    .sub-nav dt a,
+    .sub-nav dd a {
+      color: #000;
+      cursor: pointer;
+      text-decoration: none; }
+    .sub-nav dt.active a,
+    .sub-nav dd.active a {
+      -webkit-border-radius: 5px;
+      border-radius: 5px;
+      font-weight: bold;
+      background: #0061FF;
+      padding: 0.1875em 0.5625em;
+      cursor: default;
+      color: white; }
+
+
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
