@@ -94,15 +94,12 @@ def get_api_sign(secret, data):
 
     return H.hexdigest()
 
-
 def get_activkey(data):
     data = str(time.time()) + data
     return hashlib.sha1(data).hexdigest()
 
-
 def get_password_hash(password):
     return generate_password_hash(password, CRYPT_ROUND)
-
 
 def check_password(password_hash, password):
     return check_password_hash(password_hash, password)
