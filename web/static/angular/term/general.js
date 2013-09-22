@@ -26,9 +26,9 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
 
   $scope.online_periods = [
     {name:'День', value:'day'},
-    {name:'Неделю', value:'week'},
+    {name:'Неделя', value:'week'},
     {name:'Месяц', value:'month'},
-    {name:'Год', value:'year'},
+    {name:'Точно', value:'all'},
   ];
 
   //запрос отчета
