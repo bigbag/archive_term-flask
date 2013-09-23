@@ -1,0 +1,47 @@
+{% extends "term/layout.html" %}
+{% block header %}
+<header class="m-header-page">
+    <div class="row">
+        <div class="large-12 columns">
+            <h1 class="left">
+                <a class="m-logo g-color-blue" href="/">
+                    {{firm_name}}
+                </a>
+            </h1>
+        </div>
+    </div>
+</header>
+{% endblock %}
+{% block body %}
+<div class="row m-content">
+    <div class="singlebox-margin clearfix">
+        <div class="large-5 columns">
+            <div class="p-error-txt">
+                <h2>{{message}}</h2>
+                <p>If you believe that something is going
+                    wrong please connect with us and
+                    we will fix it.
+                </p>
+                <footer>
+                    <a class="color" href="mailto:help@mobispot.com">
+                        helpme@mobispot.com
+                    </a>
+                    <a class="color" href="https://twitter.com/heymobispot">
+                        @heymobispot
+                    </a>
+                </footer>
+            </div>
+        </div>
+        <div class="large-7 columns">
+            <div class="error-message">
+                <img src="/static/img/i-error.2x.png">
+                <div class="error-text-block">
+                    <h1>Oops!</h1>
+                    <span class="error-code">{{code}}</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

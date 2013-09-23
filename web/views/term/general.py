@@ -27,6 +27,35 @@ from web.views.term import firm_view, person_view, report_view, term_view
 term = Blueprint('term', __name__)
 
 
+def get_error(message, code):
+    firm_info = get_firm_name(request)
+    return render_template(
+        'term/error.html',
+        message=message,
+        code=code,
+        firm_name=firm_info['name']), code
+
+
+@app.errorhandler(400)
+def bag_request(error):
+    return get_error('Bad request', 400)
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return get_error('Not found', 404)
+
+
+@app.errorhandler(405)
+def method_not_allowed(error):
+    return get_error('Method Not Allowed', 405)
+
+
+@app.errorhandler(500)
+def method_not_allowed(error):
+    return set_message('error', 'Fail', 500)
+
+
 @lm.user_loader
 def load_user(id):
     key = 'term_user_%s' % str(id)
