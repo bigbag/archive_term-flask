@@ -28,7 +28,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     {name:'День', value:'day'},
     {name:'Неделя', value:'week'},
     {name:'Месяц', value:'month'},
-    {name:'Точно', value:'all'},
+    {name:'До операции', value:'all'},
   ];
 
   //запрос отчета

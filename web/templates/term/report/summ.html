@@ -18,11 +18,10 @@
                 <div class="m-content-page" ng-cloak class="ng-cloak">
                     <div class="content-row">
                         <dl class="sub-nav period-select">
-                          <dt>Детализация: </dt>
                           <span ng-repeat="period in online_periods">
-                              <dd 
-                                ng-class="{active: search.period==period.value}">
-                                <a ng-click="search.period=period.value">
+                              <dd ng-class="{active: search.period==period.value}">
+                                <a 
+                                    ng-click="search.period=period.value;search.page=1;pagination.cur=1">
                                     {[{period.name}]}
                                 </a>
                             </dd>

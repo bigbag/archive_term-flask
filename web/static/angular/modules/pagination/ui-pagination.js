@@ -12,6 +12,7 @@ angular.module("ui.pagination", [])
                             '<a>&lt;</a>' +
                         '</li>' +
                         '<li ng-repeat="page in pages"' +
+                            'ng-hide="firstPage()"' + 
                             'ng-class="{current: isCurrent(page)}"' +
                             'ng-click="setCurrent(page)"' +
                         '>' +
