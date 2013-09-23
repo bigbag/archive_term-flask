@@ -32,9 +32,9 @@ api_term = Blueprint('api_term', __name__)
 
 
 @api_term.route('/configs/config_<int:term_id>.xml', methods=['GET'])
-@cache.cached(timeout=120)
 @xml_headers
 @md5_content_headers
+@cache.cached(timeout=120)
 def get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
     term = Term().get_valid_term(int(term_id))
