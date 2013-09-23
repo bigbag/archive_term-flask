@@ -89,83 +89,61 @@ class Report(db.Model):
     def get_by_check_summ(self, check_summ):
         return self.query.filter_by(check_summ=check_summ).first()
 
+    @cache.cached(timeout=120, key_prefix='report_person')
     def select_person(self, firm_id, **kwargs):
-        kwargs['key'] = 'report_person'
-        key = cache.get_key(firm_id, **kwargs)
-        if not cache.get(key):
+        tz = app.config['TZ']
+        date_pattern = '%H:%M %d.%m.%y'
 
-            tz = app.config['TZ']
-            date_pattern = '%H:%M %d.%m.%y'
-            order = 'creation_date desc'
-            if 'order' in kwargs:
-                order = kwargs['order']
+        order = kwargs[
+            'order'] if 'order' in kwargs else 'creation_date desc'
+        limit = kwargs['limit'] if 'limit' in kwargs else 10
+        page = kwargs['page'] if 'page' in kwargs else 1
 
-            limit = 10
-            if 'limit' in kwargs:
-                limit = kwargs['limit']
+        query = Report.query.filter(Report.firm_id == firm_id).filter(
+            Report.type == self.TYPE_WHITE).order_by(order)
 
-            page = 1
-            if 'page' in kwargs:
-                page = kwargs['page']
+        reports_count = query.count()
+        reports = query.paginate(page, limit, False).items
 
-            query = Report.query.filter(Report.firm_id == firm_id).filter(
-                Report.type == self.TYPE_WHITE).order_by(order)
+        result = []
+        for report in reports:
 
-            reports_count = query.count()
-            reports = query.paginate(page, limit, False).items
+            creation_date = date_helper.from_utc(
+                report.creation_date,
+                tz)
+            creation_date = creation_date.strftime(date_pattern)
 
-            result = []
-            for report in reports:
-
-                creation_date = date_helper.from_utc(
-                    report.creation_date,
-                    tz)
-                creation_date = creation_date.strftime(date_pattern)
-
-                data = dict(
-                    id=report.id,
-                    term=int(report.term_id),
-                    creation_date=creation_date,
-                )
-                if not report.person:
-                    data['first_name'] = ''
-                    data['midle_name'] = ''
-                    data['last_name'] = 'Anonim'
-                else:
-                    data['first_name'] = report.person.first_name
-                    data['midle_name'] = report.person.midle_name
-                    data['last_name'] = report.person.last_name
-
-                if not report.event:
-                    data['event'] = 'Empty'
-                else:
-                    data['event'] = report.event.name
-
-                result.append(data)
-
-            value = dict(
-                report=result,
-                count=reports_count,
+            data = dict(
+                id=report.id,
+                term=int(report.term_id),
+                creation_date=creation_date,
             )
+            if not report.person:
+                data['first_name'] = ''
+                data['midle_name'] = ''
+                data['last_name'] = 'Anonim'
+            else:
+                data['first_name'] = report.person.first_name
+                data['midle_name'] = report.person.midle_name
+                data['last_name'] = report.person.last_name
 
-            cache.set(key=key, value=value, timeout=120)
+            data['event'] = report.event.name if report.event else 'Empty'
 
-        return cache.get(key)
+            result.append(data)
+
+        value = dict(
+            report=result,
+            count=reports_count,
+        )
+
+        return value
 
     def get_select_summ_query(self, firm_id, **kwargs):
         answer = {}
 
-        order = 'creation_date desc'
-        if 'order' in kwargs:
-            order = kwargs['order']
-
-        limit = 10
-        if 'limit' in kwargs:
-            limit = kwargs['limit']
-
-        page = 1
-        if 'page' in kwargs:
-            page = kwargs['page']
+        order = kwargs['order'] if 'order' in kwargs else 'creation_date desc'
+        limit = kwargs['limit'] if 'limit' in kwargs else 10
+        page = kwargs['page'] if 'page' in kwargs else 1
 
         firm_term = FirmTerm().get_list_by_firm_id(firm_id)
 
@@ -179,7 +157,8 @@ class Report(db.Model):
                     Report.term_id,
                     func.sum(Report.amount))
                 query = query.group_by('term_id')
-                query = query.group_by('YEAR(creation_date), MONTH(creation_date)')
+                query = query.group_by(
+                    'YEAR(creation_date), MONTH(creation_date)')
 
             if period == 'day':
                 query = query.group_by('DAY(creation_date)')
@@ -192,7 +171,10 @@ class Report(db.Model):
                     Report.term_id,
                     Report.amount)
 
-            query = query.filter(Report.term_id.in_(firm_term)).filter(Report.type == self.TYPE_PAYMENT)
+            query = query.filter(
+                Report.term_id.in_(
+                    firm_term)).filter(
+                        Report.type == self.TYPE_PAYMENT)
 
         query = query.order_by(order)
         query = query.order_by('term_id asc')
@@ -202,62 +184,50 @@ class Report(db.Model):
 
         return answer
 
+    @cache.cached(timeout=120, key_prefix='report_summ')
     def select_summ(self, firm_id, **kwargs):
-        kwargs['key'] = 'report_summ'
-        key = cache.get_key(firm_id, **kwargs)
-        if not cache.get(key):
+        tz = app.config['TZ']
 
-            tz = app.config['TZ']
+        date_pattern = '%H:%M %d.%m.%y'
+        if 'period' in kwargs:
+            period = kwargs['period']
 
-            date_pattern = '%H:%M %d.%m.%y'
-            if 'period' in kwargs:
-                period = kwargs['period']
+            if period == 'day':
+                date_pattern = '%d.%m.%Y'
+            elif period == 'month':
+                date_pattern = '%m.%Y'
+            elif period == 'week':
+                date_pattern = '%W, %m.%Y'
 
-                if period == 'day':
-                    date_pattern = '%d.%m.%Y'
-                elif period == 'month':
-                    date_pattern = '%m.%Y'   
-                elif period == 'week':
-                    date_pattern = '%W, %m.%Y'               
+        answer = self.get_select_summ_query(firm_id, **kwargs)
 
+        result = []
+        for report in answer['reports']:
 
-            answer = self.get_select_summ_query(firm_id, **kwargs)
+            creation_date = date_helper.from_utc(
+                report[0],
+                tz)
+            creation_date = creation_date.strftime(date_pattern)
 
-            result = []
-            for report in answer['reports']:
-
-                creation_date = date_helper.from_utc(
-                    report[0],
-                    tz)
-                creation_date = creation_date.strftime(date_pattern)
-
-                data = dict(
-                    creation_date=creation_date,
-                    amount=int(report[3] / 100),
-                )
-
-                term = Term.query.get(report[2])
-                if not term:
-                    data['term'] = 'Empty'
-                else:
-                    data['term'] = term.name
-
-                event = Event.query.get(report[1])
-                if not event:
-                    data['event'] = 'Empty'
-                else:
-                    data['event'] = event.name
-
-                result.append(data)
-
-            value = dict(
-                report=result,
-                count=answer['reports_count'],
+            data = dict(
+                creation_date=creation_date,
+                amount=int(report[3] / 100),
             )
 
-            cache.set(key=key, value=value, timeout=120)
+            term = Term.query.get(report[2])
+            data['term'] = term.name if term else 'Empty'
 
-        return cache.get(key)
+            event = Event.query.get(report[1])
+            data['event'] = event.name if event else 'Empty'
+
+            result.append(data)
+
+        value = dict(
+            report=result,
+            count=answer['reports_count'],
+        )
+
+        return value
 
     def get_check_summ(self):
         return hashlib.md5("%s%s%s%s%s" % (

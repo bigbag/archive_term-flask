@@ -61,7 +61,7 @@ class SimpleRedisCache(RedisCache):
     def clear(self):
         self.cache.clear()
 
-    def cached(self, timeout=None, key_prefix='view/%s', unless=None):
+    def cached(self, timeout=None, key_prefix='keys', unless=None):
         def decorator(f):
             @functools.wraps(f)
             def decorated_function(*args, **kwargs):
@@ -69,9 +69,10 @@ class SimpleRedisCache(RedisCache):
                 if callable(unless) and unless() is True:
                     return f(*args, **kwargs)
 
+                kwargs['key_prefix'] = key_prefix
+
                 try:
-                    cache_key = self.get_key(
-                        *args, **kwargs)
+                    cache_key = self.get_key(*args, **kwargs)
                     rv = self.cache.get(cache_key)
                 except Exception:
                     if current_app.debug:
