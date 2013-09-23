@@ -21,6 +21,7 @@
                           <span ng-repeat="period in online_periods">
                               <dd ng-class="{active: search.period==period.value}">
                                 <a 
+                                    class="f-spot-button small"
                                     ng-click="search.period=period.value;search.page=1;pagination.cur=1">
                                     {[{period.name}]}
                                 </a>

@@ -27,13 +27,15 @@
 	background-color: #ff2400;
 }
 
-.1sub-nav .active{
-	display: inline-block;
-	height: 50px;
-	background: #0061FF;
-	color: #fff;
-	font-family: Mobispot,Arial, sans-serif;
-	font-size: 18px;
+.sub-nav .f-spot-button.small{
+  height: 30px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  padding: 5px 10px;
+}
+
+.sub-nav .f-spot-button:hover{
+  font-family: Arial, sans-serif;
 }
 
 .sub-nav {
