@@ -113,22 +113,16 @@ class Report(db.Model):
                 tz)
             creation_date = creation_date.strftime(date_pattern)
 
+            term = Term.query.get(report.term_id)
             data = dict(
                 id=report.id,
-                term=int(report.term_id),
+                term=term.name if term else 'Empty',
                 creation_date=creation_date,
+                event=report.event.name if report.event else 'Empty',
+                first_name=report.person.first_name if report.person else '',
+                midle_name=report.person.midle_name if report.person else '',
+                last_name=report.person.last_name if report.person else '',
             )
-            if not report.person:
-                data['first_name'] = ''
-                data['midle_name'] = ''
-                data['last_name'] = 'Anonim'
-            else:
-                data['first_name'] = report.person.first_name
-                data['midle_name'] = report.person.midle_name
-                data['last_name'] = report.person.last_name
-
-            data['event'] = report.event.name if report.event else 'Empty'
-
             result.append(data)
 
         value = dict(
@@ -155,7 +149,8 @@ class Report(db.Model):
                     Report.creation_date,
                     Report.event_id,
                     Report.term_id,
-                    func.sum(Report.amount))
+                    func.sum(Report.amount),
+                    func.count(Report.amount))
                 query = query.group_by('term_id')
                 query = query.group_by(
                     'YEAR(creation_date), MONTH(creation_date)')
@@ -209,16 +204,16 @@ class Report(db.Model):
                 tz)
             creation_date = creation_date.strftime(date_pattern)
 
+            term = Term.query.get(report[2])
+            event = Event.query.get(report[1])
+
             data = dict(
                 creation_date=creation_date,
                 amount=int(report[3] / 100),
+                count=report[4],
+                term=term.name if term else 'Empty',
+                event=term.name if term else 'Empty',
             )
-
-            term = Term.query.get(report[2])
-            data['term'] = term.name if term else 'Empty'
-
-            event = Event.query.get(report[1])
-            data['event'] = event.name if event else 'Empty'
 
             result.append(data)
 

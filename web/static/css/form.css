@@ -229,6 +229,7 @@ form input.f-input-small{
 	padding: 14px 40px;
 	width: 344px;
 	margin: 0 auto 1em;
+	overflow: hidden;
 }
 .f-login form input{
 	margin-right: 0;
@@ -331,7 +332,7 @@ input.error:-moz-placeholder { color:#C60F13;!important; }
 	padding: 13px;
 }
 .f-spot-button.f-spot-button_plus.medium{
-	padding: 10px;
+	padding: 10px 20px;
 }
 .f-spot-button.small{
 	height: 30px;
@@ -339,5 +340,5 @@ input.error:-moz-placeholder { color:#C60F13;!important; }
 	padding: 9px 10px;
 }
 .f-spot-button.f-spot-button_plus.small{
-	padding: 5px;
+	padding: 5px 10px;
 }
