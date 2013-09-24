@@ -212,7 +212,7 @@ class Report(db.Model):
                 amount=int(report[3] / 100),
                 count=report[4],
                 term=term.name if term else 'Empty',
-                event=term.name if term else 'Empty',
+                event=event.name if event else 'Empty',
             )
 
             result.append(data)
