@@ -30,7 +30,7 @@ def to_utc(date, tz):
 def from_utc(date, tz):
     tz = timezone(tz)
     utc = pytz.timezone('UTC')
-    d_tz = utc.normalize(tz.localize(date))
+    d_tz = utc.normalize(utc.localize(date))
     localetime = d_tz.astimezone(tz)
     return localetime
 
