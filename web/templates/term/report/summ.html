@@ -7,7 +7,7 @@
 
 {% block content %}
 <h2 class="g-color-blue m-page-name">Обороты по терминалам</h2>
-<span ng-init="search.limit=20;search.action_type='online';search.period='day'"></span>
+<span ng-init="search.limit=20;search.action_type='online';search.period='day';search.detaled=0"></span>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
     <section class="section active">
         <p class="title">
@@ -29,20 +29,27 @@
                           </span>
                         </dl>
                     </div>
+                    <div class="content-row">
+                        <a 
+                            class="f-spot-button small" 
+                            ng-click="setSearchDetaled()">
+                            Подробно
+                        </a>
+                    </div>
                     <table class="m-spot-table">
                         <thead>
                         <tr>
                             <th><span>Дата</span></th>
-                            <th>Событие</th>
-                            <th>Терминал</th>
+                            <th ng-hide="!search.detaled">Событие</th>
+                            <th ng-hide="!search.detaled">Терминал</th>
                             <th>Сумма</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr ng-repeat="report in reports" class="m-t-cont-row">
                             <td>{[{report.creation_date}]}</td>
-                            <td>{[{report.event}]}</td>
-                            <td>{[{report.term}]}</td>
+                            <td ng-hide="!search.detaled">{[{report.event}]}</td>
+                            <td ng-hide="!search.detaled">{[{report.term}]}</td>
                             <td>{[{report.amount}]}</td>
                         </tr>
                         <tr class="m-table-bottom">

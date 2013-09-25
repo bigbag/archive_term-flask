@@ -16,7 +16,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     }, 5000);
   };
 
-  $scope.$watch('pagination.cur + search.period', function() {
+  $scope.$watch('pagination.cur + search.period + search.detaled', function() {
     var search = $scope.search;
     search.page = $scope.pagination.cur;
     if (search.action_type == 'online'){
@@ -31,7 +31,17 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     {name:'До операции', value:'all'},
   ];
 
-  //запрос отчета
+  //Меняем флаг детального запроса
+  $scope.setSearchDetaled = function() {
+    if ($scope.search.detaled == 0){
+      $scope.search.detaled = 1;
+    }
+    else {
+      $scope.search.detaled = 0;
+    }
+  };
+
+  //Запрос отчета
   $scope.getReport = function(search) {
     if (search.page == undefined) search.page = 1;
     

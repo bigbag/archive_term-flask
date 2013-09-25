@@ -12,7 +12,6 @@ from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_
 from web import app, cache
 
 from decorators.header import *
-from helpers.error_xml_helper import *
 
 from helpers import hash_helper
 
@@ -22,7 +21,7 @@ from models.payment_wallet import PaymentWallet
 from models.term_user import TermUser
 
 
-api_admin = Blueprint('api_admin', __name__)
+mod = Blueprint('api_admin', __name__)
 
 
 def api_admin_access(request):
@@ -43,7 +42,7 @@ def api_admin_access(request):
         abort(403)
 
 
-@api_admin.route('/spot/generate', methods=['POST'])
+@mod.route('/spot/generate', methods=['POST'])
 @xml_headers
 def spot_generate():
     """Генерация спотов"""
@@ -81,7 +80,7 @@ def spot_generate():
     return spot_list
 
 
-@api_admin.route('/spot/linking', methods=['POST'])
+@mod.route('/spot/linking', methods=['POST'])
 @xml_headers
 def linking_spot():
     """Добавляем спот и связанный с ним кошелёк"""
@@ -138,7 +137,7 @@ def linking_spot():
     return response
 
 
-@api_admin.route('/spot/<int:hard_id>', methods=['GET'])
+@mod.route('/spot/<int:hard_id>', methods=['GET'])
 @xml_headers
 def get_info(hard_id):
     """Возвращает информацию о споте по его HID"""
@@ -169,7 +168,7 @@ def get_info(hard_id):
     return response
 
 
-@api_admin.route('/spot/free', methods=['GET'])
+@mod.route('/spot/free', methods=['GET'])
 @xml_headers
 def get_free():
     """Возвращает информацию неактивированых спотах"""
@@ -187,7 +186,7 @@ def get_free():
     return response
 
 
-@api_admin.route('/spot/delete', methods=['POST'])
+@mod.route('/spot/delete', methods=['POST'])
 @xml_headers
 def spot_delete():
     """Удаление спотов"""

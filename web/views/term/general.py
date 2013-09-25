@@ -20,40 +20,10 @@ from decorators.header import *
 
 from models.term_user import TermUser
 from models.term_user_firm import TermUserFirm
+from models.report import Report
 from models.firm import Firm
 
-from web.views.term import firm_view, person_view, report_view, term_view
-
-term = Blueprint('term', __name__)
-
-
-def get_error(message, code):
-    firm_info = get_firm_name(request)
-    return render_template(
-        'term/error.html',
-        message=message,
-        code=code,
-        firm_name=firm_info['name']), code
-
-
-# @app.errorhandler(400)
-# def bag_request(error):
-#     return get_error('Bad request', 400)
-
-
-# @app.errorhandler(404)
-# def not_found(error):
-#     return get_error('Not found', 404)
-
-
-# @app.errorhandler(405)
-# def method_not_allowed(error):
-#     return get_error('Method Not Allowed', 405)
-
-
-# @app.errorhandler(500)
-# def method_not_allowed(error):
-#     return set_message('error', 'Fail', 500)
+mod = Blueprint('term', __name__)
 
 
 @lm.user_loader
@@ -65,7 +35,7 @@ def load_user(id):
     return cache.get(key)
 
 
-@term.before_request
+@mod.before_request
 def before_request():
     g.user = current_user
     g.firm_info = get_firm_name(request)
@@ -99,7 +69,7 @@ def get_firm_name(request):
         return result
 
 
-@term.route('/login', methods=['GET'])
+@mod.route('/login', methods=['GET'])
 def login_form():
     """Форма логина"""
 
@@ -112,7 +82,7 @@ def login_form():
         firm_name=firm_info['name'])
 
 
-@term.route('/login', methods=['POST'])
+@mod.route('/login', methods=['POST'])
 def login():
     """Логин"""
     answer = dict(error='yes', message='')
@@ -150,12 +120,12 @@ def login():
         answer['message'] = u'У вас нет доступа к данной фирме'
         return set_json_response(answer)
 
-    login_user(term_user, True)
+    login_user(term_user, False)
     answer['error'] = 'no'
     return set_json_response(answer)
 
 
-@term.route('/logout')
+@mod.route('/logout')
 @login_required
 def logout():
     """Выход из системы"""
@@ -164,51 +134,87 @@ def logout():
     return redirect('/')
 
 
-@term.route('/forgot', methods=['GET'])
+@mod.route('/forgot', methods=['GET'])
 def get_forgot():
     """Страница востановления пароля"""
     return render_template(
         'term/forgot.html')
 
 
-@term.route('/', methods=['GET'])
-@term.route('/report', methods=['GET'])
+@mod.route('/', methods=['GET'])
+@mod.route('/report', methods=['GET'])
 def get_default():
     """Перенаправление на вид по умолчанию"""
     return redirect('/report/person')
 
-term.add_url_rule(
-    '/report/person',
-    view_func=report_view.report_person,
-    methods=['GET', ]
-)
 
-term.add_url_rule(
-    '/report/person',
-    view_func=report_view.select_person_report,
-    methods=['POST', ]
-)
+@mod.route('/report/person', methods=['GET'])
+@login_required
+def report_person():
+    """Отчеты по сотрудникам"""
+    firm_info = g.firm_info
 
-term.add_url_rule(
-    '/report/terminal',
-    view_func=report_view.report_term,
-    methods=['GET', ]
-)
+    return render_template(
+        'term/report/person.html',
+        firm_name=firm_info['name'],
+        user_email=g.user.email)
 
-term.add_url_rule(
-    '/report/terminal',
-    view_func=report_view.select_term_report,
-    methods=['POST', ]
-)
 
-term.add_url_rule(
-    '/report/summ',
-    view_func=report_view.report_summ,
-    methods=['GET', ]
-)
+@mod.route('/report/person', methods=['POST'])
+@login_required
+@json_headers
+def select_person_report():
+    firm_info = g.firm_info
+    arg = json.loads(request.stream.read())
+    answer = Report().select_person(
+        firm_info['id'], **arg)
 
-term.add_url_rule(
-    '/report/summ',
-    view_func=report_view.select_summ_report,
-    methods=['POST', ]
-)
+    return jsonify(answer)
+
+
+@mod.route('/report/terminal', methods=['GET'])
+@login_required
+def report_term():
+    """Отчеты по терминалам"""
+    firm_info = g.firm_info
+
+    return render_template(
+        'term/report/term.html',
+        firm_name=firm_info['name'],
+        user_email=g.user.email)
+
+
+@mod.route('/report/terminal', methods=['POST'])
+@login_required
+@json_headers
+def select_term_report():
+    firm_info = g.firm_info
+    arg = json.loads(request.stream.read())
+    answer = Report().select_person(
+        firm_info['id'], **arg)
+
+    return jsonify(answer)
+
+
+@mod.route('/report/summ', methods=['GET'])
+@login_required
+def report_summ():
+    """Отчеты по суммам"""
+    firm_info = g.firm_info
+
+    return render_template(
+        'term/report/summ.html',
+        firm_name=firm_info['name'],
+        user_email=g.user.email)
+
+
+@mod.route('/report/summ', methods=['POST'])
+@login_required
+@json_headers
+def select_summ_report():
+    firm_info = g.firm_info
+    arg = json.loads(request.stream.read())
+    answer = Report().select_summ(
+        firm_info['id'], **arg)
+
+    return jsonify(answer)

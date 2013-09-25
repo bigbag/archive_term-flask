@@ -14,7 +14,6 @@ from web import app, cache
 
 from decorators.header import *
 from helpers import date_helper, hash_helper
-from helpers.error_xml_helper import *
 
 from models.term import Term
 from models.term_event import TermEvent
@@ -28,10 +27,10 @@ from models.payment_lost import PaymentLost
 from web.configs.term import TermConfig
 
 
-api_term = Blueprint('api_term', __name__)
+mod = Blueprint('api_term', __name__)
 
 
-@api_term.route('/configs/config_<int:term_id>.xml', methods=['GET'])
+@mod.route('/configs/config_<int:term_id>.xml', methods=['GET'])
 @xml_headers
 @md5_content_headers
 @cache.cached(timeout=120)
@@ -62,7 +61,7 @@ def get_config(term_id):
     return response
 
 
-@api_term.route('/configs/blacklist.xml', methods=['GET'])
+@mod.route('/configs/blacklist.xml', methods=['GET'])
 @cache.cached(timeout=120)
 @xml_headers
 @md5_content_headers
@@ -106,7 +105,7 @@ def get_blacklist():
     return response
 
 
-@api_term.route('/reports/report_<int:term_id>_<report_datetime>.xml', methods=['PUT'])
+@mod.route('/reports/report_<int:term_id>_<report_datetime>.xml', methods=['PUT'])
 def upload_report(term_id, report_datetime):
     """Прием и сохранение отчета"""
 
@@ -145,7 +144,7 @@ def upload_report(term_id, report_datetime):
     return set_message('success', hash_helper.get_content_md5(file), 201)
 
 
-@api_term.route('/configs/callback/<int:term_id>_<type>', methods=['POST'])
+@mod.route('/configs/callback/<int:term_id>_<type>', methods=['POST'])
 def set_callback(term_id, type):
     """Сообщение об удачной загрузки отчета"""
 

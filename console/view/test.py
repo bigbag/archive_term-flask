@@ -159,10 +159,29 @@ class TestCommand(Command):
             print "%s,%s,%s,%s" % data
 
     def run(self):
+
+        # spots = Spot.query.filter(
+        #     Spot.status == Spot.STATUS_REGISTERED).all()
+        # for spot in spots:
+        #     wallet = PaymentWallet.query.filter(
+        #         PaymentWallet.discodes_id == spot.discodes_id).first()
+        #     if not wallet:
+        #         if spot.user:
+        #             print spot.discodes_id
+        #             print spot.user.email
         print 1
+
         # with open('tmp/import.csv', 'rb') as csvfile:
         #     spamreader = csv.reader(csvfile)
         #     for row in spamreader:
+        #         data = row[0].split(';')
+        #         spot = Spot.query.filter(Spot.code == data[2]).first()
+
+        #         wallet = PaymentWallet()
+        #         wallet.hard_id = data[0]
+        #         wallet.payment_id = data[1]
+        #         wallet.discodes_id = spot.discodes_id
+        #         wallet.save()
         #         person = Person.query.filter_by(hard_id=row[0]).first()
 
         #         person.payment_id = str(person.payment_id).rjust(20, '0')
