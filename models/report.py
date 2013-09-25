@@ -138,38 +138,40 @@ class Report(db.Model):
         order = kwargs['order'] if 'order' in kwargs else 'creation_date desc'
         limit = kwargs['limit'] if 'limit' in kwargs else 10
         page = kwargs['page'] if 'page' in kwargs else 1
+        detaled = kwargs['detaled'] if 'detaled' in kwargs else False
+        period = kwargs['period'] if 'period' in kwargs else 'all'
 
         firm_term = FirmTerm().get_list_by_firm_id(firm_id)
 
-        if 'period' in kwargs:
-            period = kwargs['period']
+        if not period == 'all':
+            query = db.session.query(
+                Report.creation_date,
+                Report.event_id,
+                Report.term_id,
+                func.sum(Report.amount),
+                func.count(Report.amount))
 
-            if not period == 'all':
-                query = db.session.query(
-                    Report.creation_date,
-                    Report.event_id,
-                    Report.term_id,
-                    func.sum(Report.amount),
-                    func.count(Report.amount))
+            if detaled:
                 query = query.group_by('term_id')
-                query = query.group_by(
-                    'YEAR(creation_date), MONTH(creation_date)')
+
+            query = query.group_by(
+                'YEAR(creation_date), MONTH(creation_date)')
 
             if period == 'day':
                 query = query.group_by('DAY(creation_date)')
             elif period == 'week':
                 query = query.group_by('WEEK(creation_date)')
-            elif period == 'all':
-                query = db.session.query(
-                    Report.creation_date,
-                    Report.event_id,
-                    Report.term_id,
-                    Report.amount)
+        else:
+            query = db.session.query(
+                Report.creation_date,
+                Report.event_id,
+                Report.term_id,
+                Report.amount)
 
-            query = query.filter(
-                Report.term_id.in_(
-                    firm_term)).filter(
-                        Report.type == self.TYPE_PAYMENT)
+        query = query.filter(
+            Report.term_id.in_(
+                firm_term)).filter(
+                    Report.type == self.TYPE_PAYMENT)
 
         query = query.order_by(order)
         query = query.order_by('term_id asc')
@@ -179,9 +181,10 @@ class Report(db.Model):
 
         return answer
 
-    @cache.cached(timeout=120, key_prefix='report_summ')
+    #@cache.cached(timeout=120, key_prefix='report_summ')
     def select_summ(self, firm_id, **kwargs):
         tz = app.config['TZ']
+        detaled = kwargs['detaled'] if 'detaled' in kwargs else False
 
         date_pattern = '%H:%M %d.%m.%y'
         if 'period' in kwargs:
@@ -193,6 +196,8 @@ class Report(db.Model):
                 date_pattern = '%m.%Y'
             elif period == 'week':
                 date_pattern = '%W, %m.%Y'
+            elif detaled:
+                date_pattern = '%H:%M %d.%m.%y'
 
         answer = self.get_select_summ_query(firm_id, **kwargs)
 
@@ -210,7 +215,7 @@ class Report(db.Model):
             data = dict(
                 creation_date=creation_date,
                 amount=int(report[3] / 100),
-                count=report[4],
+                count=report[4] if 4 in report else 1,
                 term=term.name if term else 'Empty',
                 event=event.name if event else 'Empty',
             )
