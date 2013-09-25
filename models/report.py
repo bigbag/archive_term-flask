@@ -181,7 +181,7 @@ class Report(db.Model):
 
         return answer
 
-    #@cache.cached(timeout=120, key_prefix='report_summ')
+    @cache.cached(timeout=120, key_prefix='report_summ')
     def select_summ(self, firm_id, **kwargs):
         tz = app.config['TZ']
         detaled = kwargs['detaled'] if 'detaled' in kwargs else False
@@ -195,7 +195,7 @@ class Report(db.Model):
             elif period == 'month':
                 date_pattern = '%m.%Y'
             elif period == 'week':
-                date_pattern = '%W, %m.%Y'
+                date_pattern = '%x'
             elif detaled:
                 date_pattern = '%H:%M %d.%m.%y'
 
@@ -208,6 +208,10 @@ class Report(db.Model):
                 report[0],
                 tz)
             creation_date = creation_date.strftime(date_pattern)
+
+            if period == 'week':
+                creation_date = date_helper.get_week_interval(
+                    creation_date, '%d.%m.%y')
 
             term = Term.query.get(report[2])
             event = Event.query.get(report[1])

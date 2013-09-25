@@ -13,6 +13,7 @@ from flask import Flask, Blueprint, abort, request, make_response, url_for, rend
 from web import app, cache
 
 from decorators.header import *
+from helpers.error_xml_helper import *
 from helpers import date_helper, hash_helper
 
 from models.term import Term

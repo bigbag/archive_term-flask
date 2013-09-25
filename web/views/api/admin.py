@@ -12,6 +12,7 @@ from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_
 from web import app, cache
 
 from decorators.header import *
+from helpers.error_xml_helper import *
 
 from helpers import hash_helper
 

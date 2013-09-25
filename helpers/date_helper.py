@@ -6,8 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import pytz
-import datetime
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import timezone
 from web import app
 from flask import request, url_for
@@ -61,3 +60,19 @@ def get_timezone(tzname):
     if len(delta) < 8:
         delta = "0%s" % delta
     return "%s%s%s" % (tz.tzname(now, is_dst=False), sign, delta)
+
+
+def get_week_interval(day, format=False):
+
+    day = datetime.strptime(day, '%x')
+    day_of_week = day.weekday()
+    start_delta = timedelta(days=day_of_week)
+    start = day - start_delta
+    stop_delta = timedelta(days=6 - day_of_week)
+    stop = day + stop_delta
+
+    result = (start, stop)
+    if format:
+        result = '%s - %s' % (start.strftime(format), stop.strftime(format))
+
+    return result

@@ -8,6 +8,8 @@
 import re
 import os
 import json
+from datetime import datetime
+from time import strptime
 
 from flask import Flask, Blueprint, render_template, redirect, url_for
 from flask import session, request, g, abort, make_response, jsonify
@@ -148,14 +150,15 @@ def get_default():
     return redirect('/report/person')
 
 
-@mod.route('/report/person', methods=['GET'])
+@mod.route('/report/<action>', methods=['GET'])
 @login_required
-def report_person():
+def report_person(action):
     """Отчеты по сотрудникам"""
     firm_info = g.firm_info
 
+    template = 'term/report/%s.html' % action
     return render_template(
-        'term/report/person.html',
+        template,
         firm_name=firm_info['name'],
         user_email=g.user.email)
 
@@ -166,22 +169,11 @@ def report_person():
 def select_person_report():
     firm_info = g.firm_info
     arg = json.loads(request.stream.read())
+
     answer = Report().select_person(
         firm_info['id'], **arg)
 
     return jsonify(answer)
-
-
-@mod.route('/report/terminal', methods=['GET'])
-@login_required
-def report_term():
-    """Отчеты по терминалам"""
-    firm_info = g.firm_info
-
-    return render_template(
-        'term/report/term.html',
-        firm_name=firm_info['name'],
-        user_email=g.user.email)
 
 
 @mod.route('/report/terminal', methods=['POST'])
@@ -194,18 +186,6 @@ def select_term_report():
         firm_info['id'], **arg)
 
     return jsonify(answer)
-
-
-@mod.route('/report/summ', methods=['GET'])
-@login_required
-def report_summ():
-    """Отчеты по суммам"""
-    firm_info = g.firm_info
-
-    return render_template(
-        'term/report/summ.html',
-        firm_name=firm_info['name'],
-        user_email=g.user.email)
 
 
 @mod.route('/report/summ', methods=['POST'])
