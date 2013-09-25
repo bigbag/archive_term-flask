@@ -19,6 +19,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
   $scope.$watch('pagination.cur + search.period + search.detaled', function() {
     var search = $scope.search;
     search.page = $scope.pagination.cur;
+
     if (search.action_type == 'online'){
       $scope.getReport(search);
     }

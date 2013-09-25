@@ -17,39 +17,52 @@
             <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
                 <div class="m-content-page" ng-cloak class="ng-cloak">
                     <div class="content-row">
-                        <dl class="sub-nav period-select">
-                          <span ng-repeat="period in online_periods">
-                              <dd ng-class="{active: search.period==period.value}">
-                                <a 
-                                    class="f-spot-button small"
-                                    ng-click="search.period=period.value;search.page=1;pagination.cur=1">
-                                    {[{period.name}]}
-                                </a>
-                            </dd>
-                          </span>
-                        </dl>
-                    </div>
-                    <div class="content-row">
+                        <div class="large-9 columns">
+                            <dl class="sub-nav period-select">
+                              <span ng-repeat="period in online_periods">
+                                  <dd ng-class="{active: search.period==period.value}">
+                                    <a 
+                                        class="f-spot-button small"
+                                        ng-click="search.period=period.value;search.page=1;pagination.cur=1">
+                                        {[{period.name}]}
+                                    </a>
+                                </dd>
+                              </span>
+                            </dl>
+                        </div>
+                        <div class="large-3 columns ">
                         <a 
-                            class="f-spot-button small" 
+                            class="f-spot-button small right" 
+                            ng-class="{active: search.detaled}"
+                            ng-hide="search.period=='all'"
                             ng-click="setSearchDetaled()">
                             Подробно
                         </a>
+                        </div>
+                        
                     </div>
                     <table class="m-spot-table">
                         <thead>
                         <tr>
                             <th><span>Дата</span></th>
-                            <th ng-hide="!search.detaled">Событие</th>
-                            <th ng-hide="!search.detaled">Терминал</th>
+                            <th ng-show="search.detaled || (search.period=='all')">
+                                Событие
+                            </th>
+                            <th ng-show="search.detaled || (search.period=='all')">
+                                Терминал
+                            </th>
                             <th>Сумма</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr ng-repeat="report in reports" class="m-t-cont-row">
                             <td>{[{report.creation_date}]}</td>
-                            <td ng-hide="!search.detaled">{[{report.event}]}</td>
-                            <td ng-hide="!search.detaled">{[{report.term}]}</td>
+                            <td ng-show="search.detaled || (search.period=='all')">
+                                {[{report.event}]}
+                            </td>
+                            <td ng-show="search.detaled || (search.period=='all')">
+                                {[{report.term}]}
+                            </td>
                             <td>{[{report.amount}]}</td>
                         </tr>
                         <tr class="m-table-bottom">

@@ -320,11 +320,16 @@ form .error input,form input.error,form .error textarea,form textarea.error {
 .error::-moz-placeholder {color:#C60F13; !important;}
 .error:-ms-input-placeholder { color:#C60F13;!important; }
 input.error:-moz-placeholder { color:#C60F13;!important; }
-.f-spot-button:hover{
+
+.f-spot-button:hover,
+.f-spot-button.active{
 	background: rgb(0, 97, 255);
+	color: #fff;
 }
-.f-spot-button.bg-red:hover{
+.f-spot-button.bg-red:hover,
+.f-spot-button.bg-red.active{
 	background: rgb(255, 0, 80) !important;
+	color: #fff;
 }
 .f-spot-button.medium{
 	height: 40px;
