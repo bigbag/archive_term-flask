@@ -16,9 +16,10 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     }, 5000);
   };
 
-  $scope.$watch('pagination.cur + search.period + search.detaled', function() {
+  $scope.$watch('pagination.cur + search.period', function() {
     var search = $scope.search;
     search.page = $scope.pagination.cur;
+    search.limit = 7;
 
     if (search.action_type == 'online'){
       $scope.getReport(search);
@@ -29,18 +30,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     {name:'День', value:'day'},
     {name:'Неделя', value:'week'},
     {name:'Месяц', value:'month'},
-    {name:'До операции', value:'all'},
   ];
-
-  //Меняем флаг детального запроса
-  $scope.setSearchDetaled = function() {
-    if ($scope.search.detaled == 0){
-      $scope.search.detaled = 1;
-    }
-    else {
-      $scope.search.detaled = 0;
-    }
-  };
 
   //Запрос отчета
   $scope.getReport = function(search) {
@@ -56,7 +46,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
 
   $scope.pagination = {
     cur: 1,
-    total: 10,
+    total: 7,
     display: 15
   }
 }

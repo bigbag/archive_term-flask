@@ -7,7 +7,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask import json
-from web import app, db
+from web import app, db, cache
 from helpers import date_helper
 
 
@@ -54,6 +54,7 @@ class Term(db.Model):
             id=term_id,
             status=self.STATUS_VALID).first()
 
+    @cache.cached(timeout=600, key_prefix='term_by_id')
     def get_by_id(self, id):
         return self.query.get(id)
 

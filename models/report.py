@@ -7,8 +7,11 @@
 """
 import hashlib
 import time
+from datetime import datetime, timedelta
 from web import db, app, cache
 from sqlalchemy.sql import func
+
+from flask import g
 
 from helpers import date_helper
 
@@ -27,8 +30,6 @@ class Report(db.Model):
     TYPE_WHITE = 0
     TYPE_PAYMENT = 1
     TYPE_MPS = 2
-
-    DATE_PATTERN = "%Y-%m-%d %H:%M:%S"
 
     id = db.Column(db.Integer, primary_key=True)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
@@ -55,6 +56,7 @@ class Report(db.Model):
         return '<id %r>' % (self.id)
 
     def get_db_view(self, data):
+        date_pattern = '%Y-%m-%d %H:%M:%S'
         self.payment_id = str(data.text).rjust(20, '0')
 
         persons = Person.query.filter_by(
@@ -80,8 +82,8 @@ class Report(db.Model):
         date_time_utc = date_helper.convert_date_to_utc(
             date_time,
             self.term.tz,
-            self.DATE_PATTERN,
-            self.DATE_PATTERN)
+            date_pattern,
+            date_pattern)
         self.creation_date = date_time_utc
         self.check_summ = self.get_check_summ()
         return self
@@ -138,35 +140,24 @@ class Report(db.Model):
         order = kwargs['order'] if 'order' in kwargs else 'creation_date desc'
         limit = kwargs['limit'] if 'limit' in kwargs else 10
         page = kwargs['page'] if 'page' in kwargs else 1
-        detaled = kwargs['detaled'] if 'detaled' in kwargs else False
-        period = kwargs['period'] if 'period' in kwargs else 'all'
+        period = kwargs['period'] if 'period' in kwargs else 'day'
 
         firm_term = FirmTerm().get_list_by_firm_id(firm_id)
+        g.firm_term = firm_term
 
-        if not period == 'all':
-            query = db.session.query(
-                Report.creation_date,
-                Report.event_id,
-                Report.term_id,
-                func.sum(Report.amount),
-                func.count(Report.amount))
+        query = db.session.query(
+            Report.creation_date,
+            Report.event_id,
+            Report.term_id,
+            func.sum(Report.amount))
 
-            if detaled:
-                query = query.group_by('term_id')
+        query = query.group_by(
+            'YEAR(creation_date), MONTH(creation_date)')
 
-            query = query.group_by(
-                'YEAR(creation_date), MONTH(creation_date)')
-
-            if period == 'day':
-                query = query.group_by('DAY(creation_date)')
-            elif period == 'week':
-                query = query.group_by('WEEK(creation_date)')
-        else:
-            query = db.session.query(
-                Report.creation_date,
-                Report.event_id,
-                Report.term_id,
-                Report.amount)
+        if period == 'day':
+            query = query.group_by('DAY(creation_date)')
+        elif period == 'week':
+            query = query.group_by('WEEK(creation_date)')
 
         query = query.filter(
             Report.term_id.in_(
@@ -174,55 +165,81 @@ class Report(db.Model):
                     Report.type == self.TYPE_PAYMENT)
 
         query = query.order_by(order)
-        query = query.order_by('term_id asc')
 
         answer['reports_count'] = query.count()
         answer['reports'] = query.limit(limit).offset((page - 1) * limit).all()
 
         return answer
 
-    @cache.cached(timeout=120, key_prefix='report_summ')
+    def get_detaled_summ_query(self, period, search_date):
+        answer = {}
+
+        search_date = search_date.date()
+        #if period == 'day':
+        start_date = search_date
+        end_date = search_date + timedelta(days=1)
+
+        query = db.session.query(
+            Report.term_id,
+            func.sum(Report.amount))
+        query = query.filter(Report.type == self.TYPE_PAYMENT)
+        query = query.filter(Report.creation_date.between(start_date, end_date))
+
+        if g.firm_term:
+            query = query.filter(Report.term_id.in_(g.firm_term))
+
+        query = query.group_by('term_id')
+        query = query.order_by('amount')
+
+        answer['reports_count'] = query.count()
+        answer['reports'] = query.all()
+
+        return answer
+
+    #@cache.cached(timeout=120, key_prefix='report_summ')
     def select_summ(self, firm_id, **kwargs):
         tz = app.config['TZ']
-        detaled = kwargs['detaled'] if 'detaled' in kwargs else False
 
-        date_pattern = '%H:%M %d.%m.%y'
-        if 'period' in kwargs:
-            period = kwargs['period']
-
-            if period == 'day':
-                date_pattern = '%d.%m.%Y'
-            elif period == 'month':
-                date_pattern = '%m.%Y'
-            elif period == 'week':
-                date_pattern = '%x'
-            elif detaled:
-                date_pattern = '%H:%M %d.%m.%y'
+        period = kwargs['period'] if 'period' in kwargs else 'day'
+        if period == 'day':
+            date_pattern = '%d.%m.%Y'
+        elif period == 'month':
+            date_pattern = '%m.%Y'
+        elif period == 'week':
+            date_pattern = '%x'
 
         answer = self.get_select_summ_query(firm_id, **kwargs)
 
         result = []
         for report in answer['reports']:
 
-            creation_date = date_helper.from_utc(
+            search_date = date_helper.from_utc(
                 report[0],
                 tz)
-            creation_date = creation_date.strftime(date_pattern)
+
+            creation_date = search_date.strftime(date_pattern)
 
             if period == 'week':
                 creation_date = date_helper.get_week_interval(
                     creation_date, '%d.%m.%y')
 
-            term = Term.query.get(report[2])
-            event = Event.query.get(report[1])
-
             data = dict(
                 creation_date=creation_date,
                 amount=int(report[3] / 100),
-                count=report[4] if 4 in report else 1,
-                term=term.name if term else 'Empty',
-                event=event.name if event else 'Empty',
             )
+
+            detaled_answer = self.get_detaled_summ_query(period, search_date)
+            detaled_report = detaled_answer['reports']
+            data['detaled'] = []
+
+            for row in detaled_report:
+
+                term = Term().get_by_id(row[0])
+                detaled_data = dict (
+                    term=term.name if term else 'Empty',
+                    amount=int(row[1] / 100)
+                )
+                data['detaled'].append(detaled_data)
 
             result.append(data)
 
