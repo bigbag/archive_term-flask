@@ -62,17 +62,6 @@ def get_timezone(tzname):
         delta = "0%s" % delta
     return "%s%s%s" % (tz.tzname(now, is_dst=False), sign, delta)
 
-
-def get_week_interval(day, format=False):
-
-    print day
-    print type(day)
-    date_interval = get_date_interval(day, 'day')
-    # if format:
-    #     result = '%s - %s' % (date_interval[0].strftime(format), date_interval[1].strftime(format))
-
-    return date_interval
-
 def get_date_interval(search_date, period='day'):
 
     search_date = search_date.date()

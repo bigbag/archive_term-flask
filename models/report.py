@@ -195,7 +195,7 @@ class Report(db.Model):
 
         return answer
 
-    #@cache.cached(timeout=120, key_prefix='report_summ')
+    @cache.cached(timeout=120, key_prefix='report_summ')
     def select_summ(self, firm_id, **kwargs):
         tz = app.config['TZ']
 
