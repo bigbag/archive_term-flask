@@ -71,9 +71,13 @@ def get_firm_name(request):
         return result
 
 
+@mod.route('/', methods=['GET'])
 @mod.route('/login', methods=['GET'])
 def login_form():
     """Форма логина"""
+
+    if g.user.is_authenticated():
+        return redirect('/report/person')
 
     firm_info = get_firm_name(request)
     if not firm_info:
@@ -122,7 +126,7 @@ def login():
         answer['message'] = u'У вас нет доступа к данной фирме'
         return set_json_response(answer)
 
-    login_user(term_user, False)
+    login_user(term_user, True)
     answer['error'] = 'no'
     return set_json_response(answer)
 
@@ -143,7 +147,6 @@ def get_forgot():
         'term/forgot.html')
 
 
-@mod.route('/', methods=['GET'])
 @mod.route('/report', methods=['GET'])
 def get_default():
     """Перенаправление на вид по умолчанию"""
