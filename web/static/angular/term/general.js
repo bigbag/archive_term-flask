@@ -19,7 +19,6 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
   $scope.$watch('pagination.cur + search.period', function() {
     var search = $scope.search;
     search.page = $scope.pagination.cur;
-    search.limit = 7;
 
     if (search.action_type == 'online'){
       $scope.getReport(search);
