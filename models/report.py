@@ -174,10 +174,9 @@ class Report(db.Model):
     def get_detaled_summ_query(self, period, search_date):
         answer = {}
 
-        search_date = search_date.date()
-        #if period == 'day':
-        start_date = search_date
-        end_date = search_date + timedelta(days=1)
+        interval = date_helper.get_date_interval(search_date, period)
+        start_date = interval[0]
+        end_date = interval[1]
 
         query = db.session.query(
             Report.term_id,
@@ -217,11 +216,13 @@ class Report(db.Model):
                 report[0],
                 tz)
 
-            creation_date = search_date.strftime(date_pattern)
-
             if period == 'week':
-                creation_date = date_helper.get_week_interval(
-                    creation_date, '%d.%m.%y')
+                interval = date_helper.get_date_interval(search_date, period)
+                interval = (interval[0].strftime('%d.%m.%Y'), interval[1].strftime('%d.%m.%Y'))
+                creation_date = '%s - %s' % interval
+            else:
+                creation_date = search_date.strftime(date_pattern)
+
 
             data = dict(
                 creation_date=creation_date,

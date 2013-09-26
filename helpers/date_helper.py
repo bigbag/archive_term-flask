@@ -6,6 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import pytz
+import calendar
 from datetime import datetime, timedelta
 from pytz import timezone
 from web import app
@@ -64,15 +65,28 @@ def get_timezone(tzname):
 
 def get_week_interval(day, format=False):
 
-    day = datetime.strptime(day, '%x')
-    day_of_week = day.weekday()
-    start_delta = timedelta(days=day_of_week)
-    start = day - start_delta
-    stop_delta = timedelta(days=6 - day_of_week)
-    stop = day + stop_delta
+    print day
+    print type(day)
+    date_interval = get_date_interval(day, 'day')
+    # if format:
+    #     result = '%s - %s' % (date_interval[0].strftime(format), date_interval[1].strftime(format))
 
-    result = (start, stop)
-    if format:
-        result = '%s - %s' % (start.strftime(format), stop.strftime(format))
+    return date_interval
 
-    return result
+def get_date_interval(search_date, period='day'):
+
+    search_date = search_date.date()
+    if period == 'day':
+        start = search_date
+        stop = search_date + timedelta(days=1)
+    elif period == 'week':
+        day_of_week = search_date.weekday()
+        start_delta = timedelta(days=day_of_week)
+        start = search_date - start_delta
+        stop_delta = timedelta(days=6 - day_of_week)
+        stop = search_date + stop_delta
+    elif period == 'month':
+        start = datetime(search_date.year, search_date.month, 1)
+        stop = datetime(search_date.year, search_date.month, calendar.mdays[search_date.month])
+
+    return (start, stop)
