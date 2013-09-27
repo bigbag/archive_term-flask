@@ -147,8 +147,6 @@ class Report(db.Model):
 
         query = db.session.query(
             Report.creation_date,
-            Report.event_id,
-            Report.term_id,
             func.sum(Report.amount))
 
         query = query.group_by(
@@ -226,7 +224,7 @@ class Report(db.Model):
 
             data = dict(
                 creation_date=creation_date,
-                amount=int(report[3] / 100),
+                amount=int(report[1] / 100),
             )
 
             detaled_answer = self.get_detaled_summ_query(period, search_date)
