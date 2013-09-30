@@ -149,10 +149,18 @@ def api_upload_report(term_id, report_datetime):
 def api_set_callback(term_id, action):
     """Сообщение об удачной загрузки отчета"""
 
+    VALID_ACTITON = (
+        'config',
+        'blacklist'
+    )
+
+    if not action in VALID_ACTITON:
+        abort(400)
+
     term = Term().get_valid_term(term_id)
 
     if term is None:
-        abort(400)
+        abort(404)
 
     if action == 'config':
         term.config_date = date_helper.get_curent_date()
