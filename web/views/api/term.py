@@ -34,8 +34,8 @@ mod = Blueprint('api_term', __name__)
 @mod.route('/configs/config_<int:term_id>.xml', methods=['GET'])
 @xml_headers
 @md5_content_headers
-@cache.cached(timeout=120)
-def get_config(term_id):
+@cache.cached(timeout=120, key_prefix='term_config')
+def api_get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
     term = Term().get_valid_term(int(term_id))
 
@@ -63,10 +63,10 @@ def get_config(term_id):
 
 
 @mod.route('/configs/blacklist.xml', methods=['GET'])
-@cache.cached(timeout=120)
+@cache.cached(timeout=120, key_prefix='term_blacklist'))
 @xml_headers
 @md5_content_headers
-def get_blacklist():
+def api_get_blacklist():
     """Возвращает черный список карт"""
     wallets = PaymentWallet.query.group_by(PaymentWallet.payment_id).all()
 
@@ -107,7 +107,7 @@ def get_blacklist():
 
 
 @mod.route('/reports/report_<int:term_id>_<report_datetime>.xml', methods=['PUT'])
-def upload_report(term_id, report_datetime):
+def api_upload_report(term_id, report_datetime):
     """Прием и сохранение отчета"""
 
     if not len(report_datetime) == 13:
@@ -145,8 +145,8 @@ def upload_report(term_id, report_datetime):
     return set_message('success', hash_helper.get_content_md5(file), 201)
 
 
-@mod.route('/configs/callback/<int:term_id>_<type>', methods=['POST'])
-def set_callback(term_id, type):
+@mod.route('/configs/callback/<int:term_id>_<action>', methods=['POST'])
+def api_set_callback(term_id, action):
     """Сообщение об удачной загрузки отчета"""
 
     term = Term().get_valid_term(term_id)
@@ -154,9 +154,9 @@ def set_callback(term_id, type):
     if term is None:
         abort(400)
 
-    if type == 'config':
+    if action == 'config':
         term.config_date = date_helper.get_curent_date()
-    elif type == 'blacklist':
+    elif action == 'blacklist':
         term.blacklist_date = date_helper.get_curent_date()
 
     term.update()

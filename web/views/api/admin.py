@@ -45,7 +45,7 @@ def api_admin_access(request):
 
 @mod.route('/spot/generate', methods=['POST'])
 @xml_headers
-def spot_generate():
+def api_admin_spot_generate():
     """Генерация спотов"""
     api_admin_access(request)
 
@@ -83,7 +83,7 @@ def spot_generate():
 
 @mod.route('/spot/linking', methods=['POST'])
 @xml_headers
-def linking_spot():
+def api_admin_linking_spot():
     """Добавляем спот и связанный с ним кошелёк"""
     api_admin_access(request)
     add_success = 0
@@ -140,7 +140,7 @@ def linking_spot():
 
 @mod.route('/spot/<int:hard_id>', methods=['GET'])
 @xml_headers
-def get_info(hard_id):
+def api_admin_get_info(hard_id):
     """Возвращает информацию о споте по его HID"""
     api_admin_access(request)
 
@@ -171,7 +171,7 @@ def get_info(hard_id):
 
 @mod.route('/spot/free', methods=['GET'])
 @xml_headers
-def get_free():
+def api_admin_get_free():
     """Возвращает информацию неактивированых спотах"""
 
     spot = Spot.query.filter_by(
@@ -189,7 +189,7 @@ def get_free():
 
 @mod.route('/spot/delete', methods=['POST'])
 @xml_headers
-def spot_delete():
+def api_admin_spot_delete():
     """Удаление спотов"""
     api_admin_access(request)
 

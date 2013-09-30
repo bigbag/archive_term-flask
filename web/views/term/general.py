@@ -73,7 +73,7 @@ def get_firm_name(request):
 
 @mod.route('/', methods=['GET'])
 @mod.route('/login', methods=['GET'])
-def login_form():
+def term_login_form():
     """Форма логина"""
 
     if g.user.is_authenticated():
@@ -89,7 +89,7 @@ def login_form():
 
 
 @mod.route('/login', methods=['POST'])
-def login():
+def term_login():
     """Логин"""
     answer = dict(error='yes', message='')
     user = request.get_json()
@@ -133,7 +133,7 @@ def login():
 
 @mod.route('/logout')
 @login_required
-def logout():
+def term_logout():
     """Выход из системы"""
     logout_user()
     del session['firm_info']
@@ -141,21 +141,21 @@ def logout():
 
 
 @mod.route('/forgot', methods=['GET'])
-def get_forgot():
+def term_forgot():
     """Страница востановления пароля"""
     return render_template(
         'term/forgot.html')
 
 
 @mod.route('/report', methods=['GET'])
-def get_default():
+def term_default():
     """Перенаправление на вид по умолчанию"""
     return redirect('/report/person')
 
 
 @mod.route('/report/<action>', methods=['GET'])
 @login_required
-def report_person(action):
+def term_report_action(action):
     """Отчеты по сотрудникам"""
     firm_info = g.firm_info
 
@@ -169,7 +169,7 @@ def report_person(action):
 @mod.route('/report/person', methods=['POST'])
 @login_required
 @json_headers
-def select_person_report():
+def term_get_person_report():
     firm_info = g.firm_info
     arg = json.loads(request.stream.read())
 
@@ -182,7 +182,7 @@ def select_person_report():
 @mod.route('/report/terminal', methods=['POST'])
 @login_required
 @json_headers
-def select_term_report():
+def term_get_term_report():
     firm_info = g.firm_info
     arg = json.loads(request.stream.read())
     answer = Report().select_person(
@@ -194,7 +194,7 @@ def select_term_report():
 @mod.route('/report/summ', methods=['POST'])
 @login_required
 @json_headers
-def select_summ_report():
+def term_get_summ_report():
     firm_info = g.firm_info
     arg = json.loads(request.stream.read())
     answer = Report().select_summ(
