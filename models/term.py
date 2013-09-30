@@ -31,9 +31,11 @@ class Term(db.Model):
     report_date = db.Column(db.DateTime)
     config_date = db.Column(db.DateTime)
     blacklist_date = db.Column(db.DateTime)
-    upload = db.Column(db.String(256))
+    upload_start = db.Column(db.String(256))
+    upload_stop = db.Column(db.String(256))
     upload_period = db.Column(db.Integer, nullable=False)
-    download = db.Column(db.String(256))
+    download_start = db.Column(db.String(256))
+    download_stop = db.Column(db.String(256))
     download_period = db.Column(db.Integer, nullable=False)
     version = db.Column(db.String(128))
 
@@ -59,8 +61,6 @@ class Term(db.Model):
         return self.query.get(id)
 
     def get_xml_view(self):
-        self.download = json.loads(self.download)
-        self.upload = json.loads(self.upload)
         self.tz = date_helper.get_timezone(self.tz)
 
         if self.type == self.TYPE_VENDING:
