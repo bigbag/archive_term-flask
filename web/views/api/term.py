@@ -8,7 +8,7 @@
 import re
 import os
 
-from flask import Flask, Blueprint, abort, request, make_response, url_for, render_template
+from flask import Blueprint, abort, request, make_response, url_for, render_template
 
 from web import app, cache
 
@@ -30,7 +30,6 @@ from web.configs.term import TermConfig
 
 mod = Blueprint('api_term', __name__)
 
-
 @mod.route('/configs/config_<int:term_id>.xml', methods=['GET'])
 @cache.cached(timeout=120, key_prefix='term_config')
 @xml_headers
@@ -45,7 +44,6 @@ def api_get_config(term_id):
     term = term.get_xml_view()
 
     term_events = TermEvent().get_by_term_id(term.id)
-
     if term_events is None:
         abort(400)
 
@@ -153,9 +151,8 @@ def api_set_callback(term_id, action):
         'config',
         'blacklist'
     )
-
     if not action in VALID_ACTITON:
-        abort(400)
+        abort(404)
 
     term = Term().get_valid_term(term_id)
 

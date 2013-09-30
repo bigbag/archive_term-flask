@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Веб интерфейс терминального проекта, фасад
+    Веб интерфейс терминального проекта, отчеты фасад
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
@@ -11,7 +11,7 @@ import json
 from datetime import datetime
 from time import strptime
 
-from flask import Flask, Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for
 from flask import session, request, g, abort, make_response, jsonify
 from flask.ext.login import login_user, logout_user, current_user, login_required, make_secure_token
 from web import app, cache, lm
@@ -26,7 +26,6 @@ from models.report import Report
 from models.firm import Firm
 
 mod = Blueprint('term', __name__)
-
 
 @lm.user_loader
 def load_user(id):
@@ -69,6 +68,29 @@ def get_firm_name(request):
                 result = dict(name=firm.name, id=firm.id)
                 session['firm_info'] = result
         return result
+
+def term_get_error(message, code):
+    firm_info = get_firm_name(request)
+    return render_template(
+        'term/error.html',
+        message=message,
+        code=code,
+        firm_name=firm_info['name']), code
+
+
+@mod.errorhandler(400)
+def term_bag_request(error):
+    return term_get_error('Bad request', 400)
+
+
+@mod.errorhandler(404)
+def term_not_found(error):
+    return term_get_error('Not found', 404)
+
+
+@mod.errorhandler(405)
+def term_method_not_allowed(error):
+    return term_get_error('Method Not Allowed', 405)
 
 
 @mod.route('/', methods=['GET'])
@@ -146,58 +168,4 @@ def term_forgot():
     return render_template(
         'term/forgot.html')
 
-
-@mod.route('/report', methods=['GET'])
-def term_default():
-    """Перенаправление на вид по умолчанию"""
-    return redirect('/report/person')
-
-
-@mod.route('/report/<action>', methods=['GET'])
-@login_required
-def term_report_action(action):
-    """Отчеты по сотрудникам"""
-    firm_info = g.firm_info
-
-    template = 'term/report/%s.html' % action
-    return render_template(
-        template,
-        firm_name=firm_info['name'],
-        user_email=g.user.email)
-
-
-@mod.route('/report/person', methods=['POST'])
-@login_required
-@json_headers
-def term_get_person_report():
-    firm_info = g.firm_info
-    arg = json.loads(request.stream.read())
-
-    answer = Report().select_person(
-        firm_info['id'], **arg)
-
-    return jsonify(answer)
-
-
-@mod.route('/report/terminal', methods=['POST'])
-@login_required
-@json_headers
-def term_get_term_report():
-    firm_info = g.firm_info
-    arg = json.loads(request.stream.read())
-    answer = Report().select_person(
-        firm_info['id'], **arg)
-
-    return jsonify(answer)
-
-
-@mod.route('/report/summ', methods=['POST'])
-@login_required
-@json_headers
-def term_get_summ_report():
-    firm_info = g.firm_info
-    arg = json.loads(request.stream.read())
-    answer = Report().select_summ(
-        firm_info['id'], **arg)
-
-    return jsonify(answer)
+from web.views.term import report
