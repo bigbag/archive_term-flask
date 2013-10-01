@@ -134,23 +134,23 @@ class Report(db.Model):
 
         return value
 
-    def get_select_summ_query(self, firm_id, **kwargs):
+    def interval_query(self, firm_id, **kwargs):
         answer = {}
 
         order = kwargs['order'] if 'order' in kwargs else 'creation_date desc'
         limit = kwargs['limit'] if 'limit' in kwargs else 10
         page = kwargs['page'] if 'page' in kwargs else 1
         period = kwargs['period'] if 'period' in kwargs else 'day'
+        payment_type = kwargs[
+            'payment_type'] if 'payment_type' in kwargs else self.TYPE_WHITE
 
         firm_term = FirmTerm().get_list_by_firm_id(firm_id)
         g.firm_term = firm_term
 
         query = db.session.query(
             Report.creation_date,
-            func.sum(Report.amount))
-
-        query = query.group_by(
-            '')
+            func.sum(Report.amount),
+            func.count(Report.id))
 
         if period == 'day':
             query = query.group_by(
@@ -163,7 +163,7 @@ class Report(db.Model):
         query = query.filter(
             Report.term_id.in_(
                 firm_term)).filter(
-                    Report.type == self.TYPE_PAYMENT)
+                    Report.type == payment_type)
 
         query = query.order_by(order)
 
@@ -172,7 +172,7 @@ class Report(db.Model):
 
         return answer
 
-    def get_detaled_summ_query(self, period, search_date):
+    def interval_detaled_query(self, period, search_date, payment_type):
         answer = {}
 
         interval = date_helper.get_date_interval(search_date, period)
@@ -181,8 +181,9 @@ class Report(db.Model):
 
         query = db.session.query(
             Report.term_id,
-            func.sum(Report.amount))
-        query = query.filter(Report.type == self.TYPE_PAYMENT)
+            func.sum(Report.amount),
+            func.count(Report.id))
+        query = query.filter(Report.type == payment_type)
         query = query.filter(
             Report.creation_date.between(start_date, end_date))
 
@@ -197,9 +198,11 @@ class Report(db.Model):
 
         return answer
 
-    #@cache.cached(timeout=120, key_prefix='report_summ')
-    def select_summ(self, firm_id, **kwargs):
+    @cache.cached(timeout=120, key_prefix='report_interval')
+    def get_interval_report(self, firm_id, **kwargs):
         tz = app.config['TZ']
+        payment_type = kwargs[
+            'payment_type'] if 'payment_type' in kwargs else self.TYPE_WHITE
 
         period = kwargs['period'] if 'period' in kwargs else 'day'
         if period == 'day':
@@ -209,7 +212,8 @@ class Report(db.Model):
         elif period == 'week':
             date_pattern = '%x'
 
-        answer = self.get_select_summ_query(firm_id, **kwargs)
+        answer = self.interval_query(
+            firm_id, **kwargs)
 
         result = []
         for report in answer['reports']:
@@ -230,9 +234,11 @@ class Report(db.Model):
             data = dict(
                 creation_date=creation_date,
                 amount=int(report[1] / 100),
+                count=int(report[2])
             )
 
-            detaled_answer = self.get_detaled_summ_query(period, search_date)
+            detaled_answer = self.interval_detaled_query(
+                period, search_date, payment_type)
             detaled_report = detaled_answer['reports']
             data['detaled'] = []
 
@@ -241,7 +247,8 @@ class Report(db.Model):
                 term = Term().get_by_id(row[0])
                 detaled_data = dict(
                     term=term.name if term else 'Empty',
-                    amount=int(row[1] / 100)
+                    amount=int(row[1] / 100),
+                    count=int(row[2])
                 )
                 data['detaled'].append(detaled_data)
 

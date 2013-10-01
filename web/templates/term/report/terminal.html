@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<h2 class="g-color-blue m-page-name">Обороты по терминалам</h2>
+<h2 class="g-color-blue m-page-name">По терминалам</h2>
 <span ng-init="search.action_type='online';search.period='day';search.limit=7"></span>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
     <section class="section active">
@@ -15,7 +15,10 @@
         </p>
         <div class="content" data-slug="online">
             <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
-                <div class="m-content-page" ng-cloak class="ng-cloak">
+                <div class="m-content-page">
+                    <div class="content-row" ng-cloak class="ng-cloak">
+                        <p class="m-hint">Здесь вы можете посмотреть детальный отчет по вашим терминалам.</p>
+                    </div>
                     <div class="content-row">
                         <div class="large-9 columns">
                             <dl class="sub-nav period-select">
@@ -38,8 +41,8 @@
                             <th>
                                 <table  class="m-spot-table">
                                 <tr>
-                                    <th  width="300">Терминал</th>
-                                    <th>Сумма</th>
+                                    <th width="300">Терминал</th>
+                                    <th>Количество</th>
                                 </tr>
                                 </table>
                             </th>
@@ -51,12 +54,12 @@
                             <td>
                             <table  class="m-spot-table">
                                 <tr ng-repeat="row in report.detaled">
-                                    <td  width="300">{[{row.term}]}</td>
-                                    <td>{[{row.amount}]}</td>
+                                    <td width="300">{[{row.term}]}</td>
+                                    <td>{[{row.count}]}</td>
                                 </tr>
                                 <tr>
                                     <td><strong>Всего</strong></td>
-                                    <td><strong>{[{report.amount}]}</strong></td>
+                                    <td><strong>{[{report.count}]}</strong></td>
                                 </tr>
                             </table>
                             </td>
@@ -73,8 +76,8 @@
                         <tr class="m-t-cont-row" ng-hide="page_count">
                     
                             <td colspan="6" class="m-t-nothing">
-                                В Вашей компании нет сотрудников, пользующихся бесконтактными картами Mobispot.
-                                Добавьте сотрудников в вашу компанию, и получайте подробный отчет об их действиях в вашей сети терминалов.
+                                В Вашей компании нет терминалов, обслуживающих бесконтактные карты Mobispot.
+                                Добавьте терминал, и получайте подробный отчет об операциях на них.
                             </td>
                         </tr>
                         </tbody>
@@ -142,4 +145,72 @@
         </div>
     </div>
 </section>
+    <section class="section">
+        <p class="title">
+            <a ng-click="search.action_type='regular'">Периодический</a>
+        </p>
+        <div class="content" data-slug="regular">
+            <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
+                <div class="m-content-page">
+                    <div class="content-row">
+                        <p class="m-hint">Укажите получателей для периодических отчетов по Вашим сотрудникам и терминалам, а также точное время, когда ежедневный отчет будет формироваться и отправляться на указанные Вами адреса. </p>
+                    </div>
+                    <form class="custom">
+                        <div class="content-row  m-row-h">
+                            <h4 class="g-color-blue">Настройки ежедневного отчета</h4>
+                        </div>
+                        <div class="content-row  g-clearfix">
+                            <label for="add-email">Выгрузка в excel*</label>
+                            <div class="small-6 switch small">
+                                <input id="b" type="radio" checked="" name="switch-b">
+                                <label onclick="" for="b">Off</label>
+                                <input id="b1" type="radio" name="switch-b">
+                                <label onclick="" for="b1">On</label>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div class="content-row  g-clearfix">
+                            <label for="add-email">E-mail*</label>
+                            <input id="add-email" type="text" placeholder="e-mail" class="left"><a href="#" class="f-spot-button">Добавить E-mail</a>
+                            <div class="f-select-email">
+                                <span class="f-email-case g-radius-main">nanovolgin@gmail.com<i class="g-round"></i></span> <span class="f-email-case g-radius-main">nanovolgin@gmail.com<i class="g-round"></i></span>
+                            </div>
+                        </div>
+                        <div class="content-row  g-clearfix">
+                            <label for="reports-time">Время формирования ежедневного отчета (чч:мм)</label>
+                            <input type="time" class="f-input-small" placeholder="00:00" id="reports-time">
+                        </div>
+
+                    </form>
+                    <form class="custom">
+                        <div class="content-row  m-row-h">
+                            <h4 class="g-color-blue">Настройки ежемесячного отчета</h4>
+                        </div>
+                        <div class="content-row  g-clearfix">
+                            <label for="add-email">Выгрузка в excel*</label>
+                            <div class="small-6 switch small">
+                                <input id="b" type="radio" checked="" name="switch-b">
+                                <label onclick="" for="b">Off</label>
+                                <input id="b1" type="radio" name="switch-b">
+                                <label onclick="" for="b1">On</label>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div class="content-row  g-clearfix">
+                            <label for="add-email">E-mail*</label>
+                            <input id="add-email" type="text" placeholder="e-mail" class="left"><a href="#" class="f-spot-button">Добавить E-mail</a>
+                            <div class="f-select-email">
+                                <span class="f-email-case g-radius-main">nanovolgin@gmail.com<i class="g-round"></i></span> <span class="f-email-case g-radius-main">nanovolgin@gmail.com<i class="g-round"></i></span>
+                            </div>
+                        </div>
+                        <div class="content-row g-clearfix">
+                            <a class="f-spot-button" href="#">Сохранить</a>
+                        </div>
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

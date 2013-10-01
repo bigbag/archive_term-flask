@@ -20,8 +20,6 @@ def term_default():
 def term_report_action(action):
     """Отчеты по сотрудникам, терминалам, оборотам"""
 
-    print action
-
     VALID_ACTITON = (
         'person',
         'terminal',
@@ -55,10 +53,11 @@ def term_get_person_report():
 @mod.route('/report/terminal', methods=['POST'])
 @login_required
 @json_headers
-def term_get_term_report():
+def term_get_terminal_report():
     firm_info = g.firm_info
     arg = json.loads(request.stream.read())
-    answer = Report().select_person(
+    arg['payment_type'] = Report.TYPE_WHITE
+    answer = Report().get_interval_report(
         firm_info['id'], **arg)
 
     return jsonify(answer)
@@ -70,7 +69,8 @@ def term_get_term_report():
 def term_get_summ_report():
     firm_info = g.firm_info
     arg = json.loads(request.stream.read())
-    answer = Report().select_summ(
+    arg['payment_type'] = Report.TYPE_PAYMENT
+    answer = Report().get_interval_report(
         firm_info['id'], **arg)
 
     return jsonify(answer)

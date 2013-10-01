@@ -16,6 +16,34 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     }, 5000);
   };
 
+  // $scope.menu = [
+  //   {
+  //     name:'Главное',
+  //     id:'general',
+  //     items: [
+  //       {id:'person', name:'Сотрудники', url:'/#'},
+  //       {id:'terminal', name:'Терминалы', url:'/#'},
+  //       {id:'card', name:'Карты', url:'/#'},
+  //     ]
+  //   },
+  //   {
+  //     name:'Отчеты',
+  //     id:'report',
+  //     items: [
+  //       {id:'person', name:'По людям', url:'/report/person'},
+  //       {id:'terminal',name:'По терминалам', url:'/report/terminal'},
+  //       {id:'summ',name:'Платежный оборот', url:'/report/summ'},
+  //     ]
+  //   },
+  //   {
+  //     name:'Настройка',
+  //     id:'setting',
+  //     items: [
+  //       {id:'firm', name:'Компания', url:'/#'},
+  //     ]
+  //   }
+  // ];
+
   $scope.$watch('pagination.cur + search.period', function() {
     var search = $scope.search;
     search.page = $scope.pagination.cur;
@@ -25,7 +53,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     }
   });
 
-  $scope.online_periods = [
+  $scope.report_detaled_periods = [
     {name:'День', value:'day'},
     {name:'Неделя', value:'week'},
     {name:'Месяц', value:'month'},
