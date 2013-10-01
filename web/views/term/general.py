@@ -70,7 +70,7 @@ def get_firm_name(request):
         return result
 
 def term_get_error(message, code):
-    firm_info = get_firm_name(request)
+    firm_info = g.firm_info
     return render_template(
         'term/error.html',
         message=message,
@@ -101,7 +101,7 @@ def term_login_form():
     if g.user.is_authenticated():
         return redirect('/report/person')
 
-    firm_info = get_firm_name(request)
+    firm_info = g.firm_info
     if not firm_info:
         abort(403)
 
@@ -119,7 +119,7 @@ def term_login():
     if not 'email' in user or not 'password' in user:
         abort(400)
 
-    firm_info = get_firm_name(request)
+    firm_info = g.firm_info
     if not firm_info:
         abort(403)
 

@@ -18,12 +18,14 @@ def term_default():
 @mod.route('/report/<action>', methods=['GET'])
 @login_required
 def term_report_action(action):
-    """Отчеты по сотрудникам"""
+    """Отчеты по сотрудникам, терминалам, оборотам"""
+
+    print action
 
     VALID_ACTITON = (
-        'term',
+        'person',
+        'terminal',
         'summ',
-        'person'
     )
     if not action in VALID_ACTITON:
         abort(404)
