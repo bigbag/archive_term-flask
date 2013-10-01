@@ -150,12 +150,15 @@ class Report(db.Model):
             func.sum(Report.amount))
 
         query = query.group_by(
-            'YEAR(creation_date), MONTH(creation_date)')
+            '')
 
         if period == 'day':
-            query = query.group_by('DAY(creation_date)')
+            query = query.group_by(
+                'YEAR(creation_date), MONTH(creation_date), DAY(creation_date)')
         elif period == 'week':
-            query = query.group_by('WEEK(creation_date)')
+            query = query.group_by('YEAR(creation_date), WEEK(creation_date)')
+        elif period == 'month':
+            query = query.group_by('YEAR(creation_date), MONTH(creation_date)')
 
         query = query.filter(
             Report.term_id.in_(
@@ -180,7 +183,8 @@ class Report(db.Model):
             Report.term_id,
             func.sum(Report.amount))
         query = query.filter(Report.type == self.TYPE_PAYMENT)
-        query = query.filter(Report.creation_date.between(start_date, end_date))
+        query = query.filter(
+            Report.creation_date.between(start_date, end_date))
 
         if g.firm_term:
             query = query.filter(Report.term_id.in_(g.firm_term))
@@ -193,7 +197,7 @@ class Report(db.Model):
 
         return answer
 
-    @cache.cached(timeout=120, key_prefix='report_summ')
+    #@cache.cached(timeout=120, key_prefix='report_summ')
     def select_summ(self, firm_id, **kwargs):
         tz = app.config['TZ']
 
@@ -216,11 +220,12 @@ class Report(db.Model):
 
             if period == 'week':
                 interval = date_helper.get_date_interval(search_date, period)
-                interval = (interval[0].strftime('%d.%m.%Y'), interval[1].strftime('%d.%m.%Y'))
+                interval = (
+                    interval[0].strftime('%d.%m.%Y'),
+                    interval[1].strftime('%d.%m.%Y'))
                 creation_date = '%s - %s' % interval
             else:
                 creation_date = search_date.strftime(date_pattern)
-
 
             data = dict(
                 creation_date=creation_date,
@@ -234,7 +239,7 @@ class Report(db.Model):
             for row in detaled_report:
 
                 term = Term().get_by_id(row[0])
-                detaled_data = dict (
+                detaled_data = dict(
                     term=term.name if term else 'Empty',
                     amount=int(row[1] / 100)
                 )
