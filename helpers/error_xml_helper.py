@@ -7,7 +7,7 @@
 """
 
 from web import app
-from flask import make_response, render_template_string, current_app
+from flask import make_response, render_template_string
 from decorators.header import *
 
 message_template = """<?xml version="1.0" encoding="windows-1251"?>
@@ -24,19 +24,19 @@ def set_message(message_type, message, code):
     return make_response(message_xml, code)
 
 
-@current_app.errorhandler(400)
+@app.errorhandler(400)
 @xml_headers
 def bag_request(error):
     return set_message('error', 'Bad request', 400)
 
 
-@current_app.errorhandler(404)
+@app.errorhandler(404)
 @xml_headers
 def not_found(error):
     return set_message('error', 'Not found', 404)
 
 
-@current_app.errorhandler(405)
+@app.errorhandler(405)
 @xml_headers
 def method_not_allowed(error):
     return set_message('error', 'Method Not Allowed', 405)

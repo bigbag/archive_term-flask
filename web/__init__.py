@@ -3,9 +3,6 @@ from flask import Flask
 app = Flask(__name__)
 app.config.from_object('configs.general.Config')
 
-ctx = app.app_context()
-ctx.push()
-
 from libs.redis_cache import SimpleRedisCache
 cache = SimpleRedisCache(app)
 
