@@ -39,14 +39,14 @@ class Term(db.Model):
     download_period = db.Column(db.Integer, nullable=False)
     version = db.Column(db.String(128))
 
-    def __init__(self):
-        self.type = self.TYPE_POS
-        self.upload = {"start": "00:00:00", "stop": "23:59:59"}
-        self.upload_period = 0
-        self.download = {"start": "00:00:00", "stop": "23:59:59"}
-        self.tz = app.config['TZ']
-        self.blacklist = 0
-        self.status = self.STATUS_VALID
+    # def __init__(self):
+    #     self.type = self.TYPE_VENDING
+    #     self.upload = {"start": "00:00:00", "stop": "23:59:59"}
+    #     self.upload_period = 0
+    #     self.download = {"start": "00:00:00", "stop": "23:59:59"}
+    #     self.tz = app.config['TZ']
+    #     self.blacklist = 0
+    #     self.status = self.STATUS_VALID
 
     def __repr__(self):
         return '<id %r>' % (self.id)
