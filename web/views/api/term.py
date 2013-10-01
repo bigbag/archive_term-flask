@@ -138,7 +138,7 @@ def api_upload_report(term_id, report_datetime):
         abort(400)
 
     term.report_date = date_helper.get_curent_date()
-    term.update()
+    term.save()
 
     return set_message('success', hash_helper.get_content_md5(file), 201)
 
@@ -164,6 +164,6 @@ def api_set_callback(term_id, action):
     elif action == 'blacklist':
         term.blacklist_date = date_helper.get_curent_date()
 
-    term.update()
+    term.save()
 
     return set_message('success', 'Success', 201)
