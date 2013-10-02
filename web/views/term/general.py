@@ -44,7 +44,7 @@ def before_request():
 
 @lm.unauthorized_handler
 def unauthorized():
-    return login_form()
+    return term_login_form()
 
 
 def set_json_response(data, code=200):
