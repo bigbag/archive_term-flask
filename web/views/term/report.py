@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Веб интерфейс терминального проекта, фасад
+    Веб интерфейс терминального проекта, отчеты фасад
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
@@ -9,15 +9,9 @@
 from web.views.term.general import *
 
 
-@mod.route('/report', methods=['GET'])
-def term_default():
-    """Перенаправление на вид по умолчанию"""
-    return redirect('/report/person')
-
-
 @mod.route('/report/<action>', methods=['GET'])
 @login_required
-def term_report_action(action):
+def report_report_action(action):
     """Отчеты по сотрудникам, терминалам, оборотам"""
 
     VALID_ACTITON = (
@@ -40,7 +34,7 @@ def term_report_action(action):
 @mod.route('/report/person', methods=['POST'])
 @login_required
 @json_headers
-def term_get_person_report():
+def report_get_person_report():
     firm_info = g.firm_info
     arg = json.loads(request.stream.read())
 
@@ -53,7 +47,7 @@ def term_get_person_report():
 @mod.route('/report/terminal', methods=['POST'])
 @login_required
 @json_headers
-def term_get_terminal_report():
+def report_get_terminal_report():
     firm_info = g.firm_info
     arg = json.loads(request.stream.read())
     arg['payment_type'] = Report.TYPE_WHITE
@@ -66,7 +60,7 @@ def term_get_terminal_report():
 @mod.route('/report/summ', methods=['POST'])
 @login_required
 @json_headers
-def term_get_summ_report():
+def report_get_summ_report():
     firm_info = g.firm_info
     arg = json.loads(request.stream.read())
     arg['payment_type'] = Report.TYPE_PAYMENT

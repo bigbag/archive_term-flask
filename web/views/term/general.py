@@ -27,6 +27,7 @@ from models.firm import Firm
 
 mod = Blueprint('term', __name__)
 
+
 @lm.user_loader
 def load_user(id):
     key = 'term_user_%s' % str(id)
@@ -44,7 +45,7 @@ def before_request():
 
 @lm.unauthorized_handler
 def unauthorized():
-    return term_login_form()
+    return login_form()
 
 
 def set_json_response(data, code=200):
@@ -69,7 +70,8 @@ def get_firm_name(request):
                 session['firm_info'] = result
         return result
 
-def term_get_error(message, code):
+
+def get_error(message, code):
     firm_info = g.firm_info
     return render_template(
         'term/error.html',
@@ -79,23 +81,23 @@ def term_get_error(message, code):
 
 
 @mod.errorhandler(400)
-def term_bag_request(error):
-    return term_get_error('Bad request', 400)
+def bag_request(error):
+    return get_error('Bad request', 400)
 
 
 @mod.errorhandler(404)
-def term_not_found(error):
-    return term_get_error('Not found', 404)
+def not_found(error):
+    return get_error('Not found', 404)
 
 
 @mod.errorhandler(405)
-def term_method_not_allowed(error):
-    return term_get_error('Method Not Allowed', 405)
+def method_not_allowed(error):
+    return get_error('Method Not Allowed', 405)
 
 
 @mod.route('/', methods=['GET'])
 @mod.route('/login', methods=['GET'])
-def term_login_form():
+def login_form():
     """Форма логина"""
 
     if g.user.is_authenticated():
@@ -111,7 +113,7 @@ def term_login_form():
 
 
 @mod.route('/login', methods=['POST'])
-def term_login():
+def login():
     """Логин"""
     answer = dict(error='yes', message='')
     user = request.get_json()
@@ -155,7 +157,7 @@ def term_login():
 
 @mod.route('/logout')
 @login_required
-def term_logout():
+def logout():
     """Выход из системы"""
     logout_user()
     del session['firm_info']
@@ -163,9 +165,16 @@ def term_logout():
 
 
 @mod.route('/forgot', methods=['GET'])
-def term_forgot():
+def forgot():
     """Страница востановления пароля"""
     return render_template(
         'term/forgot.html')
 
-from web.views.term import report
+
+@mod.route('/report', methods=['GET'])
+def default():
+    """Перенаправление на вид по умолчанию"""
+    return redirect('/report/person')
+
+
+from web.views.term import report, terminal
