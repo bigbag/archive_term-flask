@@ -9,6 +9,7 @@
 from web.views.term.general import *
 from models.term import Term
 from models.firm_term import FirmTerm
+from models.term_event import TermEvent
 
 
 @mod.route('/terminal', methods=['GET'])
@@ -23,12 +24,21 @@ def terminal_view():
 @login_required
 def terminal_info(term_id):
     """Информация о терминале"""
-    firm_info = g.firm_info
-
-    if not term_id in FirmTerm().get_list_by_firm_id(firm_info['id']):
+    if not term_id in FirmTerm().get_list_by_firm_id(g.firm_info['id']):
         abort(403)
 
-    return render_template('term/terminal/info.html')
+    term = Term().get_info_by_id(term_id)
+
+    if not term:
+        abort(404)
+
+    term_events = TermEvent.query.filter(TermEvent.term_id == term_id)
+
+    return render_template(
+        'term/terminal/info.html',
+        term=term,
+        term_events=term_events
+    )
 
 
 @mod.route('/terminal', methods=['POST'])
