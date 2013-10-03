@@ -71,17 +71,20 @@ def get_firm_name(request):
 
 
 def get_error(message, code):
-    firm_info = g.firm_info
     return render_template(
         'term/error.html',
         message=message,
-        code=code,
-        firm_name=firm_info['name']), code
+        code=code), code
 
 
 @mod.errorhandler(400)
 def bag_request(error):
     return get_error('Bad request', 400)
+
+
+@mod.errorhandler(403)
+def forbidden(error):
+    return get_error('Forbidden', 403)
 
 
 @mod.errorhandler(404)
@@ -106,9 +109,7 @@ def login_form():
     if not firm_info:
         abort(403)
 
-    return render_template(
-        'term/login.html',
-        firm_name=firm_info['name'])
+    return render_template('term/login.html')
 
 
 @mod.route('/login', methods=['POST'])

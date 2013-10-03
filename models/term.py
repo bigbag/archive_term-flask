@@ -62,6 +62,23 @@ class Term(db.Model):
     def get_by_id(self, id):
         return self.query.get(id)
 
+    def get_info_by_id(self, id):
+        date_pattern = '%H:%M %d.%m.%y'
+        term = Term().get_valid_term(id)
+
+        term.report_date = date_helper.from_utc(
+            term.report_date,
+            term.tz).strftime(date_pattern)
+
+        term.config_date = date_helper.from_utc(
+            term.config_date,
+            term.tz).strftime(date_pattern)
+
+        term.blacklist_date = date_helper.from_utc(
+            term.blacklist_date,
+            term.tz).strftime(date_pattern)
+        return term
+
     def get_xml_view(self):
         self.tz = date_helper.get_timezone(self.tz)
 

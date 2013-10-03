@@ -1,10 +1,6 @@
 {% import 'term/block.html' as block %}
 {% extends "term/page.html" %}
 
-{% block header %}
-    {{ block.header(firm_name, user_email) }}
-{% endblock %}
-
 {% block content %}
 <h2 class="g-color-blue m-page-name">Терминалы</h2>
 <span ng-init="search.action_type='report';search.period='day';search.limit=7"></span>
