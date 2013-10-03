@@ -23,13 +23,8 @@ def report_report_action(action):
     if not action in VALID_ACTITON:
         abort(404)
 
-    firm_info = g.firm_info
-
     template = 'term/report/%s.html' % action
-    return render_template(
-        template,
-        firm_name=firm_info['name'],
-        user_email=g.user.email)
+    return render_template(template)
 
 
 @mod.route('/report/person', methods=['POST'])

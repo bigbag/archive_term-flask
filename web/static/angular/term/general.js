@@ -17,6 +17,8 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
   };
 
   $scope.$watch('pagination.cur + search.period', function() {
+    if (!$scope.search) return false;
+    
     var search = $scope.search;
     search.page = $scope.pagination.cur;
 
@@ -55,6 +57,10 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
       $scope.search.page_count = data.count;
       $scope.pagination.total = Math.ceil(data.count/$scope.search.limit);
     });
+  };
+
+  $scope.getTerminalInfo = function(term_id) {
+    $(location).attr('href','/terminal/' + term_id);
   };
 
   $scope.pagination = {

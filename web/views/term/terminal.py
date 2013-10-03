@@ -8,18 +8,27 @@
 
 from web.views.term.general import *
 from models.term import Term
+from models.firm_term import FirmTerm
 
 
 @mod.route('/terminal', methods=['GET'])
 @login_required
 def terminal_view():
-    """таблица имеющихся у фирмы терминалов"""
+    """Таблица имеющихся у фирмы терминалов"""
+
+    return render_template('term/terminal/view.html')
+
+
+@mod.route('/terminal/<int:term_id>', methods=['GET'])
+@login_required
+def terminal_info(term_id):
+    """Информация о терминале"""
     firm_info = g.firm_info
 
-    return render_template(
-        'term/terminal/view.html',
-        firm_name=firm_info['name'],
-        user_email=g.user.email)
+    if not term_id in FirmTerm().get_list_by_firm_id(firm_info['id']):
+        abort(403)
+
+    return render_template('term/terminal/info.html')
 
 
 @mod.route('/terminal', methods=['POST'])
