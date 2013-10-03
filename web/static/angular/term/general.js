@@ -23,6 +23,9 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     if (search.action_type == 'report'){
       $scope.getReport(search);
     }
+    else if (search.action_type == 'terminal_view') {
+      $scope.getTerminalView(search);
+    }
   });
 
   $scope.report_detaled_periods = [
@@ -38,6 +41,17 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     var url = window.location.pathname;
     $http.post(url, search).success(function(data) {
       $scope.reports = data.report;
+      $scope.search.page_count = data.count;
+      $scope.pagination.total = Math.ceil(data.count/$scope.search.limit);
+    });
+  };
+
+  //Запрос Списка терминалов
+  $scope.getTerminalView = function(search) {
+    if (search.page == undefined) search.page = 1;
+    var url = window.location.pathname;
+    $http.post(url, search).success(function(data) {
+      $scope.terms = data.terms;
       $scope.search.page_count = data.count;
       $scope.pagination.total = Math.ceil(data.count/$scope.search.limit);
     });

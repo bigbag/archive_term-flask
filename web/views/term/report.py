@@ -7,6 +7,7 @@
 """
 
 from web.views.term.general import *
+from models.report import Report
 
 
 @mod.route('/report/<action>', methods=['GET'])

@@ -6,9 +6,6 @@
     :license: BSD, see LICENSE for more details.
 """
 from web import db, app, cache
-from models.term import Term
-from models.firm import Firm
-
 from helpers import date_helper
 
 

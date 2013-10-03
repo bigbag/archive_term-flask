@@ -22,7 +22,6 @@ from decorators.header import *
 
 from models.term_user import TermUser
 from models.term_user_firm import TermUserFirm
-from models.report import Report
 from models.firm import Firm
 
 mod = Blueprint('term', __name__)
