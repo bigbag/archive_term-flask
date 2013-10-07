@@ -1,14 +1,10 @@
 {% import 'term/block.html' as block %}
 {% extends "term/page.html" %}
 
-{% block header %}
-    {{ block.header(firm_name, user_email) }}
-{% endblock %}
-
 {% block content %}
 <h2 class="g-color-blue m-page-name">Оборот</h2>
-<span ng-init="search.action_type='online';search.period='day';search.limit=7"></span>
-<div class="content" data-slug="online">
+<span ng-init="search.action_type='report';search.period='day';search.limit=7"></span>
+<div class="content">
     <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
         <div class="m-content-page">
             <div class="content-row">

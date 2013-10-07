@@ -6,9 +6,6 @@
     :license: BSD, see LICENSE for more details.
 """
 from web import db, app, cache
-from models.term import Term
-from models.firm import Firm
-
 from helpers import date_helper
 
 
@@ -47,7 +44,7 @@ class FirmTerm(db.Model):
 
         return firm_id_list
 
-    @cache.cached(timeout=600, key_prefix='list_by_firm_id')
+    @cache.cached(timeout=60, key_prefix='list_by_firm_id')
     def get_list_by_firm_id(self, firm_id):
         firm_terms = self.query.filter_by(
             child_firm_id=firm_id).all()

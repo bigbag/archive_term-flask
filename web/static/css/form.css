@@ -33,6 +33,24 @@ form input[type="url"]{
 	color: #0061ff;
 
 }
+.content-row form input[type="text"],
+.content-row form input[type="password"],
+.content-row form input[type="date"],
+.content-row form input[type="datetime"],
+.content-row form input[type="datetime-local"],
+.content-row form input[type="month"],
+.content-row form input[type="week"],
+.content-row form input[type="email"],
+.content-row form input[type="number"],
+.content-row form input[type="search"],
+.content-row form input[type="tel"],
+.content-row form input[type="time"],
+.content-row form input[type="url"]{
+	margin-bottom: 0;
+}
+.content-row.left + .content-row{
+	padding-bottom: 0 !important;
+}
 form input.duble-input{
 	min-width: 623px;
 }
@@ -138,7 +156,7 @@ form input.duble-input{
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 	padding: 10px 25px 22px;
-	margin-top: -44px;
+	z-index: 99;
 }
 .table-condensed th{
 	text-align: center;
@@ -343,7 +361,137 @@ input.error:-moz-placeholder { color:#C60F13;!important; }
 	height: 30px;
 	font-size: 14px;
 	padding: 9px 10px;
+	line-height: 14px;
 }
 .f-spot-button.f-spot-button_plus.small{
 	padding: 5px 10px;
+}
+.f-period li{
+	margin-right: 10px;
+	display: inline-block;
+}
+form input.small{
+	height: 30px;
+	margin-bottom: 0;
+}
+.f-datepicker.small:before{
+	top: 5px;
+	left: 12px;
+}
+.f-datepicker.small:after{
+	right: 12px;
+	top: 13px;
+}
+.f-datepicker.small input{
+	padding-left: 38px !important;
+}
+.radio-link.open i, .radio-link.active i{
+	background: #0062FF;
+	border: 4px solid #0062FF;
+}
+.radio-link i.large {
+	height: 19px;
+	width: 19px;
+	top: 4px;
+	margin-right: 11px;
+}
+.radio-link i {
+	display: inline-block;
+	height: 14px;
+	width: 14px;
+	-webkit-border-radius: 50%;
+	-moz-border-radius: 50%;
+	border-radius: 50%;
+	behavior: url(file:///E:/PIE.htc);
+	background: #FFF;
+	border: 3px solid #0062FF;
+	margin-right: 7px;
+	position: relative;
+	top: 2px;
+}
+.slide-setting table{
+	width: 100%;
+	border: 0;
+	background: none;
+	margin:0;
+}
+.slide-setting form input[type="text"]{
+	background: #fff;
+}
+.slide-setting .f-spot-button{
+	background: #fff;
+}
+.slide-setting .f-email-case{
+	background: #fff;
+}
+.slide-setting  .f-email-case i{
+	background-color: #F8F9F9;
+}
+.slide-setting  .content-row{
+	padding: 30px 0 0 !important;
+}
+.slide-setting  .content-row:first-child{
+	padding: 0 !important;
+}
+
+div.switch.small{
+	height: 30px;
+	width: 80px;
+}
+ div.switch.small label{
+	line-height: 30px;
+}
+ div.switch.small>span{
+	height: 31px;
+}
+ div.switch.small label{
+	padding: 0 12px;
+}
+ div.switch input:last-of-type:checked+label,
+ div.switch input:last-of-type:checked+span+label{
+	right: 8px;
+}
+.slide-setting form.custom{
+	padding-top: 0 !important;
+}
+.f-sub-control{
+	padding-bottom: 7px !important;
+}
+.slide-setting .f-datepicker input{
+	margin-bottom: 0;
+}
+.radio-link.radio-link_slide{
+	position: relative;
+}
+.radio-link.radio-link_slide:after{
+	content: '';
+	position: absolute;
+	right: -9px;
+	top: 12px;
+	width: 0;
+	height: 0;
+	border-left: 3px solid transparent;
+	border-right: 3px solid transparent;
+	border-top: 4px solid #000;
+}
+.radio-link.radio-link_slide:hover:after,
+.radio-link.radio-link_slide.active:after{
+	border-top-color: #0063ff;
+}
+.checkbox i {
+	display: inline-block;
+	height: 20px;
+	width: 20px;
+	border: 1px solid #D6DDE4;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	behavior: url(file:///E:/PIE.htc);
+	background: #FFF url("../img/i-small.png") no-repeat -100%;
+	margin-right: 7px;
+	position: relative;
+	top: 4px;
+}
+.checkbox.active i {
+	background-position: -173px -41px;
 }

@@ -1,17 +1,20 @@
 {% extends "term/layout.html" %}
+{% block header %}
+    {{ block.header(g.firm_info['name'], g.user.email) }}
+{% endblock %}
 {% block body %}
 <div class="row m-content"  ng-controller="GeneralCtrl">
     <div class="large-3 columns">
     {% block menu %}
         <ul class="m-nav-page">
-<!--             <li>
+            <li>
                 <h5>Главное</h5>
                 <ul>
-                    <li><a href="/person">Сотрудники</a></li>
+                    <!-- <li><a href="/person">Сотрудники</a></li> -->
                     <li><a href="/terminal">Терминалы</a></li>
-                    <li><a href="/card">Карты</a></li>
+                    <!-- <li><a href="/card">Карты</a></li> -->
                 </ul>
-            </li> -->
+            </li>
             <li>
                 <h5>Отчеты</h5>
                 <ul>

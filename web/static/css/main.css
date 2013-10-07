@@ -36,7 +36,6 @@
 }
 .m-grid-search{
 	padding: 0 40px;
-	margin-bottom: 42px;
 	margin-top: 20px;
 }
 .m-grid-search{
@@ -202,7 +201,6 @@
 }
 .m-row-h{
 	padding-bottom: 0 !important;
-	border-bottom: 1px solid #E9EDF2;
 }
 .popup{
 	position: fixed;
@@ -246,8 +244,8 @@
 	padding: 0 0;
 	clear: both;
 }
-form.custom{
-	padding-top: 20px !important;
+form.custom:first-child{
+	padding-top: 35px !important;
 }
 .close-popup{
 	font-family: Mobispot-icon;
@@ -298,6 +296,9 @@ form.custom{
 }
 .f-spot-button + .f-spot-button{
 	margin-left: 20px;
+}
+.f-spot-button.small + .f-spot-button.small{
+	margin-left: 10px;
 }
 .f-spot-button_plus{
 	font-size: 44px !important;
@@ -364,4 +365,89 @@ form.custom{
 }
 .p-error-txt p {
 	margin: 42px 0 50px;
+}
+.f-select-terminal a{
+	display: block;
+	float: left;
+	clear: both;
+	margin-top: 10px;
+}
+.f-select-terminal a:first-child{
+	margin-top: 0;
+}
+.slide-content{
+	display: none;
+}
+.slide-setting{
+	display: none;
+	background: #F8F9F9;
+	clear: both;
+	padding: 25px 40px;
+}
+.loc-link{
+	font-size: 14px;
+	border-bottom: 1px dashed;
+	margin-top: 8px;
+	display: inline-block;
+	position: relative;
+}
+.loc-link:after{
+	content: '';
+	display: block;
+	position: absolute;
+	right: -10px;
+	top: 6px;
+	width: 0;
+	height: 0;
+	border-left: 3px solid transparent;
+	border-right: 3px solid transparent;
+	border-top: 4px solid #000;
+}
+.loc-link.active:after,
+.loc-link:hover:after{
+	border-top: 4px solid #0063ff;
+}
+.f-form-filter form.custom{
+	padding: 0 !important;
+	overflow: hidden;
+	margin: 0;
+}
+.slide-box{
+	display: none;
+}
+.f-main-settings-block{
+	box-shadow:  0 1px 0 1px #0063ff;
+	padding-bottom: 20px;
+	padding-top: 20px;
+}
+.f-main-slide-link{
+	margin-top: -16px;
+	padding-top: 0 !important;
+}
+.f-main-slide-link a{
+	font-size: 14px;
+	padding-bottom: 2px;
+}
+.f-main-slide-link a.loc-link:after{
+	border-left: 3px solid rgba(0, 0, 0, 0);
+	border-right: 3px solid rgba(0, 0, 0, 0);
+	border-top: 4px solid #000;
+	right: -11px;
+	top: 6px;
+}
+.f-main-slide-link a.loc-link:hover:after,
+.f-main-slide-link a.loc-link.active:after{
+	border-top-color:  #0063ff;
+}
+.f-main-slide-link{
+	padding-bottom: 1px !important;
+}
+.f-content-row_button{
+	margin-top: 20px;
+}
+.content .m-row-h{
+	padding-top: 25px !important;
+}
+.content-row:first-child .m-hint{
+	padding-top: 25px;
 }
