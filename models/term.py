@@ -41,17 +41,26 @@ class Term(db.Model):
     download_period = db.Column(db.Integer, nullable=False)
     version = db.Column(db.String(128))
 
-    # def __init__(self):
-    #     self.type = self.TYPE_VENDING
-    #     self.upload = {"start": "00:00:00", "stop": "23:59:59"}
-    #     self.upload_period = 0
-    #     self.download = {"start": "00:00:00", "stop": "23:59:59"}
-    #     self.tz = app.config['TZ']
-    #     self.blacklist = 0
-    #     self.status = self.STATUS_VALID
+    def __init__(self):
+        self.type = self.TYPE_VENDING
+        self.upload_start = "00:00:00"
+        self.upload_stop = "23:59:59"
+        self.upload_period = 5
+        self.download_start = "00:00:00"
+        self.download_stop = "23:59:59"
+        self.download_period = 5
+        self.tz = app.config['TZ']
+        self.blacklist = 0
+        self.status = self.STATUS_VALID
 
     def __repr__(self):
         return '<id %r>' % (self.id)
+
+    def get_type_list(self):
+        result = []
+        result.append((self.TYPE_VENDING, u"Вендинговый"))
+        result.append((self.TYPE_POS, u"Платежный"))
+        return result
 
     def get_valid_term(self, term_id):
         return self.query.filter_by(
@@ -66,17 +75,20 @@ class Term(db.Model):
         date_pattern = '%H:%M %d.%m.%y'
         term = Term().get_valid_term(id)
 
-        term.report_date = date_helper.from_utc(
-            term.report_date,
-            term.tz).strftime(date_pattern)
+        if term.report_date:
+            term.report_date = date_helper.from_utc(
+                term.report_date,
+                term.tz).strftime(date_pattern)
 
-        term.config_date = date_helper.from_utc(
-            term.config_date,
-            term.tz).strftime(date_pattern)
+        if term.config_date:
+            term.config_date = date_helper.from_utc(
+                term.config_date,
+                term.tz).strftime(date_pattern)
 
-        term.blacklist_date = date_helper.from_utc(
-            term.blacklist_date,
-            term.tz).strftime(date_pattern)
+        if term.blacklist_date:
+            term.blacklist_date = date_helper.from_utc(
+                term.blacklist_date,
+                term.tz).strftime(date_pattern)
         return term
 
     def get_xml_view(self):
@@ -95,7 +107,7 @@ class Term(db.Model):
             self.type = self.TYPE_POS
         return self
 
-    @cache.cached(timeout=120, key_prefix='select_term_list')
+    @cache.cached(timeout=60, key_prefix='select_term_list')
     def select_term_list(self, firm_id, **kwargs):
         tz = app.config['TZ']
         date_pattern = '%H:%M %d.%m.%y'
