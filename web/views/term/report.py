@@ -31,11 +31,9 @@ def report_report_action(action):
 @login_required
 @json_headers
 def report_get_person_report():
-    firm_info = g.firm_info
     arg = json.loads(request.stream.read())
-
     answer = Report().select_person(
-        firm_info['id'], **arg)
+        g.firm_info['id'], **arg)
 
     return jsonify(answer)
 
@@ -44,11 +42,10 @@ def report_get_person_report():
 @login_required
 @json_headers
 def report_get_terminal_report():
-    firm_info = g.firm_info
     arg = json.loads(request.stream.read())
     arg['payment_type'] = Report.TYPE_WHITE
     answer = Report().get_interval_report(
-        firm_info['id'], **arg)
+        g.firm_info['id'], **arg)
 
     return jsonify(answer)
 
@@ -57,10 +54,9 @@ def report_get_terminal_report():
 @login_required
 @json_headers
 def report_get_summ_report():
-    firm_info = g.firm_info
     arg = json.loads(request.stream.read())
     arg['payment_type'] = Report.TYPE_PAYMENT
     answer = Report().get_interval_report(
-        firm_info['id'], **arg)
+        g.firm_info['id'], **arg)
 
     return jsonify(answer)

@@ -58,6 +58,8 @@ class Config(object):
     SESSION_PROTECTION = "strong"
     REMEMBER_COOKIE_NAME = ""
 
+    WTF_CSRF_ENABLED = False
+
 
 class ProductionConfig(Config):
     SQLALCHEMY_ECHO = False

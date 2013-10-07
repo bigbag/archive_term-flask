@@ -16,6 +16,13 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     }, 5000);
   };
 
+  $scope.scrollPage = function(dom_name, speed){
+    speed = typeof speed !== 'undefined' ? speed : 600;
+    var scroll_height = $(dom_name).offset().top;
+      $('html, body').animate({
+        scrollTop: scroll_height
+      }, speed);
+  }
   $scope.$watch('pagination.cur + search.period', function() {
     if (!$scope.search) return false;
     
@@ -62,6 +69,39 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
   $scope.getTerminalInfo = function(term_id) {
     $(location).attr('href','/terminal/' + term_id);
   };
+
+  //Добавляем терминал
+  $scope.addTerminal = function(term, valid) {
+    if (!valid) {
+      angular.element('#add_term input[name=id]').addClass('error');
+      angular.element('#add_term input[name=name]').addClass('error');
+      $scope.scrollPage('.m-page-name');
+      
+      return false;
+    };
+
+    $http.post('/terminal/add', term).success(function(data) {
+      $scope.scrollPage('.m-page-name');
+      if (data.error == 'yes') {
+        $scope.setModal(data.message, 'error');
+      }
+      else {
+        $scope.setModal(data.message, 'success');
+        setTimeout(function(){
+          $(location).attr('href','/terminal');
+        }, 2000);
+      }
+    });
+    
+  };
+
+  //Удаляем класс error при изменении поля
+  $scope.$watch('term.id + term.name', function(term) {
+    if ($scope.term) {
+      angular.element('#add_term input[name=id]').removeClass('error');
+      angular.element('#add_term input[name=name]').removeClass('error');
+    }
+  });
 
   $scope.pagination = {
     cur: 1,
