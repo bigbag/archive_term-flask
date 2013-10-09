@@ -8,6 +8,7 @@
 """
 from flask import json, g
 from web import app, db, cache
+
 from helpers import date_helper
 
 from models.firm_term import FirmTerm
@@ -43,11 +44,11 @@ class Term(db.Model):
 
     def __init__(self):
         self.type = self.TYPE_VENDING
-        self.upload_start = "00:00:00"
-        self.upload_stop = "23:59:59"
+        self.upload_start = "00:00"
+        self.upload_stop = "23:59"
         self.upload_period = 5
-        self.download_start = "00:00:00"
-        self.download_stop = "23:59:59"
+        self.download_start = "00:00"
+        self.download_stop = "23:59"
         self.download_period = 5
         self.tz = app.config['TZ']
         self.blacklist = 0
@@ -101,10 +102,11 @@ class Term(db.Model):
         return self
 
     def get_db_view(self):
-        if self.type == 'Vending':
-            self.type = self.TYPE_VENDING
-        elif self.type == 'Normal':
-            self.type = self.TYPE_POS
+        term = Term()
+        if len(self.upload_start) == 0:
+            self.upload_start = term.upload_start
+        if len(self.download_start) == 0:
+            self.download_start = term.download_start
         return self
 
     @cache.cached(timeout=60, key_prefix='select_term_list')
@@ -125,11 +127,17 @@ class Term(db.Model):
         result = []
         for term in terms:
             firm_general = FirmTerm().query.filter_by(term_id=term.id).first()
+
+            seans_date = None
+            if term.config_date:
+                seans_date = date_helper.from_utc(term.config_date, tz)
+                seans_date = seans_date.strftime(date_pattern)
             data = dict(
                 term_id=term.id,
                 name=term.name,
                 firm=firm_general.firm.name,
                 status='active' if term.status == self.STATUS_VALID else '',
+                seans_date=seans_date,
             )
 
             result.append(data)
