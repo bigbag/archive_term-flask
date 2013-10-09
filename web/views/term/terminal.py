@@ -56,7 +56,7 @@ def terminal_info(term_id):
     term_events = TermEvent.query.filter(TermEvent.term_id == term_id)
 
     return render_template(
-        'term/terminal/info.html',
+        'term/terminal/index.html',
         term=term,
         term_events=term_events,
         term_types=term_types
@@ -119,4 +119,26 @@ def add_term():
         else:
             answer[
                 'message'] = u'Форма заполнена неверно, проверьте формат полей'
+    return jsonify(answer)
+
+
+@mod.route('/terminal/locking', methods=['POST'])
+@login_required
+@json_headers
+def locking_term():
+    """Блокировка и разблокировка терминал"""
+    answer = dict(error='yes', message='')
+    arg = json.loads(request.stream.read())
+
+    if 'status' not in arg and 'id' not in arg:
+        abort(400)
+
+    term = Term.query.get(int(arg['id']))
+    if not term:
+        abort(404)
+
+    term.status = int(arg['status'])
+    if term.save():
+        answer['error'] = 'no'
+
     return jsonify(answer)

@@ -20,7 +20,7 @@ class Term(db.Model):
     __tablename__ = 'term'
 
     STATUS_VALID = 1
-    STATUS_BANNED = -1
+    STATUS_BANNED = 0
 
     TYPE_POS = 0
     TYPE_VENDING = 1
@@ -74,7 +74,7 @@ class Term(db.Model):
 
     def get_info_by_id(self, id):
         date_pattern = '%H:%M %d.%m.%y'
-        term = Term().get_valid_term(id)
+        term = Term().query.get(id)
 
         if term.report_date:
             term.report_date = date_helper.from_utc(

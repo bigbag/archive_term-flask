@@ -124,6 +124,19 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     });   
   };
 
+  //Блокировка и разблокировка терминал
+  $scope.lockingTerminal = function(term) {
+    if ($scope.term.status == 0) {
+      $scope.term.status = 1;
+    }
+    else {
+      $scope.term.status = 0;
+    }
+    $http.post('/terminal/locking', term).success(function(data) {
+      
+    });  
+  }
+
   $scope.pagination = {
     cur: 1,
     total: 7,
