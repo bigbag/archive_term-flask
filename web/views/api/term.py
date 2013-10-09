@@ -30,32 +30,39 @@ from web.configs.term import TermConfig
 
 mod = Blueprint('api_term', __name__)
 
+
 @mod.route('/configs/config_<int:term_id>.xml', methods=['GET'])
 @cache.cached(timeout=120, key_prefix='term_config')
 @xml_headers
 @md5_content_headers
 def api_get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
-    term = Term().get_valid_term(int(term_id))
+    term = Term().query.get(int(term_id))
 
     if term is None:
         abort(400)
 
     term = term.get_xml_view()
+    if term.status == Term.STATUS_BANNED:
+        config_xml = render_template(
+            'api/term/config_empty.xml',
+            term=term,
+            config=TermConfig).encode('cp1251')
+        response = make_response(config_xml)
+    else:
+        term_events = TermEvent().get_by_term_id(term.id)
+        if term_events is None:
+            abort(400)
 
-    term_events = TermEvent().get_by_term_id(term.id)
-    if term_events is None:
-        abort(400)
+        person_events = PersonEvent().get_by_term_id(term.id)
 
-    person_events = PersonEvent().get_by_term_id(term.id)
-
-    config_xml = render_template(
-        'api/term/config.xml',
-        term=term,
-        config=TermConfig,
-        term_events=term_events,
-        person_events=person_events).encode('cp1251')
-    response = make_response(config_xml)
+        config_xml = render_template(
+            'api/term/config.xml',
+            term=term,
+            config=TermConfig,
+            term_events=term_events,
+            person_events=person_events).encode('cp1251')
+        response = make_response(config_xml)
 
     return response
 
