@@ -11,12 +11,13 @@
             <div class="content-row">
                 <p class="m-hint">Настройте работу Ваших бесконтактных терминалов: добавьте к ним события и настройте их так, как Вам нужно.</p>
             </div>
-            <table class="m-spot-table" ng-grid="gridOptions">
+            <table class="m-spot-table">
                 <thead>
                     <tr>
                         <th><span>ID</span></th>
                         <th>Имя</th>
                         <th>Владелец</th>
+                        <th>Сеанс связи</th>
                         <th>Статус</th>
                     </tr>
                 </thead>
@@ -25,6 +26,7 @@
                         <td>{[{term.term_id}]}</td>
                         <td>{[{term.name}]}</td>
                         <td>{[{term.firm}]}</td>
+                        <td>{[{term.seans_date}]}</td>
                         <td><span class="m-card-act {[{term.status}]} g-round"></span></td>
                     </tr>
                     <tr class="m-table-bottom" ng-show="search.page_count">
@@ -92,9 +94,9 @@
                     <label for="add-upload-period">Период между отправками (мин)</label>
                     <input 
                         id="add-start-upload" 
-                        type="number"
-                        ng-minlength="1"
-                        ng-maxlength="3"
+                        type="text"
+                        minlength="1"
+                        maxlength="4"
                         ng-model="term.upload_period">
                 </div>
                 <div class="content-row g-clearfix" ng-init="term.download_start='{{term.download_start}}'">
@@ -110,9 +112,9 @@
                     <label for="add-cardnumber">Период между загрузками (мин)</label>
                     <input 
                         id="add-start-download" 
-                        type="number"
-                        ng-minlength="1"
-                        ng-maxlength="3"
+                        type="text"
+                        minlength="1"
+                        maxlength="4"
                         ng-model="term.download_period">
                 </div>
                 <div class="content-row g-clearfix">

@@ -415,11 +415,27 @@ form input.small{
 	background: none;
 	margin:0;
 }
-.slide-setting form input[type="text"]{
+.slide-setting form input[type="text"],
+.slide-setting form input[type="password"],
+.slide-setting form input[type="date"],
+.slide-setting form input[type="datetime"],
+.slide-setting form input[type="datetime-local"],
+.slide-setting form input[type="month"],
+.slide-setting form input[type="week"],
+.slide-setting form input[type="email"],
+.slide-setting form input[type="number"],
+.slide-setting form input[type="search"],
+.slide-setting form input[type="tel"],
+.slide-setting form input[type="time"],
+.slide-setting form input[type="url"],
+.slide-setting  .m-grid-search input{
 	background: #fff;
 }
 .slide-setting .f-spot-button{
 	background: #fff;
+}
+.slide-setting .f-spot-button:hover{
+	background: #0063ff;
 }
 .slide-setting .f-email-case{
 	background: #fff;
@@ -494,4 +510,21 @@ div.switch.small{
 }
 .checkbox.active i {
 	background-position: -173px -41px;
+}
+.loc-link.f-spot-button{
+	border-bottom: 0;
+	font-size: 18px;
+	margin: 25px 0;
+	clear: both;
+	float: none;
+	display: inline-block;
+}
+.loc-link.f-spot-button:after{
+	display: none;
+}
+.slide-setting form.custom .custom.dropdown.medium,.slide-setting form.custom .custom.dropdown.open.medium ul{
+	background: #fff;
+}
+.slide-setting .content-row.left{
+	margin-right: 40px;
 }

@@ -156,7 +156,8 @@ class Report(db.Model):
             query = query.group_by(
                 'YEAR(creation_date), MONTH(creation_date), DAY(creation_date)')
         elif period == 'week':
-            query = query.group_by('YEAR(creation_date), WEEK(creation_date)')
+            query = query.group_by(
+                'YEAR(creation_date), WEEK(creation_date, 1)')
         elif period == 'month':
             query = query.group_by('YEAR(creation_date), MONTH(creation_date)')
 
@@ -201,8 +202,10 @@ class Report(db.Model):
     @cache.cached(timeout=120, key_prefix='report_interval')
     def get_interval_report(self, firm_id, **kwargs):
         tz = app.config['TZ']
-        payment_type = kwargs[
-            'payment_type'] if 'payment_type' in kwargs else self.TYPE_WHITE
+        payment_type = self.TYPE_WHITE
+
+        if 'payment_type' in kwargs:
+            payment_type = kwargs['payment_type']
 
         period = kwargs['period'] if 'period' in kwargs else 'day'
         if period == 'day':

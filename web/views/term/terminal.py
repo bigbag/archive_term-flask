@@ -7,7 +7,7 @@
 """
 from web.views.term.general import *
 
-from web.form.term.add import TermAddForm
+from web.form.term import TermAddForm
 
 from models.term import Term
 from models.firm_term import FirmTerm
@@ -19,17 +19,26 @@ from models.term_event import TermEvent
 def terminal_view():
     """Таблица имеющихся у фирмы терминалов"""
 
-    term_types = Term().get_type_list()
-
     term = Term()
-    term.upload_start = term.upload_start[:5]
-    term.download_start = term.download_start[:5]
+    term_types = Term().get_type_list()
 
     return render_template(
         'term/terminal/view.html',
         term_types=term_types,
         term=term,
     )
+
+
+@mod.route('/terminal', methods=['POST'])
+@login_required
+@json_headers
+def get_term_list():
+    """Получаем список терминалов"""
+    arg = json.loads(request.stream.read())
+    answer = Term().select_term_list(
+        g.firm_info['id'], **arg)
+
+    return jsonify(answer)
 
 
 @mod.route('/terminal/<int:term_id>', methods=['GET'])
@@ -43,23 +52,39 @@ def terminal_info(term_id):
     if not term:
         abort(404)
 
+    term_types = Term().get_type_list()
     term_events = TermEvent.query.filter(TermEvent.term_id == term_id)
 
     return render_template(
-        'term/terminal/info.html',
+        'term/terminal/index.html',
         term=term,
-        term_events=term_events
+        term_events=term_events,
+        term_types=term_types
     )
 
 
-@mod.route('/terminal', methods=['POST'])
+@mod.route('/terminal/<int:term_id>', methods=['POST'])
 @login_required
 @json_headers
-def get_term_list():
+def edit_term(term_id):
+    """Редактируем терминал"""
+    answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
-    answer = Term().select_term_list(
-        g.firm_info['id'], **arg)
 
+    term = Term.query.get(int(arg['id']))
+    if not term:
+        abort(404)
+
+    form = TermAddForm.from_json(arg)
+    if form.validate():
+        form.populate_obj(term)
+
+        if term.save():
+            answer['error'] = 'no'
+            answer['message'] = u'Данные сохранены'
+    else:
+        answer[
+            'message'] = u'Форма заполнена неверно, проверьте формат полей'
     return jsonify(answer)
 
 
@@ -67,6 +92,7 @@ def get_term_list():
 @login_required
 @json_headers
 def add_term():
+    """Добавляем терминал"""
     answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
 
@@ -74,21 +100,12 @@ def add_term():
 
     if term:
         answer['message'] = u'Терминал с таким ID уже есть в системе'
-
     else:
         form = TermAddForm.from_json(arg)
         if form.validate():
             term = Term()
             form.populate_obj(term)
 
-            if 'upload_start' in arg:
-                term.upload_start = "%s:00" % arg['upload_start']
-            if 'download_start' in arg:
-                term.download_start = "%s:00" % arg['download_start']
-            if 'upload_period' in arg:
-                term.upload_period = arg['upload_period']
-            if 'download_period' in arg:
-                term.download_period = arg['download_period']
             if term.save():
                 firm_term = FirmTerm()
                 firm_term.term_id = term.id
@@ -97,9 +114,31 @@ def add_term():
                 firm_term.save()
 
                 answer['error'] = 'no'
-                answer[
-                    'message'] = u'Терминал успешно добавлен, в течении двух минут он отобразится в списке ваших терминалов'
+                answer['message'] = u"""Терминал успешно добавлен,
+                    в течении двух минут он отобразится в списке ваших терминалов"""
         else:
             answer[
                 'message'] = u'Форма заполнена неверно, проверьте формат полей'
+    return jsonify(answer)
+
+
+@mod.route('/terminal/locking', methods=['POST'])
+@login_required
+@json_headers
+def locking_term():
+    """Блокировка и разблокировка терминал"""
+    answer = dict(error='yes', message='')
+    arg = json.loads(request.stream.read())
+
+    if 'status' not in arg and 'id' not in arg:
+        abort(400)
+
+    term = Term.query.get(int(arg['id']))
+    if not term:
+        abort(404)
+
+    term.status = int(arg['status'])
+    if term.save():
+        answer['error'] = 'no'
+
     return jsonify(answer)
