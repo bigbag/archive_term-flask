@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Форма добавления терминала
+    Формы для терминалов
 
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
@@ -29,6 +29,6 @@ class TermAddForm(Form):
     name = TextField(validators=[InputRequired()])
     type = DecimalField(places=1, validators=[InputRequired()])
     upload_start = TextField(validators=[Optional(), time_check])
-    upload_period = IntegerField()
+    upload_period = IntegerField(default=5)
     download_start = TextField(validators=[Optional(), time_check])
-    download_period = IntegerField()
+    download_period = IntegerField(default=5)

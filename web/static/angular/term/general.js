@@ -23,6 +23,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
         scrollTop: scroll_height
       }, speed);
   }
+
   $scope.$watch('pagination.cur + search.period', function() {
     if (!$scope.search) return false;
     
@@ -95,13 +96,33 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     
   };
 
-  //Удаляем класс error при изменении поля
+  //Добавление терминала, удаляем класс ошибки
   $scope.$watch('term.id + term.name', function(term) {
     if ($scope.term) {
-      angular.element('#add_term input[name=id]').removeClass('error');
-      angular.element('#add_term input[name=name]').removeClass('error');
+      angular.element('input[name=id]').removeClass('error');
+      angular.element('input[name=name]').removeClass('error');
     }
   });
+
+  //Редактируем терминал
+  $scope.editTerminal = function(term, valid) {
+    if (!valid) {
+      angular.element('#add_term input[name=name]').addClass('error');
+      $scope.scrollPage('.m-page-name');
+      return false;
+    };
+    var url = '/terminal/' + term.id;
+
+    $http.post(url, term).success(function(data) {
+      $scope.scrollPage('.m-page-name');
+      if (data.error == 'yes') {
+        $scope.setModal(data.message, 'error');
+      }
+      else {
+        $scope.setModal(data.message, 'success');
+      }
+    });   
+  };
 
   $scope.pagination = {
     cur: 1,

@@ -2,7 +2,15 @@
 {% extends "term/page.html" %}
 
 {% block content %}
-<h2 class="g-color-blue m-page-name">{{term.name}}</h2>
+<h2 class="g-color-blue m-page-name">
+    <div>
+        {{term.name}}
+        <div class="right">
+            <a class="f-spot-button small">Заблокировать</a>
+            <a class="f-spot-button bg-red small">Удалить терминал</a>
+        </div>
+    </div>
+</h2>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
 
     <section class="section active">
@@ -10,11 +18,20 @@
         <div class="content" data-slug="info">
             <div class="content-row">
                 <h4>Последние сеансы связи:</h4>
-                <p>Загрузка отчета - {{term.report_date}}
-                </p>
-                <p>Загрузка настроек - {{term.config_date}}
-                </p>
-                <p>Загрузка черного списка - {{term.blacklist_date}}</p>
+                <table class="m-session-table">
+                    <tr>
+                        <td>Загрузка отчета</td>
+                        <td>{{term.report_date|replace("None", "не было")}}</td>
+                    </tr>
+                    <tr>
+                        <td>Загрузка настроек</td>
+                        <td>{{term.config_date|replace("None", "не было")}}</td>
+                    </tr>
+                    <tr>
+                        <td>Загрузка черного списка</td>
+                        <td> {{term.blacklist_date|replace("None", "не было")}}</td>
+                    </tr>
+                </table>
             </div>
             
             <div class="content-row">
@@ -46,46 +63,80 @@
     <section class="section">
         <p class="title"><a href="#edit">Редактировать</a></p>
         <div class="content" data-slug="edit">
-            <form class="custom">
-                <div class="g-clear-b g-clearfix">
+            <form class="custom" id="edit_term" name="editTermForm">
+                <span  ng-init="term.id={{term.id}}"></span>
+                <div class="g-clear-b g-clearfix" ng-init="term.name='{{term.name}}'">
                     <div class="content-row g-clearfix">
-                        <label for="add-name">Имя*</label>
-                        <input id="add-name" type="text" value="{{term.name}}">
+                        <label for="add-name">Название*</label>
+                        <input 
+                            id="add-name" 
+                            type="text"
+                            name="name"
+                            ng-maxlength="300"
+                            ng-model="term.name"
+                            required>
                     </div>
                 </div>
-                <div class="content-row g-clear-b">
-                    <label for="type-report">Тип*</label>
-                    <select id="type-report" class="medium">
-                        <option>Платежный</option>
-                        <option>Вендинговый</option>
+                <div class="content-row g-clear-b" ng-init="term.type={{term.type}}">
+                    <label for="add-type">Тип*</label>
+                    <select 
+                        id="add-type" 
+                        class="medium"
+                        name="type"
+                        ng-model="term.type">
+                        {% for key, value in term_types %}
+                            <option value="{{key}}">{{value}}</option>
+                        {% endfor %}
                     </select>
                 </div>
-
-                <div class="content-row g-clearfix">
-                    <label for="add-tnumber">Время первой отправки отчета (чч:мм)</label>
-                    <input id="add-tnumber" type="text" placeholder="Табельный номер">
+                <div class="content-row g-clearfix" ng-init="term.upload_start='{{term.upload_start}}'">
+                    <label for="add-start-upload">Время первой отправки отчета (чч:мм)</label>
+                    <input 
+                        id="add-start-upload" 
+                        type="text"
+                        minlength="5"
+                        maxlength="5"
+                        ng-model="term.upload_start">
+                </div>
+                <div class="content-row g-clearfix" ng-init="term.upload_period={{term.upload_period}}">
+                    <label for="add-upload-period">Период между отправками (мин)</label>
+                    <input 
+                        id="add-start-upload" 
+                        type="text"
+                        minlength="1"
+                        maxlength="4"
+                        ng-model="term.upload_period">
+                </div>
+                <div class="content-row g-clearfix" ng-init="term.download_start='{{term.download_start}}'">
+                    <label for="add-download-period">Время первой загрузки конфигурации (чч:мм)</label>
+                    <input 
+                        id="add-download-period" 
+                        type="text"
+                        minlength="5"
+                        maxlength="5"
+                        ng-model="term.download_start">
+                </div>
+                <div class="content-row g-clearfix" ng-init="term.download_period={{term.download_period}}">
+                    <label for="add-cardnumber">Период между загрузками (мин)</label>
+                    <input 
+                        id="add-start-download" 
+                        type="text"
+                        minlength="1"
+                        maxlength="4"
+                        ng-model="term.download_period">
                 </div>
                 <div class="content-row g-clearfix">
-                    <label for="add-cardnumber">Период между отправками (мин).</label>
-                    <input id="add-cardnumber" type="text" placeholder="Номер карты">
-                </div>
-                <div class="content-row g-clearfix">
-                    <label for="add-tnumber">Время первой загрузки конфигурации (чч:мм)</label>
-                    <input id="add-tnumber" type="text" placeholder="Табельный номер">
-                </div>
-                <div class="content-row g-clearfix">
-                    <label for="add-cardnumber">Период между загрузками, (мин).</label>
-                    <input id="add-cardnumber" type="text" placeholder="Номер карты">
-                </div>
-                <div class="content-row g-clearfix">
-                    <a href="#" class="f-spot-button">Сохранить</a>
-                    <a href="#" class="f-spot-button bg-red">Удалить терминал</a>
+                    <a 
+                        ng-click="editTerminal(term, editTermForm.$valid)"
+                        class="f-spot-button">
+                        Сохранить
+                    </a>
                 </div>
             </form>
         </div>
 
     </section>
-    <section class="section">
+   <!--  <section class="section">
         <p class="title"><a href="#event_add">Добавить</a></p>
         <div class="content" data-slug="event_add">
             <form class="custom">
@@ -184,6 +235,6 @@
                 </tbody>
             </table>
         </div>
-    </section>
+    </section> -->
 </div>
 {% endblock %}

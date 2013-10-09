@@ -8,6 +8,7 @@
 """
 from flask import json, g
 from web import app, db, cache
+
 from helpers import date_helper
 
 from models.firm_term import FirmTerm
@@ -126,11 +127,17 @@ class Term(db.Model):
         result = []
         for term in terms:
             firm_general = FirmTerm().query.filter_by(term_id=term.id).first()
+
+            seans_date = None
+            if term.config_date:
+                seans_date = date_helper.from_utc(term.config_date, tz)
+                seans_date = seans_date.strftime(date_pattern)
             data = dict(
                 term_id=term.id,
                 name=term.name,
                 firm=firm_general.firm.name,
                 status='active' if term.status == self.STATUS_VALID else '',
+                seans_date=seans_date,
             )
 
             result.append(data)

@@ -7,15 +7,15 @@
     {% if config.DOWNLOAD %}
     <download force_on_restart="1">
         <period>{{ term.download_period }}</period>
-        <start time="{{ term.download_start }}"/>
-        <stop time="{{ term.download_stop }}"/>
+        <start time="{{ term.download_start }}:00"/>
+        <stop time="{{ term.download_stop }}:00"/>
     </download>
     {% endif %}
     {% if config.UPLOAD %}
     <upload force_on_restart="1">
         <period>{{ term.upload_period }}</period>
-        <start time="{{ term.upload_start }}"/>
-        <stop time="{{ term.upload_stop }}"/>
+        <start time="{{ term.upload_start }}:00"/>
+        <stop time="{{ term.upload_stop }}:00"/>
     </upload>
     {% endif %}
     {% if config.UPDATE %}
@@ -61,7 +61,7 @@
     {% endif %}
     {% endif %}
     {% for term_event in term_events %}
-    <event type="{{term_event.event.key}}" translation="{{term_event.event.name}}" min_time="{{term_event.start}}" max_time="{{term_event.stop}}" age_limit="{{term_event.age}}">
+    <event type="{{term_event.event.key}}" translation="{{term_event.event.name}}" min_time="{{term_event.start}}:00" max_time="{{term_event.stop}}:00" age_limit="{{term_event.age}}">
         {% for person_event in person_events %}
             {% if person_event.event_id == term_event.event_id %}
             {% set payment_id = person_event.person.payment_id %}
