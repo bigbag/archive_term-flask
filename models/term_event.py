@@ -18,8 +18,8 @@ class TermEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     age = db.Column(db.Integer, nullable=False)
     cost = db.Column(db.Integer, nullable=False)
-    start = db.Column(db.Time, nullable=False)
-    stop = db.Column(db.Time, nullable=False)
+    start = db.Column(db.String(10), nullable=False)
+    stop = db.Column(db.String(10), nullable=False)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
@@ -28,8 +28,8 @@ class TermEvent(db.Model):
     def __init__(self):
         self.cost = 0
         self.age = 0
-        self.start = "00:00:00"
-        self.stop = "23:59:59"
+        self.start = "00:00"
+        self.stop = "23:59"
 
     def __repr__(self):
         return '<id %r>' % (self.id)

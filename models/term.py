@@ -43,11 +43,11 @@ class Term(db.Model):
 
     def __init__(self):
         self.type = self.TYPE_VENDING
-        self.upload_start = "00:00:00"
-        self.upload_stop = "23:59:59"
+        self.upload_start = "00:00"
+        self.upload_stop = "23:59"
         self.upload_period = 5
-        self.download_start = "00:00:00"
-        self.download_stop = "23:59:59"
+        self.download_start = "00:00"
+        self.download_stop = "23:59"
         self.download_period = 5
         self.tz = app.config['TZ']
         self.blacklist = 0
@@ -101,10 +101,11 @@ class Term(db.Model):
         return self
 
     def get_db_view(self):
-        if self.type == 'Vending':
-            self.type = self.TYPE_VENDING
-        elif self.type == 'Normal':
-            self.type = self.TYPE_POS
+        term = Term()
+        if len(self.upload_start) == 0:
+            self.upload_start = term.upload_start
+        if len(self.download_start) == 0:
+            self.download_start = term.download_start
         return self
 
     @cache.cached(timeout=60, key_prefix='select_term_list')
