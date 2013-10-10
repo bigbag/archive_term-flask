@@ -83,8 +83,7 @@ def edit_term(term_id):
             answer['error'] = 'no'
             answer['message'] = u'Данные сохранены'
     else:
-        answer[
-            'message'] = u'Форма заполнена неверно, проверьте формат полей'
+        answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
     return jsonify(answer)
 
 
@@ -117,8 +116,8 @@ def add_term():
                 answer['message'] = u"""Терминал успешно добавлен,
                     в течении двух минут он отобразится в списке ваших терминалов"""
         else:
-            answer[
-                'message'] = u'Форма заполнена неверно, проверьте формат полей'
+            answer['message'] = u"""Форма заполнена неверно,
+                проверьте формат полей"""
     return jsonify(answer)
 
 
@@ -140,5 +139,6 @@ def locking_term():
     term.status = int(arg['status'])
     if term.save():
         answer['error'] = 'no'
+        answer['message'] = u'Операция успешно выполнена'
 
     return jsonify(answer)

@@ -133,7 +133,9 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
       $scope.term.status = 0;
     }
     $http.post('/terminal/locking', term).success(function(data) {
-      
+      if (data.error == 'no') {
+        $scope.setModal(data.message, 'success');
+      }
     });  
   }
 

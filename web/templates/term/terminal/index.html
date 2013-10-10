@@ -1,0 +1,245 @@
+{% import 'term/block.html' as block %}
+{% extends "term/page.html" %}
+
+{% block content %}
+<h2 class="g-color-blue m-page-name">
+    <div ng-init="term.status={{term.status}}">
+        {{term.name}}
+        <div class="right">
+            <a ng-show="term.status" ng-click="lockingTerminal(term)" class="f-spot-button small">
+                Заблокировать
+            </a>
+            <a ng-hide="term.status" ng-click="lockingTerminal(term)" class="f-spot-button small">
+                Разблокировать
+            </a>
+            <a class="f-spot-button bg-red small">Удалить терминал</a>
+        </div>
+    </div>
+</h2>
+<div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
+
+    <section class="section active">
+        <p class="title"><a href="#info">Информация</a></p>
+        <div class="content" data-slug="info">
+            <div class="content-row">
+                <h4>Последние сеансы связи:</h4>
+                <table class="m-session-table">
+                    <tr>
+                        <td>Загрузка отчета</td>
+                        <td>{{term.report_date|replace("None", "не было")}}</td>
+                    </tr>
+                    <tr>
+                        <td>Загрузка настроек</td>
+                        <td>{{term.config_date|replace("None", "не было")}}</td>
+                    </tr>
+                    <tr>
+                        <td>Загрузка черного списка</td>
+                        <td> {{term.blacklist_date|replace("None", "не было")}}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="content-row">
+                <p class="m-hint">Для события кликните по соотвествующей строке в таблице</p>
+            </div>
+            <table class="m-spot-table" ng-grid="gridOptions">
+                <thead>
+                <tr>
+                    <th><span>Событие</span></th>
+                    <th>Начало</th>
+                    <th>Конец</th>
+                    <th>Стоимость</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for term_event in term_events %}
+                    <tr class="m-t-cont-row">
+                        <td>{{term_event.event.name}}</td>
+                        <td>{{term_event.start}}</td>
+                        <td>{{term_event.stop}}</td>
+                        <td>{{term_event.cost}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+    <section class="section">
+        <p class="title"><a href="#edit">Редактировать</a></p>
+        <div class="content" data-slug="edit">
+            <form class="custom" id="edit_term" name="editTermForm">
+                <span  ng-init="term.id={{term.id}}"></span>
+                <div class="g-clear-b g-clearfix" ng-init="term.name='{{term.name}}'">
+                    <div class="content-row g-clearfix">
+                        <label for="add-name">Название*</label>
+                        <input 
+                            id="add-name" 
+                            type="text"
+                            name="name"
+                            ng-maxlength="300"
+                            ng-model="term.name"
+                            required>
+                    </div>
+                </div>
+                <div class="content-row g-clear-b" ng-init="term.type={{term.type}}">
+                    <label for="add-type">Тип*</label>
+                    <select 
+                        id="add-type" 
+                        class="medium"
+                        name="type"
+                        ng-model="term.type">
+                        {% for key, value in term_types %}
+                            <option value="{{key}}">{{value}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="content-row g-clearfix" ng-init="term.upload_start='{{term.upload_start}}'">
+                    <label for="add-start-upload">Время первой отправки отчета (чч:мм)</label>
+                    <input 
+                        id="add-start-upload" 
+                        type="text"
+                        minlength="5"
+                        maxlength="5"
+                        ng-model="term.upload_start">
+                </div>
+                <div class="content-row g-clearfix" ng-init="term.upload_period={{term.upload_period}}">
+                    <label for="add-upload-period">Период между отправками (мин)</label>
+                    <input 
+                        id="add-start-upload" 
+                        type="text"
+                        minlength="1"
+                        maxlength="4"
+                        ng-model="term.upload_period">
+                </div>
+                <div class="content-row g-clearfix" ng-init="term.download_start='{{term.download_start}}'">
+                    <label for="add-download-period">Время первой загрузки конфигурации (чч:мм)</label>
+                    <input 
+                        id="add-download-period" 
+                        type="text"
+                        minlength="5"
+                        maxlength="5"
+                        ng-model="term.download_start">
+                </div>
+                <div class="content-row g-clearfix" ng-init="term.download_period={{term.download_period}}">
+                    <label for="add-cardnumber">Период между загрузками (мин)</label>
+                    <input 
+                        id="add-start-download" 
+                        type="text"
+                        minlength="1"
+                        maxlength="4"
+                        ng-model="term.download_period">
+                </div>
+                <div class="content-row g-clearfix">
+                    <a 
+                        ng-click="editTerminal(term, editTermForm.$valid)"
+                        class="f-spot-button">
+                        Сохранить
+                    </a>
+                </div>
+            </form>
+        </div>
+
+    </section>
+   <!--  <section class="section">
+        <p class="title"><a href="#event_add">Добавить</a></p>
+        <div class="content" data-slug="event_add">
+            <form class="custom">
+                <div class="content-row">
+                    <label for="type-event">Событие*</label>
+                    <select id="type-event" class="medium">
+                        <option>Обед</option>
+                        <option>Ужин</option>
+                        <option>Кофе</option>
+                        <option>Завтрак</option>
+                    </select>
+                </div>
+                <div class="content-row g-clearfix">
+                    <label for="start-time">Начало события (чч:мм)*</label>
+                    <input id="start-time" class="f-input-small" type="time" placeholder="00:00">
+                </div>
+                <div class="content-row g-clearfix">
+                    <label for="stop-time">Конец события (чч:мм)*</label>
+                    <input id="stop-time" class="f-input-small" type="time" placeholder="00:00">
+                </div>
+                <div class="content-row">
+                    <label for="price">Стоимость события</label>
+                    <input id="price" class="f-input-small" type="time" placeholder="10$">
+                </div>
+                <div class="content-row g-clearfix">
+                    <label for="time-out">Тайм-аут по умолчанию*</label>
+                    <input id="time-out" class="f-input-small left" type="time" placeholder="00:00">
+                    <a href="#" id="exception" class="f-spot-button left j-show-popup">+ Тайм-аут исключение</a>
+                </div>
+                <div class="content-row g-clearfix">
+                    <label for="staff">Привязать сотрудников</label>
+                    <a href="#" id="staff" class="f-spot-button left j-show-popup">+ Сотрудников</a>
+                </div>
+            </form>
+
+            <div class="content-row">
+                <a href="#" class="f-spot-button">Сохранить</a>
+            </div>
+            <div class="content-row m-row-h">
+                <h4 class="g-color-blue">Тайм-аут исключения</h4>
+            </div>
+            <div class="m-grid-search">
+                <input type="text" ng-model="search" placeholder="Поиск по исключениям">
+            </div>
+            <table class="m-spot-table" ng-grid="gridOptions">
+                <thead>
+                <tr>
+                    <th class="active"><span>Имя</span></th>
+                    <th><span>Группа</span></th>
+                    <th><span>Тайм-аут</span></th>
+                </tr>
+                </thead>
+                <tbody >
+                <tr class="m-t-cont-row">
+                    <td>Александр Полейчук</td>
+                    <td>Группа 1</td>
+                    <td>10 мин.</td>
+                </tr>
+                <tr class="m-t-cont-row">
+                    <td>Александр Полейчук</td>
+                    <td>Группа 1</td>
+                    <td>10 мин.</td>
+                </tr>
+                <tr class="m-t-cont-row">
+                    <td>Александр Полейчук</td>
+                    <td>Группа 2</td>
+                    <td>10 мин.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <section class="section">
+        <p class="title"><a href="#rent">Сдать в аренду</a></p>
+        <div class="content" data-slug="rent">
+            <form class="custom">
+                <div class="content-row  g-clearfix">
+                    <label for="add-email">Поддомен фирмы арендатора*</label>
+                    <input id="add-email" type="text" placeholder="Поддомен" class="left"><a href="#" class="f-spot-button">Сохранить</a>
+                </div>
+            </form>
+            <table class="m-spot-table" ng-grid="gridOptions">
+                <thead>
+                <tr>
+                    <th class="active"><span>Арендатор</span></th>
+                    <th><span>ИНН</span></th>
+                    <th><span>Дата</span></th>
+                </tr>
+                </thead>
+                <tbody >
+                    <tr class="m-t-cont-row">
+                        <td>Александр Полейчук</td>
+                        <td>10 мин.</td>
+                        <td>11.02.2013</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section> -->
+</div>
+{% endblock %}
