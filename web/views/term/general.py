@@ -40,6 +40,7 @@ def load_user(id):
 def before_request():
     g.user = current_user
     g.firm_info = get_firm_name(request)
+    g.token = session.sid
 
 
 @lm.unauthorized_handler
@@ -174,7 +175,7 @@ def forgot():
 @mod.route('/report', methods=['GET'])
 def default():
     """Перенаправление на вид по умолчанию"""
-    return redirect('/report/person')
+    return redirect('/report/summ')
 
 
 from web.views.term import report, terminal

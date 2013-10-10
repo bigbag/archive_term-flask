@@ -80,7 +80,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
       
       return false;
     };
-
+    term.csrf_token = $scope.token;
     $http.post('/terminal/add', term).success(function(data) {
       $scope.scrollPage('.m-page-name');
       if (data.error == 'yes') {
@@ -112,7 +112,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
       return false;
     };
     var url = '/terminal/' + term.id;
-
+    term.csrf_token = $scope.token;
     $http.post(url, term).success(function(data) {
       $scope.scrollPage('.m-page-name');
       if (data.error == 'yes') {

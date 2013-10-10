@@ -101,6 +101,7 @@ def add_term():
         answer['message'] = u'Терминал с таким ID уже есть в системе'
     else:
         form = TermAddForm.from_json(arg)
+
         if form.validate():
             term = Term()
             form.populate_obj(term)
