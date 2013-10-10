@@ -456,14 +456,13 @@ form.custom:first-child{
 	padding-top: 25px !important;
 }
 .m-session-table{
-	width: 100%;
 	border: 0;
 }
 .m-session-table td:last-child{
 	font-weight: 600;
 }
 .m-session-table td{
-	height: 35px;
+	height: 30px;
 }
 .m-spot-table .g-color-red{
 	font-weight: 600;
@@ -473,4 +472,24 @@ form.custom:first-child{
 }
 .session-negative td{
 	color: #fff;
+}
+.content-separation .m-session-table{
+	font-size: 14px;
+	margin-bottom: 0;
+}
+.content-separation h6{
+	font-weight: 600;
+	font-size: 14px;
+	font-family: arial;
+	margin-top: 0;
+	margin-bottom: 5px;
+}
+.content-separation .right{
+	padding-bottom: 0 !important;
+}
+.row-separation-l{
+
+}
+.content-separation .loc-link.f-spot-button{
+	margin-top: 39px;
 }

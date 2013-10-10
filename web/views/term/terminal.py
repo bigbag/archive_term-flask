@@ -23,7 +23,7 @@ def terminal_view():
     term_types = Term().get_type_list()
 
     return render_template(
-        'term/terminal/view.html',
+        'term/terminal/index.html',
         term_types=term_types,
         term=term,
     )
@@ -56,7 +56,7 @@ def terminal_info(term_id):
     term_events = TermEvent.query.filter(TermEvent.term_id == term_id)
 
     return render_template(
-        'term/terminal/index.html',
+        'term/terminal/view.html',
         term=term,
         term_events=term_events,
         term_types=term_types
@@ -113,8 +113,7 @@ def add_term():
                 firm_term.save()
 
                 answer['error'] = 'no'
-                answer['message'] = u"""Терминал успешно добавлен,
-                    в течении двух минут он отобразится в списке ваших терминалов"""
+                answer['message'] = u'Терминал успешно добавлен'
         else:
             answer['message'] = u"""Форма заполнена неверно,
                 проверьте формат полей"""
