@@ -12,6 +12,8 @@ from flask_wtf import Form
 from wtforms import TextField, DecimalField, IntegerField, ValidationError
 from wtforms.validators import *
 
+from web.form.base import TokenSecureForm
+
 
 def time_check(form, field):
     try:
@@ -23,7 +25,7 @@ def time_check(form, field):
 wtforms_json.init()
 
 
-class TermAddForm(Form):
+class TermAddForm(TokenSecureForm):
 
     id = IntegerField(validators=[InputRequired()])
     name = TextField(validators=[InputRequired()])
