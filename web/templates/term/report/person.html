@@ -3,7 +3,7 @@
 
 {% block content %}
 <h2 class="g-color-blue m-page-name">Люди</h2>
-<span ng-init="search.limit=20;search.action_type='report'"></span>
+<span ng-init="search.limit=20;search.action_type='get_grid_content'"></span>
 <div class="content">
     <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
         <div class="m-content-page">
@@ -25,7 +25,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="report in reports" class="m-t-cont-row">
+                <tr ng-repeat="report in result" class="m-t-cont-row">
                     <td>{[{report.last_name}]}</td>
                     <td>{[{report.first_name}]}</td>
                     <td>{[{report.midle_name}]}</td>

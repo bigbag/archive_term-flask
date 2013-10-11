@@ -17,7 +17,7 @@ from models.term_event import TermEvent
 @mod.route('/terminal', methods=['GET'])
 @login_required
 def terminal_view():
-    """Таблица имеющихся у фирмы терминалов"""
+    """Отображаем страницу со списком терминалов, сам список получаем отдельным запросом"""
 
     term = Term()
     term_types = Term().get_type_list()
@@ -33,7 +33,8 @@ def terminal_view():
 @login_required
 @json_headers
 def get_term_list():
-    """Получаем список терминалов"""
+    """Получаем список терминалов принаддежащих фирме"""
+
     arg = json.loads(request.stream.read())
     answer = Term().select_term_list(
         g.firm_info['id'], **arg)

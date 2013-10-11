@@ -3,7 +3,7 @@
 
 {% block content %}
 <h2 class="g-color-blue m-page-name">Терминалы</h2>
-<span ng-init="search.limit=20;search.action_type='terminal_view'"></span>
+<span ng-init="search.limit=20;search.action_type='get_grid_content'"></span>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
     <section class="section active" style="padding-top: 49px;">
         <p class="title"><a href="#all">Активные</a></p>
@@ -22,7 +22,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-click="getTerminalInfo(term.term_id)" ng-repeat="term in terms" class="m-t-cont-row">
+                    <tr ng-click="getTerminalInfo(term.term_id)" ng-repeat="term in result" class="m-t-cont-row">
                         <td>{[{term.term_id}]}</td>
                         <td>{[{term.name}]}</td>
                         <td>{[{term.firm}]}</td>

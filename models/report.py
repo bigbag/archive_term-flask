@@ -128,7 +128,7 @@ class Report(db.Model):
             result.append(data)
 
         value = dict(
-            report=result,
+            result=result,
             count=reports_count,
         )
 
@@ -258,7 +258,7 @@ class Report(db.Model):
             result.append(data)
 
         value = dict(
-            report=result,
+            result=result,
             count=answer['reports_count'],
         )
 

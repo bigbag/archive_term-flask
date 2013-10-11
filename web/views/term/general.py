@@ -42,8 +42,6 @@ def before_request():
     g.firm_info = get_firm_name(request)
     g.token = session['_id']
 
-    print session
-
 
 @lm.unauthorized_handler
 def unauthorized():
@@ -180,4 +178,4 @@ def default():
     return redirect('/report/summ')
 
 
-from web.views.term import report, terminal
+from web.views.term import report, terminal, person

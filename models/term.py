@@ -143,7 +143,7 @@ class Term(db.Model):
             result.append(data)
 
         value = dict(
-            terms=result,
+            result=result,
             count=query.count(),
         )
 
