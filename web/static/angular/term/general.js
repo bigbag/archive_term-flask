@@ -126,6 +126,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
 
   //Блокировка и разблокировка терминал
   $scope.lockingTerminal = function(term) {
+    term.csrf_token = $scope.token;
     if ($scope.term.status == 0) {
       $scope.term.status = 1;
     }

@@ -4,7 +4,7 @@
 {% block content %}
 <h2 class="g-color-blue m-page-name">
     <div ng-init="term.status={{term.status}}">
-        {{term.name}}
+        {[{term.name}]}
         <div class="right">
             <a ng-show="term.status" ng-click="lockingTerminal(term)" class="f-spot-button small">
                 Заблокировать
@@ -81,7 +81,7 @@
                             id="add-name" 
                             type="text"
                             name="name"
-                            ng-maxlength="300"
+                            maxlength="100"
                             ng-model="term.name"
                             required>
                     </div>

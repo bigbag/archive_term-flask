@@ -129,6 +129,9 @@ def locking_term():
     answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
 
+    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+        abort(403)
+
     if 'status' not in arg and 'id' not in arg:
         abort(400)
 
