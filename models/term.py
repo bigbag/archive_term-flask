@@ -30,6 +30,7 @@ class Term(db.Model):
     name = db.Column(db.String(300), nullable=False)
     tz = db.Column(db.String(300), nullable=False)
     blacklist = db.Column(db.Integer)
+    settings_id = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Integer, index=True)
     report_date = db.Column(db.DateTime)
     config_date = db.Column(db.DateTime)
@@ -52,6 +53,7 @@ class Term(db.Model):
         self.download_period = 5
         self.tz = app.config['TZ']
         self.blacklist = 0
+        self.settings_id = 1
         self.status = self.STATUS_VALID
 
     def __repr__(self):
