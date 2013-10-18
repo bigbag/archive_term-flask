@@ -31,7 +31,7 @@ mod = Blueprint('api_term', __name__)
 
 
 @mod.route('/configs/config_<int:term_id>.xml', methods=['GET'])
-#@cache.cached(timeout=120, key_prefix='term_config')
+@cache.cached(timeout=120, key_prefix='term_config')
 @xml_headers
 @md5_content_headers
 def api_get_config(term_id):

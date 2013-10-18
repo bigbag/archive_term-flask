@@ -6,7 +6,7 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from flask import json, g
+from flask import g
 from web import app, db, cache
 
 from helpers import date_helper

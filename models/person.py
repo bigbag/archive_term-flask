@@ -5,7 +5,8 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db, app
+from web import app, db, cache
+
 from helpers import date_helper
 
 
@@ -33,6 +34,39 @@ class Person(db.Model):
     def __init__(self):
         self.status = self.STATUS_VALID
         self.creation_date = date_helper.get_curent_date()
+
+    @cache.cached(timeout=5, key_prefix='select_term_list')
+    def select_person_list(self, firm_id, **kwargs):
+        order = kwargs['order'] if 'order' in kwargs else 'id desc'
+        limit = kwargs['limit'] if 'limit' in kwargs else 10
+        page = kwargs['page'] if 'page' in kwargs else 1
+        status = kwargs['status'] if 'status' in kwargs else 1
+
+        query = Person.query.filter(Person.firm_id == firm_id)
+        query = query.filter(Person.status == status)
+        persons = query.paginate(page, limit, False).items
+
+        result = []
+        for person in persons:
+            person.first_name = person.first_name if person.first_name else ''
+            person.midle_name = person.midle_name if person.midle_name else ''
+            person.last_name = person.last_name if person.last_name else ''
+            name = "%s %s %s" % (
+                person.first_name,
+                person.midle_name,
+                person.last_name)
+            data = dict(
+                name=name,
+                card=person.card,
+                status='active' if person.status == self.STATUS_VALID else '',
+            )
+            result.append(data)
+
+        value = dict(
+            result=result,
+            count=query.count(),
+        )
+        return value
 
     def __repr__(self):
         return '<id %r>' % (self.id)
