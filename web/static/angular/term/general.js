@@ -30,11 +30,8 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     var search = $scope.search;
     search.page = $scope.pagination.cur;
 
-    if (search.action_type == 'report'){
-      $scope.getReport(search);
-    }
-    else if (search.action_type == 'terminal_view') {
-      $scope.getTerminalView(search);
+    if (search.action_type == 'get_grid_content') {
+      $scope.getGridContent(search);
     }
   });
 
@@ -44,24 +41,12 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     {name:'Месяц', value:'month'},
   ];
 
-  //Запрос отчета
-  $scope.getReport = function(search) {
+  $scope.getGridContent = function(search) {
     if (search.page == undefined) search.page = 1;
-    
-    var url = window.location.pathname;
-    $http.post(url, search).success(function(data) {
-      $scope.reports = data.report;
-      $scope.search.page_count = data.count;
-      $scope.pagination.total = Math.ceil(data.count/$scope.search.limit);
-    });
-  };
 
-  //Запрос Списка терминалов
-  $scope.getTerminalView = function(search) {
-    if (search.page == undefined) search.page = 1;
     var url = window.location.pathname;
     $http.post(url, search).success(function(data) {
-      $scope.terms = data.terms;
+      $scope.result = data.result;
       $scope.search.page_count = data.count;
       $scope.pagination.total = Math.ceil(data.count/$scope.search.limit);
     });
@@ -126,6 +111,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
 
   //Блокировка и разблокировка терминал
   $scope.lockingTerminal = function(term) {
+    term.csrf_token = $scope.token;
     if ($scope.term.status == 0) {
       $scope.term.status = 1;
     }

@@ -94,12 +94,27 @@ def get_api_sign(secret, data):
 
     return H.hexdigest()
 
+
 def get_activkey(data):
     data = str(time.time()) + data
     return hashlib.sha1(data).hexdigest()
 
+
 def get_password_hash(password):
     return generate_password_hash(password, CRYPT_ROUND)
 
+
 def check_password(password_hash, password):
     return check_password_hash(password_hash, password)
+
+
+def get_user_token(request):
+    address = request.remote_addr
+    user_agent = request.user_agent
+
+    base = '{0}|{1}'.format(address, user_agent)
+    if str is bytes:
+        base = unicode(base, 'utf-8', errors='replace')
+    h = hashlib.md5()
+    h.update(base.encode('utf8'))
+    return h.hexdigest()
