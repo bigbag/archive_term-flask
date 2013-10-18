@@ -1,62 +1,62 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <config mode="{{ term.type }}" blacklist="{{ term.blacklist }}">
     <ntp>
-        <server>{{ config.NTP_SERVER }}</server>
+        <server>pool.ntp.org</server>
         <timezone>{{ term.tz }}</timezone>
     </ntp>
-    {% if config.DOWNLOAD %}
+    {% if config.download_status == 1 %}
     <download force_on_restart="1">
         <period>{{ term.download_period }}</period>
         <start time="{{ term.download_start }}:00"/>
         <stop time="{{ term.download_stop }}:00"/>
     </download>
     {% endif %}
-    {% if config.UPLOAD %}
+    {% if config.upload_status == 1 %}
     <upload force_on_restart="1">
         <period>{{ term.upload_period }}</period>
         <start time="{{ term.upload_start }}:00"/>
         <stop time="{{ term.upload_stop }}:00"/>
     </upload>
     {% endif %}
-    {% if config.UPDATE %}
+    {% if config.update_status == 1 %}
     {% if term.version %}
     <update force_on_restart="1">
-        <period>{{ config.UPDATE_PERIOD }}</period>
+        <period>1440</period>
         <qid>{{term.version}}</qid>
     </update>
     {% endif %}
     {% endif %}
-    {% if config.DOWNLOAD %}
+    {% if config.download_status == 1 %}
     <server goal="download">
-        <ip>{{ config.DOWNLOAD_IP }}</ip>
-        <port>{{ config.DOWNLOAD_PORT }}</port>
-        <proto upload_method="PUT">{{ config.DOWNLOAD_PROTO }}</proto>
-        <link>{{ config.DOWNLOAD_LINK_TYPE }}</link>
+        <ip>{{ config.download_ip }}</ip>
+        <port>{{ config.download_port }}</port>
+        <proto upload_method="PUT">{{ config.download_proto }}</proto>
+        <link>{{ config.download_link_type }}</link>
     </server>
     {% endif %}
-    {% if config.UPLOAD %}
+    {% if config.upload_status == 1 %}
     <server goal="upload">
-        <ip>{{ config.UPLOAD_IP }}</ip>
-        <port>{{ config.UPLOAD_PORT }}</port>
-        <proto upload_method="PUT">{{ config.UPLOAD_PROTO }}</proto>
-        <link>{{ config.UPLOAD_LINK_TYPE }}</link>
+        <ip>{{ config.upload_ip }}</ip>
+        <port>{{ config.upload_port }}</port>
+        <proto upload_method="PUT">{{ config.upload_proto }}</proto>
+        <link>{{ config.upload_link_type }}</link>
     </server>
     {% endif %}
-    {% if config.LOGGER %}
+    {% if config.logger_status == 1 %}
     <server goal="logger">
-        <ip>{{ config.LOGGER_IP }}</ip>
-        <port>{{ config.LOGGER_PORT }}</port>
-        <proto upload_method="PUT">{{ config.LOGGER_PROTO }}</proto>
-        <link>{{ config.LOGGER_LINK_TYPE }}</link>
+        <ip>{{ config.logger_ip }}</ip>
+        <port>{{ config.logger_port }}</port>
+        <proto upload_method="PUT">{{ config.logger_proto }}</proto>
+        <link>{{ config.logger_link_type }}</link>
     </server>
     {% endif %}
-    {% if config.UPDATE %}
+    {% if config.update_status == 1 %}
     {% if term.version %}
     <server goal="update">
-        <ip>{{ config.UPDATE_IP }}</ip>
-        <port>{{ config.UPDATE_PORT }}</port>
-        <proto upload_method="PUT">{{ config.UPDATE_PROTO }}</proto>
-        <link>{{ config.UPDATE_LINK_TYPE }}</link>
+        <ip>{{ config.update_ip }}</ip>
+        <port>{{ config.update_port }}</port>
+        <proto upload_method="PUT">{{ config.update_proto }}</proto>
+        <link>{{ config.update_link_type }}</link>
     </server>
     {% endif %}
     {% endif %}
