@@ -3,54 +3,48 @@
 
 {% block content %}
 <h2 class="g-color-blue m-page-name">Сотрудники</h2>
-<span ng-init="search.limit=20;search.action_type='get_grid_content'"></span>
+<span ng-init="search.limit=20;search.action_type='get_grid_content';search.status=1"></span>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
     <section class="section active">
-        <p class="title"><a href="#activ">Активные</a></p>
+        <p class="title">
+            <a href="#activ" ng-click="search.status=1">Активные</a>
+        </p>
         <div class="content" data-slug="activ">
             <div class="content-row">
                 <p class="m-hint">Кликните на строку с определенным сотрудником, чтобы редактировать его возможности по пользованию бесконтактными терминалами, установленными в Вашей компании.</p>
             </div>
             <div class="m-grid-search">
-                <input type="text" ng-model="search" placeholder="Поиск по фамилии или карте">
+                <input type="text" placeholder="Поиск по фамилии или карте">
             </div>
-            <table class="m-spot-table" ng-grid="gridOptions">
+            <table class="m-spot-table">
                 <thead>
                     <tr>
                         <th class="active no-arr"><span >ФИО</span></th>
-                        <th><span>Группа</span></th>
                         <th><span>Карта</span></th>
-                        <th><span>Номер карты</span></th>
+                        <th><span>Статус</span></th>
                     </tr>
                 </thead>
-                <tbody ng-controller="TodoCtrl" >
-                    <tr onclick="window.location='person.html'" ng-repeat="todo in staff|filter:search" class="m-t-cont-row">
-                        <td>{[{todo.name}]}</td>
-                        <td>{[{todo.group}]}</td>
-                        <td><span class="m-card-act {[{todo.status}]} g-round"></span></td>
-                        <td>{[{todo.number}]}</td>
+                <tbody>
+                    <tr ng-repeat="person in result" class="m-t-cont-row">
+                        <td>{[{person.name}]}</td>
+                        <td>{[{person.card}]}</td>
+                        <td><span class="m-card-act {[{person.status}]} g-round"></span></td>
                     </tr>
-
-                    <tr class="m-table-bottom">
-                        <td colspan="4">
-                            <ul class="pagination">
-                                <li class="current"><a href="">1</a></li>
-                                <li><a href="">2</a></li>
-                                <li><a href="">3</a></li>
-                                <li><a href="">4</a></li>
-                                <li><a href="">5</a></li>
-                                <li><a href="">6</a></li>
-                                <li><a href="">7</a></li>
-                            </ul>
+                    <tr class="m-table-bottom" ng-show="search.page_count">
+                        <td colspan="10">
+                            <ui-pagination 
+                                cur="pagination.cur" 
+                                total="pagination.total" 
+                                display="{[{pagination.display}]}">
+                            </ui-pagination>
                         </td>
                     </tr>
                 </tbody>
             </table>
-
         </div>
     </section>
     <section class="section">
-        <p class="title"><a href="#delete">Удаленные</a></p>
+        <p class="title"><a href="#delete" ng-click="search.status=-1">Удаленные</a></p>
         <div class="content" data-slug="delete">
                 <div class="content-row">
                     <p class="m-hint">
@@ -58,40 +52,33 @@
                     </p>
                 </div>
                 <div class="m-grid-search">
-                    <input type="text" ng-model="search" placeholder="Поиск по фамилии или карте">
-                </div>
-                <table class="m-spot-table" ng-grid="gridOptions">
-                    <thead>
+                <input type="text" placeholder="Поиск по фамилии или карте">
+            </div>
+            <table class="m-spot-table">
+                <thead>
                     <tr>
-                        <th class="active"><span>ФИО</span></th>
-                        <th><span>Группа</span></th>
+                        <th class="active no-arr"><span >ФИО</span></th>
                         <th><span>Карта</span></th>
-                        <th><span>Номер карты</span></th>
+                        <th><span>Статус</span></th>
                     </tr>
-                    </thead>
-                    <tbody ng-controller="TodoCtrl" >
-                        <tr ng-repeat="todo in staffRemoved|filter:search" class="m-t-cont-row">
-                            <td>{[{todo.name}]}</td>
-                            <td>{[{todo.group}]}</td>
-                            <td><span class="m-card-act {[{todo.status}]} g-round"></span></td>
-                            <td>{[{todo.number}]}</td>
-                        </tr>
-
-                    <tr class="m-table-bottom">
-                        <td colspan="4">
-                            <ul class="pagination">
-                                <li class="current"><a href="">1</a></li>
-                                <li><a href="">2</a></li>
-                                <li><a href="">3</a></li>
-                                <li><a href="">4</a></li>
-                                <li><a href="">5</a></li>
-                                <li><a href="">6</a></li>
-                                <li><a href="">7</a></li>
-                            </ul>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="person in result" class="m-t-cont-row">
+                        <td>{[{person.name}]}</td>
+                        <td>{[{person.card}]}</td>
+                        <td><span class="m-card-act {[{person.status}]} g-round"></span></td>
+                    </tr>
+                    <tr class="m-table-bottom" ng-show="search.page_count">
+                        <td colspan="10">
+                            <ui-pagination 
+                                cur="pagination.cur" 
+                                total="pagination.total" 
+                                display="{[{pagination.display}]}">
+                            </ui-pagination>
                         </td>
                     </tr>
-                    </tbody>
-                </table>
+                </tbody>
+            </table>
         </div>
     </section>
     <section class="section">
@@ -113,7 +100,7 @@
                     <th><span>Дата создания</span></th>
                 </tr>
                 </thead>
-                <tbody ng-controller="TodoCtrl" >
+                <tbody>
                 <tr onclick="window.location='group.html'" ng-repeat="todo in staffRemoved|filter:search" class="m-t-cont-row">
                     <td>Группа 1</td>
                     <td>5</td>

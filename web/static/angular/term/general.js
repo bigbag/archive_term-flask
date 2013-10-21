@@ -24,7 +24,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
       }, speed);
   }
 
-  $scope.$watch('pagination.cur + search.period', function() {
+  $scope.$watch('pagination.cur + search.period  + search.status', function() {
     if (!$scope.search) return false;
     
     var search = $scope.search;
@@ -41,6 +41,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     {name:'Месяц', value:'month'},
   ];
 
+  //Запрос на отображение табличных данных
   $scope.getGridContent = function(search) {
     if (search.page == undefined) search.page = 1;
 
