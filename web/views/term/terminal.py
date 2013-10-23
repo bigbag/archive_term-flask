@@ -19,14 +19,31 @@ from models.term_event import TermEvent
 def terminal_view():
     """Отображаем страницу со списком терминалов, сам список получаем отдельным запросом"""
 
-    term = Term()
-    term_types = Term().get_type_list()
+    return render_template('term/terminal/index.html')
 
-    return render_template(
-        'term/terminal/index.html',
+
+@mod.route('/terminal/content/<path:action>', methods=['POST'])
+@login_required
+@json_headers
+def get_terminal_content(action):
+    """Получаем блок для динамической вставки"""
+
+    term = None
+    term_types = None
+
+    if action == 'form':
+        term = Term()
+        term_types = Term().get_type_list()
+
+    answer = dict(content='', error='yes')
+    patch = "term/terminal/%s.html" % action
+    answer['content'] = render_template(
+        patch,
         term_types=term_types,
-        term=term,
-    )
+        term=term)
+    answer['error'] = 'no'
+
+    return jsonify(answer)
 
 
 @mod.route('/terminal', methods=['POST'])

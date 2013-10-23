@@ -140,7 +140,8 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     var url = '/' + parent + '/content/' + action;
     $http.post(url).success(function(data) {
       if (data.error == 'no') {
-        content_div.html($compile(data.content)($scope));
+         content_div.html($compile(data.content)($scope));
+         content_div.foundation('forms');
       }
     });
   }
