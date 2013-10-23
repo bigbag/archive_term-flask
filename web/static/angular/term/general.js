@@ -126,6 +126,25 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     });  
   }
 
+  //Загружаем шаблон
+  $scope.getContent = function(e, parent, action){
+    if (!parent) return false;
+    if (!action) return false;
+    if (!e) {
+      var content_div = angular.element('.section-container').find('.content');
+    }
+    else {
+      var content_div = angular.element(e.currentTarget).next('.content');
+    }
+
+    var url = '/' + parent + '/content/' + action;
+    $http.post(url).success(function(data) {
+      if (data.error == 'no') {
+        content_div.html($compile(data.content)($scope));
+      }
+    });
+  }
+
   $scope.pagination = {
     cur: 1,
     total: 7,

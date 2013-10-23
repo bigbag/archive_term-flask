@@ -27,7 +27,7 @@ class PaymentReccurent(db.Model):
     TYPE_LIMIT = 1
 
     MAX_COUNT = 3
-    PERIOD = 100
+    PERIOD = 20
 
     id = db.Column(db.Integer, primary_key=True)
     wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'), index=True)

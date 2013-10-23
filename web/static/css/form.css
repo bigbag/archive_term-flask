@@ -443,8 +443,8 @@ form input.small{
 .slide-setting  .f-email-case i{
 	background-color: #F8F9F9;
 }
-.slide-setting  .content-row{
-	padding: 30px 0 0 !important;
+.slide-setting .content-row{
+	padding: 10px 0 0 !important;
 }
 .slide-setting  .content-row:first-child{
 	padding: 0 !important;

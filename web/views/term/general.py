@@ -172,6 +172,7 @@ def forgot():
         'term/forgot.html')
 
 
+@mod.route('/report/', methods=['GET'])
 @mod.route('/report', methods=['GET'])
 def default():
     """Перенаправление на вид по умолчанию"""
