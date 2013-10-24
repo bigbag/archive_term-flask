@@ -270,7 +270,7 @@ input[type="time"][disabled],
 input[type="url"][disabled],
 textarea[disabled]  {
 	cursor: not-allowed;
-	background-color: #EEE;
+	background-color: #FDFDFD !important;
 }
 div.switch{
 	margin-bottom: 0;

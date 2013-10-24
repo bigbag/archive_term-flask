@@ -1,0 +1,35 @@
+<div class="content-row">
+    <p class="m-hint">
+        Кликните на строку с определенной группой, чтобы редактировать ее.
+    </p>
+</div>
+<table class="m-spot-table" ng-grid="gridOptions">
+    <thead>
+    <tr>
+        <th class="active"><span>Группа</span></th>
+        <th><span>Участников</span></th>
+        <th><span>Дата создания</span></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr onclick="window.location='group.html'" ng-repeat="todo in staffRemoved|filter:search" class="m-t-cont-row">
+        <td>Группа 1</td>
+        <td>5</td>
+        <td>15.03.2013</td>
+    </tr>
+
+    <tr class="m-table-bottom">
+        <td colspan="4">
+            <ul class="pagination">
+                <li class="current"><a href="">1</a></li>
+                <li><a href="">2</a></li>
+                <li><a href="">3</a></li>
+                <li><a href="">4</a></li>
+                <li><a href="">5</a></li>
+                <li><a href="">6</a></li>
+                <li><a href="">7</a></li>
+            </ul>
+        </td>
+    </tr>
+    </tbody>
+</table>

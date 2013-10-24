@@ -1,227 +1,34 @@
 {% import 'term/block.html' as block %}
+{% import 'term/person/list.html' as list %}
 {% extends "term/page.html" %}
 
 {% block content %}
 <h2 class="g-color-blue m-page-name">Сотрудники</h2>
 <span ng-init="search.limit=20;search.action_type='get_grid_content';search.status=1"></span>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
-    <section class="section active">
-        <p class="title">
-            <a href="#activ" ng-click="search.status=1">Активные</a>
+    <section class="section active">    
+        <p class="title" ng-click="getContent($event, 'person', 'list')">
+            <a ng-click="search.status=1">Активные</a>
         </p>
-        <div class="content" data-slug="activ">
-            <div class="content-row">
-                <p class="m-hint">Кликните на строку с определенным сотрудником, чтобы редактировать его возможности по пользованию бесконтактными терминалами, установленными в Вашей компании.</p>
-            </div>
-            <div class="m-grid-search">
-                <input type="text" placeholder="Поиск по фамилии или карте">
-            </div>
-            <table class="m-spot-table">
-                <thead>
-                    <tr>
-                        <th class="active no-arr"><span >ФИО</span></th>
-                        <th><span>Карта</span></th>
-                        <th><span>Статус</span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="person in result" class="m-t-cont-row">
-                        <td>{[{person.name}]}</td>
-                        <td>{[{person.card}]}</td>
-                        <td><span class="m-card-act {[{person.status}]} g-round"></span></td>
-                    </tr>
-                    <tr class="m-table-bottom" ng-show="search.page_count">
-                        <td colspan="10">
-                            <ui-pagination 
-                                cur="pagination.cur" 
-                                total="pagination.total" 
-                                display="{[{pagination.display}]}">
-                            </ui-pagination>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <div class="content">{{list}}</div>
     </section>
     <section class="section">
-        <p class="title"><a href="#delete" ng-click="search.status=-1">Удаленные</a></p>
-        <div class="content" data-slug="delete">
-                <div class="content-row">
-                    <p class="m-hint">
-                        Кликните на строку с определенным сотрудником, чтобы редактировать его возможности по пользованию бесконтактными терминалами, установленными в Вашей компании.
-                    </p>
-                </div>
-                <div class="m-grid-search">
-                <input type="text" placeholder="Поиск по фамилии или карте">
-            </div>
-            <table class="m-spot-table">
-                <thead>
-                    <tr>
-                        <th class="active no-arr"><span >ФИО</span></th>
-                        <th><span>Карта</span></th>
-                        <th><span>Статус</span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="person in result" class="m-t-cont-row">
-                        <td>{[{person.name}]}</td>
-                        <td>{[{person.card}]}</td>
-                        <td><span class="m-card-act {[{person.status}]} g-round"></span></td>
-                    </tr>
-                    <tr class="m-table-bottom" ng-show="search.page_count">
-                        <td colspan="10">
-                            <ui-pagination 
-                                cur="pagination.cur" 
-                                total="pagination.total" 
-                                display="{[{pagination.display}]}">
-                            </ui-pagination>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <p class="title" ng-click="getContent($event, 'person', 'list')">
+            <a ng-click="search.status=-1">Удаленные</a>
+        </p>
+        <div class="content"></div>
     </section>
     <section class="section">
-        <p class="title"><a href="#group">Группы</a></p>
-        <div class="content" data-slug="group">
-            <div class="content-row">
-                <p class="m-hint">
-                    Кликните на строку с определенной группой, чтобы редактировать ее.
-                </p>
-            </div>
-            <div class="m-grid-search">
-                <input type="text" ng-model="search" placeholder="Поиск по группам">
-            </div>
-            <table class="m-spot-table" ng-grid="gridOptions">
-                <thead>
-                <tr>
-                    <th class="active"><span>Группа</span></th>
-                    <th><span>Участников</span></th>
-                    <th><span>Дата создания</span></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr onclick="window.location='group.html'" ng-repeat="todo in staffRemoved|filter:search" class="m-t-cont-row">
-                    <td>Группа 1</td>
-                    <td>5</td>
-                    <td>15.03.2013</td>
-                </tr>
-
-                <tr class="m-table-bottom">
-                    <td colspan="4">
-                        <ul class="pagination">
-                            <li class="current"><a href="">1</a></li>
-                            <li><a href="">2</a></li>
-                            <li><a href="">3</a></li>
-                            <li><a href="">4</a></li>
-                            <li><a href="">5</a></li>
-                            <li><a href="">6</a></li>
-                            <li><a href="">7</a></li>
-                        </ul>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+        <p class="title" ng-click="getContent($event, 'person', 'group')">
+            <a>Группы</a>
+        </p>
+        <div class="content"></div>
     </section>
     <section class="section">
-        <p class="title"><a href="#add">Добавить</a></p>
-        <div class="content" data-slug="add">
-            <div class="content-row m-row-h">
-                <h4 class="g-color-blue">Добавить сотрудника</h4>
-            </div>
-            <form class="custom">
-                <div class="g-clear-b g-clearfix">
-                    <div class="content-row left g-clearfix">
-                        <label for="add-lastname">Фамилия*</label>
-                        <input id="add-lastname" type="text" placeholder="Фамилия">
-                        <label for="add-patronymic">Отчество</label>
-                        <input id="add-patronymic" type="text" placeholder="Отчество">
-                    </div>
-                    <div class="content-row g-clearfix">
-                        <label for="add-name">Имя*</label>
-                        <input id="add-name" type="text" placeholder="Имя">
-                    </div>
-                </div>
-                <div class="content-row g-clear-b">
-                    <label for="add-birthday">День рождения</label>
-                    <div class="f-datepicker">
-                        <input type="text" placeholder="День рождения" id="add-birthday" />
-                    </div>
-                </div>
-
-                <div class="content-row g-clearfix">
-                    <label for="add-tnumber">Табельный номер</label>
-                    <input id="add-tnumber" type="text" placeholder="Табельный номер">
-                </div>
-                <div class="content-row g-clearfix">
-                    <label for="add-cardnumber">Номер карты</label>
-                    <input id="add-cardnumber" type="text" placeholder="Номер карты">
-                </div>
-                <div class="content-row  g-clearfix">
-                    <label for="add-group">Добавть в группу</label>
-                    <div class="f-dd-light left">
-                        <input id="add-group" class="f-dd-input" type="text" placeholder="Гпуппа" class="left">
-                        <div class="dd-list">
-                            <ul>
-                                <li>Группа 1</li>
-                                <li>Группа 2</li>
-                                <li>Группа 3</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <a href="#" class="f-spot-button f-spot-button_plus">+</a>
-
-                    <div class="f-select-email">
-                        <span class="f-email-case g-radius-main">Группа 1<i class="g-round"></i></span> <span class="f-email-case g-radius-main">Группа 2<i class="g-round"></i></span>
-                    </div>
-                </div>
-                <div class="content-row g-clearfix">
-                    <a href="#" class="f-spot-button">Добавить</a>
-                </div>
-            </form>
-
-                <div class="content-row m-row-h">
-                    <h4 class="g-color-blue">Импорт</h4>
-                </div>
-            <div class="content-row g-clearfix">
-                <p class="m-hint">Вы можете загрузить таблицу Excel (xls, xlsx), данные должны быть только на первом листе. Расположение колонок в таблице:</p>
-
-                <div class="m-table-wrapper">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th class="g-color-red">Фамилия</th>
-                            <th class="g-color-red">Имя</th>
-                            <th>Отчество</th>
-                            <th>Номер&nbsp;карты <br>(8 цифр)</th>
-                            <th>День рождения (дд.мм.гггг)</th>
-                            <th>Табельный номер</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>Иванов</td>
-                            <td>Иван</td>
-                            <td>Иванович</td>
-                            <td>12345678</td>
-                            <td>29.12.1970</td>
-                            <td>11</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="content-row">
-                    <label for="ImportForm_file">Файл</label>
-                    <input id="ytImportForm_file" type="hidden" name="ImportForm[file]" value="">
-                    <input id="ImportForm_file" type="file" name="ImportForm[file]">
-
-                </div>
-                <div class="content-row g-clearfix">
-                    <a href="#" class="f-spot-button">Загрузить</a>
-                </div>
-        </div>
+        <p class="title" ng-click="getContent($event, 'person', 'add')">
+            <a>Добавить</a>
+        </p>
+        <div class="content"></div>
     </section>
 </div>
 {% endblock %}
