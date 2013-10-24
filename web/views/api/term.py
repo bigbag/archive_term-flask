@@ -40,7 +40,6 @@ def api_get_xml_config(term_id):
 
 @mod.route('/configs/config_<int:term_id>.xml.gz', methods=['GET'])
 @cache.cached(timeout=120, key_prefix='term_gzip_config')
-@xml_headers
 @gzip_content
 @md5_content_headers
 def api_get_gzip_config(term_id):
@@ -91,7 +90,6 @@ def api_get_xml_blacklist():
 
 @mod.route('/configs/blacklist.xml.gz', methods=['GET'])
 @cache.cached(timeout=120, key_prefix='term_gzip_blacklist')
-@xml_headers
 @gzip_content
 @md5_content_headers
 def api_get_gzip_blacklist():
