@@ -76,6 +76,7 @@ def gzip_content(f):
         resp.data = gzip_buffer.getvalue()
 
         h = resp.headers
+        h['Content-Type'] = 'application/gzip'
         h['Content-Encoding'] = 'gzip'
         h['Content-Length'] = len(resp.data)
 
