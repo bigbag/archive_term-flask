@@ -176,7 +176,8 @@ def api_upload_report(term_id, report_datetime):
 
 
 @mod.route('/configs/callback/<int:term_id>_<action>', methods=['POST'])
-def api_set_callback(term_id, action):
+@mod.route('/configs/callback/<int:term_id>_<action>_<version>', methods=['POST'])
+def api_set_callback(term_id, action, version=None):
     """Сообщение об удачной загрузки отчета"""
 
     VALID_ACTITON = (
