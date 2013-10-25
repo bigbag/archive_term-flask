@@ -53,7 +53,8 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     });
   };
 
-  $scope.getTerminalInfo = function(term_id) {
+  //Переадресация на страницу информации о терминале
+  $scope.getTerminalView = function(term_id) {
     $(location).attr('href','/terminal/' + term_id);
   };
 
@@ -138,7 +139,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     }
 
     var url = '/' + parent + '/content/' + action;
-    $http.post(url).success(function(data) {
+    $http.post(url, $scope.search).success(function(data) {
       if (data.error == 'no') {
          content_div.html($compile(data.content)($scope));
          content_div.foundation('forms');

@@ -45,10 +45,10 @@ class Term(db.Model):
 
     def __init__(self):
         self.type = self.TYPE_VENDING
-        self.upload_start = "00:00"
+        self.upload_start = "00:01"
         self.upload_stop = "23:59"
         self.upload_period = 5
-        self.download_start = "00:00"
+        self.download_start = "00:01"
         self.download_stop = "23:59"
         self.download_period = 5
         self.tz = app.config['TZ']
@@ -61,8 +61,8 @@ class Term(db.Model):
 
     def get_type_list(self):
         result = []
-        result.append((self.TYPE_VENDING, u"Вендинговый"))
-        result.append((self.TYPE_POS, u"Платежный"))
+        result.append({'id': self.TYPE_VENDING, 'name': u"Вендинговый"})
+        result.append({'id': self.TYPE_POS, 'name': u"Платежный"})
         return result
 
     def get_valid_term(self, term_id):

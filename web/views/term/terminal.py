@@ -22,12 +22,37 @@ def terminal_view():
     return render_template('term/terminal/index.html')
 
 
+@mod.route('/terminal/content/form', methods=['POST'])
+@login_required
+@json_headers
+def get_terminal_form():
+    """Получаем форму для редактирования и добавления терминала"""
+
+    answer = dict(content='', error='yes')
+    arg = json.loads(request.stream.read())
+
+    term = Term()
+    term_types = Term().get_type_list()
+    print term_types
+    if 'term_id' in arg and arg['term_id']:
+        term = Term.query.get(int(arg['term_id']))
+
+    answer['content'] = render_template(
+        "term/terminal/form.html",
+        term_types=term_types,
+        term=term)
+    answer['error'] = 'no'
+
+    return jsonify(answer)
+
+
 @mod.route('/terminal/content/<path:action>', methods=['POST'])
 @login_required
 @json_headers
 def get_terminal_content(action):
     """Получаем блок для динамической вставки"""
 
+    answer = dict(content='', error='yes')
     term = None
     term_types = None
 
@@ -35,7 +60,6 @@ def get_terminal_content(action):
         term = Term()
         term_types = Term().get_type_list()
 
-    answer = dict(content='', error='yes')
     patch = "term/terminal/%s.html" % action
     answer['content'] = render_template(
         patch,
@@ -50,7 +74,7 @@ def get_terminal_content(action):
 @login_required
 @json_headers
 def get_term_list():
-    """Получаем список терминалов принаддежащих фирме"""
+    """Получаем список терминалов принадлежащих фирме"""
 
     arg = json.loads(request.stream.read())
     answer = Term().select_term_list(
@@ -70,14 +94,12 @@ def terminal_info(term_id):
     if not term:
         abort(404)
 
-    term_types = Term().get_type_list()
     term_events = TermEvent.query.filter(TermEvent.term_id == term_id)
 
     return render_template(
         'term/terminal/view.html',
         term=term,
-        term_events=term_events,
-        term_types=term_types
+        term_events=term_events
     )
 
 
@@ -89,7 +111,7 @@ def edit_term(term_id):
     answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
 
-    term = Term.query.get(int(arg['id']))
+    term = Term.query.get(int(term_id))
     if not term:
         abort(404)
 
@@ -150,7 +172,7 @@ def locking_term():
     if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
         abort(403)
 
-    if 'status' not in arg and 'id' not in arg:
+    if 'status' not in arg or 'id' not in arg:
         abort(400)
 
     term = Term.query.get(int(arg['id']))
