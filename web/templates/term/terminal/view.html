@@ -6,6 +6,7 @@
 <h2 class="g-color-blue m-page-name">
     <div>
         {{term.name}}
+        {% if term_access %}
         <div class="right">
             <a 
                 ng-show="term.status" 
@@ -21,6 +22,7 @@
             </a>
             <a class="f-spot-button bg-red small">Удалить терминал</a>
         </div>
+        {% endif %}
     </div>
 </h2>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
@@ -47,7 +49,7 @@
                     </table>
                 </div>
                 <div class="content-row row-separation-l">
-                    <p class="m-hint">Для события кликните по соотвествующей строке в таблице</p>
+                    <p class="m-hint">Для изменения события кликните по соотвествующей строке в таблице</p>
                 </div>
                 <!-- <div class="content-row f-main-slide-link">
                     <div class="toggle-active"><a id="filter" href="javascript:;" class="loc-link f-spot-button small">+ Добавить событие</a></div>

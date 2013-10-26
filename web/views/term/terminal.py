@@ -22,6 +22,19 @@ def terminal_view():
     return render_template('term/terminal/index.html')
 
 
+@mod.route('/terminal', methods=['POST'])
+@login_required
+@json_headers
+def get_term_list():
+    """Получаем список терминалов принадлежащих фирме"""
+
+    arg = json.loads(request.stream.read())
+    answer = Term().select_term_list(
+        g.firm_info['id'], **arg)
+
+    return jsonify(answer)
+
+
 @mod.route('/terminal/content/form', methods=['POST'])
 @login_required
 @json_headers
@@ -70,19 +83,6 @@ def get_terminal_content(action):
     return jsonify(answer)
 
 
-@mod.route('/terminal', methods=['POST'])
-@login_required
-@json_headers
-def get_term_list():
-    """Получаем список терминалов принадлежащих фирме"""
-
-    arg = json.loads(request.stream.read())
-    answer = Term().select_term_list(
-        g.firm_info['id'], **arg)
-
-    return jsonify(answer)
-
-
 @mod.route('/terminal/<int:term_id>', methods=['GET'])
 @login_required
 def terminal_info(term_id):
@@ -94,12 +94,14 @@ def terminal_info(term_id):
     if not term:
         abort(404)
 
+    term_access = FirmTerm().get_access_by_firm_id(g.firm_info['id'], term_id)
     term_events = TermEvent.query.filter(TermEvent.term_id == term_id)
 
     return render_template(
         'term/terminal/view.html',
         term=term,
-        term_events=term_events
+        term_events=term_events,
+        term_access=term_access,
     )
 
 
