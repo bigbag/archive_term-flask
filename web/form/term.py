@@ -13,7 +13,9 @@ from wtforms import TextField, DecimalField, IntegerField, ValidationError
 from wtforms.validators import *
 
 from web.form.base import TokenSecureForm
-from webform import base
+from web.form import base
+
+wtforms_json.init()
 
 
 class TermAddForm(TokenSecureForm):

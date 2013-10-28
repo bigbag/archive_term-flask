@@ -19,8 +19,6 @@ def time_check(form, field):
     except ValueError:
         raise ValidationError('Bad time format')
 
-wtforms_json.init()
-
 
 class TokenSecureForm(Form):
 
