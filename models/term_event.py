@@ -18,6 +18,7 @@ class TermEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     age = db.Column(db.Integer, nullable=False)
     cost = db.Column(db.Integer, nullable=False)
+    timeout = db.Column(db.Integer, nullable=False)
     start = db.Column(db.String(10), nullable=False)
     stop = db.Column(db.String(10), nullable=False)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
@@ -28,8 +29,9 @@ class TermEvent(db.Model):
     def __init__(self):
         self.cost = 0
         self.age = 0
-        self.start = "00:00"
+        self.start = "00:01"
         self.stop = "23:59"
+        self.timeout = 0
 
     def __repr__(self):
         return '<id %r>' % (self.id)

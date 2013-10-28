@@ -1,0 +1,76 @@
+<div class="m-block">
+    <form class="custom" name="eventForm">
+        <div class="content-row" ng-init="term_event.event_id='{{term_event.event_id}}'">
+            <label for="type-event">Событие*</label>
+            <select id="type-event" 
+                class="medium"
+                min="1"
+                ng-model="term_event.event_id"
+                required>
+                {% for event in events %}
+                <option 
+                    {% if event.id == term_event.event_id %} selected="selected" {% endif %} 
+                    value="{{event.id}}">
+                    {{event.name}}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="content-row left g-clearfix"
+            ng-init="term_event.start='{{term_event.start}}'">
+            <label for="start-time">Начало события (чч:мм)*</label>
+            <input id="start-time" 
+                class="f-input-small" 
+                type="text"
+                minlength="5"
+                maxlength="5"
+                ng-model="term_event.start"
+                required>
+        </div>
+        <div class="content-row g-clearfix"
+            ng-init="term_event.stop='{{term_event.stop}}'">
+            <label for="stop-time">Конец события (чч:мм)*</label>
+            <input id="stop-time" 
+                class="f-input-small" 
+                type="text"
+                minlength="5"
+                maxlength="5"
+                ng-model="term_event.stop"
+                required>
+        </div>
+        <div class="content-row"
+            ng-init="term_event.cost='{{term_event.cost}}'">
+            <label for="price">Стоимость события</label>
+            <input id="price" 
+                class="f-input-small" 
+                type="text"
+                minlength="1"
+                maxlength="5"
+                ng-model="term_event.cost">
+        </div>
+        <div class="content-row g-clearfix"
+            ng-init="term_event.timeout='{{term_event.timeout}}'">
+            <label for="time-out">Тайм-аут по умолчанию (в секундах)*</label>
+            <input id="time-out" 
+                class="f-input-small left"
+                minlength="1"
+                maxlength="5" 
+                type="text"
+                ng-model="term_event.timeout"
+                required>
+        </div>
+    </form>
+
+    <div ng-hide="term_event.id" class="content-row g-clearfix">
+        <a ng-click="addEventTerminal(term_event, eventForm.$valid)"
+            class="f-spot-button">
+            Добавить
+        </a>
+    </div>
+    <div ng-show="term_event.id" class="content-row g-clearfix">
+        <a ng-click="editEventTerminal(term_event, eventForm.$valid)"
+            class="f-spot-button">
+            Сохранить
+        </a>
+    </div>
+</div>

@@ -8,19 +8,19 @@
         {{term.name}}
         {% if term_access %}
         <div class="right">
-            <a 
-                ng-show="term.status" 
+            <a ng-show="term.status" 
                 ng-click="lockingTerminal(term)" 
                 class="f-spot-button small">
                 Заблокировать
             </a>
-            <a 
-                ng-hide="term.status" 
+            <a ng-hide="term.status" 
                 ng-click="lockingTerminal(term)" 
                 class="f-spot-button small">
                 Разблокировать
             </a>
-            <a class="f-spot-button bg-red small">Удалить терминал</a>
+            <!-- <a class="f-spot-button bg-red small">
+                Удалить терминал
+            </a> -->
         </div>
         {% endif %}
     </div>
@@ -51,9 +51,16 @@
                 <div class="content-row row-separation-l">
                     <p class="m-hint">Для изменения события кликните по соотвествующей строке в таблице</p>
                 </div>
-                <!-- <div class="content-row f-main-slide-link">
-                    <div class="toggle-active"><a id="filter" href="javascript:;" class="loc-link f-spot-button small">+ Добавить событие</a></div>
-                </div> -->
+                <div class="content-row f-main-slide-link">
+                    <div class="toggle-active">
+                        <a id="event" class="loc-link f-spot-button small" 
+                            ng-click="termEventForm($event, term)">
+                            + Добавить событие
+                        </a>
+                    </div>
+                </div>
+                <div id="eventForm" class="slide-box slide-setting">
+                </div>
                 <table class="m-spot-table">
                     <thead>
                     <tr>
