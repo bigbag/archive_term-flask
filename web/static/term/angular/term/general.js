@@ -1,8 +1,17 @@
 'use strict';
-function GeneralCtrl($scope, $http, $compile, $timeout) {
+
+angular.module('term').controller('GeneralCtrl', function($scope, $http, $compile, $timeout) {
   var resultModal = angular.element('.m-result');
   var resultContent = resultModal.find('p');
 
+  //Параметры по умолчанию для пагинации
+  $scope.pagination = {
+    cur: 1,
+    total: 7,
+    display: 15
+  }
+
+  //Вызываем модальное окно
   $scope.setModal = function(content, type){
     resultModal.removeClass('m-negative');
     if (type == 'error') {
@@ -16,6 +25,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     }, 5000);
   };
 
+  //Автоскролинг до нужного блока
   $scope.scrollPage = function(dom_name, speed){
     speed = typeof speed !== 'undefined' ? speed : 600;
     var scroll_height = $(dom_name).offset().top;
@@ -24,9 +34,28 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
       }, speed);
   }
 
+  //Загружаем динамический шаблон
+  $scope.getContent = function(e, parent, action){
+    if (!parent) return false;
+    if (!action) return false;
+    if (!e) {
+      var content_div = angular.element('.section-container').find('.content');
+    }
+    else {
+      var content_div = angular.element(e.currentTarget).next('.content');
+    }
+
+    var url = '/' + parent + '/content/' + action;
+    $http.post(url, $scope.search).success(function(data) {
+      if (data.error == 'no') {
+        content_div.html($compile(data.content)($scope));    
+      }
+    });
+  }
+
+  //Тригер на запрос табличных данных по параметрам
   $scope.$watch('pagination.cur + search.period  + search.status', function() {
     if (!$scope.search) return false;
-    
     var search = $scope.search;
     search.page = $scope.pagination.cur;
 
@@ -35,6 +64,7 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     }
   });
 
+  //Список периодов для отчетов
   $scope.report_detaled_periods = [
     {name:'День', value:'day'},
     {name:'Неделя', value:'week'},
@@ -58,17 +88,26 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     $(location).attr('href','/terminal/' + term_id);
   };
 
-  //Добавляем терминал
-  $scope.addTerminal = function(term, valid) {
+  //Тригер на изменение снятие ошибки при изменение полей, в форме добавления терминала
+  $scope.$watch('term.id + term.name', function(term) {
+    if ($scope.term) {
+      angular.element('input[name=id]').removeClass('error');
+      angular.element('input[name=name]').removeClass('error');
+    }
+  });
+
+
+  //Добавляем новый или редактируем старый терминал
+  $scope.saveTerminal = function(term, valid) {
     if (!valid) {
       angular.element('#add_term input[name=id]').addClass('error');
       angular.element('#add_term input[name=name]').addClass('error');
       $scope.scrollPage('.m-page-name');
-      
       return false;
     };
+    var url = '/terminal/' + term.id + '/' + term.action;
     term.csrf_token = $scope.token;
-    $http.post('/terminal/add', term).success(function(data) {
+    $http.post(url, term).success(function(data) {
       $scope.scrollPage('.m-page-name');
       if (data.error == 'yes') {
         $scope.setModal(data.message, 'error');
@@ -79,39 +118,10 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
           $(location).attr('href','/terminal');
         }, 2000);
       }
-    });
-    
-  };
-
-  //Добавление терминала, удаляем класс ошибки
-  $scope.$watch('term.id + term.name', function(term) {
-    if ($scope.term) {
-      angular.element('input[name=id]').removeClass('error');
-      angular.element('input[name=name]').removeClass('error');
-    }
-  });
-
-  //Редактируем терминал
-  $scope.editTerminal = function(term, valid) {
-    if (!valid) {
-      angular.element('#add_term input[name=name]').addClass('error');
-      $scope.scrollPage('.m-page-name');
-      return false;
-    };
-    var url = '/terminal/' + term.id;
-    term.csrf_token = $scope.token;
-    $http.post(url, term).success(function(data) {
-      $scope.scrollPage('.m-page-name');
-      if (data.error == 'yes') {
-        $scope.setModal(data.message, 'error');
-      }
-      else {
-        $scope.setModal(data.message, 'success');
-      }
     });   
   };
 
-  //Блокировка и разблокировка терминал
+  //Блокируем и разблокируем терминал
   $scope.lockingTerminal = function(term) {
     term.csrf_token = $scope.token;
     if ($scope.term.status == 0) {
@@ -127,52 +137,50 @@ function GeneralCtrl($scope, $http, $compile, $timeout) {
     });  
   }
 
-  //Запрос формы редактирования события, прявязанного к терминалу
-  $scope.termEventForm = function(e, term){
-    var event_form = angular.element('#eventForm');
-    var event_id = angular.element('#event');
+  //Переадресация на страницу редактирования привязанного события
+  $scope.getTermEventEdit = function(term_id, term_event_id) {
+    $(location).attr('href','/terminal/' + term_id + '/event/' + term_event_id);
+  };
 
-    if (!event_id.hasClass('active')){
-      $http.post('/terminal/event/form', term).success(function(data) {
-        if (data.error == 'no') {
-          event_form.html($compile(data.content)($scope));
-          event_form.foundation('forms');
-        }
-      });
-    }
-    else {
-      event_form.empty();
-    }
-  }
 
-  //Привязываем новое событие к терминалу
-  $scope.addEventTerminal = function(term_event, valid){
-    console.log(term_event);
-  }
+  //Привязываем новое событие к терминалу или редактируем уже привязанное
+  $scope.saveEventTerminal = function(term_event, valid){
+    if (!valid) return false;
 
-  //Загружаем динамический шаблон
-  $scope.getContent = function(e, parent, action){
-    if (!parent) return false;
-    if (!action) return false;
-    if (!e) {
-      var content_div = angular.element('.section-container').find('.content');
-    }
-    else {
-      var content_div = angular.element(e.currentTarget).next('.content');
-    }
+    if (term_event.id == undefined) term_event.id = 0;
+    term_event.csrf_token = $scope.token;
 
-    var url = '/' + parent + '/content/' + action;
-    $http.post(url, $scope.search).success(function(data) {
-      if (data.error == 'no') {
-         content_div.html($compile(data.content)($scope));
-         content_div.foundation('forms');
+    var url = '/terminal/' + term_event.term_id + '/event/' + term_event.id;
+    $http.post(url, term_event).success(function(data) {
+      $scope.scrollPage('.m-page-name');
+      if (data.error == 'yes') {
+        $scope.setModal(data.message, 'error');
       }
-    });
+      else {
+        $scope.setModal(data.message, 'success');
+        setTimeout(function(){
+          $(location).attr('href','/terminal/' + term_event.term_id);
+        }, 2000);
+      }
+    });  
   }
 
-  $scope.pagination = {
-    cur: 1,
-    total: 7,
-    display: 15
+  //Удаляем привязанное событие
+  $scope.deleteEventTerminal = function(term_event){
+    var url = '/terminal/' + term_event.term_id + '/event/' + term_event.id + '/delete';
+    term_event.csrf_token = $scope.token;
+    $http.post(url, term_event).success(function(data) {
+      $scope.scrollPage('.m-page-name');
+      if (data.error == 'yes') {
+        $scope.setModal(data.message, 'error');
+      }
+      else {
+        $scope.setModal(data.message, 'success');
+        setTimeout(function(){
+          $(location).attr('href','/terminal/' + term_event.term_id);
+        }, 2000);
+      }
+    });  
   }
-}
+
+});

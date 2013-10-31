@@ -1,20 +1,25 @@
 <div class="m-block">
     <form class="custom" name="eventForm">
-        <div class="content-row" ng-init="term_event.event_id='{{term_event.event_id}}'">
-            <label for="type-event">Событие*</label>
-            <select id="type-event" 
-                class="medium"
-                min="1"
-                ng-model="term_event.event_id"
-                required>
-                {% for event in events %}
-                <option 
-                    {% if event.id == term_event.event_id %} selected="selected" {% endif %} 
-                    value="{{event.id}}">
-                    {{event.name}}
-                </option>
-                {% endfor %}
-            </select>
+        <div class="row" 
+            ng-init="term_event.id={{term_event.id}};term_event.term_id={{term.id}}">
+            <div class="large-5 columns">
+                <div class="content-row" ng-init="term_event.event_id={{term_event.event_id}}">
+                    <label for="type-event">Событие*</label>
+                    <select id="type-event" 
+                        class="medium"
+                        min="1"
+                        ng-model="term_event.event_id"
+                        required>
+                        {% for event in events %}
+                        <option 
+                            {% if event.id == term_event.event_id %} selected {% endif %} 
+                            value="{{event.id}}">
+                            {{event.name}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
         </div>
         <div class="content-row left g-clearfix"
             ng-init="term_event.start='{{term_event.start}}'">
@@ -49,7 +54,7 @@
                 ng-model="term_event.cost">
         </div>
         <div class="content-row g-clearfix"
-            ng-init="term_event.timeout='{{term_event.timeout}}'">
+            ng-init="term_event.timeout={{term_event.timeout}}">
             <label for="time-out">Тайм-аут по умолчанию (в секундах)*</label>
             <input id="time-out" 
                 class="f-input-small left"
@@ -61,16 +66,16 @@
         </div>
     </form>
 
-    <div ng-hide="term_event.id" class="content-row g-clearfix">
-        <a ng-click="addEventTerminal(term_event, eventForm.$valid)"
+    <div class="content-row g-clearfix">
+        <a ng-click="saveEventTerminal(term_event, eventForm.$valid)"
             class="f-spot-button">
-            Добавить
+            <span ng-hide="term_event.id">Добавить</span>
+            <span ng-show="term_event.id">Сохранить</span>
         </a>
-    </div>
-    <div ng-show="term_event.id" class="content-row g-clearfix">
-        <a ng-click="editEventTerminal(term_event, eventForm.$valid)"
-            class="f-spot-button">
-            Сохранить
+        <a ng-show="term_event.id" 
+            ng-click="deleteEventTerminal(term_event)"
+            class="f-spot-button bg-red">
+            Удалить событие
         </a>
     </div>
 </div>

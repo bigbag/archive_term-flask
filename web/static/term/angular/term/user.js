@@ -1,5 +1,6 @@
 'use strict';
-function UserCtrl($scope, $http, $compile, $timeout) {
+
+angular.module('term').controller('UserCtrl', function($scope, $http, $compile, $timeout) {
 
   var resultModal = angular.element('.m-result');
   var resultContent = resultModal.find('p');
@@ -80,4 +81,4 @@ function UserCtrl($scope, $http, $compile, $timeout) {
       }
     });
   };
-}
+});

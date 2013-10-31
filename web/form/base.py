@@ -8,6 +8,7 @@
 import time
 
 from flask import request
+from wtforms import ValidationError
 
 from flask_wtf import Form
 

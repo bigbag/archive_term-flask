@@ -8,11 +8,13 @@
 from web.views.term.general import *
 
 from web.form.term import TermAddForm
+from web.form.event import TermEventAddForm
 
 from models.term import Term
 from models.event import Event
 from models.firm_term import FirmTerm
 from models.term_event import TermEvent
+from models.person_event import PersonEvent
 
 
 @mod.route('/terminal/content/<path:action>', methods=['POST'])
@@ -44,7 +46,11 @@ def terminal_dynamic_content(action):
 def terminal_view():
     """Отображаем страницу со списком терминалов, сам список получаем отдельным запросом"""
 
-    return render_template('term/terminal/index.html')
+    return render_template(
+        'term/terminal/index.html',
+        term=Term(),
+        term_types=Term().get_type_list()
+    )
 
 
 @mod.route('/terminal', methods=['POST'])
@@ -60,37 +66,37 @@ def terminal_list():
     return jsonify(answer)
 
 
-@mod.route('/terminal/content/form', methods=['POST'])
+@mod.route('/terminal/<int:term_id>', methods=['GET'])
 @login_required
-@json_headers
-def terminal_form():
-    """Получаем форму для редактирования и добавления терминала"""
+def terminal_info(term_id):
+    """Информация о терминале"""
+    if not term_id in FirmTerm().get_list_by_firm_id(g.firm_info['id']):
+        abort(403)
 
-    answer = dict(content='', error='yes')
-    arg = json.loads(request.stream.read())
+    term = Term().get_info_by_id(term_id)
+    if not term:
+        abort(404)
 
-    term = Term()
-    term_types = Term().get_type_list()
-    print term_types
-    if 'term_id' in arg and arg['term_id']:
-        term = Term.query.get(int(arg['term_id']))
+    events = Event().get_events()
+    term_event = TermEvent()
 
-    answer['content'] = render_template(
-        "term/terminal/form.html",
-        term_types=term_types,
-        term=term)
-    answer['error'] = 'no'
+    term_access = FirmTerm().get_access_by_firm_id(g.firm_info['id'], term_id)
+    term_events = TermEvent.query.filter(TermEvent.term_id == term_id)
 
-    return jsonify(answer)
+    return render_template(
+        'term/terminal/view.html',
+        term=term,
+        events=events,
+        term_event=term_event,
+        term_events=term_events,
+        term_access=term_access,
+        term_types=Term().get_type_list()
+    )
 
 
-@mod.route('/terminal/add', methods=['POST'])
-@login_required
-@json_headers
-def terminal_add():
+def terminal_add(arg):
     """Добавляем терминал"""
     answer = dict(error='yes', message='')
-    arg = json.loads(request.stream.read())
 
     term = Term.query.get(int(arg['id']))
 
@@ -118,19 +124,16 @@ def terminal_add():
     return jsonify(answer)
 
 
-@mod.route('/terminal/<int:term_id>', methods=['POST'])
-@login_required
-@json_headers
-def terminal_edit(term_id):
+def terminal_edit(arg, term_id):
     """Редактируем терминал"""
     answer = dict(error='yes', message='')
-    arg = json.loads(request.stream.read())
 
     term = Term.query.get(int(term_id))
     if not term:
         abort(404)
 
     form = TermAddForm.from_json(arg)
+
     if form.validate():
         form.populate_obj(term)
 
@@ -140,6 +143,21 @@ def terminal_edit(term_id):
     else:
         answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
     return jsonify(answer)
+
+
+@mod.route('/terminal/<int:term_id>/<action>', methods=['POST'])
+@login_required
+@json_headers
+def terminal_save(term_id, action):
+    """Добавляем или редактируем терминал"""
+    arg = json.loads(request.stream.read())
+
+    if 'add' in action:
+        result = terminal_add(arg)
+    elif 'edit' in action:
+        result = terminal_edit(arg, term_id)
+
+    return result
 
 
 @mod.route('/terminal/locking', methods=['POST'])
@@ -168,55 +186,92 @@ def terminal_locking():
     return jsonify(answer)
 
 
-@mod.route('/terminal/<int:term_id>', methods=['GET'])
+@mod.route('/terminal/<int:term_id>/event/<int:term_event_id>', methods=['GET'])
 @login_required
-def terminal_info(term_id):
-    """Информация о терминале"""
-    if not term_id in FirmTerm().get_list_by_firm_id(g.firm_info['id']):
-        abort(403)
+def terminal_event_info(term_id, term_event_id):
+    """Информация о событии привязаном к терминалу"""
 
     term = Term().get_info_by_id(term_id)
     if not term:
         abort(404)
 
-    term_access = FirmTerm().get_access_by_firm_id(g.firm_info['id'], term_id)
-    term_events = TermEvent.query.filter(TermEvent.term_id == term_id)
+    term_event = TermEvent.query.get(int(term_event_id))
+    if not term_event:
+        abort(404)
 
-    return render_template(
-        'term/terminal/view.html',
-        term=term,
-        term_events=term_events,
-        term_access=term_access,
-    )
-
-
-@mod.route('/terminal/event/form', methods=['POST'])
-@login_required
-@json_headers
-def terminal_event_add_form():
-    """Отображаем форму добавления или изменения события на терминале"""
-    answer = dict(error='yes', content='')
-    arg = json.loads(request.stream.read())
+    if term_event.term_id != term.id:
+        abort(400)
 
     events = Event().get_events()
-    term_event = TermEvent()
 
-    answer['content'] = render_template(
-        'term/terminal/event_form.html',
+    return render_template(
+        'term/terminal/event_view.html',
+        term=term,
         events=events,
-        term_event=term_event)
-    answer['error'] = 'no'
+        term_event=term_event
+    )
 
-    return jsonify(answer)
-
-
-@mod.route('/terminal/event/save', methods=['POST'])
+@mod.route('/terminal/<int:term_id>/event/<int:term_event_id>', methods=['POST'])
 @login_required
 @json_headers
-def terminal_event_add():
+def terminal_event_save(term_id, term_event_id):
     """Сохраняем событие привязаное к терминалу"""
     answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
 
-    print arg
+    if term_event_id == 0:
+        term_event = TermEvent()
+    else:
+        term_event = TermEvent.query.get(term_event_id)
+        if not term_event:
+            abort(404)
+
+    form = TermEventAddForm.from_json(arg)
+    if form.validate():
+        form.populate_obj(term_event)
+
+        term_event_old = TermEvent.query.filter_by(
+            term_id=term_id, event_id=term_event.event_id).first()
+
+        if term_event_old:
+            answer[
+                'message'] = u'Такое событие уже есть, удалите старое или измените тип нового'
+
+        elif term_event.save():
+            answer['error'] = 'no'
+            answer['message'] = u'Данные сохранены'
+    else:
+        answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
+
+    return jsonify(answer)
+
+@mod.route('/terminal/<int:term_id>/event/<int:term_event_id>/delete', methods=['POST'])
+@login_required
+@json_headers
+def terminal_event_delete(term_id, term_event_id):
+    answer = dict(error='yes', message='')
+
+    arg = json.loads(request.stream.read())
+    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+        abort(403)
+
+    firm_term = FirmTerm().get_list_by_firm_id(g.firm_info['id'])
+    if term_id not in firm_term:
+        abort(403)
+
+    term_event = TermEvent.query.filter_by(
+        term_id=term_id, id=term_event_id).first()
+
+    if not term_event:
+        abort(400)
+
+    PersonEvent.query.filter_by(
+        term_id=term_id,
+        firm_id=g.firm_info['id'],
+        event_id=term_event.event_id).delete()
+
+    term_event.delete()
+    answer['error'] = 'no'
+    answer['message'] = u'Событие удалено'
+
     return jsonify(answer)

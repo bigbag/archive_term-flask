@@ -1,6 +1,7 @@
 <form class="custom" id="add_term" name="termForm">
     <div class="g-clear-b g-clearfix">
-        <div ng-hide="term.id" class="content-row left g-clearfix" 
+        {% if not term.id %}
+        <div class="content-row left g-clearfix" 
             ng-init="term.id={{term.id}}">
             <label for="add-id">ID* (только числа)</label>
             <input id="add-id" 
@@ -10,6 +11,10 @@
                 ng-model="term.id"
                 required>
         </div>
+            <span ng-init="term.action='add'"></span>
+        {% else %}
+            <span ng-init="term.action='edit'"></span>
+        {% endif %}
         <div class="content-row g-clearfix" 
             ng-init="term.name='{{term.name|replace('None', '')}}'">
             <label for="add-name">Название*</label>
@@ -78,16 +83,11 @@
             maxlength="4"
             ng-model="term.download_period">
     </div>
-    <div ng-hide="term.id" class="content-row g-clearfix">
-        <a ng-click="addTerminal(term, termForm.$valid)"
+    <div class="content-row g-clearfix">
+        <a ng-click="saveTerminal(term, termForm.$valid)"
             class="f-spot-button">
-            Добавить
-        </a>
-    </div>
-    <div ng-show="term.id" class="content-row g-clearfix">
-        <a ng-click="editTerminal(term, termForm.$valid)"
-            class="f-spot-button">
-            Сохранить
+            <span ng-hide="term.id">Добавить</span>
+            <span ng-show="term.id">Сохранить</span>
         </a>
     </div>
 </form>
