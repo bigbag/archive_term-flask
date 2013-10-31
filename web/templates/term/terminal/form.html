@@ -21,22 +21,27 @@
                 required>
         </div>
     </div>
-
-    <div class="content-row g-clear-b" 
-        ng-init="term.type='{{term.type}}'">
-        <label for="add-type">Тип*</label>
-        <select id="add-type" 
-            class="medium"
-            name="type"
-            ng-model="term.type">
-            {% for type in term_types %}
-            <option {% if type['id'] == term.type %} selected="selected" {% endif %} 
-                value="{{type['id']}}">
-                    {{type['name']}}
-            </option>
-            {% endfor %}
-        </select>
+    <div class="row">
+        <div class="large-6 columns">
+            <div class="content-row g-clear-b" 
+                ng-init="term.type={{term.type}}">
+                <label for="add-type">Тип*</label>
+                <select id="add-type" 
+                    class="medium"
+                    name="type"
+                    ng-model="term.type"
+                    ng-change="change()">
+                    {% for type in term_types %}
+                    <option {% if type['id'] == term.type %} selected {% endif %} 
+                        value="{{type['id']}}">
+                            {{type['name']}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
     </div>
+
     <div class="content-row g-clearfix" 
         ng-init="term.upload_start='{{term.upload_start}}'">
         <label for="add-start-upload">Время первой отправки отчета (чч:мм)</label>
@@ -86,6 +91,3 @@
         </a>
     </div>
 </form>
-<script type="text/javascript">
-    $("#add-type").trigger("change", true);
-</script>

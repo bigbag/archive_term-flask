@@ -32,6 +32,7 @@ class TermEvent(db.Model):
         self.start = "00:01"
         self.stop = "23:59"
         self.timeout = 0
+        self.event_id = 1
 
     def __repr__(self):
         return '<id %r>' % (self.id)

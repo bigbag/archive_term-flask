@@ -5,7 +5,6 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import time
 import wtforms_json
 
 from flask_wtf import Form

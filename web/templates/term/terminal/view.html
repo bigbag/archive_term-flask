@@ -1,4 +1,3 @@
-{% import 'term/block.html' as block %}
 {% extends "term/page.html" %}
 
 {% block content %}
@@ -23,6 +22,10 @@
             </a> -->
         </div>
         {% endif %}
+    </div>
+    <div class="block-nav">
+        <a href="/terminal">Терминалы</a>
+        <span>{{term.name}}</span>
     </div>
 </h2>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
@@ -53,13 +56,14 @@
                 </div>
                 <div class="content-row f-main-slide-link">
                     <div class="toggle-active">
-                        <a id="event" class="loc-link f-spot-button small" 
-                            ng-click="termEventForm($event, term)">
+                        <a id="event" class="loc-link f-spot-button small">
                             + Добавить событие
                         </a>
+                        
                     </div>
                 </div>
                 <div id="eventForm" class="slide-box slide-setting">
+                    {% include 'term/terminal/event_form.html' %}
                 </div>
                 <table class="m-spot-table">
                     <thead>
@@ -72,7 +76,8 @@
                     </thead>
                     <tbody>
                         {% for term_event in term_events %}
-                        <tr class="m-t-cont-row">
+                        <tr ng-click="getTermEventEdit({{term_event.term_id}}, {{term_event.id}})"
+                            class="m-t-cont-row">
                             <td>{{term_event.event.name}}</td>
                             <td>{{term_event.start}}</td>
                             <td>{{term_event.stop}}</td>
@@ -86,10 +91,12 @@
 
     </section>
     <section class="section">
-        <p class="title" ng-click="getContent($event, 'terminal', 'form')">
-            <a ng-click="search.term_id={{term.id}}">Редактировать</a>
+        <p class="title">
+            <a>Редактировать</a>
         </p>
-        <div class="content"></div>
+        <div class="content">
+            {% include 'term/terminal/form.html' %}
+        </div>
     </section>
 </div>
 {% endblock %}

@@ -1,7 +1,10 @@
 {% extends "term/layout.html" %}
+{% import 'term/block.html' as block %}
+
 {% block header %}
     {{ block.header(g.firm_info['name'], g.user.email) }}
 {% endblock %}
+
 {% block body %}
 <div class="row m-content"  ng-controller="GeneralCtrl" ng-init="token='{{g.token}}'">
     <div class="large-3 columns">

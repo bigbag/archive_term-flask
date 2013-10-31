@@ -5,7 +5,6 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import time
 import wtforms_json
 
 from flask_wtf import Form
@@ -22,7 +21,7 @@ class TermAddForm(TokenSecureForm):
 
     id = IntegerField(validators=[InputRequired()])
     name = TextField(validators=[InputRequired()])
-    type = DecimalField(places=1, validators=[InputRequired()])
+    type = IntegerField(default=1)
     upload_start = TextField(validators=[Optional(), base.time_check])
     upload_period = IntegerField(default=5)
     download_start = TextField(validators=[Optional(), base.time_check])
