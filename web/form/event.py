@@ -20,7 +20,10 @@ wtforms_json.init()
 class TermEventAddForm(TokenSecureForm):
 
     id = IntegerField(validators=[InputRequired()])
-    term_id = IntegerField(InputRequired())
-    event_id = IntegerField(InputRequired())
+    age = IntegerField(default=0)
+    cost = IntegerField(default=0)
+    timeout = IntegerField(default=0)
     start = TextField(validators=[Optional(), base.time_check])
     stop = TextField(validators=[Optional(), base.time_check])
+    term_id = IntegerField(InputRequired())
+    event_id = IntegerField(InputRequired())
