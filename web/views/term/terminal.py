@@ -14,7 +14,6 @@ from models.term import Term
 from models.event import Event
 from models.firm_term import FirmTerm
 from models.term_event import TermEvent
-from models.person_event import PersonEvent
 
 
 @mod.route('/terminal/content/<path:action>', methods=['POST'])
@@ -249,11 +248,11 @@ def terminal_event_save(term_id, term_event_id):
         term_event_old = TermEvent.query.filter_by(
             term_id=term_id, event_id=term_event.event_id).first()
 
-        if term_event_old:
-            answer[
-                'message'] = u'Такое событие уже есть, удалите старое или измените тип нового'
+        if term_event_old and not term_event.id:
+            answer['message'] = u"""Такое событие уже есть,
+                                    удалите старое или измените тип нового"""
 
-        elif term_event.save():
+        elif term_event.term_event_save(g.firm_info['id']):
             answer['error'] = 'no'
             answer['message'] = u'Данные сохранены'
     else:
@@ -265,6 +264,7 @@ def terminal_event_save(term_id, term_event_id):
 @login_required
 @json_headers
 def terminal_event_delete(term_id, term_event_id):
+    """Удаляем событие привязаное к терминалу"""
     answer = dict(error='yes', message='')
 
     arg = json.loads(request.stream.read())
@@ -281,13 +281,8 @@ def terminal_event_delete(term_id, term_event_id):
     if not term_event:
         abort(400)
 
-    PersonEvent.query.filter_by(
-        term_id=term_id,
-        firm_id=g.firm_info['id'],
-        event_id=term_event.event_id).delete()
-
-    term_event.delete()
-    answer['error'] = 'no'
-    answer['message'] = u'Событие удалено'
+    if term_event.term_event_remove(g.firm_info['id']):
+        answer['error'] = 'no'
+        answer['message'] = u'Событие удалено'
 
     return jsonify(answer)

@@ -7,6 +7,9 @@
 """
 from web import db, app
 
+from models.person_event import PersonEvent
+from models.person import Person
+
 
 class TermEvent(db.Model):
 
@@ -34,6 +37,38 @@ class TermEvent(db.Model):
 
     def __repr__(self):
         return '<id %r>' % (self.id)
+
+    def term_event_save(self, firm_id):
+        result = False
+
+        if self.save():
+            PersonEvent.query.filter_by(
+                term_id=self.term_id,
+                firm_id=firm_id,
+                event_id=self.event_id).delete()
+
+            persons = Person.query.filter_by(firm_id=firm_id).all()
+            for person in persons:
+                person_event = PersonEvent()
+                person_event.person_id = person.id
+                person_event.term_id = self.term_id
+                person_event.event_id = self.event_id
+                person_event.firm_id = firm_id
+                person_event.timeout = self.timeout
+                person_event.save()
+
+            result = True
+
+        return result
+
+    def term_event_remove(self, firm_id):
+        PersonEvent.query.filter_by(
+            term_id=self.term_id,
+            firm_id=firm_id,
+            event_id=self.event_id).delete()
+
+        self.delete()
+        return True
 
     def get_by_term_id(self, term_id):
         return self.query.filter_by(term_id=term_id).all()
