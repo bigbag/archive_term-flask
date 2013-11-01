@@ -12,6 +12,8 @@ from web import app, db, cache
 from helpers import date_helper
 
 from models.firm_term import FirmTerm
+from models.term_event import TermEvent
+from models.person_event import PersonEvent
 
 
 class Term(db.Model):
@@ -45,10 +47,10 @@ class Term(db.Model):
 
     def __init__(self):
         self.type = self.TYPE_VENDING
-        self.upload_start = "00:00"
+        self.upload_start = "00:01"
         self.upload_stop = "23:59"
         self.upload_period = 5
-        self.download_start = "00:00"
+        self.download_start = "00:01"
         self.download_stop = "23:59"
         self.download_period = 5
         self.tz = app.config['TZ']
@@ -59,10 +61,30 @@ class Term(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
+    def term_add(self, firm_id):
+        result = False
+
+        if self.save():
+            firm_term = FirmTerm()
+            firm_term.term_id = self.id
+            firm_term.firm_id = firm_id
+            firm_term.child_firm_id = firm_id
+            firm_term.save()
+            result = True
+        return result
+
+    def term_remove(self):
+        FirmTerm().query.filter_by(term_id=self.id).delete()
+        TermEvent().query.filter_by(term_id=self.id).delete()
+        PersonEvent().query.filter_by(term_id=self.id).delete()
+        self.delete()
+
+        return True
+
     def get_type_list(self):
         result = []
-        result.append((self.TYPE_VENDING, u"Вендинговый"))
-        result.append((self.TYPE_POS, u"Платежный"))
+        result.append({'id': self.TYPE_VENDING, 'name': u"Вендинговый"})
+        result.append({'id': self.TYPE_POS, 'name': u"Платежный"})
         return result
 
     def get_valid_term(self, term_id):

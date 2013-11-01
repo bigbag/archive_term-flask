@@ -5,11 +5,22 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import time
+
 from flask import request
+from wtforms import ValidationError
 
 from flask_wtf import Form
 
 from helpers import hash_helper, date_helper
+
+
+def time_check(form, field):
+    try:
+        time.strptime(field.data, '%H:%M')
+        return True
+    except ValueError:
+        raise ValidationError('Bad time format')
 
 
 class TokenSecureForm(Form):

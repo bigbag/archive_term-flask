@@ -9,9 +9,6 @@
 """
 
 from web import db, app
-from models.term import Term
-from models.event import Event
-from models.person import Person
 
 
 class PersonEvent(db.Model):

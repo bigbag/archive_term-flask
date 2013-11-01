@@ -44,7 +44,7 @@ class FirmTerm(db.Model):
 
         return firm_id_list
 
-    @cache.cached(timeout=60, key_prefix='list_by_firm_id')
+    @cache.cached(timeout=30, key_prefix='list_by_firm_id')
     def get_list_by_firm_id(self, firm_id):
         firm_terms = self.query.filter_by(
             child_firm_id=firm_id).all()
@@ -54,6 +54,18 @@ class FirmTerm(db.Model):
             firm_id_list.append(firm_term.term_id)
 
         return firm_id_list
+
+    def get_access_by_firm_id(self, firm_id, term_id):
+        result = False
+        access = self.query.filter_by(
+            firm_id=firm_id).filter_by(
+                term_id=term_id).first(
+                )
+
+        if access:
+            result = True
+
+        return result
 
     def delete(self):
         db.session.delete(self)

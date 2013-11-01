@@ -1,19 +1,24 @@
-<form class="custom" id="add_term" name="addTermForm">
+<form class="custom" id="add_term" name="termForm">
     <div class="g-clear-b g-clearfix">
-        <div class="content-row left g-clearfix">
+        {% if not term.id %}
+        <div class="content-row left g-clearfix" 
+            ng-init="term.id={{term.id}}">
             <label for="add-id">ID* (только числа)</label>
-            <input 
-                id="add-id" 
+            <input id="add-id" 
                 type="number"
                 name="id"
                 min="1"
                 ng-model="term.id"
                 required>
         </div>
-        <div class="content-row g-clearfix">
+            <span ng-init="term.action='add'"></span>
+        {% else %}
+            <span ng-init="term.action='edit'"></span>
+        {% endif %}
+        <div class="content-row g-clearfix" 
+            ng-init="term.name='{{term.name|replace('None', '')}}'">
             <label for="add-name">Название*</label>
-            <input 
-                id="add-name" 
+            <input id="add-name" 
                 type="text"
                 name="name"
                 ng-maxlength="300"
@@ -21,59 +26,68 @@
                 required>
         </div>
     </div>
-    <div class="content-row g-clear-b" ng-init="term.type={{term.type}}">
-        <label for="add-type">Тип*</label>
-        <select 
-            id="add-type" 
-            class="medium"
-            name="type"
-            ng-model="term.type">
-            {% for key, value in term_types %}
-                <option value="{{key}}">{{value}}</option>
-            {% endfor %}
-        </select>
+    <div class="row">
+        <div class="large-6 columns">
+            <div class="content-row g-clear-b" 
+                ng-init="term.type={{term.type}}">
+                <label for="add-type">Тип*</label>
+                <select id="add-type" 
+                    class="medium"
+                    name="type"
+                    ng-model="term.type"
+                    ng-change="change()">
+                    {% for type in term_types %}
+                    <option {% if type['id'] == term.type %} selected {% endif %} 
+                        value="{{type['id']}}">
+                            {{type['name']}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
     </div>
-    <div class="content-row g-clearfix" ng-init="term.upload_start='{{term.upload_start}}'">
+
+    <div class="content-row g-clearfix" 
+        ng-init="term.upload_start='{{term.upload_start}}'">
         <label for="add-start-upload">Время первой отправки отчета (чч:мм)</label>
-        <input 
-            id="add-start-upload" 
+        <input id="add-start-upload" 
             type="text"
             minlength="5"
             maxlength="5"
             ng-model="term.upload_start">
     </div>
-    <div class="content-row g-clearfix" ng-init="term.upload_period={{term.upload_period}}">
+    <div class="content-row g-clearfix" 
+        ng-init="term.upload_period='{{term.upload_period}}'">
         <label for="add-upload-period">Период между отправками (мин)</label>
-        <input 
-            id="add-start-upload" 
+        <input id="add-start-upload" 
             type="text"
             minlength="1"
             maxlength="4"
             ng-model="term.upload_period">
     </div>
-    <div class="content-row g-clearfix" ng-init="term.download_start='{{term.download_start}}'">
+    <div class="content-row g-clearfix" 
+        ng-init="term.download_start='{{term.download_start}}'">
         <label for="add-download-period">Время первой загрузки конфигурации (чч:мм)</label>
-        <input 
-            id="add-download-period" 
+        <input id="add-download-period" 
             type="text"
             minlength="5"
             maxlength="5"
             ng-model="term.download_start">
     </div>
-    <div class="content-row g-clearfix" ng-init="term.download_period={{term.download_period}}">
+    <div class="content-row g-clearfix"
+        ng-init="term.download_period='{{term.download_period}}'">
         <label for="add-cardnumber">Период между загрузками (мин)</label>
-        <input 
-            id="add-start-download" 
+        <input id="add-start-download" 
             type="text"
             minlength="1"
             maxlength="4"
             ng-model="term.download_period">
     </div>
     <div class="content-row g-clearfix">
-        <a 
-            ng-click="addTerminal(term, addTermForm.$valid)"
+        <a ng-click="saveTerminal(term, termForm.$valid)"
             class="f-spot-button">
-            Добавить
+            <span ng-hide="term.id">Добавить</span>
+            <span ng-show="term.id">Сохранить</span>
         </a>
     </div>
 </form>

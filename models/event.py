@@ -5,7 +5,7 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db, app
+from web import app, db, cache
 
 
 class Event(db.Model):
@@ -22,6 +22,10 @@ class Event(db.Model):
 
     def get_by_key(self, key):
         return self.query.filter_by(key=key).first()
+
+    @cache.cached(timeout=600, key_prefix='all_events')
+    def get_events(self):
+        return self.query.all()
 
     def delete(self):
         db.session.delete(self)
