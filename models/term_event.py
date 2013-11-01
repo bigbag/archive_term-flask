@@ -32,31 +32,31 @@ class TermEvent(db.Model):
         self.age = 0
         self.start = "00:01"
         self.stop = "23:59"
-        self.timeout = 0
+        self.timeout = 300
         self.event_id = 1
 
     def __repr__(self):
         return '<id %r>' % (self.id)
 
-    def term_event_save(self, firm_id):
+    def term_event_save(self, firm_id, term_id):
         result = False
 
+        PersonEvent.query.filter_by(
+            term_id=term_id,
+            firm_id=firm_id,
+            event_id=self.event_id).delete()
+
+        persons = Person.query.filter_by(firm_id=firm_id).all()
+        for person in persons:
+            person_event = PersonEvent()
+            person_event.person_id = person.id
+            person_event.term_id = term_id
+            person_event.event_id = self.event_id
+            person_event.firm_id = firm_id
+            person_event.timeout = self.timeout
+            db.session.add(person_event)
+
         if self.save():
-            PersonEvent.query.filter_by(
-                term_id=self.term_id,
-                firm_id=firm_id,
-                event_id=self.event_id).delete()
-
-            persons = Person.query.filter_by(firm_id=firm_id).all()
-            for person in persons:
-                person_event = PersonEvent()
-                person_event.person_id = person.id
-                person_event.term_id = self.term_id
-                person_event.event_id = self.event_id
-                person_event.firm_id = firm_id
-                person_event.timeout = self.timeout
-                db.session.add(person_event)
-
             db.session.commit()
             result = True
 

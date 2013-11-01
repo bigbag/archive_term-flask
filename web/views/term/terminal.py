@@ -252,7 +252,7 @@ def terminal_event_save(term_id, term_event_id):
             answer['message'] = u"""Такое событие уже есть,
                                     удалите старое или измените тип нового"""
 
-        elif term_event.term_event_save(g.firm_info['id']):
+        elif term_event.term_event_save(g.firm_info['id'], term_id):
             answer['error'] = 'no'
             answer['message'] = u'Данные сохранены'
     else:
