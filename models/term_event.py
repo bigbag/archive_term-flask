@@ -6,8 +6,6 @@
     :license: BSD, see LICENSE for more details.
 """
 from web import db, app
-from models.term import Term
-from models.event import Event
 
 
 class TermEvent(db.Model):

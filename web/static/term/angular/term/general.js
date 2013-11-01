@@ -130,9 +130,21 @@ angular.module('term').controller('GeneralCtrl', function($scope, $http, $compil
     else {
       $scope.term.status = 0;
     }
-    $http.post('/terminal/locking', term).success(function(data) {
+    $http.post('/terminal/locking/' + term.id, term).success(function(data) {
       if (data.error == 'no') {
         $scope.setModal(data.message, 'success');
+      }
+    });  
+  }
+
+  $scope.removeTerminal = function(term) {
+    term.csrf_token = $scope.token;
+    $http.post('/terminal/remove/' + term.id, term).success(function(data) {
+      if (data.error == 'no') {
+        $scope.setModal(data.message, 'success');
+        setTimeout(function(){
+          $(location).attr('href','/terminal');
+        }, 2000);
       }
     });  
   }
@@ -140,7 +152,7 @@ angular.module('term').controller('GeneralCtrl', function($scope, $http, $compil
   //Переадресация на страницу редактирования привязанного события
   $scope.getTermEventEdit = function(term_id, term_event_id) {
     $(location).attr('href','/terminal/' + term_id + '/event/' + term_event_id);
-  };
+  }
 
 
   //Привязываем новое событие к терминалу или редактируем уже привязанное

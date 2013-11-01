@@ -109,13 +109,7 @@ def terminal_add(arg):
             term = Term()
             form.populate_obj(term)
 
-            if term.save():
-                firm_term = FirmTerm()
-                firm_term.term_id = term.id
-                firm_term.firm_id = g.firm_info['id']
-                firm_term.child_firm_id = firm_term.firm_id
-                firm_term.save()
-
+            if term.term_add(g.firm_info['id']):
                 answer['error'] = 'no'
                 answer['message'] = u'Терминал успешно добавлен'
         else:
@@ -160,10 +154,10 @@ def terminal_save(term_id, action):
     return result
 
 
-@mod.route('/terminal/locking', methods=['POST'])
+@mod.route('/terminal/locking/<int:term_id>', methods=['POST'])
 @login_required
 @json_headers
-def terminal_locking():
+def terminal_locking(term_id):
     """Блокировка и разблокировка терминал"""
     answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
@@ -174,12 +168,34 @@ def terminal_locking():
     if 'status' not in arg or 'id' not in arg:
         abort(400)
 
-    term = Term.query.get(int(arg['id']))
+    term = Term.query.get(term_id)
     if not term:
         abort(404)
 
     term.status = int(arg['status'])
     if term.save():
+        answer['error'] = 'no'
+        answer['message'] = u'Операция успешно выполнена'
+
+    return jsonify(answer)
+
+
+@mod.route('/terminal/remove/<int:term_id>', methods=['POST'])
+@login_required
+@json_headers
+def terminal_remove(term_id):
+    """Удаление терминал"""
+    answer = dict(error='yes', message='')
+    arg = json.loads(request.stream.read())
+
+    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+        abort(403)
+
+    term = Term.query.get(term_id)
+    if not term:
+        abort(404)
+
+    if term.term_remove():
         answer['error'] = 'no'
         answer['message'] = u'Операция успешно выполнена'
 

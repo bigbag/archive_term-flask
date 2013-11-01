@@ -17,9 +17,10 @@
                 class="f-spot-button small">
                 Разблокировать
             </a>
-            <!-- <a class="f-spot-button bg-red small">
+            <a ng-click="removeTerminal(term)" 
+                class="f-spot-button bg-red small">
                 Удалить терминал
-            </a> -->
+            </a>
         </div>
         {% endif %}
     </div>
@@ -29,7 +30,6 @@
     </div>
 </h2>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
-
     <section class="section active">
         <p class="title"><a>Информация</a></p>
         <div class="content">
@@ -54,6 +54,7 @@
                 <div class="content-row row-separation-l">
                     <p class="m-hint">Для изменения события кликните по соотвествующей строке в таблице</p>
                 </div>
+                {% if term_access %}
                 <div class="content-row f-main-slide-link">
                     <div class="toggle-active">
                         <a id="event" class="loc-link f-spot-button small">
@@ -62,6 +63,7 @@
                         
                     </div>
                 </div>
+                {% endif %}
                 <div id="eventForm" class="slide-box slide-setting">
                     {% include 'term/terminal/event_form.html' %}
                 </div>
@@ -76,7 +78,10 @@
                     </thead>
                     <tbody>
                         {% for term_event in term_events %}
-                        <tr ng-click="getTermEventEdit({{term_event.term_id}}, {{term_event.id}})"
+                        <tr 
+                            {% if term_access %}
+                                ng-click="getTermEventEdit({{term_event.term_id}}, {{term_event.id}})"
+                            {% endif %}
                             class="m-t-cont-row">
                             <td>{{term_event.event.name}}</td>
                             <td>{{term_event.start}}</td>
@@ -90,6 +95,7 @@
         </div>
 
     </section>
+    {% if term_access %}
     <section class="section">
         <p class="title">
             <a>Редактировать</a>
@@ -98,5 +104,6 @@
             {% include 'term/terminal/form.html' %}
         </div>
     </section>
+    {% endif %}
 </div>
 {% endblock %}
