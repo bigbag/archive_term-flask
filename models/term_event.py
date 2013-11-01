@@ -55,8 +55,9 @@ class TermEvent(db.Model):
                 person_event.event_id = self.event_id
                 person_event.firm_id = firm_id
                 person_event.timeout = self.timeout
-                person_event.save()
+                db.session.add(person_event)
 
+            db.session.commit()
             result = True
 
         return result
