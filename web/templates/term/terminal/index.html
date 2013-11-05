@@ -12,7 +12,7 @@
             <div class="content-row">
                 <p class="m-hint">Настройте работу Ваших бесконтактных терминалов: добавьте к ним события и настройте их так, как Вам нужно.</p>
             </div>
-            <table class="m-spot-table">
+            <table class="m-spot-table" ng-controller="TerminalController">
                 <thead>
                     <tr>
                         <th><span>ID</span></th>
@@ -55,3 +55,7 @@
     </section>
 </div>
 {% endblock %}
+{% block footer_script %}
+<script type="text/javascript" src="/static/term/angular/term/controllers/terminal.js"></script> 
+{{ super() }}
+{% endblock %} 

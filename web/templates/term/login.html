@@ -1,7 +1,7 @@
 {% extends "term/layout.html" %}
 {% block title %}Мобиспот - {{firm_name}}{% endblock %}
 {% block body %}
-<div class="row m-content block-center"  ng-controller="UserCtrl">
+<div class="row m-content block-center"  ng-controller="UserController">
     <div class="f-login">
         <form class="f-login_box" name="signForm">
             <hgroup>
@@ -42,5 +42,5 @@
 {% endblock %}
 
 {% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/user.js"></script>  
+<script type="text/javascript" src="/static/term/angular/term/controllers/user.js"></script>  
 {% endblock %}
