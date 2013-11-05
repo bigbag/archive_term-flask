@@ -107,3 +107,7 @@
     {% endif %}
 </div>
 {% endblock %}
+{% block footer_script %}
+<script type="text/javascript" src="/static/term/angular/term/controllers/terminal.js"></script> 
+{{ super() }}
+{% endblock %} 

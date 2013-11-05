@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block body %}
-<div class="row m-content"  ng-controller="GeneralCtrl" ng-init="token='{{g.token}}'">
+<div class="row m-content" ng-controller="GeneralController" ng-init="token='{{g.token}}'">
     <div class="large-3 columns">
     {% block menu %}
     {% set nav = [dict(
@@ -45,16 +45,8 @@
     {% endblock %}
     </div>
 </div>
-
-<!-- <div class="mess-bottom">
-    <div class="row">
-        <h3>Терминал удален</h3>
-        <p>Если это произошло случайно, то оменяйте скорее</p>
-        <a href="#" class="f-spot-button">Отменить удаление</a>
-    </div>
-</div> -->
 {% endblock %}
 
 {% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/general.js"></script>  
+<script type="text/javascript" src="/static/term/angular/term/controllers/general.js"></script> 
 {% endblock %}

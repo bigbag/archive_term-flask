@@ -1,87 +1,7 @@
 'use strict';
 
-angular.module('term').controller('GeneralCtrl', function($scope, $http, $compile, $timeout) {
-  var resultModal = angular.element('.m-result');
-  var resultContent = resultModal.find('p');
-
-  //Параметры по умолчанию для пагинации
-  $scope.pagination = {
-    cur: 1,
-    total: 7,
-    display: 15
-  }
-
-  //Вызываем модальное окно
-  $scope.setModal = function(content, type){
-    resultModal.removeClass('m-negative');
-    if (type == 'error') {
-        resultModal.addClass('m-negative');
-    }
-    resultModal.hide();
-    resultModal.show();
-    resultContent.text(content);
-    setTimeout(function(){
-      resultModal.hide();
-    }, 5000);
-  };
-
-  //Автоскролинг до нужного блока
-  $scope.scrollPage = function(dom_name, speed){
-    speed = typeof speed !== 'undefined' ? speed : 600;
-    var scroll_height = $(dom_name).offset().top;
-      $('html, body').animate({
-        scrollTop: scroll_height
-      }, speed);
-  }
-
-  //Загружаем динамический шаблон
-  $scope.getContent = function(e, parent, action){
-    if (!parent) return false;
-    if (!action) return false;
-    if (!e) {
-      var content_div = angular.element('.section-container').find('.content');
-    }
-    else {
-      var content_div = angular.element(e.currentTarget).next('.content');
-    }
-
-    var url = '/' + parent + '/content/' + action;
-    $http.post(url, $scope.search).success(function(data) {
-      if (data.error == 'no') {
-        content_div.html($compile(data.content)($scope));    
-      }
-    });
-  }
-
-  //Тригер на запрос табличных данных по параметрам
-  $scope.$watch('pagination.cur + search.period  + search.status', function() {
-    if (!$scope.search) return false;
-    var search = $scope.search;
-    search.page = $scope.pagination.cur;
-
-    if (search.action_type == 'get_grid_content') {
-      $scope.getGridContent(search);
-    }
-  });
-
-  //Список периодов для отчетов
-  $scope.report_detaled_periods = [
-    {name:'День', value:'day'},
-    {name:'Неделя', value:'week'},
-    {name:'Месяц', value:'month'},
-  ];
-
-  //Запрос на отображение табличных данных
-  $scope.getGridContent = function(search) {
-    if (search.page == undefined) search.page = 1;
-
-    var url = window.location.pathname;
-    $http.post(url, search).success(function(data) {
-      $scope.result = data.result;
-      $scope.search.page_count = data.count;
-      $scope.pagination.total = Math.ceil(data.count/$scope.search.limit);
-    });
-  };
+angular.module('term').controller('TerminalController', 
+    function($scope, $http, $compile, contentService) {
 
   //Переадресация на страницу информации о терминале
   $scope.getTerminalView = function(term_id) {
@@ -102,18 +22,18 @@ angular.module('term').controller('GeneralCtrl', function($scope, $http, $compil
     if (!valid) {
       angular.element('#add_term input[name=id]').addClass('error');
       angular.element('#add_term input[name=name]').addClass('error');
-      $scope.scrollPage('.m-page-name');
+      contentService.scrollPage('.m-page-name');
       return false;
     };
     var url = '/terminal/' + term.id + '/' + term.action;
     term.csrf_token = $scope.token;
     $http.post(url, term).success(function(data) {
-      $scope.scrollPage('.m-page-name');
+      contentService.scrollPage('.m-page-name');
       if (data.error == 'yes') {
-        $scope.setModal(data.message, 'error');
+        contentService.setModal(data.message, 'error');
       }
       else {
-        $scope.setModal(data.message, 'success');
+        contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal');
         }, 2000);
@@ -132,7 +52,7 @@ angular.module('term').controller('GeneralCtrl', function($scope, $http, $compil
     }
     $http.post('/terminal/locking/' + term.id, term).success(function(data) {
       if (data.error == 'no') {
-        $scope.setModal(data.message, 'success');
+        contentService.setModal(data.message, 'success');
       }
     });  
   }
@@ -141,7 +61,7 @@ angular.module('term').controller('GeneralCtrl', function($scope, $http, $compil
     term.csrf_token = $scope.token;
     $http.post('/terminal/remove/' + term.id, term).success(function(data) {
       if (data.error == 'no') {
-        $scope.setModal(data.message, 'success');
+        contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal');
         }, 2000);
@@ -164,12 +84,12 @@ angular.module('term').controller('GeneralCtrl', function($scope, $http, $compil
 
     var url = '/terminal/' + term_event.term_id + '/event/' + term_event.id;
     $http.post(url, term_event).success(function(data) {
-      $scope.scrollPage('.m-page-name');
+      contentService.scrollPage('.m-page-name');
       if (data.error == 'yes') {
-        $scope.setModal(data.message, 'error');
+        contentService.setModal(data.message, 'error');
       }
       else {
-        $scope.setModal(data.message, 'success');
+        contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal/' + term_event.term_id);
         }, 2000);
@@ -182,12 +102,12 @@ angular.module('term').controller('GeneralCtrl', function($scope, $http, $compil
     var url = '/terminal/' + term_event.term_id + '/event/' + term_event.id + '/delete';
     term_event.csrf_token = $scope.token;
     $http.post(url, term_event).success(function(data) {
-      $scope.scrollPage('.m-page-name');
+      contentService.scrollPage('.m-page-name');
       if (data.error == 'yes') {
-        $scope.setModal(data.message, 'error');
+        contentService.setModal(data.message, 'error');
       }
       else {
-        $scope.setModal(data.message, 'success');
+        contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal/' + term_event.term_id);
         }, 2000);

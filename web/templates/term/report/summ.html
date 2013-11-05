@@ -3,7 +3,7 @@
 {% block content %}
 <h2 class="g-color-blue m-page-name">Оборот</h2>
 <span ng-init="search.action_type='get_grid_content';search.period='day';search.limit=7"></span>
-<div class="content">
+<div class="content" ng-controller="ReportController">
     <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
         <div class="m-content-page">
             <div class="content-row">
@@ -76,3 +76,7 @@
     </div>
 </div>
 {% endblock %}
+{% block footer_script %}
+<script type="text/javascript" src="/static/term/angular/term/controllers/report.js"></script>
+{{ super() }}
+{% endblock %} 
