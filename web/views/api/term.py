@@ -140,17 +140,14 @@ def api_get_blacklist():
 def api_upload_report(term_id, report_datetime):
     """Прием и сохранение отчета"""
 
-    app.logger.error(1)
     if not len(report_datetime) == 13:
         abort(400)
 
-    app.logger.error(2)
     if not re.search('\d{6}_\d{6}', str(report_datetime)):
         abort(400)
 
     term = Term().get_valid_term(term_id)
 
-    app.logger.error(3)
     if term is None:
         abort(400)
 
@@ -160,11 +157,9 @@ def api_upload_report(term_id, report_datetime):
         str(term_id),
         str(report_datetime))
 
-    app.logger.error(4)
     if not request.headers.get('Content-MD5'):
         abort(400)
 
-    app.logger.error(5)
     if request.headers.get('Content-MD5') != hash_helper.get_content_md5(file):
         abort(400)
 
