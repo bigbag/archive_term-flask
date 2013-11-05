@@ -175,6 +175,35 @@ def api_upload_report(term_id, report_datetime):
     return set_message('success', hash_helper.get_content_md5(file), 201)
 
 
+@mod.route('/reports/log_<int:term_id>_<report_datetime>.log.gz', methods=['PUT'])
+def api_upload_log(term_id, report_datetime):
+    """Прием и сохранение логов"""
+
+    if not len(report_datetime) == 13:
+        abort(400)
+
+    if not re.search('\d{6}_\d{6}', str(report_datetime)):
+        abort(400)
+
+    term = Term().get_valid_term(term_id)
+
+    if term is None:
+        abort(400)
+
+    file = request.stream.read()
+    filename = "%s/%s_%s" % (
+        app.config['UPLOAD_LOG'],
+        str(term_id),
+        str(report_datetime))
+    if file:
+        with open(filename, 'w') as f:
+            f.write(file)
+    else:
+        abort(400)
+
+    return set_message('success', hash_helper.get_content_md5(file), 201)
+
+
 @mod.route('/configs/callback/<int:term_id>_<action>', methods=['POST'])
 @mod.route('/configs/callback/<int:term_id>_<action>_<version>', methods=['POST'])
 def api_set_callback(term_id, action, version=None):
