@@ -121,9 +121,7 @@ class Report(db.Model):
                 term=term.name if term else 'Empty',
                 creation_date=creation_date,
                 event=report.event.name if report.event else 'Empty',
-                first_name=report.person.first_name if report.person else '',
-                midle_name=report.person.midle_name if report.person else '',
-                last_name=report.person.last_name if report.person else '',
+                name=report.person.name if report.person else '',
             )
             result.append(data)
 

@@ -19,9 +19,7 @@ class Person(db.Model):
     STATUS_BANNED = -1
 
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(150), nullable=False)
-    midle_name = db.Column(db.String(150))
-    last_name = db.Column(db.String(150))
+    name = db.Column(db.Text, nullable=False)
     tabel_id = db.Column(db.String(150))
     birthday = db.Column(db.Date())
     firm_id = db.Column(db.Integer, nullable=False)
@@ -50,17 +48,9 @@ class Person(db.Model):
 
         result = []
         for person in persons:
-            person.first_name = person.first_name if person.first_name else ''
-            person.midle_name = person.midle_name if person.midle_name else ''
-            person.last_name = person.last_name if person.last_name else ''
-            name = "%s %s %s" % (
-                person.last_name,
-                person.first_name,
-                person.midle_name
-            )
             data = dict(
                 id=person.id,
-                name=name,
+                name=person.name,
                 card=person.card,
                 status='active' if person.status == self.STATUS_VALID else '',
             )

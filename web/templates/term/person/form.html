@@ -6,33 +6,15 @@
         {% else %}
             <span ng-init="person.action='edit'"></span>
         {% endif %}
-        <div class="content-row left g-clearfix" >`
-            <label for="add-last-name" 
-                ng-init="person.last_name='{{person.last_name|replace("None", "")}}'">
-                Фамилия*
+        <div class="content-row left g-clearfix" >
+            <label for="add-name" 
+                ng-init="person.name='{{person.name|replace("None", "")}}'">
+                ФИО*
             </label>
-            <input id="add-last-name" 
-                name="last_name"
+            <input id="add-name" 
+                name="name"
                 type="text" 
-                ng-model="person.last_name"
-                required>
-            <label for="add-patronymic" 
-                ng-init="person.midle_name='{{person.midle_name|replace("None", "")}}'">
-                Отчество
-            </label>
-            <input id="add-midle-name" 
-                type="text" 
-                ng-model="person.midle_name">
-        </div>
-        <div class="content-row g-clearfix">
-            <label for="add-first-name"
-                ng-init="person.first_name='{{person.first_name|replace("None", "")}}'">
-                Имя*
-            </label>
-            <input id="add-first-name"
-                name="first_name"
-                type="text" 
-                ng-model="person.first_name"
+                ng-model="person.name"
                 required>
         </div>
     </div>

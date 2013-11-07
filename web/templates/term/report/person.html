@@ -9,15 +9,10 @@
             <div class="content-row">
                 <p class="m-hint">Здесь вы можете посмотреть детальный отчет по действиям людей, которые находятся в ваших белых списках</p>
             </div>
-            <!-- <div class="m-grid-search">
-                <input type="text" ng-model="search" placeholder="Поиск по сотрудникам или по терминалам">
-            </div> -->
             <table class="m-spot-table" ng-cloak class="ng-cloak">
                 <thead>
                 <tr>
-                    <th>Фамилия</th>
-                    <th>Имя</th>
-                    <th>Отчество</th>
+                    <th>ФИО</th>
                     <th><span>Дата</span></th>
                     <th>Терминал</th>
                     <th>Событие</th>
@@ -25,9 +20,7 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="report in result" class="m-t-cont-row">
-                    <td>{[{report.last_name}]}</td>
-                    <td>{[{report.first_name}]}</td>
-                    <td>{[{report.midle_name}]}</td>
+                    <td>{[{report.name}]}</td>
                     <td>{[{report.creation_date}]}</td>
                     <td>{[{report.term}]}</td>
                     <td>{[{report.event}]}</td>

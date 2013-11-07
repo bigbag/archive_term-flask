@@ -75,20 +75,20 @@ def person_info(person_id):
     )
 
 
-def terminal_edit(arg, term_id):
+def person_edit(arg, person_id):
     """Редактируем терминал"""
     answer = dict(error='yes', message='')
 
-    term = Term.query.get(int(term_id))
-    if not term:
+    person = Person.query.get(int(person_id))
+    if not person:
         abort(404)
 
     form = PersonAddForm.from_json(arg)
 
     if form.validate():
-        form.populate_obj(term)
+        form.populate_obj(person)
 
-        if term.save():
+        if person.save():
             answer['error'] = 'no'
             answer['message'] = u'Данные сохранены'
     else:
@@ -106,7 +106,7 @@ def person_save(person_id, action):
     if 'add' in action:
         result = person_add(arg)
     elif 'edit' in action:
-        result = person_edit(arg, term_id)
+        result = person_edit(arg, person_id)
     else:
         abort(400)
 

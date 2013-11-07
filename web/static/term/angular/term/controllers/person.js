@@ -9,10 +9,9 @@ angular.module('term').controller('PersonController',
   };
 
    //Тригер на изменение снятие ошибки при изменение полей, в форме добавления терминала
-  $scope.$watch('person.last_name + person.first_name', function(term) {
+  $scope.$watch('person.name', function(term) {
     if ($scope.term) {
-      angular.element('input[name=last_name]').removeClass('error');
-      angular.element('input[name=first_name]').removeClass('error');
+      angular.element('input[name=name]').removeClass('error');
     }
   });
 
@@ -20,8 +19,7 @@ angular.module('term').controller('PersonController',
   //Добавляем или редактируем человека
   $scope.savePerson = function(person, valid) {
     if (!valid) {
-      angular.element('#add_person input[name=last_name]').addClass('error');
-      angular.element('#add_person input[name=first_name]').addClass('error');
+      angular.element('#add_person input[name=name]').addClass('error');
       contentService.scrollPage('.m-page-name');
       return false;
     };
@@ -35,7 +33,7 @@ angular.module('term').controller('PersonController',
       else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
-          $(location).attr('href','/terminal');
+          $(location).attr('href','/person');
         }, 2000);
       }
     });   

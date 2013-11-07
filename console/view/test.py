@@ -159,6 +159,21 @@ class TestCommand(Command):
             print "%s,%s,%s,%s" % data
 
     def run(self):
+        persons = Person.query.all()
+
+        for person in persons:
+            person.name = ''
+
+            if person.last_name:
+                person.name = '%s %s' % (person.name, person.last_name)
+
+            if person.first_name and 'Anonim' not in person.first_name:
+                person.name = '%s %s' % (person.name, person.first_name)
+
+            if person.midle_name:
+                person.name = '%s %s' % (person.name, person.midle_name)
+
+            person.save()
 
         # spots = Spot.query.filter(
         #     Spot.status == Spot.STATUS_REGISTERED).all()
@@ -171,57 +186,57 @@ class TestCommand(Command):
         #             print spot.user.email
         # print 1
 
-        with open('tmp/import.csv', 'rb') as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
-            for row in spamreader:
-        #         spot = Spot.query.filter(Spot.code == data[2]).first()
+        # with open('tmp/import.csv', 'rb') as csvfile:
+        #     spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        #     for row in spamreader:
+        # spot = Spot.query.filter(Spot.code == data[2]).first()
 
-        #         wallet = PaymentWallet()
-        #         wallet.hard_id = data[0]
-        #         wallet.payment_id = data[1]
-        #         wallet.discodes_id = spot.discodes_id
-        #         wallet.save()
-        #         person = Person.query.filter_by(hard_id=row[0]).first()
+        # wallet = PaymentWallet()
+        # wallet.hard_id = data[0]
+        # wallet.payment_id = data[1]
+        # wallet.discodes_id = spot.discodes_id
+        # wallet.save()
+        # person = Person.query.filter_by(hard_id=row[0]).first()
 
-        #         person.payment_id = str(person.payment_id).rjust(20, '0')
-        #         person.save()
+        # person.payment_id = str(person.payment_id).rjust(20, '0')
+        # person.save()
 
-                # if person:
-                #     continue
+        # if person:
+        # continue
 
-                person = Person()
-                person.hard_id = row[0]
-                person.payment_id = row[1]
-                person.firm_id = 17
-                person.first_name = 'Anonim'
-                person.last_name = u'Гость конференции'
+        #         person = Person()
+        #         person.hard_id = row[0]
+        #         person.payment_id = row[1]
+        #         person.firm_id = 17
+        #         person.first_name = 'Anonim'
+        #         person.last_name = u'Гость конференции'
 
-                if not person.save():
-                    continue
+        #         if not person.save():
+        #             continue
 
-                person_event = PersonEvent()
-                person_event.person_id = person.id
-                person_event.term_id = 40
-                person_event.event_id = 3
-                person_event.firm_id = person.firm_id
-                person_event.timeout = 300
-                person_event.save()
+        #         person_event = PersonEvent()
+        #         person_event.person_id = person.id
+        #         person_event.term_id = 40
+        #         person_event.event_id = 3
+        #         person_event.firm_id = person.firm_id
+        #         person_event.timeout = 300
+        #         person_event.save()
 
-                person_event = PersonEvent()
-                person_event.person_id = person.id
-                person_event.term_id = 42
-                person_event.event_id = 3
-                person_event.firm_id = person.firm_id
-                person_event.timeout = 300
-                person_event.save()
+        #         person_event = PersonEvent()
+        #         person_event.person_id = person.id
+        #         person_event.term_id = 42
+        #         person_event.event_id = 3
+        #         person_event.firm_id = person.firm_id
+        #         person_event.timeout = 300
+        #         person_event.save()
 
-                person_event = PersonEvent()
-                person_event.person_id = person.id
-                person_event.term_id = 48
-                person_event.event_id = 3
-                person_event.firm_id = person.firm_id
-                person_event.timeout = 300
-                person_event.save()
+        #         person_event = PersonEvent()
+        #         person_event.person_id = person.id
+        #         person_event.term_id = 48
+        #         person_event.event_id = 3
+        #         person_event.firm_id = person.firm_id
+        #         person_event.timeout = 300
+        #         person_event.save()
 
              # for row in spamreader:
         #     person = Person.query.filter_by(

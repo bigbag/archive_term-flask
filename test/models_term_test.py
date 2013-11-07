@@ -71,7 +71,7 @@ class ModelsTermCase(unittest.TestCase):
 
     def test_person(self):
         data = dict(
-            first_name=self.TEST_STRING,
+            name=self.TEST_STRING,
             firm_id=self.FIRM_ID,
             payment_id=self.PAYMENT_ID,
             hard_id=self.HARD_ID
