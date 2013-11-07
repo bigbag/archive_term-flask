@@ -27,7 +27,7 @@
             <ul>
             {% for data in row.data %}
                 {% set current_class = ''%}
-                {% if '/term' + data[0] == request.path %}
+                {% if '/term' + data[0] in request.path %}
                     {% set current_class = 'active'%}
                 {% endif %}
                 <li>

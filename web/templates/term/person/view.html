@@ -1,0 +1,61 @@
+{% extends "term/page.html" %}
+
+{% block content %}
+<h2 class="g-color-blue m-page-name">
+    <div ng-controller="PersonController">
+        {{person.first_name|replace("None", "")}} 
+        {{person.midle_name|replace("None", "")}}
+        {{person.last_name|replace("None", "")}}
+    </div>
+</h2>
+<div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
+    <section class="section active">
+        <p class="title"><a>Все события</a></p>
+        <div class="content">
+            <div class="content-row">
+                <p class="m-hint">Для изменения времени начала и конца события два раза кликните по нему. </p>
+            </div>
+            <div class="content-row f-main-slide-link">
+                <div class="toggle-active">
+                    <a id="event" class="loc-link f-spot-button small">
+                        + Добавить событие
+                    </a>
+                    
+                </div>
+            </div>
+            <div id="eventForm" class="slide-box slide-setting">
+                ывывыв
+            </div>
+            <table class="m-spot-table" ng-grid="gridOptions">
+                <thead>
+                <tr>
+                    <th>Событие</th>
+                    <th>Терминал</th>
+                    <th>Таймаут (сек)</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for person_event in person_events %}
+                <tr class="m-t-cont-row">
+                    <td>{{person_event.event.name}}</td>
+                    <td>{{person_event.term.name}}</td>
+                    <td>{{person_event.timeout}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+    <section class="section">
+        <p class="title"><a>Редактировать</a></p>
+        <div class="content">
+            {% include 'term/person/form.html' %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+{% block footer_script %}
+<script type="text/javascript" src="/static/term/angular/term/controllers/person.js"></script>
+{{ super() }}
+{% endblock %} 

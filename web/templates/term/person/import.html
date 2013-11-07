@@ -1,0 +1,42 @@
+<div class="content-row m-row-h">
+    <h4 class="g-color-blue">Импорт</h4>
+</div>
+<div class="content-row g-clearfix">
+    <p class="m-hint">Вы можете загрузить таблицу Excel (xls, xlsx), данные должны быть только на первом листе. Расположение колонок в таблице:</p>
+
+    <div class="m-table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th class="g-color-red">Фамилия</th>
+                <th class="g-color-red">Имя</th>
+                <th>Отчество</th>
+                <th>Номер&nbsp;карты <br>(8 цифр)</th>
+                <th>День рождения (дд.мм.гггг)</th>
+                <th>Табельный номер</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Иванов</td>
+                <td>Иван</td>
+                <td>Иванович</td>
+                <td>12345678</td>
+                <td>29.12.1970</td>
+                <td>11</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="content-row g-clearfix">
+        <label class="f-spot-button medium" for="ImportForm_file">Загрузить файл</label>
+
+
+        <input id="ytImportForm_file" type="hidden" name="ImportForm[file]" value="">
+        <input id="ImportForm_file" class="hide" type="file" name="ImportForm[file]">
+
+    </div>
+    <div class="content-row g-clearfix">
+        <a href="#" class="f-spot-button">Сохранить</a>
+    </div>
+</div>

@@ -149,6 +149,8 @@ def terminal_save(term_id, action):
         result = terminal_add(arg)
     elif 'edit' in action:
         result = terminal_edit(arg, term_id)
+    else:
+        abort(400)
 
     return result
 

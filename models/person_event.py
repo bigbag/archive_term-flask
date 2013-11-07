@@ -35,6 +35,9 @@ class PersonEvent(db.Model):
     def get_by_term_id(self, term_id):
         return self.query.filter_by(term_id=term_id).all()
 
+    def get_by_person_id(self, person_id):
+        return self.query.filter_by(person_id=person_id).all()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

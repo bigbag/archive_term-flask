@@ -1,0 +1,71 @@
+<form class="custom" id="add_person" name="personForm" ng-controller="PersonController">
+    <div class="g-clear-b g-clearfix" 
+        ng-init="person.id='{{person.id}}';person.firm_id={{g.firm_info['id']}}">
+        {% if not person.id %}
+            <span ng-init="person.action='add'"></span>
+        {% else %}
+            <span ng-init="person.action='edit'"></span>
+        {% endif %}
+        <div class="content-row left g-clearfix" >`
+            <label for="add-last-name" 
+                ng-init="person.last_name='{{person.last_name|replace("None", "")}}'">
+                Фамилия*
+            </label>
+            <input id="add-last-name" 
+                name="last_name"
+                type="text" 
+                ng-model="person.last_name"
+                required>
+            <label for="add-patronymic" 
+                ng-init="person.midle_name='{{person.midle_name|replace("None", "")}}'">
+                Отчество
+            </label>
+            <input id="add-midle-name" 
+                type="text" 
+                ng-model="person.midle_name">
+        </div>
+        <div class="content-row g-clearfix">
+            <label for="add-first-name"
+                ng-init="person.first_name='{{person.first_name|replace("None", "")}}'">
+                Имя*
+            </label>
+            <input id="add-first-name"
+                name="first_name"
+                type="text" 
+                ng-model="person.first_name"
+                required>
+        </div>
+    </div>
+<!--     <div class="content-row g-clear-b">
+        <label for="add-birthday">День рождения</label>
+        <div class="f-datepicker">
+            <input type="text" placeholder="День рождения" id="add-birthday" />
+        </div>
+    </div> -->
+
+    <div class="content-row g-clearfix">
+        <label for="add-tnumber"
+            ng-init="person.tabel_id='{{person.tabel_id|replace("None", "")}}'">
+            Табельный номер
+        </label>
+        <input id="add-tnumber" 
+            type="text"
+            ng-model="person.tabel_id">
+    </div>
+    <div class="content-row g-clearfix">
+        <label for="add-cardnumber"
+            ng-init="person.card='{{person.card|replace("None", "")}}'">
+            Номер карты
+        </label>
+        <input id="add-cardnumber" 
+            type="text"
+            ng-model="person.card">
+    </div>
+    <div class="content-row g-clearfix">
+        <a ng-click="savePerson(person, personForm.$valid)"
+            class="f-spot-button">
+            <span ng-hide="person.id">Добавить</span>
+            <span ng-show="person.id">Сохранить</span>
+        </a>
+    </div>
+</form>

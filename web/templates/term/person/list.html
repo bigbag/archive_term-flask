@@ -9,16 +9,18 @@
     <!-- <div class="m-grid-search">
         <input type="text" placeholder="Поиск по фамилии или карте">
     </div> -->
-    <table class="m-spot-table">
+    <table class="m-spot-table" ng-controller="PersonController">
         <thead>
             <tr>
-                <th class="active no-arr"><span >ФИО</span></th>
-                <th><span>Карта</span></th>
-                <th><span>Статус</span></th>
+                <th><span >ФИО</span></th>
+                <th>Карта</th>
+                <th>Статус</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="person in result" class="m-t-cont-row">
+            <tr ng-click="getPersonView(person.id)"
+                ng-repeat="person in result" 
+                class="m-t-cont-row">
                 <td>{[{person.name}]}</td>
                 <td>{[{person.card}]}</td>
                 <td><span class="m-card-act {[{person.status}]} g-round"></span></td>
