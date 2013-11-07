@@ -1,13 +1,14 @@
 'use strict';
 
-angular.module('term').controller('UserController', function($scope, $http, $compile, $timeout, alertService) {
+angular.module('term').controller('UserController', 
+  function($scope, $http, $compile, $timeout, contentService) {
 
   //Авторизация
   $scope.login = function(user, valid) {
     if (!valid) return false;
     $http.post('/login', user).success(function(data) {
       if (data.error == 'yes') {
-        alertService.setModal(data.message, 'error');
+        contentService.setModal(data.message, 'error');
 
         angular.element('.f-login input[name=email]').addClass('error');
         angular.element('.f-login input[name=password]').addClass('error');
@@ -37,11 +38,11 @@ angular.module('term').controller('UserController', function($scope, $http, $com
     $http.post('/service/recoveryMail', user).success(function(data) {
       if (data.error == 'yes') {
         angular.element('#recPassForm input[name=email]').addClass('error');
-        alertService.setModal(data.content, 'error');
+        contentService.setModal(data.content, 'error');
       }
       else if (data.error == 'no'){
         angular.element('#recPassForm').slideUp(400, function() {
-          alertService.setModal(data.content, 'none');
+          contentService.setModal(data.content, 'none');
         });
 
         $scope.user.email="";
