@@ -169,12 +169,11 @@ class TestCommand(Command):
         #         if spot.user:
         #             print spot.discodes_id
         #             print spot.user.email
-        print 1
+        # print 1
 
-        # with open('tmp/import.csv', 'rb') as csvfile:
-        #     spamreader = csv.reader(csvfile)
-        #     for row in spamreader:
-        #         data = row[0].split(';')
+        with open('tmp/import.csv', 'rb') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+            for row in spamreader:
         #         spot = Spot.query.filter(Spot.code == data[2]).first()
 
         #         wallet = PaymentWallet()
@@ -190,31 +189,39 @@ class TestCommand(Command):
                 # if person:
                 #     continue
 
-                # person = Person()
-                # person.hard_id = row[0]
-                # person.payment_id = row[1]
-                # person.firm_id = 13
-                # person.first_name = 'Anonim'
-                # person.last_name = u'Гость конференции'
+                person = Person()
+                person.hard_id = row[0]
+                person.payment_id = row[1]
+                person.firm_id = 17
+                person.first_name = 'Anonim'
+                person.last_name = u'Гость конференции'
 
-                # if not person.save():
-                #     continue
+                if not person.save():
+                    continue
 
-                # person_event = PersonEvent()
-                # person_event.person_id = person.id
-                # person_event.term_id = 39
-                # person_event.event_id = 3
-                # person_event.firm_id = person.firm_id
-                # person_event.timeout = "00:05:00"
-                # person_event.save()
+                person_event = PersonEvent()
+                person_event.person_id = person.id
+                person_event.term_id = 40
+                person_event.event_id = 3
+                person_event.firm_id = person.firm_id
+                person_event.timeout = 300
+                person_event.save()
 
-                # person_event = PersonEvent()
-                # person_event.person_id = person.id
-                # person_event.term_id = 47
-                # person_event.event_id = 3
-                # person_event.firm_id = person.firm_id
-                # person_event.timeout = "00:05:00"
-                # person_event.save()
+                person_event = PersonEvent()
+                person_event.person_id = person.id
+                person_event.term_id = 42
+                person_event.event_id = 3
+                person_event.firm_id = person.firm_id
+                person_event.timeout = 300
+                person_event.save()
+
+                person_event = PersonEvent()
+                person_event.person_id = person.id
+                person_event.term_id = 48
+                person_event.event_id = 3
+                person_event.firm_id = person.firm_id
+                person_event.timeout = 300
+                person_event.save()
 
              # for row in spamreader:
         #     person = Person.query.filter_by(
