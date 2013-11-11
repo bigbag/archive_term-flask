@@ -12,6 +12,8 @@ from web.form.person import PersonAddForm
 
 from models.person import Person
 from models.person_event import PersonEvent
+from models.spot import Spot
+from models.payment_wallet import PaymentWallet
 
 
 @mod.route('/person/content/<path:action>', methods=['POST'])
@@ -68,18 +70,23 @@ def person_info(person_id):
         abort(403)
 
     person_events = PersonEvent().get_by_person_id(person.id)
+
+    template_patch = 'term/person/view.html'
+    if not person.hard_id:
+        template_patch = 'term/person/view_empty.html'
+
     return render_template(
-        'term/person/view.html',
+        template_patch,
         person=person,
         person_events=person_events
     )
 
 
 def person_edit(arg, person_id):
-    """Редактируем терминал"""
+    """Редактируем человека"""
     answer = dict(error='yes', message='')
 
-    person = Person.query.get(int(person_id))
+    person = Person.query.get(person_id)
     if not person:
         abort(404)
 
@@ -96,14 +103,49 @@ def person_edit(arg, person_id):
     return jsonify(answer)
 
 
+def person_add_card(arg, person_id):
+    """Привязываем к человеку карту"""
+    answer = dict(error='yes', message='')
+
+    code = arg['card_code'] if 'card_code' in arg else False
+    if not code:
+        abort(400)
+
+    person = Person.query.get(person_id)
+    if not person:
+        abort(404)
+
+    spot = Spot().get_valid_by_code(code)
+
+    if not spot:
+        answer['message'] = u'Код неверен или уже активирован'
+        return jsonify(answer)
+
+    wallet = PaymentWallet.query.filter_by(
+        discodes_id=spot.discodes_id).first()
+
+    if not wallet:
+        answer['message'] = u'Привязываемая карта отсутсвует'
+    else:
+        person.payment_id = wallet.payment_id
+        person.hard_id = wallet.hard_id
+        if person.save():
+            answer['error'] = 'no'
+            answer['message'] = u'Карта успешно привязана'
+
+    return jsonify(answer)
+
+
 @mod.route('/person/<int:person_id>/<action>', methods=['POST'])
 @login_required
 @json_headers
 def person_save(person_id, action):
-    """Добавляем или редактируем терминал"""
+    """Добавляем или редактируем терминал, привязываем карту"""
     arg = json.loads(request.stream.read())
 
-    if 'add' in action:
+    if 'add_card' in action:
+        result = person_add_card(arg, person_id)
+    elif 'add' in action:
         result = person_add(arg)
     elif 'edit' in action:
         result = person_edit(arg, person_id)

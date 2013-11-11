@@ -1,6 +1,5 @@
 'use strict';
 angular.module('term', [
-    'ui.keypress', 
     'ui.pagination',
     ]);
 

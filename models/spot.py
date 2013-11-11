@@ -102,6 +102,16 @@ class Spot(db.Model):
         else:
             return url
 
+    def get_valid_by_code(self, code):
+        valid_status = [
+            self.STATUS_ACTIVATED,
+            self.STATUS_REGISTERED,
+            self.STATUS_CLONES
+        ]
+        return Spot.query.filter(
+            Spot.code == code).filter(
+                Spot.status.in_(valid_status)).first()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

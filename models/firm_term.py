@@ -59,8 +59,7 @@ class FirmTerm(db.Model):
         result = False
         access = self.query.filter_by(
             firm_id=firm_id).filter_by(
-                term_id=term_id).first(
-                )
+                term_id=term_id).first()
 
         if access:
             result = True

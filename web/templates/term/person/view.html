@@ -6,9 +6,9 @@
         {{person.name}}
     </div>
 </h2>
-<div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
+<div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style=""  ng-controller="PersonController">
     <section class="section active">
-        <p class="title"><a>Все события</a></p>
+        <p class="title"><a>События</a></p>
         <div class="content">
             <div class="content-row">
                 <p class="m-hint">Для изменения времени начала и конца события два раза кликните по нему. </p>
@@ -18,13 +18,12 @@
                     <a id="event" class="loc-link f-spot-button small">
                         + Добавить событие
                     </a>
-                    
                 </div>
             </div>
             <div id="eventForm" class="slide-box slide-setting">
                 ывывыв
             </div>
-            <table class="m-spot-table" ng-grid="gridOptions">
+            <table class="m-spot-table">
                 <thead>
                 <tr>
                     <th>Событие</th>

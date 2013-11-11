@@ -1,4 +1,4 @@
-<form class="custom" id="add_person" name="personForm" ng-controller="PersonController">
+<form class="custom" id="add_person" name="personForm">
     <div class="g-clear-b g-clearfix" 
         ng-init="person.id='{{person.id}}';person.firm_id={{g.firm_info['id']}}">
         {% if not person.id %}
@@ -12,7 +12,8 @@
                 ФИО*
             </label>
             <input id="add-name" 
-                name="name"
+                class="duble-input"
+                name="user_name"
                 type="text" 
                 ng-model="person.name"
                 required>
@@ -24,7 +25,17 @@
             <input type="text" placeholder="День рождения" id="add-birthday" />
         </div>
     </div> -->
-
+    {% if not person.hard_id %}
+        <div class="content-row g-clearfix">
+        <label for="add-card-code">
+            Код активации карты (6 цифр и 4 буквы)
+        </label>
+        <input id="add-card-code" 
+            type="text"
+            ng-model="person.card_code"
+            required>
+    </div>
+    {% endif %} 
     <div class="content-row g-clearfix">
         <label for="add-tnumber"
             ng-init="person.tabel_id='{{person.tabel_id|replace("None", "")}}'">
