@@ -1,6 +1,6 @@
 <form class="custom" id="add_person" name="personForm">
     <div class="g-clear-b g-clearfix" 
-        ng-init="person.id='{{person.id}}';person.firm_id={{g.firm_info['id']}}">
+        ng-init="person.id='{{person.id|replace("None", 0)}}';person.firm_id={{g.firm_info['id']}}">
         {% if not person.id %}
             <span ng-init="person.action='add'"></span>
         {% else %}
@@ -19,21 +19,19 @@
                 required>
         </div>
     </div>
-<!--     <div class="content-row g-clear-b">
-        <label for="add-birthday">День рождения</label>
-        <div class="f-datepicker">
-            <input type="text" placeholder="День рождения" id="add-birthday" />
-        </div>
-    </div> -->
     {% if not person.hard_id %}
         <div class="content-row g-clearfix">
         <label for="add-card-code">
             Код активации карты (6 цифр и 4 буквы)
         </label>
         <input id="add-card-code" 
+            name="card_code"
+            maxlength="10"
+            minlength="10"
+            ng-minlength="10"
+            ng-maxlength="10"
             type="text"
-            ng-model="person.card_code"
-            required>
+            ng-model="person.card_code">
     </div>
     {% endif %} 
     <div class="content-row g-clearfix">

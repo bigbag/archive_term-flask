@@ -23,8 +23,10 @@ angular.module('term').controller('PersonController',
       contentService.scrollPage('.m-page-name');
       return false;
     };
-    var url = '/person/' + person.id + '/' + person.action;
+
     person.csrf_token = $scope.token;
+    var url = '/person/' + person.id + '/' + person.action;
+
     $http.post(url, person).success(function(data) {
       contentService.scrollPage('.m-page-name');
       if (data.error == 'yes') {
