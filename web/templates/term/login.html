@@ -13,7 +13,7 @@
                 type="email" 
                 placeholder="Email"
                 ng-model="user.email"
-                ui-keypress="{enter: 'login(user, signForm.$valid)'}"
+                ng-keypress="($event.keyCode == 13)?login(user, signForm.$valid):''"
                 autocomplete="off"
                 maxlength="300"
                 required >
@@ -22,10 +22,11 @@
                 type="password" 
                 placeholder="Пароль"
                 ng-model="user.password"
-                ui-keypress="{enter: 'login(user, signForm.$valid)'}"
+                ng-keypress="($event.keyCode == 13)?login(user, signForm.$valid):''"
                 autocomplete="off"
                 maxlength="300"
                 required >
+
             <a href="javascript:;" class="f-spot-button" ng-click="login(user, signForm.$valid)">
                Войти
             </a>
