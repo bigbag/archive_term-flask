@@ -82,63 +82,34 @@ def person_info(person_id):
     )
 
 
-@mod.route('/person/<int:person_id>/<action>', methods=['POST'])
+@mod.route('/person/<int:person_id>/add', methods=['POST'])
+@mod.route('/person/<int:person_id>/edit', methods=['POST'])
 @login_required
 @json_headers
-def person_save(person_id, action):
-    """Добавляем или редактируем терминал, привязываем карту"""
+def person_save(person_id):
+    """Добавляем или редактируем человека"""
+
+    answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
+    form = PersonAddForm.from_json(arg)
 
-    if 'add_card' in action:
-        result = person_add_card(arg, person_id)
-    elif 'add' in action:
-        result = person_add(arg)
-    elif 'edit' in action:
-        result = person_edit(arg, person_id)
+    if person_id == 0:
+        code = arg['card_code'] if 'card_code' in arg else False
+        person = Person()
+
+        if code:
+            linking_card = person_linking_card(code)
+            if not linking_card['wallet']:
+                answer['message'] = person_failed_linking_card(code)
+                return jsonify(answer)
+            else:
+                wallet = linking_card['wallet']
+                person.payment_id = wallet.payment_id
+                person.hard_id = wallet.hard_id
     else:
-        abort(400)
-
-    return result
-
-def person_add(arg):
-    """Добавляем человека"""
-    answer = dict(error='yes', message='')
-
-    code = arg['card_code'] if 'card_code' in arg else False
-
-    person = Person()
-    form = PersonAddForm.from_json(arg)
-
-    if code:
-        linking_card = person_linking_card(code)
-        if not linking_card['wallet']:
-            answer['message'] = person_failed_linking_card(code)
-            return jsonify(answer)
-        else:
-            wallet = linking_card['wallet']
-            person.payment_id = wallet.payment_id
-            person.hard_id = wallet.hard_id
-    
-    if form.validate():
-        form.populate_obj(person)
-        
-        if person.save():
-            answer['error'] = 'no'
-            answer['message'] = u'Данные сохранены'
-        else:
-            answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
-    return jsonify(answer)
-
-
-def person_edit(arg, person_id):
-    """Редактируем человека"""
-    answer = dict(error='yes', message='')
-
-    person = Person.query.get(person_id)
-    if not person:
-        abort(404)
-
-    form = PersonAddForm.from_json(arg)
+        person = Person.query.get(person_id)
+        if not person:
+            abort(404)
 
     if form.validate():
         form.populate_obj(person)
@@ -146,32 +117,20 @@ def person_edit(arg, person_id):
         if person.save():
             answer['error'] = 'no'
             answer['message'] = u'Данные сохранены'
-    else:
-        answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
+        else:
+            answer[
+                'message'] = u'Форма заполнена неверно, проверьте формат полей'
     return jsonify(answer)
 
 
-def person_linking_card(code):
-    answer = dict(error='yes', message='', wallet=False)
-
-    spot = Spot().get_valid_by_code(code)
-    if not spot:
-        answer['message'] = u'Код неверен или уже активирован'
-    else:
-        wallet = PaymentWallet.query.filter_by(
-            discodes_id=spot.discodes_id).first()
-
-        if not wallet:
-            answer['message'] = u'Привязываемая карта отсутсвует'
-        else:
-            answer['wallet'] = wallet
-
-    return answer
-
-
-def person_add_card(arg, person_id):
+@mod.route('/person/<int:person_id>/add_card', methods=['POST'])
+@login_required
+@json_headers
+def person_add_card(person_id):
     """Привязываем к человеку карту"""
+
     answer = dict(error='yes', message='')
+    arg = json.loads(request.stream.read())
 
     code = arg['card_code'] if 'card_code' in arg else False
     if not code:
@@ -183,7 +142,7 @@ def person_add_card(arg, person_id):
 
     linking_card = person_linking_card(code)
     if not linking_card['wallet']:
-        answer['message'] = person_failed_linking_card(code)
+        answer['message'] = linking_card['message']
     else:
         wallet = linking_card['wallet']
         person.payment_id = wallet.payment_id
@@ -193,3 +152,21 @@ def person_add_card(arg, person_id):
             answer['message'] = u'Карта успешно привязана'
 
     return jsonify(answer)
+
+
+def person_linking_card(code):
+    answer = dict(error='yes', message='', wallet=False)
+
+    spot = Spot().get_valid_by_code(code)
+    if not spot:
+        answer['message'] = u'Код активации не верен'
+    else:
+        wallet = PaymentWallet.query.filter_by(
+            discodes_id=spot.discodes_id).first()
+
+        if not wallet:
+            answer['message'] = u'Привязываемая карта отсутсвует'
+        else:
+            answer['wallet'] = wallet
+
+    return answer
