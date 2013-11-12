@@ -44,14 +44,14 @@ angular.module('term').controller('TerminalController',
   //Блокируем и разблокируем терминал
   $scope.lockingTerminal = function(term) {
     term.csrf_token = $scope.token;
-    if ($scope.term.status == 0) {
-      $scope.term.status = 1;
-    }
-    else {
-      $scope.term.status = 0;
-    }
-    $http.post('/terminal/locking/' + term.id, term).success(function(data) {
+    $http.post('/terminal/' + term.id + '/locking', term).success(function(data) {
       if (data.error == 'no') {
+        if ($scope.term.status == 0) {
+          $scope.term.status = 1;
+        }
+        else {
+          $scope.term.status = 0;
+        }
         contentService.setModal(data.message, 'success');
       }
     });  
@@ -59,7 +59,7 @@ angular.module('term').controller('TerminalController',
 
   $scope.removeTerminal = function(term) {
     term.csrf_token = $scope.token;
-    $http.post('/terminal/remove/' + term.id, term).success(function(data) {
+    $http.post('/terminal' + term.id + '/remove', term).success(function(data) {
       if (data.error == 'no') {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){

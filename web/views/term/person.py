@@ -170,3 +170,33 @@ def person_linking_card(code):
             answer['wallet'] = wallet
 
     return answer
+
+
+@mod.route('/person/<int:person_id>/remove', methods=['POST'])
+@login_required
+def person_remove(person_id):
+    """Блокировка сотрудника"""
+
+    answer = dict(error='yes', message='', status=False)
+    arg = json.loads(request.stream.read())
+
+    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+        abort(403)
+
+    if 'status' not in arg or 'id' not in arg:
+        abort(400)
+
+    person = Person.query.get(person_id)
+    if not person:
+        abort(404)
+
+    if person.status == Person.STATUS_VALID:
+        person.status = Person.STATUS_BANNED
+    elif person.status == Person.STATUS_BANNED:
+        person.status = Person.STATUS_VALID
+
+    if person.save():
+        answer['error'] = 'no'
+        answer['message'] = u'Операция успешно выполнена'
+
+    return jsonify(answer)

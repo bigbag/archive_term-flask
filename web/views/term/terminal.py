@@ -155,7 +155,7 @@ def terminal_save(term_id, action):
     return result
 
 
-@mod.route('/terminal/locking/<int:term_id>', methods=['POST'])
+@mod.route('/terminal/<int:term_id>/locking', methods=['POST'])
 @login_required
 @json_headers
 def terminal_locking(term_id):
@@ -173,7 +173,10 @@ def terminal_locking(term_id):
     if not term:
         abort(404)
 
-    term.status = int(arg['status'])
+    if term.status == Term.STATUS_VALID:
+        term.status = Term.STATUS_BANNED
+    elif term.status == Term.STATUS_BANNED:
+        term.status = Term.STATUS_VALID
     if term.save():
         answer['error'] = 'no'
         answer['message'] = u'Операция успешно выполнена'
@@ -181,7 +184,7 @@ def terminal_locking(term_id):
     return jsonify(answer)
 
 
-@mod.route('/terminal/remove/<int:term_id>', methods=['POST'])
+@mod.route('/terminal/<int:term_id>/remove', methods=['POST'])
 @login_required
 @json_headers
 def terminal_remove(term_id):

@@ -16,7 +16,7 @@ class Person(db.Model):
     __tablename__ = 'person'
 
     STATUS_VALID = 1
-    STATUS_BANNED = -1
+    STATUS_BANNED = 0
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
@@ -53,6 +53,7 @@ class Person(db.Model):
                 name=person.name,
                 card=person.card,
                 status='active' if person.status == self.STATUS_VALID else '',
+                hard_id='active' if person.hard_id else '',
             )
             result.append(data)
 

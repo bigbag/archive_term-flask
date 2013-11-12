@@ -1,25 +1,21 @@
 {% extends "term/page.html" %}
 
 {% block content %}
-
-<h2 class="g-color-blue m-page-name">
-    <div ng-controller="PersonController">
+<span ng-init="person.id={{person.id}};person.status={{person.status}}"></span>
+<h2 class="g-color-blue m-page-name" ng-controller="PersonController">
+    <div>
         {{person.name}}
     </div>
     <div class="right">
-        <a ng-show="term.status" 
-            ng-click="lockingTerminal(term)" 
-            class="f-spot-button small">
-            Заблокировать
-        </a>
-        <a ng-hide="term.status" 
-            ng-click="lockingTerminal(term)" 
-            class="f-spot-button small">
-            Разблокировать
-        </a>
-        <a ng-click="removeTerminal(term)" 
+        <a ng-show="person.status"
+            ng-click="removePerson(person)" 
             class="f-spot-button bg-red small">
-            Удалить терминал
+            Удалить
+        </a>
+        <a ng-hide="person.status"
+            ng-click="removePerson(person)" 
+            class="f-spot-button bg-red small">
+            Восстановить
         </a>
     </div>
 </h2>

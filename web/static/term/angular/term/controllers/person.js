@@ -72,6 +72,22 @@ angular.module('term').controller('PersonController',
     });  
   };
 
+  //Блокируем пользователя
+  $scope.removePerson = function(person) {
+    person.csrf_token = $scope.token;
+    $http.post('/person/' + person.id + '/remove', person).success(function(data) {
+      if (data.error == 'no') {
+        if ($scope.person.status == 0) {
+          $scope.person.status = 1;
+        }
+        else {
+          $scope.person.status = 0;
+        }
+        contentService.setModal(data.message, 'success');
+      }
+    }); 
+  };
+
   //Привязываем новое событие к человеку или редактируем уже привязанное
   $scope.saveEventPerson = function(person_event, valid){
     if (!valid) return false;

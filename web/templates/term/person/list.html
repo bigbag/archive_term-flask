@@ -22,7 +22,7 @@
                 ng-repeat="person in result" 
                 class="m-t-cont-row">
                 <td>{[{person.name}]}</td>
-                <td>{[{person.card}]}</td>
+                <td><span class="m-card-act {[{person.hard_id}]} g-round"></span></td>
                 <td><span class="m-card-act {[{person.status}]} g-round"></span></td>
             </tr>
             <tr class="m-table-bottom" ng-show="search.page_count">
