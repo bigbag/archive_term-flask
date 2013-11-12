@@ -162,17 +162,6 @@ class TestCommand(Command):
         persons = Person.query.all()
 
         for person in persons:
-            person.name = ''
-
-            if person.last_name:
-                person.name = '%s %s' % (person.name, person.last_name)
-
-            if person.first_name and 'Anonim' not in person.first_name:
-                person.name = '%s %s' % (person.name, person.first_name)
-
-            if person.midle_name:
-                person.name = '%s %s' % (person.name, person.midle_name)
-
             person.save()
 
         # spots = Spot.query.filter(

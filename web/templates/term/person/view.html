@@ -1,9 +1,26 @@
 {% extends "term/page.html" %}
 
 {% block content %}
+
 <h2 class="g-color-blue m-page-name">
     <div ng-controller="PersonController">
         {{person.name}}
+    </div>
+    <div class="right">
+        <a ng-show="term.status" 
+            ng-click="lockingTerminal(term)" 
+            class="f-spot-button small">
+            Заблокировать
+        </a>
+        <a ng-hide="term.status" 
+            ng-click="lockingTerminal(term)" 
+            class="f-spot-button small">
+            Разблокировать
+        </a>
+        <a ng-click="removeTerminal(term)" 
+            class="f-spot-button bg-red small">
+            Удалить терминал
+        </a>
     </div>
 </h2>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style=""  ng-controller="PersonController">

@@ -36,7 +36,7 @@ class Person(db.Model):
     @cache.cached(timeout=5, key_prefix='select_term_list')
     def select_person_list(self, firm_id, **kwargs):
         order = kwargs[
-            'order'] if 'order' in kwargs else 'last_name asc, first_name asc'
+            'order'] if 'order' in kwargs else 'name asc'
         limit = kwargs['limit'] if 'limit' in kwargs else 10
         page = kwargs['page'] if 'page' in kwargs else 1
         status = kwargs['status'] if 'status' in kwargs else 1
