@@ -27,7 +27,7 @@ class PersonEvent(db.Model):
     timeout = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
-        self.timeout = "0"
+        self.timeout = 300
 
     def __repr__(self):
         return '<id %r>' % (self.id)

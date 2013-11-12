@@ -79,7 +79,6 @@ angular.module('term').controller('TerminalController',
   $scope.saveEventTerminal = function(term_event, valid){
     if (!valid) return false;
 
-    if (term_event.id == undefined) term_event.id = 0;
     term_event.csrf_token = $scope.token;
 
     var url = '/terminal/' + term_event.term_id + '/event/' + term_event.id;

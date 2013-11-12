@@ -8,6 +8,7 @@
 from web import db, app
 
 from models.person_event import PersonEvent
+from models.firm_term import FirmTerm
 from models.person import Person
 
 
@@ -73,6 +74,12 @@ class TermEvent(db.Model):
 
     def get_by_term_id(self, term_id):
         return self.query.filter_by(term_id=term_id).all()
+
+    def get_by_firm_id(self, firm_id):
+        firm_term = FirmTerm().get_list_by_firm_id(firm_id)
+        return self.query.filter(
+            TermEvent.term_id.in_(
+                firm_term)).all()
 
     def delete(self):
         db.session.delete(self)

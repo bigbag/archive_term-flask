@@ -12,6 +12,7 @@ from web.form.person import PersonAddForm
 
 from models.person import Person
 from models.person_event import PersonEvent
+from models.term_event import TermEvent
 from models.spot import Spot
 from models.payment_wallet import PaymentWallet
 
@@ -62,14 +63,11 @@ def person_info(person_id):
     """Информация о сотруднике"""
 
     person = Person.query.get(person_id)
-
     if not person:
         abort(404)
 
     if person.firm_id != g.firm_info['id']:
         abort(403)
-
-    person_events = PersonEvent().get_by_person_id(person.id)
 
     template_patch = 'term/person/view.html'
     if not person.hard_id:
@@ -78,7 +76,9 @@ def person_info(person_id):
     return render_template(
         template_patch,
         person=person,
-        person_events=person_events
+        person_events=PersonEvent().get_by_person_id(person.id),
+        term_events=TermEvent().get_by_firm_id(g.firm_info['id']),
+        person_event=PersonEvent()
     )
 
 

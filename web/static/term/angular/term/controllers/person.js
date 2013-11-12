@@ -71,4 +71,27 @@ angular.module('term').controller('PersonController',
       }
     });  
   };
+
+  //Привязываем новое событие к человеку или редактируем уже привязанное
+  $scope.saveEventPerson = function(person_event, valid){
+    if (!valid) return false;
+
+    person_event.csrf_token = $scope.token;
+
+    console.log(person_event);
+
+    // var url = '/зукыщ/' + term_event.term_id + '/event/' + term_event.id;
+    // $http.post(url, term_event).success(function(data) {
+    //   contentService.scrollPage('.m-page-name');
+    //   if (data.error == 'yes') {
+    //     contentService.setModal(data.message, 'error');
+    //   }
+    //   else {
+    //     contentService.setModal(data.message, 'success');
+    //     setTimeout(function(){
+    //       $(location).attr('href','/terminal/' + term_event.term_id);
+    //     }, 2000);
+    //   }
+    // });  
+  }
 });

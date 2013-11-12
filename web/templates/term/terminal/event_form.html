@@ -1,7 +1,7 @@
 <div class="m-block" ng-controller="TerminalController">
     <form class="custom" name="eventForm">
         <div class="row" 
-            ng-init="term_event.id={{term_event.id}};term_event.term_id={{term.id}}">
+            ng-init="term_event.id={{term_event.id|replace("None", 0)}};term_event.term_id={{term.id}}">
             <div class="large-5 columns">
                 <div class="content-row" ng-init="term_event.event_id={{term_event.event_id}}">
                     <label for="type-event">Событие*</label>
