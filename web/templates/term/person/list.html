@@ -2,7 +2,7 @@
     <div ng-show="search.status==1" class="content-row">
         <p class="m-hint">Кликните на строку с фамилией, чтобы редактировать возможности человека по пользованию бесконтактными терминалами, установленными в Вашей компании.</p>
     </div>
-    <div ng-show="search.status==-1" class="content-row">
+    <div ng-show="search.status==0" class="content-row">
         <br />
         <p class="m-hint">Кликните на строку с определенным сотрудником, чтобы восстановить учетную запись</p>
     </div>
@@ -41,7 +41,7 @@
     <div ng-show="search.status==1" class="content-row">
         <p class="m-hint">Вы не зарегистрировали ни одного человека. Для добавления воспользуйтесь вкладкой "Добавить".</p>
     </div>
-    <div ng-show="search.status==-1" class="content-row">
+    <div ng-show="search.status==0" class="content-row">
         <br />
         <p class="m-hint">У вас нет ни одного удаленного сотрудника.</p>
     </div>
