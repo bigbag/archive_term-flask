@@ -27,3 +27,11 @@ class TermEventAddForm(TokenSecureForm):
     stop = TextField(validators=[Optional(), base.time_check])
     term_id = IntegerField(InputRequired())
     event_id = IntegerField(InputRequired())
+
+class PersonEventAddForm(TokenSecureForm):
+
+    id = IntegerField()
+    person_id = IntegerField(InputRequired())
+    term_id = IntegerField(InputRequired())
+    event_id = IntegerField(InputRequired())
+    timeout = IntegerField(default=0)

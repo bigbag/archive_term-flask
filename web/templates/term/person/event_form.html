@@ -4,14 +4,13 @@
             ng-init="person_event.id={{person_event.id|replace("None", 0)}};person_event.person_id={{person.id}}">
             <div class="large-5 columns">
                 <div class="content-row"
-                    ng-init="person_event.term_event_id=0">
+                    ng-init="person_event.term_event_id='{{term_events[0].id}}'">
                     <label for="type-event">Событие*</label>
                     <select id="type-event" 
                         class="medium"
                         min="1"
                         ng-model="person_event.term_event_id"
                         required>
-                        <option value="0" selected>Выберите</option>
                         {% for term_event in term_events %}
                         <option value="{{term_event.id}}">
                             {{term_event.event.name}}, {{term_event.term.name}}
@@ -24,7 +23,7 @@
         </div>
         <div class="content-row g-clearfix"
             ng-init="person_event.timeout={{person_event.timeout}}">
-            <label for="time-out">Тайм-аут по умолчанию (в секундах)*</label>
+            <label for="time-out">Тайм-аут (в секундах)*</label>
             <input id="time-out" 
                 class="f-input-small left"
                 minlength="1"

@@ -9,6 +9,7 @@
 from web.views.term.general import *
 
 from web.form.person import PersonAddForm
+from web.form.event import PersonEventAddForm
 
 from models.person import Person
 from models.person_event import PersonEvent
@@ -198,5 +199,63 @@ def person_remove(person_id):
     if person.save():
         answer['error'] = 'no'
         answer['message'] = u'Операция успешно выполнена'
+
+    return jsonify(answer)
+
+
+@mod.route('/person/<int:person_id>/event/<int:person_event_id>', methods=['POST'])
+@login_required
+@json_headers
+def person_event_save(person_id, person_event_id):
+    """Сохраняем событие привязаное к человеку"""
+
+    answer = dict(error='yes', message='')
+    arg = json.loads(request.stream.read())
+
+    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+        abort(403)
+
+    if 'term_event_id' not in arg:
+        abort(400)
+    term_event_id = arg['term_event_id']
+
+    term_event = TermEvent.query.get(term_event_id)
+    if not term_event:
+        abort(404)
+
+    person = Person.query.get(person_id)
+    if not person:
+        abort(404)
+
+    if person_event_id == 0:
+        person_event = PersonEvent()
+    else:
+        person_event = PersonEvent.query.get(person_event_id)
+        if not person_event:
+            abort(404)
+
+    form = PersonEventAddForm.from_json(arg)
+    if form.validate():
+        form.populate_obj(person_event)
+        person_event.term_id = term_event.term_id
+        person_event.event_id = term_event.event_id
+        person_event.firm_id = g.firm_info['id']
+
+        person_event_old = PersonEvent.query.filter_by(
+            person_id=person.id,
+            term_id=term_event.term_id, 
+            event_id=term_event.event_id).first()
+
+        if person_event_old and not person_event.id:
+            answer['message'] = u"""Такое событие уже есть,
+                                    удалите старое или измените тип нового"""
+        elif person_event.save():
+            answer['error'] = 'no'
+            answer['message'] = u'Данные сохранены'
+    else:
+        answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
+
+
+
 
     return jsonify(answer)

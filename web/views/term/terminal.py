@@ -217,7 +217,7 @@ def terminal_event_info(term_id, term_event_id):
     if not term:
         abort(404)
 
-    term_event = TermEvent.query.get(int(term_event_id))
+    term_event = TermEvent.query.get(term_event_id)
     if not term_event:
         abort(404)
 
@@ -233,6 +233,7 @@ def terminal_event_info(term_id, term_event_id):
         term_event=term_event
     )
 
+
 @mod.route('/terminal/<int:term_id>/event/<int:term_event_id>', methods=['POST'])
 @login_required
 @json_headers
@@ -240,6 +241,13 @@ def terminal_event_save(term_id, term_event_id):
     """Сохраняем событие привязаное к терминалу"""
     answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
+
+    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+        abort(403)
+
+    term = Term.query.get(term_id)
+    if not term:
+        abort(404)
 
     if term_event_id == 0:
         term_event = TermEvent()
@@ -253,19 +261,20 @@ def terminal_event_save(term_id, term_event_id):
         form.populate_obj(term_event)
 
         term_event_old = TermEvent.query.filter_by(
-            term_id=term_id, event_id=term_event.event_id).first()
+            term_id=term.id, event_id=term_event.event_id).first()
 
         if term_event_old and not term_event.id:
             answer['message'] = u"""Такое событие уже есть,
                                     удалите старое или измените тип нового"""
 
-        elif term_event.term_event_save(g.firm_info['id'], term_id):
+        elif term_event.term_event_save(g.firm_info['id'], term.id):
             answer['error'] = 'no'
             answer['message'] = u'Данные сохранены'
     else:
         answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
 
     return jsonify(answer)
+
 
 @mod.route('/terminal/<int:term_id>/event/<int:term_event_id>/delete', methods=['POST'])
 @login_required
