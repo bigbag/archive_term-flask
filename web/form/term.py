@@ -22,6 +22,7 @@ class TermAddForm(TokenSecureForm):
     id = IntegerField(validators=[InputRequired()])
     name = TextField(validators=[InputRequired()])
     type = IntegerField(default=1)
+    blacklist = IntegerField(default=1)
     upload_start = TextField(validators=[Optional(), base.time_check])
     upload_period = IntegerField(default=5)
     download_start = TextField(validators=[Optional(), base.time_check])

@@ -48,7 +48,8 @@ def terminal_view():
     return render_template(
         'term/terminal/index.html',
         term=Term(),
-        term_types=Term().get_type_list()
+        term_types=Term().get_type_list(),
+        term_blacklist=Term().get_blacklist_list()
     )
 
 
@@ -89,7 +90,8 @@ def terminal_info(term_id):
         term_event=term_event,
         term_events=term_events,
         term_access=term_access,
-        term_types=Term().get_type_list()
+        term_types=Term().get_type_list(),
+        term_blacklist=Term().get_blacklist_list(),
     )
 
 

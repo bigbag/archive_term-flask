@@ -22,8 +22,14 @@
                 ng-repeat="person in result" 
                 class="m-t-cont-row">
                 <td>{[{person.name}]}</td>
-                <td><span class="m-card-act {[{person.hard_id}]} g-round"></span></td>
-                <td><span class="m-card-act {[{person.status}]} g-round"></span></td>
+                <td>
+                    <span class="m-card-act g-round"
+                        ng-class="(person.hard_id==1)?'active':''"></span>
+                </td>
+                <td>
+                    <span class="m-card-act g-round"
+                        ng-class="(person.status==1)?'active':''"></span>
+                </td>
             </tr>
             <tr class="m-table-bottom" ng-show="search.page_count">
                 <td colspan="10">

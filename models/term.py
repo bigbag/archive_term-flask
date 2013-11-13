@@ -24,8 +24,13 @@ class Term(db.Model):
     STATUS_VALID = 1
     STATUS_BANNED = 0
 
+    BLACKLIST_ON = 1
+    BLACKLIST_OFF = 0
+
     TYPE_POS = 0
     TYPE_VENDING = 1
+
+    SEANS_ALARM = 86400
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.Integer, nullable=False)
@@ -54,7 +59,7 @@ class Term(db.Model):
         self.download_stop = "23:59"
         self.download_period = 5
         self.tz = app.config['TZ']
-        self.blacklist = 0
+        self.blacklist = self.BLACKLIST_OFF
         self.settings_id = 1
         self.status = self.STATUS_VALID
 
@@ -82,10 +87,16 @@ class Term(db.Model):
         return True
 
     def get_type_list(self):
-        result = []
-        result.append({'id': self.TYPE_VENDING, 'name': u"Вендинговый"})
-        result.append({'id': self.TYPE_POS, 'name': u"Платежный"})
-        return result
+        return [
+            {'id': self.TYPE_VENDING, 'name': u"Вендинговый"},
+            {'id': self.TYPE_POS, 'name': u"Платежный"}
+        ]
+
+    def get_blacklist_list(self):
+        return [
+            {'id': self.BLACKLIST_ON, 'name': u"Денежный"},
+            {'id': self.BLACKLIST_OFF, 'name': u"Корпоративный"}
+        ]
 
     def get_valid_term(self, term_id):
         return self.query.filter_by(
@@ -99,7 +110,6 @@ class Term(db.Model):
     def get_info_by_id(self, id):
         date_pattern = '%H:%M %d.%m.%y'
         term = Term().query.get(id)
-
         if term.report_date:
             term.report_date = date_helper.from_utc(
                 term.report_date,
@@ -133,7 +143,7 @@ class Term(db.Model):
             self.download_start = term.download_start
         return self
 
-    @cache.cached(timeout=5, key_prefix='select_term_list')
+    #@cache.cached(timeout=10, key_prefix='select_term_list')
     def select_term_list(self, firm_id, **kwargs):
         tz = app.config['TZ']
         date_pattern = '%H:%M %d.%m.%y'
@@ -154,14 +164,20 @@ class Term(db.Model):
 
             seans_date = None
             if term.config_date:
+                delta = date_helper.get_curent_date(
+                    format=False) - term.config_date
+
+                seans_alarm = delta.total_seconds() > self.SEANS_ALARM
+
                 seans_date = date_helper.from_utc(term.config_date, tz)
                 seans_date = seans_date.strftime(date_pattern)
             data = dict(
                 term_id=term.id,
                 name=term.name,
                 firm=firm_general.firm.name,
-                status='active' if term.status == self.STATUS_VALID else '',
+                status=int(term.status == self.STATUS_VALID),
                 seans_date=seans_date,
+                seans_alarm=int(seans_alarm),
             )
 
             result.append(data)

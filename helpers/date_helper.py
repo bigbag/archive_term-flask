@@ -13,10 +13,11 @@ from web import app
 from flask import request, url_for
 
 
-def get_curent_date():
+def get_curent_date(format='%Y-%m-%d %H:%M:%S'):
     client_time = datetime.utcnow()
-
-    return client_time.strftime('%Y-%m-%d %H:%M:%S')
+    if format:
+        client_time = client_time.strftime(format)
+    return client_time
 
 
 def to_utc(date, tz):
@@ -62,6 +63,7 @@ def get_timezone(tzname):
         delta = "0%s" % delta
     return "%s%s%s" % (tz.tzname(now, is_dst=False), sign, delta)
 
+
 def get_date_interval(search_date, period='day'):
 
     search_date = search_date.date()
@@ -76,6 +78,9 @@ def get_date_interval(search_date, period='day'):
         stop = search_date + stop_delta
     elif period == 'month':
         start = datetime(search_date.year, search_date.month, 1)
-        stop = datetime(search_date.year, search_date.month, calendar.mdays[search_date.month])
+        stop = datetime(
+            search_date.year,
+            search_date.month,
+            calendar.mdays[search_date.month])
 
     return (start, stop)

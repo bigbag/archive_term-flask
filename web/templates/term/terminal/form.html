@@ -26,11 +26,33 @@
                 required>
         </div>
     </div>
+
+    <div class="row">
+        <div class="large-6 columns">
+            <div class="content-row g-clear-b" 
+                ng-init="term.blacklist={{term.blacklist}}">
+                <label for="add-type">Вид</label>
+                <select id="add-type" 
+                    class="medium"
+                    name="type"
+                    ng-model="term.blacklist"
+                    ng-change="change()">
+                    {% for blacklist in term_blacklist %}
+                    <option {% if blacklist['id'] == term.blacklist %} selected {% endif %} 
+                        value="{{blacklist['id']}}">
+                            {{blacklist['name']}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="large-6 columns">
             <div class="content-row g-clear-b" 
                 ng-init="term.type={{term.type}}">
-                <label for="add-type">Тип*</label>
+                <label for="add-type">Тип</label>
                 <select id="add-type" 
                     class="medium"
                     name="type"

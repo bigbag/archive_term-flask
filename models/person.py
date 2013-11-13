@@ -52,8 +52,8 @@ class Person(db.Model):
                 id=person.id,
                 name=person.name,
                 card=person.card,
-                status='active' if person.status == self.STATUS_VALID else '',
-                hard_id='active' if person.hard_id else '',
+                status=int(person.status == self.STATUS_VALID),
+                hard_id=int(person.hard_id is not None),
             )
             result.append(data)
 

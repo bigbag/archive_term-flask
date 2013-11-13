@@ -29,8 +29,14 @@
                         <td>{[{term.term_id}]}</td>
                         <td>{[{term.name}]}</td>
                         <td>{[{term.firm}]}</td>
-                        <td>{[{term.seans_date}]}</td>
-                        <td><span class="m-card-act {[{term.status}]} g-round"></span></td>
+                        <td ng-class="(term.seans_alarm==1)?'g-color-red':''">
+                            {[{term.seans_date}]}
+                        </td>
+
+                        <td>
+                            <span class="m-card-act g-round"
+                                ng-class="(term.status==1)?'active':''"></span>
+                        </td>
                     </tr>
                     <tr class="m-table-bottom" ng-show="search.page_count">
                         <td colspan="10">
