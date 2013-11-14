@@ -10,11 +10,11 @@
                         min="1"
                         ng-model="term_event.event_id"
                         required>
-                        {% for event in events %}
+                        {% for row in events %}
                         <option 
-                            {% if event.id == term_event.event_id %} selected {% endif %} 
-                            value="{{event.id}}">
-                            {{event.name}}
+                            {% if row.id == term_event.event_id %} selected {% endif %} 
+                            value="{{row.id}}">
+                            {{row.name}}
                         </option>
                         {% endfor %}
                     </select>

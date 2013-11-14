@@ -74,12 +74,17 @@ def person_info(person_id):
     if not person.hard_id:
         template_patch = 'term/person/view_empty.html'
 
+    term_events = TermEvent().get_by_firm_id(g.firm_info['id'])
+    term_event = TermEvent()
+    term_event.id = term_events[0].id
+
     return render_template(
         template_patch,
         person=person,
+        person_event=PersonEvent(),
         person_events=PersonEvent().get_by_person_id(person.id),
-        term_events=TermEvent().get_by_firm_id(g.firm_info['id']),
-        person_event=PersonEvent()
+        term_event=term_event,
+        term_events=term_events
     )
 
 
@@ -203,6 +208,33 @@ def person_remove(person_id):
     return jsonify(answer)
 
 
+@mod.route('/person/<int:person_id>/event/<int:person_event_id>', methods=['GET'])
+@login_required
+def person_event_info(person_id, person_event_id):
+    """Информация о событии привязаном к человеку"""
+
+    person = Person.query.get(person_id)
+    if not person:
+        abort(404)
+
+    person_event = PersonEvent.query.get(person_event_id)
+    if not person_event:
+        abort(404)
+
+    term_event = TermEvent.query.filter_by(
+        term_id=person_event.term_id,
+        event_id=person_event.event_id).first()
+
+    return render_template(
+        'term/person/event_view.html',
+        person=person,
+        person_event=person_event,
+        person_events=PersonEvent().get_by_person_id(person.id),
+        term_event=term_event,
+        term_events=TermEvent().get_by_firm_id(g.firm_info['id']),
+    )
+
+
 @mod.route('/person/<int:person_id>/event/<int:person_event_id>', methods=['POST'])
 @login_required
 @json_headers
@@ -243,10 +275,10 @@ def person_event_save(person_id, person_event_id):
 
         person_event_old = PersonEvent.query.filter_by(
             person_id=person.id,
-            term_id=term_event.term_id, 
+            term_id=term_event.term_id,
             event_id=term_event.event_id).first()
 
-        if person_event_old and not person_event.id:
+        if person_event_old and (person_event.id != person_event_old.id):
             answer['message'] = u"""Такое событие уже есть,
                                     удалите старое или измените тип нового"""
         elif person_event.save():
@@ -255,7 +287,28 @@ def person_event_save(person_id, person_event_id):
     else:
         answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
 
+    return jsonify(answer)
 
 
+@mod.route('/person/<int:person_id>/event/<int:person_event_id>/delete', methods=['POST'])
+@login_required
+@json_headers
+def person_event_delete(person_id, person_event_id):
+    """Удаляем событие привязаное к человеку"""
+    answer = dict(error='yes', message='')
+
+    arg = json.loads(request.stream.read())
+    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+        abort(403)
+
+    person_event = PersonEvent.query.filter_by(
+        person_id=person_id, id=person_event_id).first()
+
+    if not person_event:
+        abort(400)
+
+    person_event.delete()
+    answer['error'] = 'no'
+    answer['message'] = u'Событие удалено'
 
     return jsonify(answer)

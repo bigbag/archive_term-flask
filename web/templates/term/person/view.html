@@ -46,7 +46,8 @@
                 </thead>
                 <tbody>
                 {% for person_event in person_events %}
-                <tr class="m-t-cont-row">
+                <tr class="m-t-cont-row"
+                    ng-click="getPesonEventEdit({{person_event.person_id}}, {{person_event.id}})">
                     <td>{{person_event.event.name}}</td>
                     <td>{{person_event.term.name}}</td>
                     <td>{{person_event.timeout}}</td>

@@ -93,10 +93,30 @@ angular.module('term').controller('PersonController',
     if (!valid) return false;
 
     person_event.csrf_token = $scope.token;
-
-    console.log(person_event);
-
     var url = '/person/' + person_event.person_id + '/event/' + person_event.id;
+    $http.post(url, person_event).success(function(data) {
+      contentService.scrollPage('.m-page-name');
+      if (data.error == 'yes') {
+        contentService.setModal(data.message, 'error');
+      }
+      else {
+        contentService.setModal(data.message, 'success');
+        setTimeout(function(){
+          $(location).attr('href','/person/' + person_event.person_id);
+        }, 2000);
+      }
+    });  
+  }
+
+  //Переадресация на страницу редактирования привязанного события
+  $scope.getPesonEventEdit = function(person_id, person_event_id) {
+    $(location).attr('href','/person/' + person_id + '/event/' + person_event_id);
+  }
+
+  //Удаляем привязанное событие
+  $scope.deleteEventPerson = function(person_event){
+    var url = '/person/' + person_event.person_id + '/event/' + person_event.id + '/delete';
+    person_event.csrf_token = $scope.token;
     $http.post(url, person_event).success(function(data) {
       contentService.scrollPage('.m-page-name');
       if (data.error == 'yes') {

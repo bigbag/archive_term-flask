@@ -263,7 +263,7 @@ def terminal_event_save(term_id, term_event_id):
         term_event_old = TermEvent.query.filter_by(
             term_id=term.id, event_id=term_event.event_id).first()
 
-        if term_event_old and not term_event.id:
+        if term_event_old and (term_event.id != term_event_old.id):
             answer['message'] = u"""Такое событие уже есть,
                                     удалите старое или измените тип нового"""
 

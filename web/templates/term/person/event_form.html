@@ -4,16 +4,18 @@
             ng-init="person_event.id={{person_event.id|replace("None", 0)}};person_event.person_id={{person.id}}">
             <div class="large-5 columns">
                 <div class="content-row"
-                    ng-init="person_event.term_event_id='{{term_events[0].id}}'">
+                    ng-init="person_event.term_event_id='{{term_event.id}}'">
                     <label for="type-event">Событие*</label>
                     <select id="type-event" 
                         class="medium"
                         min="1"
                         ng-model="person_event.term_event_id"
                         required>
-                        {% for term_event in term_events %}
-                        <option value="{{term_event.id}}">
-                            {{term_event.event.name}}, {{term_event.term.name}}
+                        {% for row in term_events %}
+                        <option 
+                            {% if row.id == term_event.id %} selected {% endif %} 
+                            value="{{row.id}}">
+                            {{row.term.name}}, {{row.event.name}}
                         </option>
                         {% endfor %}
                     </select>
@@ -41,7 +43,7 @@
             <span ng-show="person_event.id">Сохранить</span>
         </a>
         <a ng-show="person_event.id" 
-            ng-click="deleteEventTerminal(person_event)"
+            ng-click="deleteEventPerson(person_event)"
             class="f-spot-button bg-red">
             Удалить событие
         </a>
