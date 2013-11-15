@@ -16,6 +16,9 @@ class PersonEvent(db.Model):
     __bind_key__ = 'term'
     __tablename__ = 'person_event'
 
+    STATUS_ACTIVE = 1
+    STATUS_BANNED = 0
+
     id = db.Column(db.Integer, primary_key=True)
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
     person = db.relationship('Person')
@@ -25,9 +28,11 @@ class PersonEvent(db.Model):
     event = db.relationship('Event')
     firm_id = db.Column(db.Integer, index=True)
     timeout = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
         self.timeout = 300
+        self.status = self.STATUS_ACTIVE
 
     def __repr__(self):
         return '<id %r>' % (self.id)
