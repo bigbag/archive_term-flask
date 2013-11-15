@@ -73,9 +73,9 @@ angular.module('term').controller('PersonController',
   };
 
   //Блокируем пользователя
-  $scope.removePerson = function(person) {
+  $scope.lockPerson = function(person) {
     person.csrf_token = $scope.token;
-    $http.post('/person/' + person.id + '/remove', person).success(function(data) {
+    $http.post('/person/' + person.id + '/lock', person).success(function(data) {
       if (data.error == 'no') {
         if ($scope.person.status == 0) {
           $scope.person.status = 1;

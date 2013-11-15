@@ -67,7 +67,7 @@ def api_get_config(term_id):
         if term_events is None:
             abort(400)
 
-        person_events = PersonEvent().get_by_term_id(term.id)
+        person_events = PersonEvent().get_valid_by_term_id(term.id)
 
         config_xml = render_template(
             'api/term/config.xml',

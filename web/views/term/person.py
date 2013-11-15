@@ -178,9 +178,9 @@ def person_linking_card(code):
     return answer
 
 
-@mod.route('/person/<int:person_id>/remove', methods=['POST'])
+@mod.route('/person/<int:person_id>/lock', methods=['POST'])
 @login_required
-def person_remove(person_id):
+def person_lock(person_id):
     """Блокировка сотрудника"""
 
     answer = dict(error='yes', message='', status=False)
@@ -202,6 +202,7 @@ def person_remove(person_id):
         person.status = Person.STATUS_VALID
 
     if person.save():
+        PersonEvent().person_save(person)
         answer['error'] = 'no'
         answer['message'] = u'Операция успешно выполнена'
 

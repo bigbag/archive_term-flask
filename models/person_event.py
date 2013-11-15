@@ -37,11 +37,27 @@ class PersonEvent(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
-    def get_by_term_id(self, term_id):
-        return self.query.filter_by(term_id=term_id).all()
+    def get_valid_by_term_id(self, term_id):
+        return self.query.filter_by(term_id=term_id, status=self.STATUS_ACTIVE).all()
 
     def get_by_person_id(self, person_id):
         return self.query.filter_by(person_id=person_id).all()
+
+    def person_save(self, person):
+        result = False
+
+        persons_event = PersonEvent.query.filter_by(person_id=person.id)
+        if persons_event:
+            for person_event in persons_event:
+                person_event.status = person.status
+                db.session.add(person_event)
+
+            db.session.commit()
+            result = True
+        else:
+            result = True
+
+        return result
 
     def delete(self):
         db.session.delete(self)

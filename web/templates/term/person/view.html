@@ -8,14 +8,14 @@
     </div>
     <div class="right">
         <a ng-show="person.status"
-            ng-click="removePerson(person)" 
+            ng-click="lockPerson(person)" 
             class="f-spot-button bg-red small">
-            Удалить
+            Заблокировать
         </a>
         <a ng-hide="person.status"
-            ng-click="removePerson(person)" 
+            ng-click="lockPerson(person)" 
             class="f-spot-button bg-red small">
-            Восстановить
+            Разблокировать
         </a>
     </div>
 </h2>
