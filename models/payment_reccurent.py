@@ -39,7 +39,7 @@ class PaymentReccurent(db.Model):
     creation_date = db.Column(db.DateTime, nullable=False)
     run_date = db.Column(db.DateTime)
     type = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, nullable=False, index=True)
     count = db.Column(db.Integer)
 
     def __init__(self):

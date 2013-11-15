@@ -15,9 +15,9 @@ class FirmTerm(db.Model):
     __tablename__ = 'firm_term'
 
     id = db.Column(db.Integer, primary_key=True)
-    term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
+    term_id = db.Column(db.Integer, db.ForeignKey('term.id'), index=True)
     term = db.relationship('Term')
-    firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
+    firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'), index=True)
     firm = db.relationship(
         'Firm',
         primaryjoin="Firm.id==FirmTerm.firm_id")

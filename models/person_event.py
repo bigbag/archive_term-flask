@@ -22,13 +22,13 @@ class PersonEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
     person = db.relationship('Person')
-    term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
+    term_id = db.Column(db.Integer, db.ForeignKey('term.id'), index=True)
     term = db.relationship('Term')
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     event = db.relationship('Event')
     firm_id = db.Column(db.Integer, index=True)
     timeout = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, nullable=False, index=True)
 
     def __init__(self):
         self.timeout = 300

@@ -30,16 +30,16 @@ class PaymentHistory(db.Model):
     TYPE_PLUS = 1
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     user = db.relationship('User')
-    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
+    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'), index=True)
     wallet = db.relationship('PaymentWallet')
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
     amount = db.Column(db.String(50), nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
-    type = db.Column(db.Integer(), nullable=False)
-    status = db.Column(db.Integer(), nullable=False)
+    type = db.Column(db.Integer(), nullable=False, index=True)
+    status = db.Column(db.Integer(), nullable=False, index=True)
 
     def __init__(self):
         self.term_id = 0

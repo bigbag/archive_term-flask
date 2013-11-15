@@ -22,12 +22,12 @@ class Person(db.Model):
     name = db.Column(db.Text, nullable=False)
     tabel_id = db.Column(db.String(150))
     birthday = db.Column(db.Date())
-    firm_id = db.Column(db.Integer, nullable=False)
+    firm_id = db.Column(db.Integer, nullable=False, index=True)
     card = db.Column(db.String(8))
-    payment_id = db.Column(db.String(20), nullable=False)
-    hard_id = db.Column(db.String(128), nullable=False)
+    payment_id = db.Column(db.String(20), nullable=False, index=True)
+    hard_id = db.Column(db.String(128), nullable=False, index=True)
     creation_date = db.Column(db.DateTime, nullable=False)
-    status = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, nullable=False, index=True)
 
     def __init__(self):
         self.status = self.STATUS_VALID

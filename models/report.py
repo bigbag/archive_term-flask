@@ -32,19 +32,19 @@ class Report(db.Model):
     TYPE_MPS = 2
 
     id = db.Column(db.Integer, primary_key=True)
-    term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
+    term_id = db.Column(db.Integer, db.ForeignKey('term.id'), index=True)
     term = db.relationship('Term')
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     event = db.relationship('Event')
-    person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id'), index=True)
     person = db.relationship('Person')
     payment_id = db.Column(db.String(20))
-    firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
+    firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'), index=True)
     firm = db.relationship('Firm')
     amount = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Integer, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
-    check_summ = db.Column(db.String(32), nullable=False)
+    check_summ = db.Column(db.String(32), nullable=False, index=True)
 
     def __init__(self):
         self.amount = 0
