@@ -106,12 +106,12 @@ h6 {
 .pagination li{
 	height: auto;
 }
-.pagination li.current a{
+ul.pagination li.current a{
 	background: none;
 	color: #0061FF;
 }
-.pagination li a:hover,
-.pagination li.current a:hover{
+ul.pagination li a:hover,
+ul.pagination li.current a:hover{
 	background: none;
 }
 form.custom .custom.dropdown{

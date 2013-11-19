@@ -73,7 +73,7 @@ class PaymentInfo(Command):
 
     def set_missing_payment(self):
         date_start = datetime.utcnow() - timedelta(days=1)
-        date_stop = datetime.utcnow() - timedelta(minutes=15)
+        date_stop = datetime.utcnow() - timedelta(minutes=25)
 
         payment_history = PaymentHistory.query.filter(
             (PaymentHistory.type == PaymentHistory.TYPE_PLUS) &
@@ -92,7 +92,8 @@ class PaymentInfo(Command):
             if not str(history.id) in info:
                 if history.status == PaymentHistory.STATUS_NEW:
                     history.status = PaymentHistory.STATUS_MISSING
-                    history.save()
+                    # history.save()
+                    print history.creation_date
 
             else:
                 payment_info = info[str(history.id)]

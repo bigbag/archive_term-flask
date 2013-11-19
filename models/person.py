@@ -32,6 +32,7 @@ class Person(db.Model):
     def __init__(self):
         self.status = self.STATUS_VALID
         self.creation_date = date_helper.get_curent_date()
+        self.name = 'Anonim'
 
     @cache.cached(timeout=5, key_prefix='select_term_list')
     def select_person_list(self, firm_id, **kwargs):

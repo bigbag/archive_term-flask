@@ -38,6 +38,7 @@ class Report(db.Model):
     event = db.relationship('Event')
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'), index=True)
     person = db.relationship('Person')
+    name = db.Column(db.Text, nullable=False)
     payment_id = db.Column(db.String(20))
     firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'), index=True)
     firm = db.relationship('Firm')
@@ -51,6 +52,7 @@ class Report(db.Model):
         self.person_id = 0
         self.firm_id = 0
         self.type = self.TYPE_WHITE
+        self.name = 'Anonim'
 
     def __repr__(self):
         return '<id %r>' % (self.id)
@@ -65,6 +67,7 @@ class Report(db.Model):
         firm_id_list = FirmTerm().get_list_by_term_id(self.term.id)
         for person in persons:
             if person.firm_id in firm_id_list:
+                self.name = person.name
                 self.person_id = person.id
                 self.firm_id = person.firm_id
                 continue
@@ -121,7 +124,7 @@ class Report(db.Model):
                 term=term.name if term else 'Empty',
                 creation_date=creation_date,
                 event=report.event.name if report.event else 'Empty',
-                name=report.person.name if report.person else '',
+                name=report.name,
             )
             result.append(data)
 
