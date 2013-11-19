@@ -204,16 +204,20 @@ def person_lock(person_id):
         abort(404)
 
     corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id).first()
+    if corp_wallet:
+        if person.status == Person.STATUS_VALID:
+            corp_wallet.status = TermCorpWallet.STATUS_BANNED
+        elif person.status == Person.STATUS_BANNED:
+            corp_wallet.status = TermCorpWallet.STATUS_ACTIVE
 
     if person.status == Person.STATUS_VALID:
         person.status = Person.STATUS_BANNED
-        corp_wallet.status = TermCorpWallet.STATUS_BANNED
     elif person.status == Person.STATUS_BANNED:
         person.status = Person.STATUS_VALID
-        corp_wallet.status = TermCorpWallet.STATUS_ACTIVE
 
     if person.save():
-        corp_wallet.save()
+        if corp_wallet:
+            corp_wallet.save()
         PersonEvent().person_save(person)
         answer['error'] = 'no'
         answer['message'] = u'Операция успешно выполнена'
