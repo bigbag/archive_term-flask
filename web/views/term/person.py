@@ -203,7 +203,7 @@ def person_lock(person_id):
     if not person:
         abort(404)
 
-    corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id)
+    corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id).first()
 
     if person.status == Person.STATUS_VALID:
         person.status = Person.STATUS_BANNED
