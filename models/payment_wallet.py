@@ -27,9 +27,6 @@ class PaymentWallet(db.Model):
     BLACKLIST_ON = 1
     BLACKLIST_OFF = 0
 
-    TYPE_CORP = 0
-    TYPE_MONEY = 1
-
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.String(20), index=True)
     hard_id = db.Column(db.Integer(128), index=True)
@@ -40,7 +37,6 @@ class PaymentWallet(db.Model):
     creation_date = db.Column(db.DateTime, nullable=False)
     balance = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Integer, nullable=False)
-    type = db.Column(db.Integer, nullable=False)
     blacklist = db.Column(db.Integer(), index=True)
 
     def __init__(self):
@@ -49,7 +45,6 @@ class PaymentWallet(db.Model):
         self.blacklist = self.BLACKLIST_ON
         self.balance = 0
         self.user_id = 0
-        self.type = self.TYPE_MONEY
         self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_NOACTIVE
 

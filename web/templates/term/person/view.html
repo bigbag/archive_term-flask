@@ -34,8 +34,8 @@
                 </div>
             </div>
             <div id="eventForm" class="slide-box slide-setting">
-                    {% include 'term/person/event_form.html' %}
-                </div>
+                {% include 'term/person/event_form.html' %}
+            </div>
             <table class="m-spot-table">
                 <thead>
                 <tr>
@@ -57,6 +57,16 @@
             </table>
         </div>
 
+    </section>
+    <section class="section">
+        <p class="title"><a>Кошелёк</a></p>
+            <div class="content">
+                {% if not person.type %}
+                    {% include 'term/person/wallet_form.html' %}
+                {% else %}
+                   {% include 'term/person/wallet_view.html' %}
+                {% endif %}
+            </div>
     </section>
     <section class="section">
         <p class="title"><a>Редактировать</a></p>

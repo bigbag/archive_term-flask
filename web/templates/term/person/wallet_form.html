@@ -1,0 +1,29 @@
+<div class="content-row">
+    <p class="m-hint">Для того что бы задействовать корпоративный кошелёк, введите месячный лимит операций для данного человека. Минимальная сумма 100 рублей.</p>
+</div>
+
+<div class="m-block" ng-controller="PersonController">
+    <span ng-init="person_wallet.type=0;person_wallet.person_id=person.id"></span>
+    <form class="custom" name="walletForm">
+        <div class="content-row g-clearfix">
+        <label for="add-card-code">Сумма*</label>
+        <input id="add-wallet-amount" 
+            name="wallet_amount"
+            maxlength="4"
+            minlength="3"
+            ng-minlength="3"
+            ng-maxlength="4"
+            type="text"
+            ng-model="person_wallet.amount"
+            required>
+    </div>
+    <div class="content-row g-clearfix">
+        <a ng-click="saveWalletPerson(person_wallet, walletForm.$valid)"
+            class="f-spot-button">Сохранить</span>
+        </a>
+    </div>
+</div>
+<div class="content-row">
+    <p>Как только баланс на кошельке станет меньше 40 рублей, человек будет заблокирован. </p>
+    <p>Разблокировать его можно вручную, введя сумму на которую необходимо пополнить кошелёк или же он разблокируется автоматически первого числа следующего месяца.</p>
+</div>

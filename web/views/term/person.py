@@ -16,6 +16,7 @@ from models.person_event import PersonEvent
 from models.term_event import TermEvent
 from models.spot import Spot
 from models.payment_wallet import PaymentWallet
+from models.term_corp_wallet import TermCorpWallet
 
 
 @mod.route('/person/content/<path:action>', methods=['POST'])
@@ -78,13 +79,19 @@ def person_info(person_id):
     term_event = TermEvent()
     term_event.id = term_events[0].id
 
+    corp_wallet = TermCorpWallet.query.filter_by(
+        person_id=person.id).first()
+    if not corp_wallet:
+        corp_wallet = TermCorpWallet()
+
     return render_template(
         template_patch,
         person=person,
         person_event=PersonEvent(),
         person_events=PersonEvent().get_by_person_id(person.id),
         term_event=term_event,
-        term_events=term_events
+        term_events=term_events,
+        corp_wallet=corp_wallet
     )
 
 
@@ -196,12 +203,17 @@ def person_lock(person_id):
     if not person:
         abort(404)
 
+    corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id)
+
     if person.status == Person.STATUS_VALID:
         person.status = Person.STATUS_BANNED
+        corp_wallet.status = TermCorpWallet.STATUS_BANNED
     elif person.status == Person.STATUS_BANNED:
         person.status = Person.STATUS_VALID
+        corp_wallet.status = TermCorpWallet.STATUS_ACTIVE
 
     if person.save():
+        corp_wallet.save()
         PersonEvent().person_save(person)
         answer['error'] = 'no'
         answer['message'] = u'Операция успешно выполнена'
@@ -312,4 +324,45 @@ def person_event_delete(person_id, person_event_id):
     answer['error'] = 'no'
     answer['message'] = u'Событие удалено'
 
+    return jsonify(answer)
+
+
+@mod.route('/person/<int:person_id>/wallet', methods=['POST'])
+@login_required
+@json_headers
+def person_wallet(person_id):
+    """Включаем или выключаем корпоративный кошелёк"""
+    answer = dict(error='yes', message='')
+
+    arg = json.loads(request.stream.read())
+    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+        abort(403)
+
+    person_type = arg['type'] if 'type' in arg else False
+    person_amount = arg['amount'] if 'amount' in arg else False
+
+    person = Person.query.get(person_id)
+    if not person:
+        abort(404)
+
+    corp_wallet = TermCorpWallet.query.filter_by(
+        person_id=person.id).first()
+    if not corp_wallet:
+        corp_wallet = TermCorpWallet()
+
+    if person_type == Person.TYPE_TIMEOUT:
+        corp_wallet.person_id = person.id
+        corp_wallet.balance = int(person_amount) * 100
+        corp_wallet.limit = corp_wallet.balance
+        corp_wallet.status = TermCorpWallet.STATUS_ACTIVE
+        person.type = Person.TYPE_WALLET
+
+    elif person_type == Person.TYPE_WALLET:
+        person.type = Person.TYPE_TIMEOUT
+        corp_wallet.status = TermCorpWallet.STATUS_DISABLED
+
+    if person.save():
+        corp_wallet.save()
+        answer['error'] = 'no'
+        answer['message'] = u'Операция выполнена'
     return jsonify(answer)

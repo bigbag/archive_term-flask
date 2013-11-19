@@ -130,4 +130,23 @@ angular.module('term').controller('PersonController',
       }
     });  
   }
+
+  //Добавляем корпоративный кошелёк
+  $scope.saveWalletPerson = function(person_wallet, valid){
+    if (!valid) return false;
+
+    person_wallet.csrf_token = $scope.token;
+    var url = '/person/' + person_wallet.person_id + '/wallet';
+    $http.post(url, person_wallet).success(function(data) {
+      if (data.error == 'yes') {
+        contentService.setModal(data.message, 'error');
+      }
+      else {
+        contentService.setModal(data.message, 'success');
+        setTimeout(function(){
+          $(location).attr('href','/person/' + person_wallet.person_id);
+        }, 2000);
+      }
+    });  
+  }
 });
