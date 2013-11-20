@@ -50,7 +50,7 @@ class PaymentAuto(Command):
             elif reccurent.type == PaymentReccurent.TYPE_LIMIT:
                 i = 1
                 limit = PaymentReccurent.PAYMENT_MIN + \
-                    PaymentReccurent.BALANCE_MIN
+                    PaymentWallet.BALANCE_MIN
                 while int(reccurent.wallet.balance) + amount <= limit:
                     amount = int(reccurent.amount) * i
                     i = i + 1

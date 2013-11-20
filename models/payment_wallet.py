@@ -27,6 +27,8 @@ class PaymentWallet(db.Model):
     BLACKLIST_ON = 1
     BLACKLIST_OFF = 0
 
+    BALANCE_MIN = 4000
+
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.String(20), index=True)
     hard_id = db.Column(db.Integer(128), index=True)

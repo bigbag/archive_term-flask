@@ -17,7 +17,6 @@ class PaymentReccurent(db.Model):
     __bind_key__ = 'payment'
     __tablename__ = 'reccurent'
 
-    BALANCE_MIN = 4000
     PAYMENT_MIN = 10000
 
     STATUS_ON = 1

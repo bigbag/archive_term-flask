@@ -103,7 +103,7 @@ def api_get_blacklist():
     valid_payment_id = []
     invalid_payment_id = []
     for wallet in wallets:
-        if (int(wallet.balance) < PaymentReccurent.BALANCE_MIN) | (int(wallet.status) != 1):
+        if (int(wallet.balance) < PaymentWallet.BALANCE_MIN) | (int(wallet.status) != PaymentWallet.STATUS_ACTIVE):
             invalid_payment_id.append(str(wallet.payment_id))
         else:
             valid_payment_id.append(str(wallet.payment_id))

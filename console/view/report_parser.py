@@ -16,6 +16,7 @@ from console import app
 from models.report import Report
 from models.event import Event
 from models.term import Term
+from models.person import Person
 from models.payment_wallet import PaymentWallet
 from models.payment_lost import PaymentLost
 from models.payment_history import PaymentHistory
@@ -79,7 +80,6 @@ class ReportParser(Command):
                         report = Report()
                         report.term = term
                         report.event_id = event.id
-
                         report = report.get_db_view(card_node)
 
                         old_report = Report().get_by_check_summ(
@@ -89,6 +89,23 @@ class ReportParser(Command):
 
                         report.save()
 
+                        person = Person.query.get(report.person_id)
+                        # Если человек имеет корпоративный кошелек, обновляем его баланс
+                        if person.type == Person.TYPE_WALLET:
+                            corp_wallet = TermCorpWallet.query.filter_by(
+                                person_id=person.id).first()
+                            if corp_wallet:
+                                corp_wallet.balance = int(
+                                    corp_wallet.balance) - int(
+                                        report.amount)
+                                corp_wallet.save()
+
+                                # Блокируем возможность платежей через корпоративный кошелек
+                                if corp_wallet.balance < PaymentWallet.BALANCE_MIN:
+                                    person.wallet_status = Person.STATUS_BANNED
+                                    person.save()
+
+                        # Если операция платежная, обновляем баланс личного кошелька
                         if not int(report.type) == Report.TYPE_PAYMENT:
                             continue
 
@@ -124,15 +141,13 @@ class ReportParser(Command):
             status=PaymentReccurent.STATUS_OFF).all()
 
         for reccurent in reccurents:
-
             if not reccurent.wallet:
                 continue
-            if int(reccurent.wallet.balance) > PaymentReccurent.BALANCE_MIN:
+            if int(reccurent.wallet.balance) > PaymentWallet.BALANCE_MIN:
                 continue
 
             history = PaymentHistory().get_new_by_wallet_id(
                 reccurent.wallet.id)
-
             if history:
                 continue
 
