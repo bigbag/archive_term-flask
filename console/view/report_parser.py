@@ -17,6 +17,7 @@ from models.report import Report
 from models.event import Event
 from models.term import Term
 from models.person import Person
+from models.term_corp_wallet import TermCorpWallet
 from models.payment_wallet import PaymentWallet
 from models.payment_lost import PaymentLost
 from models.payment_history import PaymentHistory
