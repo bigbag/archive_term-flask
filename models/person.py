@@ -31,12 +31,12 @@ class Person(db.Model):
     hard_id = db.Column(db.String(128), nullable=False, index=True)
     creation_date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.Integer, nullable=False, index=True)
-    walled_status = db.Column(db.Integer, nullable=False, index=True)
+    wallet_status = db.Column(db.Integer, nullable=False, index=True)
     type = db.Column(db.Integer, nullable=False, index=True)
 
     def __init__(self):
         self.status = self.STATUS_VALID
-        self.walled_status = self.STATUS_BANNED
+        self.wallet_status = self.STATUS_VALID
         self.type = self.TYPE_TIMEOUT
         self.creation_date = date_helper.get_curent_date()
         self.name = 'Anonim'

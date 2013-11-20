@@ -218,7 +218,6 @@ def person_lock(person_id):
     if person.save():
         if corp_wallet:
             corp_wallet.save()
-        PersonEvent().person_save(person)
         answer['error'] = 'no'
         answer['message'] = u'Операция успешно выполнена'
 
