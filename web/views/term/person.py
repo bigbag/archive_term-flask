@@ -361,6 +361,11 @@ def person_wallet(person_id):
         corp_wallet.status = TermCorpWallet.STATUS_ACTIVE
         person.type = Person.TYPE_WALLET
 
+        person_events = PersonEvent().get_by_person_id(person.id)
+        for person_event in person_events:
+            person_event.timeout = 0
+            person_event.save()
+
     elif person_type == Person.TYPE_WALLET:
         person.type = Person.TYPE_TIMEOUT
         corp_wallet.status = TermCorpWallet.STATUS_DISABLED
