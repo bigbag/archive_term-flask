@@ -90,26 +90,26 @@ class ReportParser(Command):
 
                         report.save()
 
-                        person = Person.query.get(report.person_id)
-                        # Если человек имеет корпоративный кошелек, обновляем его баланс
-                        if person.type == Person.TYPE_WALLET:
-                            corp_wallet = TermCorpWallet.query.filter_by(
-                                person_id=person.id).first()
-                            if corp_wallet:
-                                corp_wallet.balance = int(
-                                    corp_wallet.balance) - int(
-                                        report.amount)
-                                corp_wallet.save()
-
-                                # Блокируем возможность платежей через корпоративный кошелек
-                                if corp_wallet.balance < PaymentWallet.BALANCE_MIN:
-                                    person.wallet_status = Person.STATUS_BANNED
-                                    person.save()
-
-                        # Если операция платежная, обновляем баланс личного кошелька
                         if not int(report.type) == Report.TYPE_PAYMENT:
+                            person = Person.query.get(report.person_id)
+                            # Если человек имеет корпоративный кошелек, обновляем его баланс
+                            if person.type == Person.TYPE_WALLET:
+                                corp_wallet = TermCorpWallet.query.filter_by(
+                                    person_id=person.id).first()
+                                if corp_wallet:
+                                    corp_wallet.balance = int(
+                                        corp_wallet.balance) - int(
+                                            report.amount)
+                                    corp_wallet.save()
+
+                                    # Блокируем возможность платежей через корпоративный кошелек
+                                    if corp_wallet.balance < PaymentWallet.BALANCE_MIN:
+                                        person.wallet_status = Person.STATUS_BANNED
+                                        person.save()
+
                             continue
 
+                        # Если операция платежная, обновляем баланс личного кошелька
                         wallet = PaymentWallet().get_by_payment_id(
                             report.payment_id)
                         if not wallet or wallet.user_id == 0:
