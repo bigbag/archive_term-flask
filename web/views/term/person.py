@@ -72,7 +72,7 @@ def person_info(person_id):
         abort(403)
 
     template_patch = 'term/person/view.html'
-    if not person.hard_id:
+    if not person.payment_id:
         template_patch = 'term/person/view_empty.html'
 
     term_events = TermEvent().get_by_firm_id(g.firm_info['id'])
@@ -321,11 +321,55 @@ def person_event_delete(person_id, person_event_id):
         person_id=person_id, id=person_event_id).first()
 
     if not person_event:
-        abort(400)
+        abort(404)
 
     person_event.delete()
     answer['error'] = 'no'
     answer['message'] = u'Событие удалено'
+
+    return jsonify(answer)
+
+
+@mod.route('/person/<int:person_id>/get_type_block', methods=['POST'])
+@login_required
+@json_headers
+def person_type_block(person_id):
+    """Получаем блок управления типом пользователя"""
+    answer = dict(error='yes', content='')
+
+    arg = json.loads(request.stream.read())
+    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+        abort(403)
+
+    person = Person.query.get(person_id)
+    if not person:
+        abort(404)
+
+    person_type = int(arg['type']) if 'type' in arg else False
+    corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id).first()
+
+    if person_type == Person.TYPE_TIMEOUT:
+        person.type = Person.TYPE_TIMEOUT
+        person.wallet_status = Person.STATUS_VALID
+        if corp_wallet:
+            corp_wallet.delete()
+
+    elif person_type == Person.TYPE_WALLET:
+        if not corp_wallet:
+            person.type = Person.TYPE_WALLET
+            person.wallet_status = Person.STATUS_BANNED
+            answer['content'] = render_template(
+                'term/person/wallet_form.html',
+                corp_wallet=corp_wallet)
+
+        else:
+            answer['content'] = render_template(
+                'term/person/wallet_view.html',
+                corp_wallet=corp_wallet)
+
+    person.save()
+
+    answer['error'] = 'no'
 
     return jsonify(answer)
 
@@ -348,26 +392,17 @@ def person_wallet(person_id):
     if not person:
         abort(404)
 
-    corp_wallet = TermCorpWallet.query.filter_by(
-        person_id=person.id).first()
-    if not corp_wallet:
-        corp_wallet = TermCorpWallet()
+    corp_wallet = TermCorpWallet()
+    corp_wallet.person_id = person.id
+    corp_wallet.balance = int(person_amount) * 100
+    corp_wallet.limit = corp_wallet.balance
+    corp_wallet.status = TermCorpWallet.STATUS_ACTIVE
+    person.wallet_status = Person.STATUS_VALID
 
-    if person_type == Person.TYPE_TIMEOUT:
-        corp_wallet.person_id = person.id
-        corp_wallet.balance = int(person_amount) * 100
-        corp_wallet.limit = corp_wallet.balance
-        corp_wallet.status = TermCorpWallet.STATUS_ACTIVE
-        person.type = Person.TYPE_WALLET
-
-        person_events = PersonEvent().get_by_person_id(person.id)
-        for person_event in person_events:
-            person_event.timeout = 0
-            person_event.save()
-
-    elif person_type == Person.TYPE_WALLET:
-        person.type = Person.TYPE_TIMEOUT
-        corp_wallet.status = TermCorpWallet.STATUS_DISABLED
+    person_events = PersonEvent().get_by_person_id(person.id)
+    for person_event in person_events:
+        person_event.timeout = 0
+        person_event.save()
 
     if person.save():
         corp_wallet.save()

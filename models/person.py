@@ -28,7 +28,7 @@ class Person(db.Model):
     firm_id = db.Column(db.Integer, nullable=False, index=True)
     card = db.Column(db.String(8))
     payment_id = db.Column(db.String(20), nullable=False, index=True)
-    hard_id = db.Column(db.String(128), nullable=False, index=True)
+    hard_id = db.Column(db.String(128), nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.Integer, nullable=False, index=True)
     wallet_status = db.Column(db.Integer, nullable=False, index=True)
@@ -61,7 +61,7 @@ class Person(db.Model):
                 name=person.name,
                 card=person.card,
                 status=int(person.status == self.STATUS_VALID),
-                hard_id=int(person.hard_id is not None),
+                hard_id=int(person.payment_id is not None),
             )
             result.append(data)
 

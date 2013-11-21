@@ -22,7 +22,38 @@
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style=""  ng-controller="PersonController">
     <section class="section active">
         <p class="title"><a>События</a></p>
+        <span ng-init="person.type={{person.type}}"></span>
+        <span ng-init="getPersonTypeBlock(person)"></span>
         <div class="content">
+            <div class="content-row">
+                <p class="m-hint">Вы можете выбрать способ управления событиями</p>
+                <br />
+                <form>
+                <div class="row">
+                    <div class="large-6 columns">
+                        <label ng-click="getPersonTypeBlock(person)">
+                        <input  
+                            type="radio" 
+                            ng-model="person.type" 
+                            type="radio" 
+                            value=1>
+                            Кошелёк
+                        </label>
+                    </div>
+                    <div class="large-6 columns">
+                        <label ng-click="getPersonTypeBlock(person)">
+                        <input  
+                            type="radio" 
+                            ng-model="person.type" 
+                            type="radio" 
+                            value=0>
+                            Тайм-аут
+                        </label>
+                    </div>
+                </form>
+                </div>
+            </div>
+            <div id="person-type"></div>
             <div class="content-row">
                 <p class="m-hint">Для изменения времени начала и конца события два раза кликните по нему. </p>
             </div>
@@ -57,16 +88,6 @@
             </table>
         </div>
 
-    </section>
-    <section class="section">
-        <p class="title"><a>Кошелёк</a></p>
-            <div class="content">
-                {% if not person.type %}
-                    {% include 'term/person/wallet_form.html' %}
-                {% else %}
-                   {% include 'term/person/wallet_view.html' %}
-                {% endif %}
-            </div>
     </section>
     <section class="section">
         <p class="title"><a>Редактировать</a></p>

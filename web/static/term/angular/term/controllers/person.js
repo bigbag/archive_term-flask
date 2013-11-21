@@ -149,4 +149,15 @@ angular.module('term').controller('PersonController',
       }
     });  
   }
+
+  //Получаем блок управления расчетами пользователя, из корп. кошелька или с учетом тайм-аутов
+  $scope.getPersonTypeBlock = function(person){
+    person.csrf_token = $scope.token;
+    var url = '/person/' + person.id + '/get_type_block';
+    $http.post(url, person).success(function(data) {
+      if (data.error == 'no') {
+        angular.element('#person-type').html($compile(data.content)($scope));
+      }
+    });  
+  }
 });
