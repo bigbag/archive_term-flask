@@ -143,9 +143,7 @@ angular.module('term').controller('PersonController',
       }
       else {
         contentService.setModal(data.message, 'success');
-        setTimeout(function(){
-          $(location).attr('href','/person/' + person_wallet.person_id);
-        }, 2000);
+        $scope.getPersonTypeBlock($scope.person);
       }
     });  
   }
