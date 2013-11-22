@@ -31,6 +31,9 @@ class Report(db.Model):
     TYPE_PAYMENT = 1
     TYPE_MPS = 2
 
+    CORP_TYPE_OFF = 0
+    CORP_TYPE_ON = 1
+
     id = db.Column(db.Integer, primary_key=True)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'), index=True)
     term = db.relationship('Term')
@@ -43,6 +46,7 @@ class Report(db.Model):
     firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'), index=True)
     firm = db.relationship('Firm')
     amount = db.Column(db.Integer, nullable=False)
+    corp_type = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Integer, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
     check_summ = db.Column(db.String(32), nullable=False, index=True)
@@ -51,6 +55,7 @@ class Report(db.Model):
         self.amount = 0
         self.person_id = 0
         self.firm_id = 0
+        self.corp_type = self.CORP_TYPE_OFF
         self.type = self.TYPE_WHITE
         self.name = 'Anonim'
 
