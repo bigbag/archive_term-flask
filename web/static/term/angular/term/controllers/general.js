@@ -31,7 +31,7 @@ angular.module('term').controller('GeneralController',
 
   //Запрос на отображение табличных данных
   $scope.getGridContent = function(search) {
-    if (search.page == undefined) search.page = 1;
+    if(typeof(search.page)==='undefined') search.page = 1;
 
     var url = window.location.pathname;
     $http.post(url, search).success(function(data) {

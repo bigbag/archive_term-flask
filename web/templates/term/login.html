@@ -14,7 +14,6 @@
                 placeholder="Email"
                 ng-model="user.email"
                 ng-keypress="($event.keyCode == 13)?login(user, signForm.$valid):''"
-                autocomplete="off"
                 maxlength="300"
                 required >
             <input 
@@ -23,7 +22,6 @@
                 placeholder="Пароль"
                 ng-model="user.password"
                 ng-keypress="($event.keyCode == 13)?login(user, signForm.$valid):''"
-                autocomplete="off"
                 maxlength="300"
                 required >
 
