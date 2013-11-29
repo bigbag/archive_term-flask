@@ -61,14 +61,14 @@
     {% endif %}
     {% endif %}
     {% for term_event in term_events %}
-    <event type="{{term_event.event.key}}" translation="{{term_event.event.name}}" min_time="{{term_event.start}}:00" max_time="{{term_event.stop}}:00" age_limit="{{term_event.age}}">
+    <event type="{{term_event.event.key}}" translation="{{term_event.event.name}}" min_time="{{term_event.start}}:00" max_time="{{term_event.stop}}:00" age_limit="{{term_event.age}}"  price="{{term_event.cost}}">
         {% for person_event in person_events %}
             {% if person_event.event_id == term_event.event_id %}
             {% set payment_id = person_event.person.payment_id %}
                 {% if person_event.person.status == 1 %}
                 {% if person_event.person.wallet_status == 1 %}
                 {% if payment_id %}
-                <card timeout="{{person_event.timeout}}" price="{{term_event.cost}}">
+                <card timeout="{{person_event.timeout}}">
                 {{ payment_id }}</card>
                 {% endif %}
                 {% endif %}
