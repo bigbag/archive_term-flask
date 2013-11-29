@@ -12,6 +12,7 @@ from web.form.person import PersonAddForm
 from web.form.event import PersonEventAddForm
 
 from models.person import Person
+from models.report import Report
 from models.person_event import PersonEvent
 from models.term_event import TermEvent
 from models.spot import Spot
@@ -408,4 +409,20 @@ def person_wallet(person_id):
         corp_wallet.save()
         answer['error'] = 'no'
         answer['message'] = u'Операция выполнена'
+    return jsonify(answer)
+
+
+@mod.route('/person/<int:person_id>/report/', methods=['POST'])
+@login_required
+@json_headers
+def person_report(person_id):
+    """Отчет по операциям человека"""
+    arg = json.loads(request.stream.read())
+    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+        abort(403)
+
+    arg['type'] = 'person'
+    arg['id'] = person_id
+    answer = Report().get_person_report(**arg)
+
     return jsonify(answer)

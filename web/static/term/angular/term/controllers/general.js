@@ -7,7 +7,7 @@ angular.module('term').controller('GeneralController',
   $scope.pagination = {
       cur: 1,
       total: 7,
-      display: 15
+      display: 12
     };
 
   //Загружаем динамический шаблон
@@ -32,8 +32,14 @@ angular.module('term').controller('GeneralController',
   //Запрос на отображение табличных данных
   $scope.getGridContent = function(search) {
     if(typeof(search.page)==='undefined') search.page = 1;
-
-    var url = window.location.pathname;
+    if(typeof(search.action)!=='undefined'){
+      var url = window.location.pathname + '/' + search.action + '/';
+    }
+    else {
+      var url = window.location.pathname
+    }
+    search.csrf_token = $scope.token;
+    
     $http.post(url, search).success(function(data) {
       $scope.result = data.result;
       $scope.search.page_count = data.count;
@@ -46,7 +52,6 @@ angular.module('term').controller('GeneralController',
     if (!$scope.search) return false;
     var search = $scope.search;
     search.page = $scope.pagination.cur;
-
     if (search.action_type == 'get_grid_content') {
       $scope.getGridContent(search);
     }

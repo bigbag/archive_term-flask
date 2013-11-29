@@ -3,6 +3,16 @@
 angular.module('term').controller('PersonController', 
     function($scope, $http, $compile, contentService) {
 
+  //Просмотр списка операций человека
+  $scope.getPersonReport = function(person) {
+    var url = "/person/"+ person.id + "/report/"
+    $http.post(url, person).success(function(data) {
+      $scope.result = data.result;
+      $scope.search.page_count = data.count;
+      $scope.pagination.total = Math.ceil(data.count/$scope.search.limit);
+    }); 
+  };
+
   //Переадресация на страницу информации о человеке
   $scope.getPersonView = function(person_id) {
     $(location).attr('href','/person/' + person_id);

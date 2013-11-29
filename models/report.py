@@ -34,6 +34,9 @@ class Report(db.Model):
     CORP_TYPE_OFF = 0
     CORP_TYPE_ON = 1
 
+    DEFAULT_PAGE = 1
+    POST_ON_PAGE = 10
+
     id = db.Column(db.Integer, primary_key=True)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'), index=True)
     term = db.relationship('Term')
@@ -100,17 +103,22 @@ class Report(db.Model):
         return self.query.filter_by(check_summ=check_summ).first()
 
     @cache.cached(timeout=120, key_prefix='report_person')
-    def select_person(self, firm_id, **kwargs):
+    def get_person_report(self, **kwargs):
         tz = app.config['TZ']
-        date_pattern = '%H:%M %d.%m.%y'
+        date_pattern = '%d.%m.%y %H:%M'
 
         order = kwargs[
             'order'] if 'order' in kwargs else 'creation_date desc'
-        limit = kwargs['limit'] if 'limit' in kwargs else 10
-        page = kwargs['page'] if 'page' in kwargs else 1
+        limit = kwargs['limit'] if 'limit' in kwargs else self.POST_ON_PAGE
+        page = kwargs['page'] if 'page' in kwargs else self.DEFAULT_PAGE
 
-        query = Report.query.filter(Report.firm_id == firm_id).filter(
-            Report.type == self.TYPE_WHITE).order_by(order)
+        if 'person' in kwargs['type']:
+            query = Report.query.filter(
+                Report.person_id == kwargs['id']).order_by(
+                    order)
+        elif 'firm' in kwargs['type']:
+            query = Report.query.filter(Report.firm_id == kwargs['id']).filter(
+                Report.type == self.TYPE_WHITE).order_by(order)
 
         reports_count = query.count()
         reports = query.paginate(page, limit, False).items
@@ -129,6 +137,7 @@ class Report(db.Model):
                 term=term.name if term else 'Empty',
                 creation_date=creation_date,
                 event=report.event.name if report.event else 'Empty',
+                amount=int(report.amount / 100),
                 name=report.name,
             )
             result.append(data)
@@ -144,8 +153,8 @@ class Report(db.Model):
         answer = {}
 
         order = kwargs['order'] if 'order' in kwargs else 'creation_date desc'
-        limit = kwargs['limit'] if 'limit' in kwargs else 10
-        page = kwargs['page'] if 'page' in kwargs else 1
+        limit = kwargs['limit'] if 'limit' in kwargs else self.POST_ON_PAGE
+        page = kwargs['page'] if 'page' in kwargs else self.DEFAULT_PAGE
         period = kwargs['period'] if 'period' in kwargs else 'day'
         payment_type = kwargs[
             'payment_type'] if 'payment_type' in kwargs else self.TYPE_WHITE
@@ -206,7 +215,7 @@ class Report(db.Model):
         return answer
 
     @cache.cached(timeout=120, key_prefix='report_interval')
-    def get_interval_report(self, firm_id, **kwargs):
+    def get_firm_interval_report(self, firm_id, **kwargs):
         tz = app.config['TZ']
         payment_type = self.TYPE_WHITE
 
