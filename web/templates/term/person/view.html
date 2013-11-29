@@ -90,6 +90,36 @@
 
     </section>
     <section class="section">
+        <p class="title">
+            <a ng-click="getPersonReport(person)">Транзакции</a>
+        </p>
+        <div class="content">
+            <table class="m-spot-table">
+                <thead>
+                <tr>
+                    <th>Событие</th>
+                    <th>Терминал</th>
+                    <th>Таймаут (сек)</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for person_event in person_events %}
+                <tr class="m-t-cont-row"
+                    ng-click="getPesonEventEdit({{person_event.person_id}}, {{person_event.id}})">
+                    <td>{{person_event.event.name}}</td>
+                    <td>{{person_event.term.name}}</td>
+                    <td>{{person_event.timeout}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="content-row">
+                <p class="m-hint">Для того что бы дать возможность человеку пользоваться терминальной сетью, вам необходимо ввести код активации карты, которую вы хотите к нему привязать. именно эта карта в дальнейшем будет идентифицировать человека.</p>
+            </div>
+        </div>
+
+    </section>
+    <section class="section">
         <p class="title"><a>Редактировать</a></p>
         <div class="content">
             {% include 'term/person/form.html' %}
