@@ -39,7 +39,7 @@ angular.module('term').controller('PersonController',
 
     $http.post(url, person).success(function(data) {
       contentService.scrollPage('.m-page-name');
-      if (data.error == 'yes') {
+      if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
       }
       else {
@@ -70,7 +70,7 @@ angular.module('term').controller('PersonController',
     person.csrf_token = $scope.token;
     $http.post(url, person).success(function(data) {
       contentService.scrollPage('.m-page-name');
-      if (data.error == 'yes') {
+      if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
       }
       else {
@@ -86,8 +86,8 @@ angular.module('term').controller('PersonController',
   $scope.lockPerson = function(person) {
     person.csrf_token = $scope.token;
     $http.post('/person/' + person.id + '/lock', person).success(function(data) {
-      if (data.error == 'no') {
-        if ($scope.person.status == 0) {
+      if (data.error === 'no') {
+        if ($scope.person.status === 0) {
           $scope.person.status = 1;
         }
         else {
@@ -106,7 +106,7 @@ angular.module('term').controller('PersonController',
     var url = '/person/' + person_event.person_id + '/event/' + person_event.id;
     $http.post(url, person_event).success(function(data) {
       contentService.scrollPage('.m-page-name');
-      if (data.error == 'yes') {
+      if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
       }
       else {
@@ -129,7 +129,7 @@ angular.module('term').controller('PersonController',
     person_event.csrf_token = $scope.token;
     $http.post(url, person_event).success(function(data) {
       contentService.scrollPage('.m-page-name');
-      if (data.error == 'yes') {
+      if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
       }
       else {
@@ -148,7 +148,7 @@ angular.module('term').controller('PersonController',
     person_wallet.csrf_token = $scope.token;
     var url = '/person/' + person_wallet.person_id + '/wallet';
     $http.post(url, person_wallet).success(function(data) {
-      if (data.error == 'yes') {
+      if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
       }
       else {
@@ -163,7 +163,7 @@ angular.module('term').controller('PersonController',
     person.csrf_token = $scope.token;
     var url = '/person/' + person.id + '/get_type_block';
     $http.post(url, person).success(function(data) {
-      if (data.error == 'no') {
+      if (data.error === 'no') {
         angular.element('#person-type').html($compile(data.content)($scope));
       }
     });  

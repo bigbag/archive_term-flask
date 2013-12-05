@@ -7,7 +7,7 @@ angular.module('term').controller('UserController',
   $scope.login = function(user, valid) {
     if (!valid) return false;
     $http.post('/login', user).success(function(data) {
-      if (data.error == 'yes') {
+      if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
 
         angular.element('.f-login input[name=email]').addClass('error');
@@ -36,11 +36,11 @@ angular.module('term').controller('UserController',
     user.email = recovery.email;
 
     $http.post('/service/recoveryMail', user).success(function(data) {
-      if (data.error == 'yes') {
+      if (data.error === 'yes') {
         angular.element('#recPassForm input[name=email]').addClass('error');
         contentService.setModal(data.content, 'error');
       }
-      else if (data.error == 'no'){
+      else if (data.error === 'no'){
         angular.element('#recPassForm').slideUp(400, function() {
           contentService.setModal(data.content, 'none');
         });
@@ -57,11 +57,11 @@ angular.module('term').controller('UserController',
     if (!valid) return false;
 
     $http.post('/service/changepassword', user).success(function(data) {
-      if (data.error == 'yes') {
+      if (data.error === 'yes') {
         angular.element('#changePassForm input[name=password]').addClass('error');
         angular.element('#changePassForm input[name=confirmPassword]').addClass('error');
       }
-      else if (data.error == 'no'){
+      else if (data.error === 'no'){
         $(location).attr('href','/wallet/');
       }
     });

@@ -29,7 +29,7 @@ angular.module('term').controller('TerminalController',
     term.csrf_token = $scope.token;
     $http.post(url, term).success(function(data) {
       contentService.scrollPage('.m-page-name');
-      if (data.error == 'yes') {
+      if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
       }
       else {
@@ -45,8 +45,8 @@ angular.module('term').controller('TerminalController',
   $scope.lockingTerminal = function(term) {
     term.csrf_token = $scope.token;
     $http.post('/terminal/' + term.id + '/locking', term).success(function(data) {
-      if (data.error == 'no') {
-        if ($scope.term.status == 0) {
+      if (data.error === 'no') {
+        if ($scope.term.status === 0) {
           $scope.term.status = 1;
         }
         else {
@@ -60,7 +60,7 @@ angular.module('term').controller('TerminalController',
   $scope.removeTerminal = function(term) {
     term.csrf_token = $scope.token;
     $http.post('/terminal' + term.id + '/remove', term).success(function(data) {
-      if (data.error == 'no') {
+      if (data.error === 'no') {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal');
@@ -84,7 +84,7 @@ angular.module('term').controller('TerminalController',
     var url = '/terminal/' + term_event.term_id + '/event/' + term_event.id;
     $http.post(url, term_event).success(function(data) {
       contentService.scrollPage('.m-page-name');
-      if (data.error == 'yes') {
+      if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
       }
       else {
@@ -102,7 +102,7 @@ angular.module('term').controller('TerminalController',
     term_event.csrf_token = $scope.token;
     $http.post(url, term_event).success(function(data) {
       contentService.scrollPage('.m-page-name');
-      if (data.error == 'yes') {
+      if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
       }
       else {

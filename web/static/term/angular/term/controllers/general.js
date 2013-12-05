@@ -23,7 +23,7 @@ angular.module('term').controller('GeneralController',
 
     var url = '/' + parent + '/content/' + action;
     $http.post(url, $scope.search).success(function(data) {
-      if (data.error == 'no') {
+      if (data.error === 'no') {
         content_div.html($compile(data.content)($scope));    
       }
     });
@@ -52,7 +52,7 @@ angular.module('term').controller('GeneralController',
     if (!$scope.search) return false;
     var search = $scope.search;
     search.page = $scope.pagination.cur;
-    if (search.action_type == 'get_grid_content') {
+    if (search.action_type === 'get_grid_content') {
       $scope.getGridContent(search);
     }
   });
