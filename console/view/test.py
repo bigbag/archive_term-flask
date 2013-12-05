@@ -19,7 +19,9 @@ from models.spot import Spot
 from models.spot_dis import SpotDis
 
 from console.configs.payment import UnitellerConfig
+from console.configs.smsru import SmsruConfig
 from libs.uniteller_api import UnitellerApi
+from libs.smsru_api import SmsruApi
 
 from helpers import hash_helper
 
@@ -158,77 +160,29 @@ class TestCommand(Command):
 
             print "%s,%s,%s,%s" % data
 
-    def run(self):
-        # persons = Person.query.all()
-
-        # for person in persons:
-        #     person.save()
-
-        # spots = Spot.query.filter(
-        #     Spot.status == Spot.STATUS_REGISTERED).all()
-        # for spot in spots:
-        #     wallet = PaymentWallet.query.filter(
-        #         PaymentWallet.discodes_id == spot.discodes_id).first()
-        #     if not wallet:
-        #         if spot.user:
-        #             print spot.discodes_id
-        #             print spot.user.email
-        # print 1
-
+    def import_wallet(self):
         with open('tmp/import.csv', 'rb') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=';', quotechar='"')
             for row in spamreader:
                 spot = Spot.query.filter(Spot.code == row[2]).first()
+
+                if not spot:
+                    continue
+
+                wallet = PaymentWallet().filter(
+                    PaymentWallet.discodes_id == spot.discodes_id).first()
+
+                if wallet:
+                    continue
+
                 wallet = PaymentWallet()
                 wallet.hard_id = row[0]
                 wallet.payment_id = row[1]
                 wallet.discodes_id = spot.discodes_id
                 wallet.save()
-                # person = Person.query.filter_by(hard_id=row[0]).first()
 
-        # person.payment_id = str(person.payment_id).rjust(20, '0')
-        # person.save()
-
-        # if person:
-        # continue
-
-        #         person = Person()
-        #         person.hard_id = row[0]
-        #         person.payment_id = row[1]
-        #         person.firm_id = 17
-        #         person.first_name = 'Anonim'
-        #         person.last_name = u'Гость конференции'
-
-        #         if not person.save():
-        #             continue
-
-        #         person_event = PersonEvent()
-        #         person_event.person_id = person.id
-        #         person_event.term_id = 40
-        #         person_event.event_id = 3
-        #         person_event.firm_id = person.firm_id
-        #         person_event.timeout = 300
-        #         person_event.save()
-
-        #         person_event = PersonEvent()
-        #         person_event.person_id = person.id
-        #         person_event.term_id = 42
-        #         person_event.event_id = 3
-        #         person_event.firm_id = person.firm_id
-        #         person_event.timeout = 300
-        #         person_event.save()
-
-        #         person_event = PersonEvent()
-        #         person_event.person_id = person.id
-        #         person_event.term_id = 48
-        #         person_event.event_id = 3
-        #         person_event.firm_id = person.firm_id
-        #         person_event.timeout = 300
-        #         person_event.save()
-
-             # for row in spamreader:
-        #     person = Person.query.filter_by(
-        #         payment_id=row[1]).first()
-        #     if person.payment_id == person.hard_id:
-        #         person.hard_id = row[0]
-        #         print person.save()
+    def run(self):
+        sms = SmsruApi(SmsruConfig)
+        to = '79627056382'
+        text = 'Test'
+        print sms.sms_send(to, text).response.body

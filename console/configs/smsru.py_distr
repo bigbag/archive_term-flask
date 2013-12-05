@@ -10,7 +10,7 @@
 class SmsruConfig(object):
     GENERAL_URL = 'http://sms.ru/'
 
-    METHOD = dict(
+    METHODS = dict(
         get_token='auth/get_token',
         sms_send='sms/send',
         sms_status='sms/status',
@@ -21,4 +21,6 @@ class SmsruConfig(object):
     )
 
     API_ID = '0'
+    LOGIN = '7000000000'
+    PASSWORD = ''
     PARTNER_ID = 0
