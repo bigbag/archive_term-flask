@@ -185,4 +185,4 @@ class TestCommand(Command):
         sms = SmsruApi(SmsruConfig)
         to = '79627056382'
         text = 'Test'
-        print sms.sms_send(to, text).response.body
+        print sms.sms_send(to, text)

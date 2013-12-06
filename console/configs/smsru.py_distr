@@ -24,3 +24,4 @@ class SmsruConfig(object):
     LOGIN = '7000000000'
     PASSWORD = ''
     PARTNER_ID = 0
+    SENDER_NAME = 'Mobispot'
