@@ -96,7 +96,7 @@
             <table class="m-spot-table">
                 <thead>
                 <tr>
-                    <th>Дата</th>
+                    <th>Дата и время</th>
                     <th>Терминал</th>
                     <th>Событие</th>
                     <th>Сумма покупки</th>
@@ -104,7 +104,7 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="report in result" class="m-t-cont-row">
-                    <td>{[{report.creation_date}]}</td>
+                    <td>{[{report.date}]} {[{report.time}]}</td>
                     <td>{[{report.term}]}</td>
                     <td>{[{report.event}]}</td>
                     <td>{[{report.amount}]}</td>

@@ -27,6 +27,14 @@ class Event(db.Model):
     def get_events(self):
         return self.query.all()
 
+    @cache.cached(timeout=600, key_prefix='all_events_list')
+    def get_events_list(self):
+        events = Event().get_events()
+        result = {}
+        for event in events:
+            result[event.id] = event.name
+        return result
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

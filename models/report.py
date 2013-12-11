@@ -105,7 +105,8 @@ class Report(db.Model):
     @cache.cached(timeout=120, key_prefix='report_person')
     def get_person_report(self, **kwargs):
         tz = app.config['TZ']
-        date_pattern = '%d.%m.%y %H:%M'
+        time_pattern = '%H:%M'
+        date_pattern = '%d.%m.%Y'
 
         order = kwargs[
             'order'] if 'order' in kwargs else 'creation_date desc'
@@ -124,19 +125,24 @@ class Report(db.Model):
         reports = query.paginate(page, limit, False).items
 
         result = []
+
+        events = Event().get_events_list()
         for report in reports:
 
             creation_date = date_helper.from_utc(
                 report.creation_date,
                 tz)
-            creation_date = creation_date.strftime(date_pattern)
 
-            term = Term.query.get(report.term_id)
+            term = Term().get_by_id(report.term_id)
             data = dict(
                 id=report.id,
                 term=term.name if term else 'Empty',
-                creation_date=creation_date,
-                event=report.event.name if report.event else 'Empty',
+                term_id=term.id if term else 'Empty',
+                date=creation_date.strftime(date_pattern),
+                time=creation_date.strftime(time_pattern),
+                event=events[
+                    report.event_id] if events[
+                        report.event_id] else 'Empty',
                 amount=int(report.amount / 100),
                 name=report.name,
             )
