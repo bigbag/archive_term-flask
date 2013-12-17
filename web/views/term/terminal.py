@@ -268,6 +268,9 @@ def terminal_event_save(term_id, term_event_id):
                                     удалите старое или измените тип нового"""
 
         elif term_event.term_event_save(g.firm_info['id'], term.id):
+            if term_event_id == 0:
+                term_event.save()
+
             answer['error'] = 'no'
             answer['message'] = u'Данные сохранены'
     else:
