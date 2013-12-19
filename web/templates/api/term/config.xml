@@ -65,7 +65,7 @@
         {% for person_event in person_events %}
             {% if person_event.event_id == term_event.event_id %}
             {% set payment_id = person_event.person.payment_id %}
-                {% if person_event.person.status == 1 %}
+                {% if person_event.status == 1 %}
                 {% if person_event.person.wallet_status == 1 %}
                 {% if payment_id %}
                 <card timeout="{{person_event.timeout}}">

@@ -61,6 +61,10 @@ class Report(db.Model):
         self.corp_type = self.CORP_TYPE_OFF
         self.type = self.TYPE_WHITE
         self.name = 'Anonim'
+        self.tz = app.config['TZ']
+        self.order = 'creation_date desc'
+        self.limit = self.POST_ON_PAGE
+        self.page = self.DEFAULT_PAGE
 
     def __repr__(self):
         return '<id %r>' % (self.id)
@@ -102,36 +106,42 @@ class Report(db.Model):
     def get_by_check_summ(self, check_summ):
         return self.query.filter_by(check_summ=check_summ).first()
 
+    def _get_search_params(self, **kwargs):
+        if 'order' in kwargs:
+            self.order = kwargs['order']
+
+        if 'limit' in kwargs:
+            self.limit = kwargs['limit']
+
+        if 'page' in kwargs:
+            self.page = kwargs['page']
+        return True
+
     @cache.cached(timeout=120, key_prefix='report_person')
     def get_person_report(self, **kwargs):
-        tz = app.config['TZ']
+
         time_pattern = '%H:%M'
         date_pattern = '%d.%m.%Y'
-
-        order = kwargs[
-            'order'] if 'order' in kwargs else 'creation_date desc'
-        limit = kwargs['limit'] if 'limit' in kwargs else self.POST_ON_PAGE
-        page = kwargs['page'] if 'page' in kwargs else self.DEFAULT_PAGE
+        self._get_search_params(kwargs)
 
         if 'person' in kwargs['type']:
             query = Report.query.filter(
                 Report.person_id == kwargs['id']).order_by(
-                    order)
+                    self.order)
         elif 'firm' in kwargs['type']:
             query = Report.query.filter(Report.firm_id == kwargs['id']).filter(
-                Report.type == self.TYPE_WHITE).order_by(order)
+                Report.type == self.TYPE_WHITE).order_by(self.order)
 
         reports_count = query.count()
-        reports = query.paginate(page, limit, False).items
+        reports = query.paginate(self.page, self.limit, False).items
 
         result = []
-
         events = Event().get_events_list()
         for report in reports:
 
             creation_date = date_helper.from_utc(
                 report.creation_date,
-                tz)
+                self.tz)
 
             term = Term().get_by_id(report.term_id)
             data = dict(
@@ -222,7 +232,6 @@ class Report(db.Model):
 
     @cache.cached(timeout=120, key_prefix='report_interval')
     def get_firm_interval_report(self, firm_id, **kwargs):
-        tz = app.config['TZ']
         payment_type = self.TYPE_WHITE
 
         if 'payment_type' in kwargs:
@@ -244,7 +253,7 @@ class Report(db.Model):
 
             search_date = date_helper.from_utc(
                 report[0],
-                tz)
+                self.tz)
 
             if period == 'week':
                 interval = date_helper.get_date_interval(search_date, period)
