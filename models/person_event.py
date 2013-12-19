@@ -19,6 +19,8 @@ class PersonEvent(db.Model):
     STATUS_ACTIVE = 1
     STATUS_BANNED = 0
 
+    LIKE_TIMEOUT = 100000
+
     id = db.Column(db.Integer, primary_key=True)
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
     person = db.relationship('Person')
@@ -31,7 +33,7 @@ class PersonEvent(db.Model):
 
     def __init__(self):
         self.timeout = 300
-        self.status = self.STATUS_ACTIVE
+        # self.status = self.STATUS_ACTIVE
 
     def __repr__(self):
         return '<id %r>' % (self.id)

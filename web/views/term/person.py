@@ -114,7 +114,7 @@ def person_save(person_id):
         if code:
             linking_card = person_linking_card(code)
             if not linking_card['wallet']:
-                answer['message'] = person_failed_linking_card(code)
+                answer['message'] = u'Код активации не верен'
                 return jsonify(answer)
             else:
                 wallet = linking_card['wallet']
