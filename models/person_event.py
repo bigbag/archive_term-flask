@@ -7,7 +7,6 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-
 from web import db, app
 
 
@@ -28,12 +27,14 @@ class PersonEvent(db.Model):
     term = db.relationship('Term')
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     event = db.relationship('Event')
-    firm_id = db.Column(db.Integer, index=True)
+    firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
+    firm = db.relationship('Event')
     timeout = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
         self.timeout = 300
-        # self.status = self.STATUS_ACTIVE
+        self.status = self.STATUS_ACTIVE
 
     def __repr__(self):
         return '<id %r>' % (self.id)
@@ -43,6 +44,14 @@ class PersonEvent(db.Model):
 
     def get_by_person_id(self, person_id):
         return self.query.filter_by(person_id=person_id).all()
+
+    def set_status_by_person_id(self, person_id, status):
+        person_events = PersonEvent().get_by_person_id(person_id)
+        for person_event in person_events:
+            person_event.status = status
+            db.session.add(person_event)
+
+        db.session.commit()
 
     def delete(self):
         db.session.delete(self)

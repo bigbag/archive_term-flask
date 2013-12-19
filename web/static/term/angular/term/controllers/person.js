@@ -45,7 +45,7 @@ angular.module('term').controller('PersonController',
       else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
-          $(location).attr('href','/person' + person.id );
+          $(location).attr('href','/person/' + person.id );
         }, 2000);
       }
     });   
