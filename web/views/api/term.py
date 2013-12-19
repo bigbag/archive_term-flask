@@ -135,7 +135,7 @@ def api_get_blacklist():
 
     return response
 
-
+@mod.route('/reports/report_<int:term_id>_<report_datetime>.xml.gz', methods=['PUT'])
 @mod.route('/reports/report_<int:term_id>_<report_datetime>.xml', methods=['PUT'])
 def api_upload_report(term_id, report_datetime):
     """Прием и сохранение отчета"""
