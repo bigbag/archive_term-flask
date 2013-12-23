@@ -36,13 +36,22 @@ class PaymentAuto(Command):
             if not reccurent.wallet:
                 continue
 
+            """ Делается одна попытка пополнить кошелек.
+                Если она не успешны, скрипт делается попытки на кратном PERIOD_LENGH проходе.
+                Если за MAX_PERIOD*PERIOD_LENGH проходов пополнение не удалось
+                больше попыток не делается"""
+
             count = int(reccurent.count)
-            if count > PaymentReccurent.MAX_COUNT:
-                factor = count % PaymentReccurent.PERIOD
-                if not factor == 0:
-                    reccurent.status = PaymentReccurent.STATUS_OFF
-                    reccurent.save()
-                    continue
+            current_period = count // PaymentReccurent.PERIOD_LENGH
+
+            if current_period > PaymentReccurent.MAX_PERIOD:
+                continue
+
+            delta = count % PaymentReccurent.PERIOD_LENGH
+            if not delta == 0:
+                reccurent.status = PaymentReccurent.STATUS_OFF
+                reccurent.save()
+                continue
 
             amount = int(reccurent.amount) - int(reccurent.wallet.balance)
 
