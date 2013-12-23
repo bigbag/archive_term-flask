@@ -30,6 +30,7 @@ class PaymentAuto(Command):
         un = UnitellerApi(UnitellerConfig)
 
         for reccurent in reccurents:
+            print reccurent
             amount = 0
             reccurent.count = reccurent.count + 1
 
@@ -44,21 +45,7 @@ class PaymentAuto(Command):
                     reccurent.save()
                     continue
 
-            if reccurent.type == PaymentReccurent.TYPE_CEILING:
-                amount = int(reccurent.amount) - int(reccurent.wallet.balance)
-
-            elif reccurent.type == PaymentReccurent.TYPE_LIMIT:
-                i = 1
-                limit = PaymentReccurent.PAYMENT_MIN + \
-                    PaymentWallet.BALANCE_MIN
-                while int(reccurent.wallet.balance) + amount <= limit:
-                    amount = int(reccurent.amount) * i
-                    i = i + 1
-            else:
-                continue
-
-            if amount < PaymentReccurent.PAYMENT_MIN:
-                continue
+            amount = int(reccurent.amount) - int(reccurent.wallet.balance)
 
             history = PaymentHistory()
             history.user_id = reccurent.wallet.user_id

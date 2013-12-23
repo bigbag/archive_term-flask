@@ -92,9 +92,7 @@ class PaymentInfo(Command):
             if not str(history.id) in info:
                 if history.status == PaymentHistory.STATUS_NEW:
                     history.status = PaymentHistory.STATUS_MISSING
-                    # history.save()
-                    print history.creation_date
-
+                    history.save()
             else:
                 payment_info = info[str(history.id)]
                 if history.status == PaymentHistory.STATUS_FAILURE:

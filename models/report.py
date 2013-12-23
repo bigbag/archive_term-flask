@@ -122,7 +122,7 @@ class Report(db.Model):
 
         time_pattern = '%H:%M'
         date_pattern = '%d.%m.%Y'
-        self._get_search_params(kwargs)
+        self._get_search_params(**kwargs)
 
         if 'person' in kwargs['type']:
             query = Report.query.filter(
