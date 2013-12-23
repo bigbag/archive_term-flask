@@ -215,6 +215,7 @@ def person_lock(person_id):
         person.status = Person.STATUS_BANNED
         PersonEvent().set_status_by_person_id(
             person_id, PersonEvent.STATUS_BANNED)
+
     elif person.status == Person.STATUS_BANNED:
         person.status = Person.STATUS_VALID
         PersonEvent().set_status_by_person_id(
