@@ -8,12 +8,11 @@
 from flask import Flask
 from flask.ext.script import Command
 from grab import Grab
-
 from models.loyalty import Loyalty
 from models.likes_stack import LikesStack
 from models.soc_token import SocToken
 from console.configs.payment import UnitellerConfig
-from libs.facebook_api import FacebookApi
+from libs.socnets_api import SocnetsApi
 
 
 class CheckLikes(Command):
@@ -32,13 +31,13 @@ class CheckLikes(Command):
             if len(url):
                 socToken = SocToken.query.filter_by(
                     id=stackItem.token_id).first()
-                pageLiked = FacebookApi.check_like(url, socToken.user_token)
+                pageLiked = SocnetsApi.check_like(
+                    socToken.type, url, socToken.user_token)
 
                 if pageLiked:
                     print 'You are liked this page: ' + url
+                    # stackItem.delete()
                 else:
                     print 'You are not liked this page: ' + url
-                    
-                #stackItem.delete()
 
         return True
