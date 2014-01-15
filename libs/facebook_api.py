@@ -11,21 +11,12 @@ import json
 
 class FacebookApi():
 
-    @staticmethod
-    def check_like(url, token):
+    def check_like(self, url, token):
         pageLiked = False
-        username = FacebookApi.parse_username(url)
-        urlAPI = 'https://graph.facebook.com/' + \
-            username + '?access_token=' + token
-        g = Grab()
-        g.go(urlAPI)
-        page = json.loads(g.response.body)
+        page = self.get_page(url, token, True)
 
         if page.get('id'):
-            urlAPI = 'https://graph.facebook.com/me/likes/' + \
-                page['id'] + '?&access_token=' + token
-            g.go(urlAPI)
-            like = json.loads(g.response.body)
+            like = self.get_like(page['id'], token, True)
 
             if like.has_key('data') and len(like['data']) and like['data'][0].get('id'):
                 pageLiked = True
@@ -46,3 +37,26 @@ class FacebookApi():
             username = username[0:username.find("&")]
 
         return username
+
+    def get_page(self, url, token, parse_json):
+        username = FacebookApi.parse_username(url)
+        urlAPI = 'https://graph.facebook.com/' + \
+            username + '?access_token=' + token
+        g = Grab()
+        g.go(urlAPI)
+        answer = g.response.body
+        if parse_json:
+            answer = json.loads(answer)
+
+        return answer
+
+    def get_like(self, page_id, token, parse_json):
+        urlAPI = 'https://graph.facebook.com/me/likes/' + \
+            page_id + '?&access_token=' + token
+        g = Grab()
+        g.go(urlAPI)
+        answer = g.response.body
+        if parse_json:
+            answer = json.loads(answer)
+
+        return answer

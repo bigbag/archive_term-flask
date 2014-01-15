@@ -32,9 +32,9 @@ class ModelsTermCase(unittest.TestCase):
     EVENT_ID = 3
     HARD_ID = '9995749700230784'
     PAYMENT_ID = '99999999999999999999'
-    PERSON_ID = 1
     USER_ID = 1
     DISCODES_ID = 999999
+    LOYALTY_ID = 1
 
     def model_test(self, Model, data):
         old = Model()
@@ -123,3 +123,10 @@ class ModelsTermCase(unittest.TestCase):
     def test_func_get_url(self):
         spot = Spot()
         assert spot.get_url()
+
+    def test_func_add_by_user_loyalty_id(self):
+        event_id = PersonEvent.add_by_user_loyalty_id(
+            self.USER_ID, self.LOYALTY_ID)
+        assert event_id
+        event = PersonEvent.query.get(event_id)
+        event.delete()

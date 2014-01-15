@@ -7,7 +7,11 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import json
 from web import db, app
+from models.loyalty import Loyalty
+from models.payment_wallet import PaymentWallet
+from models.person import Person
 
 
 class PersonEvent(db.Model):
@@ -70,3 +74,41 @@ class PersonEvent(db.Model):
             return False
         else:
             return True
+
+    @staticmethod
+    def add_by_user_loyalty_id(user_id, loyalty_id):
+        loyalty = Loyalty.query.filter_by(
+            id=loyalty_id).first()
+        wallet = PaymentWallet.query.filter_by(
+            user_id=user_id).first()
+        if loyalty and wallet:
+            person = Person.query.filter_by(
+                firm_id=loyalty.firm_id, payment_id=wallet.payment_id).first()
+
+            if not person:
+                person = Person()
+                person.name = 'Участник промо-кампании'
+                person.firm_id = loyalty.firm_id
+                person.hard_id = wallet.hard_id
+                person.payment_id = wallet.payment_id
+                person.save()
+
+            terms = json.loads(loyalty.terms_id)
+            for term in terms:
+                event = PersonEvent.query.filter_by(
+                    person_id=person.id, term_id=term, event_id=loyalty.event_id, firm_id=loyalty.firm_id).first()
+
+            if event:
+                if event.timeout > PersonEvent.LIKE_TIMEOUT:
+                    event.status = PersonEvent.STATUS_BANNED
+                    event.save()
+            else:
+                event = PersonEvent()
+                event.person_id = person.id
+                event.term_id = term
+                event.event_id = loyalty.event_id
+                event.firm_id = loyalty.firm_id
+                event.timeout = PersonEvent.LIKE_TIMEOUT
+                event.save()
+
+            return event.id

@@ -5,7 +5,8 @@
     :copyright: (c) 2013 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
-from libs.facebook_api import FacebookApi
+#from libs.facebook_api import FacebookApi
+from libs.mock_facebook_api import MockFacebookApi
 from models.soc_token import SocToken
 
 
@@ -16,6 +17,7 @@ class SocnetsApi():
         pageLiked = False
 
         if type == SocToken.TYPE_FACEBOOK:
-            pageLiked = FacebookApi.check_like(url, token)
+            facebookApi = MockFacebookApi()
+            pageLiked = facebookApi.check_like(url, token)
 
         return pageLiked
