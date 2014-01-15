@@ -13,6 +13,9 @@ from models.card_stack import CardStack
 from models.mail_stack import MailStack
 from models.report_stack import ReportStack
 from models.user import User
+from models.loyalty import Loyalty
+from models.soc_token import SocToken
+from models.likes_stack import LikesStack
 
 from helpers import hash_helper
 
@@ -26,6 +29,10 @@ class ModelsCase(unittest.TestCase):
     TERM_ID = 21
     PERSON_ID = 1
     FIRM_ID = 8
+    EVENT_ID = 3
+    USER_ID = 1
+    TOKEN_ID = 1
+    LOYALTY_ID = 1
 
     def model_test(self, Model, data):
         old = Model()
@@ -71,3 +78,39 @@ class ModelsCase(unittest.TestCase):
             password=self.TEST_STRING,
         )
         self.model_test(User, data)
+
+    def test_loyalty(self):
+        data = dict(
+            terms_id='[21]',
+            event_id=self.EVENT_ID,
+            firm_id=self.FIRM_ID,
+            rules=0,
+            interval=3,
+            amount=8000,
+            threshold=60000,
+            desc='Тестовая акция',
+            creation_date='2013-11-22 13:43:47',
+            start_date='2013-10-30 18:07:40',
+            stop_date='2014-04-30 18:07:40',
+            img='defoult-store.png',
+            part_limit=3,
+        )
+        self.model_test(Loyalty, data)
+
+    def test_soc_token(self):
+        data = dict(
+            type=1,
+            user_id=self.USER_ID,
+            soc_id=100003300240179,
+            soc_email=self.TEST_EMAIL,
+            user_token='token',
+            token_expires=1392539342
+        )
+        self.model_test(SocToken, data)
+
+    def test_likes_stack(self):
+        data = dict(
+            token_id=self.TOKEN_ID,
+            loyalty_id=self.LOYALTY_ID
+        )
+        self.model_test(LikesStack, data)
