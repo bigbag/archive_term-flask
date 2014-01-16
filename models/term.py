@@ -48,6 +48,7 @@ class Term(db.Model):
     download_start = db.Column(db.String(256))
     download_stop = db.Column(db.String(256))
     download_period = db.Column(db.Integer, nullable=False)
+    factor = db.Column(db.Integer)
     version = db.Column(db.String(128))
 
     def __init__(self):
@@ -61,6 +62,7 @@ class Term(db.Model):
         self.tz = app.config['TZ']
         self.blacklist = self.BLACKLIST_OFF
         self.settings_id = 1
+        self.factor = 1
         self.status = self.STATUS_VALID
 
     def __repr__(self):
