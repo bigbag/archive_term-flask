@@ -85,7 +85,7 @@ class Report(db.Model):
                 continue
 
         if data.get('summ'):
-            self.amount = data.get('summ') * self.term.factor
+            self.amount = int(data.get('summ')) * int(self.term.factor)
 
         if data.get('type'):
             self.type = data.get('type')
