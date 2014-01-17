@@ -22,6 +22,13 @@ class Loyalty(db.Model):
     STATUS_ALL = 2
     STATUS_MY = 100
 
+    FACEBOOK_LIKE = 1
+    FACEBOOK_SHARE = 2
+    TWITTER_SHARE = 3
+    TWITTER_RETWIT = 4
+    TWITTER_READING = 5
+    TWITTER_HASHTAG = 6
+
     id = db.Column(db.Integer, primary_key=True)
     terms_id = db.Column(db.Integer)
     event_id = db.Column(db.Integer, db.ForeignKey('person_event.id'))
@@ -34,6 +41,7 @@ class Loyalty(db.Model):
     creation_date = db.Column(db.DateTime)
     start_date = db.Column(db.DateTime)
     stop_date = db.Column(db.DateTime)
+    sharing_type = db.Column(db.Integer)
 
     def __init__(self):
         self.rules = self.RULE_FIXED

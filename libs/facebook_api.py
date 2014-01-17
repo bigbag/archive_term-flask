@@ -5,18 +5,21 @@
     :copyright: (c) 2013 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
+from libs.socnet_api_base import SocnetApiBase
+from models.soc_token import SocToken
 from grab import Grab
 import json
 
 
 class FacebookApi():
 
-    def check_like(self, url, token):
+    def check_like(self, url, token_id):
         pageLiked = False
-        page = self.get_page(url, token, True)
+        socToken = SocToken.query.get(token_id)
+        page = self.get_page(url, socToken.user_token, True)
 
         if page.get('id'):
-            like = self.get_like(page['id'], token, True)
+            like = self.get_like(page['id'], socToken.user_token, True)
 
             if like.has_key('data') and len(like['data']) and like['data'][0].get('id'):
                 pageLiked = True
@@ -29,12 +32,8 @@ class FacebookApi():
         if "facebook.com/" in username:
             username = username[
                 username.find("facebook.com/") + len("facebook.com/"):]
-        if "/" in username:
-            username = username[0:username.find("/")]
-        if "?" in username:
-            username = username[0:username.find("?")]
-        if "&" in username:
-            username = username[0:username.find("&")]
+
+        username = SocnetApiBase.rmGetParams(username)
 
         return username
 

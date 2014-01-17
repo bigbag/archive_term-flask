@@ -23,22 +23,20 @@ class CheckLikes(Command):
         lStack = LikesStack.query.filter().all()
 
         for stackItem in lStack:
-            userToken = SocToken.query.filter_by(
-                id=stackItem.token_id).first()
-
             url = Loyalty.get_action_link(stackItem.loyalty_id)
+            action = Loyalty.query.get(stackItem.loyalty_id)
 
             if len(url):
-                socToken = SocToken.query.filter_by(
-                    id=stackItem.token_id).first()
-                pageLiked = SocnetsApi.check_like(
-                    socToken.type, url, socToken.user_token)
+                socToken = SocToken.query.get(stackItem.token_id)
+                pageLiked = SocnetsApi.check_soc_sharing(
+                    action.sharing_type, url, socToken.id)
 
                 if pageLiked:
-                    PersonEvent.add_by_user_loyalty_id(socToken.user_id, stackItem.loyalty_id)
-                    print 'user is liked this page: ' + url
-                    #stackItem.delete()
+                    PersonEvent.add_by_user_loyalty_id(
+                        socToken.user_id, stackItem.loyalty_id)
+                    print 'user complied with the conditions for ' + url
+                    # stackItem.delete()
 
                 else:
-                    print 'user is not liked this page: ' + url
+                    print 'user not complied with the conditions for ' + url
         return True
