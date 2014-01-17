@@ -280,7 +280,7 @@ class Report(db.Model):
                 term = Term().get_by_id(row[0])
                 detaled_data = dict(
                     term=term.name if term else 'Empty',
-                    amount=float(report[1]) / 100,
+                    amount=float(row[1]) / 100,
                     count=int(row[2])
                 )
                 data['detaled'].append(detaled_data)
