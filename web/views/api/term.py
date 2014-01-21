@@ -48,7 +48,7 @@ def api_get_gzip_config(term_id):
 
 def api_get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
-    term = Term().query.get(int(term_id))
+    term = Term().get_valid_term(int(term_id))
 
     if term is None:
         abort(400)

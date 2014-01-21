@@ -18,8 +18,6 @@ wtforms_json.init()
 
 
 class PersonAddForm(TokenSecureForm):
-
-    id = IntegerField(validators=[InputRequired()])
     name = TextField(validators=[InputRequired()])
     tabel_id = TextField()
     birthday = DateTimeField()

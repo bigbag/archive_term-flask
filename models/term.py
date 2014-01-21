@@ -33,6 +33,7 @@ class Term(db.Model):
     SEANS_ALARM = 86400
 
     id = db.Column(db.Integer, primary_key=True)
+    hard_id = db.Column(db.Integer, nullable=False, unique=True)
     type = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(300), nullable=False)
     tz = db.Column(db.String(300), nullable=False)
@@ -102,12 +103,13 @@ class Term(db.Model):
 
     def get_valid_term(self, term_id):
         return self.query.filter_by(
-            id=term_id,
+            hard_id=term_id,
             status=self.STATUS_VALID).first()
 
     @cache.cached(timeout=600, key_prefix='term_by_id')
     def get_by_id(self, id):
-        return self.query.get(id)
+        return self.query.filter_by(
+            id=id).first()
 
     def get_info_by_id(self, id):
         date_pattern = '%H:%M %d.%m.%y'
@@ -174,7 +176,8 @@ class Term(db.Model):
                 seans_date = date_helper.from_utc(term.config_date, tz)
                 seans_date = seans_date.strftime(date_pattern)
             data = dict(
-                term_id=term.id,
+                id=term.id,
+                hard_id=term.hard_id,
                 name=term.name,
                 firm=firm_general.firm.name,
                 status=int(term.status == self.STATUS_VALID),

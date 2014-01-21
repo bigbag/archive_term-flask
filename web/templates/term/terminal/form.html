@@ -1,16 +1,16 @@
 <form class="custom" id="add_term" name="termForm" ng-controller="TerminalController">
     <div class="g-clear-b g-clearfix">
-        {% if not term.id %}
         <div class="content-row left g-clearfix" 
-            ng-init="term.id={{term.id}}">
-            <label for="add-id">ID* (только числа)</label>
-            <input id="add-id" 
+            ng-init="term.hard_id={{term.hard_id}}">
+            <label for="add-hard_id">ID* (только числа)</label>
+            <input id="add-hard_id" 
                 type="number"
-                name="id"
+                name="hard_id"
                 min="1"
-                ng-model="term.id"
+                ng-model="term.hard_id"
                 required>
         </div>
+        {% if not term.id %}
             <span ng-init="term.action='add'"></span>
         {% else %}
             <span ng-init="term.action='edit'"></span>

@@ -14,12 +14,16 @@ from wtforms.validators import *
 from web.form.base import TokenSecureForm
 from web.form import base
 
+from models.term import Term
+
 wtforms_json.init()
 
 
 class TermAddForm(TokenSecureForm):
 
-    id = IntegerField(validators=[InputRequired()])
+    id = IntegerField(validators=[Optional()])
+    hard_id = IntegerField(
+        validators=[InputRequired(), base.Unique(Term, Term.name)])
     name = TextField(validators=[InputRequired()])
     type = IntegerField(default=1)
     blacklist = IntegerField(default=1)

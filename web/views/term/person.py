@@ -103,7 +103,7 @@ def person_info(person_id):
 def person_save(person_id):
     """Добавляем или редактируем человека"""
 
-    answer = dict(error='yes', message='')
+    answer = dict(error='yes', message='', person_id=0)
     arg = json.loads(request.stream.read())
     form = PersonAddForm.from_json(arg)
 
@@ -129,6 +129,7 @@ def person_save(person_id):
         form.populate_obj(person)
 
         if person.save():
+            answer['person_id'] = person.id
             answer['error'] = 'no'
             answer['message'] = u'Данные сохранены'
         else:

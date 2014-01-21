@@ -15,7 +15,8 @@
             <table class="m-spot-table" ng-controller="TerminalController">
                 <thead>
                     <tr>
-                        <th><span>ID</span></th>
+                        <th>ID</th>
+                        <th>SN</th>
                         <th>Имя</th>
                         <th>Владелец</th>
                         <th>Сеанс связи</th>
@@ -23,10 +24,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-click="getTerminalView(term.term_id)" 
+                    <tr ng-click="getTerminalView(term.id)" 
                         ng-repeat="term in result" 
                         class="m-t-cont-row">
-                        <td>{[{term.term_id}]}</td>
+                        <td>{[{term.id}]}</td>
+                        <td>{[{term.hard_id}]}</td>
                         <td>{[{term.name}]}</td>
                         <td>{[{term.firm}]}</td>
                         <td ng-class="(term.seans_alarm==1)?'g-color-red':''">

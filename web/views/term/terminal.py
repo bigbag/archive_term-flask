@@ -137,6 +137,8 @@ def terminal_edit(arg, term_id):
             answer['message'] = u'Данные сохранены'
     else:
         answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
+
+    print form.errors
     return jsonify(answer)
 
 
