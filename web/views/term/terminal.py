@@ -11,6 +11,7 @@ from web.form.term import TermAddForm
 from web.form.event import TermEventAddForm
 
 from models.term import Term
+from models.report import Report
 from models.event import Event
 from models.firm_term import FirmTerm
 from models.term_event import TermEvent
@@ -172,20 +173,26 @@ def terminal_locking(term_id):
 @login_required
 @json_headers
 def terminal_remove(term_id):
-    """Удаление терминал"""
+    """Удаление терминала"""
     answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
 
     if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
         abort(403)
 
-    term = Term.query.get(term_id)
+    term = Term().get_info_by_id(term_id)
     if not term:
         abort(404)
 
-    if term.term_remove():
-        answer['error'] = 'no'
-        answer['message'] = u'Операция успешно выполнена'
+    report = Report.query.filter_by(term_id=term.id).first()
+
+    if not report:
+        if term.term_remove():
+            answer['error'] = 'no'
+            answer['message'] = u'Операция успешно выполнена'
+    else:
+        answer['message'] = u"""Невозможно удалить.
+            По терминалу была совершена операция."""
 
     return jsonify(answer)
 

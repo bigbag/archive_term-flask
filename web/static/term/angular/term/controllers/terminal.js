@@ -60,12 +60,14 @@ angular.module('term').controller('TerminalController',
 
   $scope.removeTerminal = function(term) {
     term.csrf_token = $scope.token;
-    $http.post('/terminal' + term.id + '/remove', term).success(function(data) {
+    $http.post('/terminal/' + term.id + '/remove', term).success(function(data) {
       if (data.error === 'no') {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal');
         }, 2000);
+      } else {
+        contentService.setModal(data.message, 'error');
       }
     });  
   }

@@ -251,9 +251,8 @@ def person_remove(person_id):
         report = Report.query.filter_by(payment_id=person.payment_id).first()
 
     if report:
-        answer['error'] = 'yes'
-        answer[
-            'message'] = u'Невозможно удалить. По карте была совершена операция.'
+        answer['message'] = u"""Невозможно удалить.
+            По карте была совершена операция."""
     else:
         person.delete()
         answer['error'] = 'no'
