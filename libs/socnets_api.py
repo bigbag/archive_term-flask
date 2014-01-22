@@ -8,6 +8,7 @@
 from libs.facebook_api import FacebookApi
 from libs.mock_facebook_api import MockFacebookApi
 from libs.twitter_api import TwitterApi
+from libs.mock_twitter_api import MockTwitterApi
 from models.loyalty import Loyalty
 
 
@@ -18,7 +19,7 @@ class SocnetsApi():
         netShared = False
 
         if type == Loyalty.FACEBOOK_LIKE:
-            facebookApi = MockFacebookApi()
+            facebookApi = FacebookApi()
             netShared = facebookApi.check_like(url, token_id)
         elif type == Loyalty.TWITTER_SHARE:
             twitterApi = TwitterApi()

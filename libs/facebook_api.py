@@ -11,15 +11,17 @@ from grab import Grab
 import json
 
 
-class FacebookApi():
+class FacebookApi(SocnetApiBase):
+
+    API_PATH = 'https://graph.facebook.com/'
 
     def check_like(self, url, token_id):
         pageLiked = False
-        socToken = SocToken.query.get(token_id)
-        page = self.get_page(url, socToken.user_token, True)
+
+        page = self.get_page(url, token_id, True)
 
         if page.get('id'):
-            like = self.get_like(page['id'], socToken.user_token, True)
+            like = self.get_like(page['id'], token_id, True)
 
             if like.has_key('data') and len(like['data']) and like['data'][0].get('id'):
                 pageLiked = True
@@ -37,23 +39,25 @@ class FacebookApi():
 
         return username
 
-    def get_page(self, url, token, parse_json):
+    def get_page(self, url, token_id, parse_json):
+        socToken = SocToken.query.get(token_id)
         username = FacebookApi.parse_username(url)
-        urlAPI = 'https://graph.facebook.com/' + \
-            username + '?access_token=' + token
-        g = Grab()
-        g.go(urlAPI)
-        answer = g.response.body
-        if parse_json:
-            answer = json.loads(answer)
+        urlAPI = self.API_PATH + username + \
+            '?access_token=' + socToken.user_token
 
-        return answer
+        return self.make_api_request(urlAPI, parse_json)
 
-    def get_like(self, page_id, token, parse_json):
-        urlAPI = 'https://graph.facebook.com/me/likes/' + \
-            page_id + '?&access_token=' + token
+    def get_like(self, page_id, token_id, parse_json):
+        socToken = SocToken.query.get(token_id)
+        urlAPI = self.API_PATH + 'me/likes/' + \
+            page_id + '?&access_token=' + socToken.user_token
+
+        return self.make_api_request(urlAPI, parse_json)
+
+    @staticmethod
+    def make_api_request(url, parse_json):
         g = Grab()
-        g.go(urlAPI)
+        g.go(url)
         answer = g.response.body
         if parse_json:
             answer = json.loads(answer)

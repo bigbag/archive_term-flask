@@ -5,12 +5,14 @@
     :copyright: (c) 2013 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
+from libs.socnet_api_base import SocnetApiBase
 from grab import Grab
 import json
 from libs.facebook_api import FacebookApi
 
+
 class MockFacebookApi(FacebookApi):
-    TOKEN_FOR_LIKED = 'CAAB8zqViDY8BAAIDe44MUByoeWeqe3ADHqsh9SQ1CJIiudb1IatfMpjZBwt2UZAAFJkgMt4Td4PnHx7JD5tLMXwDiLL8P0X44W8hcg9dWeM5508lfYkbeQGmghY8lXY0KTvvdq8xUjZBHf54fghV5kLSQ8Mnn4J9NEwBRQqMMvL3DDGEf72yCoD9awsvqQZD'
+
     TEST_PAGE = """{
    "about": "Founded June 16, 1903 by Henry Ford.",
    "can_post": true,
@@ -85,19 +87,19 @@ class MockFacebookApi(FacebookApi):
 
 }
         """
-        
-    def get_page(self, url, token, parse_json):
-        answer = MockFacebookApi.TEST_PAGE
+
+    def get_page(self, url, token_id, parse_json):
+        answer = self.TEST_PAGE
         if parse_json:
             answer = json.loads(answer)
-            
+
         return answer
-    
-    def get_like(self, page_id, token, parse_json):
+
+    def get_like(self, page_id, token_id, parse_json):
         answer = MockFacebookApi.DATA_NOT_LIKED
-        if token == MockFacebookApi.TOKEN_FOR_LIKED:
+        if token_id == SocnetApiBase.TOKEN_FOR_SHARED:
             answer = MockFacebookApi.DATA_LIKED
         if parse_json:
             answer = json.loads(answer)
-        
+
         return answer

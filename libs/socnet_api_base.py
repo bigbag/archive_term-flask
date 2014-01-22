@@ -10,6 +10,8 @@ import json
 
 
 class SocnetApiBase():
+    TOKEN_NOT_SHARED = -1  # для тестов
+    TOKEN_FOR_SHARED = -2  # для тестов
 
     @staticmethod
     def rmGetParams(str):
