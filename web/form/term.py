@@ -20,10 +20,7 @@ wtforms_json.init()
 
 
 class TermAddForm(TokenSecureForm):
-
-    id = IntegerField(validators=[Optional()])
-    hard_id = IntegerField(
-        validators=[InputRequired(), base.Unique(Term, Term.name)])
+    hard_id = IntegerField(validators=[InputRequired()])
     name = TextField(validators=[InputRequired()])
     type = IntegerField(default=1)
     blacklist = IntegerField(default=1)

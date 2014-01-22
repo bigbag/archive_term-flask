@@ -95,68 +95,48 @@ def terminal_info(term_id):
     )
 
 
-def terminal_add(arg):
-    """Добавляем терминал"""
-    answer = dict(error='yes', message='')
-
-    term = Term.query.get(int(arg['id']))
-
-    if term:
-        answer['message'] = u'Терминал с таким ID уже есть в системе'
-    else:
-        form = TermAddForm.from_json(arg)
-
-        if form.validate():
-            term = Term()
-            form.populate_obj(term)
-
-            if term.term_add(g.firm_info['id']):
-                answer['error'] = 'no'
-                answer['message'] = u'Терминал успешно добавлен'
-        else:
-            answer['message'] = u"""Форма заполнена неверно,
-                проверьте формат полей"""
-    return jsonify(answer)
-
-
-def terminal_edit(arg, term_id):
-    """Редактируем терминал"""
-    answer = dict(error='yes', message='')
-
-    term = Term.query.get(int(term_id))
-    if not term:
-        abort(404)
-
-    form = TermAddForm.from_json(arg)
-
-    if form.validate():
-        form.populate_obj(term)
-
-        if term.save():
-            answer['error'] = 'no'
-            answer['message'] = u'Данные сохранены'
-    else:
-        answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
-
-    print form.errors
-    return jsonify(answer)
-
-
 @mod.route('/terminal/<int:term_id>/<action>', methods=['POST'])
 @login_required
 @json_headers
 def terminal_save(term_id, action):
     """Добавляем или редактируем терминал"""
+    answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
+    action_list = ('add', 'edit')
 
-    if 'add' in action:
-        result = terminal_add(arg)
-    elif 'edit' in action:
-        result = terminal_edit(arg, term_id)
-    else:
+    if action not in action_list:
         abort(400)
 
-    return result
+    id = int(arg['id']) if 'id' in arg else 0
+    term = Term().get_by_hard_id(arg['hard_id'])
+
+    if not term and 'edit' in action:
+        abort(404)
+
+    if term and term.id != id:
+        answer['message'] = u'Терминал с таким ID уже есть в системе'
+    else:
+        form = TermAddForm.from_json(arg)
+
+        if form.validate():
+            if not term and 'add' in action:
+                term = Term()
+            form.populate_obj(term)
+
+            result = False
+            if 'add' in action:
+                result = term.term_add(g.firm_info['id'])
+            elif 'edit' in action:
+                result = term.save()
+
+            if result:
+                answer['error'] = 'no'
+                answer['message'] = u'Данные сохранены'
+        else:
+            answer[
+                'message'] = u'Форма заполнена неверно, проверьте формат полей'
+
+    return jsonify(answer)
 
 
 @mod.route('/terminal/<int:term_id>/locking', methods=['POST'])

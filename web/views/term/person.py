@@ -234,7 +234,7 @@ def person_lock(person_id):
 @mod.route('/person/<int:person_id>/remove', methods=['POST'])
 @login_required
 def person_remove(person_id):
-    """Блокировка сотрудника"""
+    """Удаление сотрудника"""
 
     answer = dict(error='yes', message='', status=False)
     arg = json.loads(request.stream.read())

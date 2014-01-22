@@ -23,23 +23,6 @@ def time_check(form, field):
         raise ValidationError('Bad time format')
 
 
-class Unique(object):
-
-    def __init__(self, model, field, message=None):
-        self.model = model
-        self.field = field
-        if not message:
-            message = u'Already exists'
-        self.message = message
-
-    def __call__(self, form, field):
-        result = self.model.query.filter_by(hard_id=field.data).first()
-        if result and result.id != form.data['id']:
-            if self.message is None:
-                self.message = field.gettext('Already exists.')
-            raise ValidationError(self.message)
-
-
 class TokenSecureForm(Form):
 
     def generate_csrf_token(self, csrf_context):
