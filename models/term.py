@@ -107,9 +107,9 @@ class Term(db.Model):
             status=self.STATUS_VALID).first()
 
     @cache.cached(timeout=600, key_prefix='term_by_id')
-    def get_by_id(self, id):
+    def get_by_id(self, term_id):
         return self.query.filter_by(
-            id=id).first()
+            hard_id=term_id).first()
 
     def get_info_by_id(self, id):
         date_pattern = '%H:%M %d.%m.%y'
