@@ -31,8 +31,7 @@ angular.module('term').controller('TerminalController',
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
-      }
-      else {
+      } else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal');
@@ -48,8 +47,7 @@ angular.module('term').controller('TerminalController',
       if (data.error === 'no') {
         if ($scope.term.status === 0) {
           $scope.term.status = 1;
-        }
-        else {
+        } else {
           $scope.term.status = 0;
         }
         contentService.setModal(data.message, 'success');
@@ -86,8 +84,7 @@ angular.module('term').controller('TerminalController',
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
-      }
-      else {
+      } else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal/' + term_event.term_id);
@@ -104,8 +101,7 @@ angular.module('term').controller('TerminalController',
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
-      }
-      else {
+      } else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal/' + term_event.term_id);

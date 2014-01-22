@@ -231,6 +231,38 @@ def person_lock(person_id):
     return jsonify(answer)
 
 
+@mod.route('/person/<int:person_id>/remove', methods=['POST'])
+@login_required
+def person_remove(person_id):
+    """Блокировка сотрудника"""
+
+    answer = dict(error='yes', message='', status=False)
+    arg = json.loads(request.stream.read())
+
+    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+        abort(403)
+
+    person = Person.query.get(person_id)
+    if not person:
+        abort(404)
+
+    report = None
+    if person.payment_id:
+        report = Report.query.filter_by(payment_id=person.payment_id).first()
+
+    if report:
+        answer['error'] = 'yes'
+        answer[
+            'message'] = u'Невозможно удалить. По карте была совершена операция.'
+    else:
+        person.delete()
+        answer['error'] = 'no'
+        answer['message'] = u'Операция успешно выполнена'
+
+    return jsonify(answer)
+
+
+
 @mod.route('/person/<int:person_id>/event/<int:person_event_id>', methods=['GET'])
 @login_required
 def person_event_info(person_id, person_event_id):

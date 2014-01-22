@@ -12,8 +12,7 @@ angular.module('term').controller('UserController',
 
         angular.element('.f-login input[name=email]').addClass('error');
         angular.element('.f-login input[name=password]').addClass('error');
-      }
-      else {
+      } else {
         $(location).attr('href','/');
       }
     });
@@ -39,8 +38,7 @@ angular.module('term').controller('UserController',
       if (data.error === 'yes') {
         angular.element('#recPassForm input[name=email]').addClass('error');
         contentService.setModal(data.content, 'error');
-      }
-      else if (data.error === 'no'){
+      } else if (data.error === 'no'){
         angular.element('#recPassForm').slideUp(400, function() {
           contentService.setModal(data.content, 'none');
         });
@@ -60,8 +58,7 @@ angular.module('term').controller('UserController',
       if (data.error === 'yes') {
         angular.element('#changePassForm input[name=password]').addClass('error');
         angular.element('#changePassForm input[name=confirmPassword]').addClass('error');
-      }
-      else if (data.error === 'no'){
+      } else if (data.error === 'no'){
         $(location).attr('href','/wallet/');
       }
     });

@@ -41,8 +41,7 @@ angular.module('term').controller('PersonController',
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
-      }
-      else {
+      } else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/person/' + data.person_id);
@@ -72,8 +71,7 @@ angular.module('term').controller('PersonController',
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
-      }
-      else {
+      } else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href', '/person/' + person.id);
@@ -82,21 +80,36 @@ angular.module('term').controller('PersonController',
     });  
   };
 
-  //Блокируем пользователя
+  //Блокируем или разблокируем пользователя
   $scope.lockPerson = function(person) {
     person.csrf_token = $scope.token;
     $http.post('/person/' + person.id + '/lock', person).success(function(data) {
       if (data.error === 'no') {
         if ($scope.person.status === 0) {
           $scope.person.status = 1;
-        }
-        else {
+        } else {
           $scope.person.status = 0;
         }
         contentService.setModal(data.message, 'success');
       }
     }); 
   };
+
+  //Удаляем пользователя
+  $scope.removePerson = function(person) {
+    person.csrf_token = $scope.token;
+    $http.post('/person/' + person.id + '/remove', person).success(function(data) {
+      if (data.error === 'no') {
+        contentService.setModal(data.message, 'success');
+        setTimeout(function(){
+          $(location).attr('href', '/person');
+        });
+      } else {
+        contentService.setModal(data.message, 'error');
+      }
+    }); 
+  };
+
 
   //Привязываем новое событие к человеку или редактируем уже привязанное
   $scope.saveEventPerson = function(person_event, valid){
@@ -108,8 +121,7 @@ angular.module('term').controller('PersonController',
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
-      }
-      else {
+      } else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/person/' + person_event.person_id);
@@ -131,8 +143,7 @@ angular.module('term').controller('PersonController',
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
-      }
-      else {
+      } else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/person/' + person_event.person_id);
@@ -150,8 +161,7 @@ angular.module('term').controller('PersonController',
     $http.post(url, person_wallet).success(function(data) {
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
-      }
-      else {
+      } else {
         contentService.setModal(data.message, 'success');
         $scope.getPersonTypeBlock($scope.person);
       }

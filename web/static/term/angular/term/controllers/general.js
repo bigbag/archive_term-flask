@@ -16,8 +16,7 @@ angular.module('term').controller('GeneralController',
     if (!action) return false;
     if (!e) {
       var content_div = angular.element('.section-container').find('.content');
-    }
-    else {
+    } else {
       var content_div = angular.element(e.currentTarget).next('.content');
     }
 
@@ -34,8 +33,7 @@ angular.module('term').controller('GeneralController',
     if(typeof(search.page)==='undefined') search.page = 1;
     if(typeof(search.action)!=='undefined'){
       var url = window.location.pathname + '/' + search.action + '/';
-    }
-    else {
+    } else {
       var url = window.location.pathname
     }
     search.csrf_token = $scope.token;
