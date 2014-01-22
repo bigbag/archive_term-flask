@@ -67,7 +67,7 @@ class ReportParser(Command):
                     if not event:
                         continue
 
-                    term = Term().get_by_id(term_id)
+                    term = Term().get_by_hard_id(term_id)
                     if not term:
                         term = Term()
                         term.hard_id = term_id

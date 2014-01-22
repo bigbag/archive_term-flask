@@ -106,10 +106,15 @@ class Term(db.Model):
             hard_id=term_id,
             status=self.STATUS_VALID).first()
 
-    @cache.cached(timeout=600, key_prefix='term_by_id')
-    def get_by_id(self, term_id):
+    @cache.cached(timeout=60, key_prefix='term_by_hard_id')
+    def get_by_hard_id(self, term_id):
         return self.query.filter_by(
             hard_id=term_id).first()
+
+    @cache.cached(timeout=60, key_prefix='term_by_id')
+    def get_by_id(self, id):
+        return self.query.filter_by(
+            id=id).first()
 
     def get_info_by_id(self, id):
         date_pattern = '%H:%M %d.%m.%y'
