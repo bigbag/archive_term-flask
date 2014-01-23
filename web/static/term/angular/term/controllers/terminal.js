@@ -9,9 +9,8 @@ angular.module('term').controller('TerminalController',
   };
 
   //Тригер на изменение снятие ошибки при изменение полей, в форме добавления терминала
-  $scope.$watch('term.hard_id + term.name', function(term) {
+  $scope.$watch('term.name', function(term) {
     if ($scope.term) {
-      angular.element('input[name=hard_id]').removeClass('error');
       angular.element('input[name=name]').removeClass('error');
     }
   });
@@ -20,7 +19,6 @@ angular.module('term').controller('TerminalController',
   //Добавляем новый или редактируем старый терминал
   $scope.saveTerminal = function(term, valid) {
     if (!valid) {
-      angular.element('#add_term input[name=hard_id]').addClass('error');
       angular.element('#add_term input[name=name]').addClass('error');
       contentService.scrollPage('.m-page-name');
       return false;
