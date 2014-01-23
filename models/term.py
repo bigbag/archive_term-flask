@@ -33,7 +33,7 @@ class Term(db.Model):
     SEANS_ALARM = 86400
 
     id = db.Column(db.Integer, primary_key=True)
-    hard_id = db.Column(db.Integer, nullable=False, unique=True)
+    hard_id = db.Column(db.Integer, index=True)
     type = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(300), nullable=False)
     tz = db.Column(db.String(300), nullable=False)
@@ -54,6 +54,7 @@ class Term(db.Model):
 
     def __init__(self):
         self.type = self.TYPE_VENDING
+        self.hard_id = 0
         self.upload_start = "00:01"
         self.upload_stop = "23:59"
         self.upload_period = 5

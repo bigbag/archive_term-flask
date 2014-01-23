@@ -111,9 +111,6 @@ def terminal_save(term_id, action):
     id = int(arg['id']) if 'id' in arg else 0
     term = Term().get_by_hard_id(arg['hard_id'])
 
-    if not term and 'edit' in action:
-        abort(404)
-
     if term and term.id != id:
         answer['message'] = u'Терминал с таким ID уже есть в системе'
     else:
