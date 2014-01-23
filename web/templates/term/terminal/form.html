@@ -1,20 +1,12 @@
 <form class="custom" id="add_term" name="termForm" ng-controller="TerminalController">
-    <div class="g-clear-b g-clearfix" ng-init="term.id={{term.id}}">
+    <span  ng-init="term.id={{term.id}}"></span>
+    {% if not term.id %}
+        <span ng-init="term.action='add'"></span>
+    {% else %}
+        <span ng-init="term.action='edit'"></span>
+    {% endif %}
+    <div class="g-clear-b g-clearfix">
         <div class="content-row left g-clearfix" 
-            ng-init="term.hard_id={{term.hard_id}}">
-            <label for="add-hard_id">ID (только числа)</label>
-            <input id="add-hard_id" 
-                type="number"
-                name="hard_id"
-                min="1"
-                ng-model="term.hard_id">
-        </div>
-        {% if not term.id %}
-            <span ng-init="term.action='add'"></span>
-        {% else %}
-            <span ng-init="term.action='edit'"></span>
-        {% endif %}
-        <div class="content-row g-clearfix" 
             ng-init="term.name='{{term.name|replace('None', '')}}'">
             <label for="add-name">Название*</label>
             <input id="add-name" 
@@ -23,6 +15,15 @@
                 ng-maxlength="300"
                 ng-model="term.name"
                 required>
+        </div>
+        <div class="content-row g-clearfix" 
+            ng-init="term.hard_id={{term.hard_id}}">
+            <label for="add-hard_id">SN (только числа)</label>
+            <input id="add-hard_id" 
+                type="number"
+                name="hard_id"
+                min="0"
+                ng-model="term.hard_id">
         </div>
     </div>
 

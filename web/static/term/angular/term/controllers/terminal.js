@@ -18,6 +18,7 @@ angular.module('term').controller('TerminalController',
 
   //Добавляем новый или редактируем старый терминал
   $scope.saveTerminal = function(term, valid) {
+    console.log(valid);
     if (!valid) {
       angular.element('#add_term input[name=name]').addClass('error');
       contentService.scrollPage('.m-page-name');

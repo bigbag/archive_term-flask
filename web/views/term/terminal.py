@@ -108,17 +108,20 @@ def terminal_save(term_id, action):
     if action not in action_list:
         abort(400)
 
-    id = int(arg['id']) if 'id' in arg else 0
-    term = Term().get_by_hard_id(arg['hard_id'])
+    id = int(arg['id']) if 'id' in arg else None
 
-    if term and term.id != id:
-        answer['message'] = u'Терминал с таким ID уже есть в системе'
+    if 'hard_id' in arg and arg['hard_id']:
+        term = Term().get_by_hard_id(arg['hard_id'])
+    elif 'edit' in action:
+        term = Term().get_by_id(id)
+    else:
+        term = Term()
+
+    if term and term.id and term.id != id:
+        answer['message'] = u'Терминал с таким SN уже есть в системе'
     else:
         form = TermAddForm.from_json(arg)
-
         if form.validate():
-            if not term and 'add' in action:
-                term = Term()
             form.populate_obj(term)
 
             result = False
