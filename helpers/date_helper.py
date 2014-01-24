@@ -6,6 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import pytz
+import time
 import calendar
 from datetime import datetime, timedelta
 from pytz import timezone
@@ -84,3 +85,11 @@ def get_date_interval(search_date, period='day'):
             calendar.mdays[search_date.month])
 
     return (start, stop)
+
+
+def validate_date(d, format):
+    try:
+        time.strptime(d, format)
+        return True
+    except ValueError:
+        return False
