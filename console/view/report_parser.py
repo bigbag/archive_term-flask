@@ -197,10 +197,13 @@ class ReportParser(Command):
             reccurent.save()
 
     def run(self):
-        pool = ThreadPool(4)
-        report_files = self.get_files()
-        results = pool.map(self.report_parser, report_files)
-        pool.close()
-        pool.join()
+        try:
+            pool = ThreadPool(4)
+            report_files = self.get_files()
+            results = pool.map(self.report_parser, report_files)
+            pool.close()
+            pool.join()
 
-        self.set_reccurent_on()
+            self.set_reccurent_on()
+        except Exception as e:
+            app.logger.error(e)
