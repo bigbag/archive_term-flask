@@ -198,11 +198,12 @@ class ReportParser(Command):
 
     def run(self):
         try:
-            pool = ThreadPool(4)
             report_files = self.get_files()
-            results = pool.map(self.report_parser, report_files)
-            pool.close()
-            pool.join()
+            if len(report_files) > 0:
+                pool = ThreadPool(4)
+                results = pool.map(self.report_parser, report_files)
+                pool.close()
+                pool.join()
 
             self.set_reccurent_on()
         except Exception as e:
