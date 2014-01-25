@@ -13,6 +13,7 @@
                 type="email" 
                 placeholder="Email"
                 ng-model="recovery.email"
+                ng-keypress="($event.keyCode == 13)?forgot(recovery, recoveryForm.$valid):''"
                 autocomplete="on"
                 maxlength="300"
                 required >
