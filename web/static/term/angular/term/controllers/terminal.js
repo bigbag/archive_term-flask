@@ -9,9 +9,8 @@ angular.module('term').controller('TerminalController',
   };
 
   //Тригер на изменение снятие ошибки при изменение полей, в форме добавления терминала
-  $scope.$watch('term.id + term.name', function(term) {
+  $scope.$watch('term.name', function(term) {
     if ($scope.term) {
-      angular.element('input[name=id]').removeClass('error');
       angular.element('input[name=name]').removeClass('error');
     }
   });
@@ -19,20 +18,22 @@ angular.module('term').controller('TerminalController',
 
   //Добавляем новый или редактируем старый терминал
   $scope.saveTerminal = function(term, valid) {
+    console.log(valid);
     if (!valid) {
-      angular.element('#add_term input[name=id]').addClass('error');
       angular.element('#add_term input[name=name]').addClass('error');
       contentService.scrollPage('.m-page-name');
       return false;
     };
+
+    if (!term.id) term.id = 0;
+
     var url = '/terminal/' + term.id + '/' + term.action;
     term.csrf_token = $scope.token;
     $http.post(url, term).success(function(data) {
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
-      }
-      else {
+      } else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal');
@@ -48,8 +49,7 @@ angular.module('term').controller('TerminalController',
       if (data.error === 'no') {
         if ($scope.term.status === 0) {
           $scope.term.status = 1;
-        }
-        else {
+        } else {
           $scope.term.status = 0;
         }
         contentService.setModal(data.message, 'success');
@@ -59,12 +59,14 @@ angular.module('term').controller('TerminalController',
 
   $scope.removeTerminal = function(term) {
     term.csrf_token = $scope.token;
-    $http.post('/terminal' + term.id + '/remove', term).success(function(data) {
+    $http.post('/terminal/' + term.id + '/remove', term).success(function(data) {
       if (data.error === 'no') {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal');
         }, 2000);
+      } else {
+        contentService.setModal(data.message, 'error');
       }
     });  
   }
@@ -86,8 +88,7 @@ angular.module('term').controller('TerminalController',
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
-      }
-      else {
+      } else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal/' + term_event.term_id);
@@ -104,8 +105,7 @@ angular.module('term').controller('TerminalController',
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
-      }
-      else {
+      } else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
           $(location).attr('href','/terminal/' + term_event.term_id);

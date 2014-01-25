@@ -10,11 +10,18 @@ import csv
 import uuid
 import urllib
 from flask.ext.script import Command
+
+from web import db
+
 from models.person import Person
 from models.payment_wallet import PaymentWallet
+from models.payment_lost import PaymentLost
 from models.payment_history import PaymentHistory
 from models.report import Report
 from models.person_event import PersonEvent
+from models.term import Term
+from models.term_event import TermEvent
+from models.firm_term import FirmTerm
 from models.spot import Spot
 from models.spot_dis import SpotDis
 
@@ -182,7 +189,44 @@ class TestCommand(Command):
                 wallet.save()
 
     def run(self):
-        sms = SmsruApi(SmsruConfig)
-        to = '79627056382'
-        text = 'Test'
-        print sms.sms_send(to, text)
+        terms = Term.query.all()
+        for term in terms:
+            term_events = TermEvent.query.filter_by(term_id=term.hard_id).all()
+            for row in term_events:
+                row.term_id = term.id
+                db.session.add(row)
+
+            firm_terms = FirmTerm.query.filter_by(term_id=term.hard_id).all()
+            for row in firm_terms:
+                row.term_id = term.id
+                db.session.add(row)
+
+            payment_history = PaymentHistory.query.filter_by(
+                term_id=term.hard_id).all()
+            for row in payment_history:
+                row.term_id = term.id
+                db.session.add(row)
+
+            payment_lost = PaymentLost.query.filter_by(
+                term_id=term.hard_id).all()
+            for row in payment_lost:
+                row.term_id = term.id
+                db.session.add(row)
+
+            person_event = PersonEvent.query.filter_by(
+                term_id=term.hard_id).all()
+            for row in person_event:
+                row.term_id = term.id
+                db.session.add(row)
+
+            reports = Report.query.filter_by(
+                term_id=term.hard_id).all()
+            for row in reports:
+                row.term_id = term.id
+                db.session.add(row)
+
+        db.session.commit()
+        # sms = SmsruApi(SmsruConfig)
+        # to = '79627056382'
+        # text = 'Test'
+        # print sms.sms_send(to, text)

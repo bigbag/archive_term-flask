@@ -16,11 +16,11 @@ from helpers import hash_helper, date_helper
 
 
 def time_check(form, field):
-    try:
-        time.strptime(field.data, '%H:%M')
-        return True
-    except ValueError:
+    result = date_helper.validate_date(field.data, '%H:%M')
+    if not result:
         raise ValidationError('Bad time format')
+    else:
+        return True
 
 
 class TokenSecureForm(Form):

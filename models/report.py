@@ -85,7 +85,7 @@ class Report(db.Model):
                 continue
 
         if data.get('summ'):
-            self.amount = data.get('summ')
+            self.amount = int(data.get('summ')) * int(self.term.factor)
 
         if data.get('type'):
             self.type = data.get('type')
@@ -153,7 +153,7 @@ class Report(db.Model):
                 event=events[
                     report.event_id] if events[
                         report.event_id] else 'Empty',
-                amount=int(report.amount / 100),
+                amount=float(report.amount) / 100,
                 name=report.name,
             )
             result.append(data)
@@ -266,7 +266,7 @@ class Report(db.Model):
 
             data = dict(
                 creation_date=creation_date,
-                amount=int(report[1] / 100),
+                amount=float(report[1]) / 100,
                 count=int(report[2])
             )
 
@@ -280,7 +280,7 @@ class Report(db.Model):
                 term = Term().get_by_id(row[0])
                 detaled_data = dict(
                     term=term.name if term else 'Empty',
-                    amount=int(row[1] / 100),
+                    amount=float(row[1]) / 100,
                     count=int(row[2])
                 )
                 data['detaled'].append(detaled_data)

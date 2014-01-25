@@ -33,6 +33,7 @@ class Term(db.Model):
     SEANS_ALARM = 86400
 
     id = db.Column(db.Integer, primary_key=True)
+    hard_id = db.Column(db.Integer)
     type = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(300), nullable=False)
     tz = db.Column(db.String(300), nullable=False)
@@ -48,6 +49,7 @@ class Term(db.Model):
     download_start = db.Column(db.String(256))
     download_stop = db.Column(db.String(256))
     download_period = db.Column(db.Integer, nullable=False)
+    factor = db.Column(db.Integer)
     version = db.Column(db.String(128))
 
     def __init__(self):
@@ -61,6 +63,7 @@ class Term(db.Model):
         self.tz = app.config['TZ']
         self.blacklist = self.BLACKLIST_OFF
         self.settings_id = 1
+        self.factor = 1
         self.status = self.STATUS_VALID
 
     def __repr__(self):
@@ -98,14 +101,20 @@ class Term(db.Model):
             {'id': self.BLACKLIST_OFF, 'name': u"Корпоративный"}
         ]
 
-    def get_valid_term(self, term_id):
+    def get_valid_term(self, hard_id):
         return self.query.filter_by(
-            id=term_id,
+            hard_id=hard_id,
             status=self.STATUS_VALID).first()
 
-    @cache.cached(timeout=600, key_prefix='term_by_id')
+    #@cache.cached(timeout=60, key_prefix='term_by_hard_id')
+    def get_by_hard_id(self, hard_id):
+        return self.query.filter_by(
+            hard_id=int(hard_id)).first()
+
+    #@cache.cached(timeout=60, key_prefix='term_by_id')
     def get_by_id(self, id):
-        return self.query.get(id)
+        return self.query.filter_by(
+            id=int(id)).first()
 
     def get_info_by_id(self, id):
         date_pattern = '%H:%M %d.%m.%y'
@@ -172,7 +181,8 @@ class Term(db.Model):
                 seans_date = date_helper.from_utc(term.config_date, tz)
                 seans_date = seans_date.strftime(date_pattern)
             data = dict(
-                term_id=term.id,
+                id=term.id,
+                hard_id=term.hard_id,
                 name=term.name,
                 firm=firm_general.firm.name,
                 status=int(term.status == self.STATUS_VALID),

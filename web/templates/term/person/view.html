@@ -7,6 +7,10 @@
         {{person.name}}
     </div>
     <div class="right">
+        <a ng-click="removePerson(person)" 
+            class="f-spot-button bg-red small">
+            Удалить
+        </a>
         <a ng-show="person.status"
             ng-click="lockPerson(person)" 
             class="f-spot-button bg-red small">

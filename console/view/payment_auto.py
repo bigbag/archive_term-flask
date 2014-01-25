@@ -30,6 +30,7 @@ class PaymentAuto(Command):
         un = UnitellerApi(UnitellerConfig)
 
         for reccurent in reccurents:
+            print reccurent
             amount = 0
             reccurent.count = reccurent.count + 1
 

@@ -11,6 +11,7 @@ from web.form.term import TermAddForm
 from web.form.event import TermEventAddForm
 
 from models.term import Term
+from models.report import Report
 from models.event import Event
 from models.firm_term import FirmTerm
 from models.term_event import TermEvent
@@ -95,66 +96,48 @@ def terminal_info(term_id):
     )
 
 
-def terminal_add(arg):
-    """Добавляем терминал"""
-    answer = dict(error='yes', message='')
-
-    term = Term.query.get(int(arg['id']))
-
-    if term:
-        answer['message'] = u'Терминал с таким ID уже есть в системе'
-    else:
-        form = TermAddForm.from_json(arg)
-
-        if form.validate():
-            term = Term()
-            form.populate_obj(term)
-
-            if term.term_add(g.firm_info['id']):
-                answer['error'] = 'no'
-                answer['message'] = u'Терминал успешно добавлен'
-        else:
-            answer['message'] = u"""Форма заполнена неверно,
-                проверьте формат полей"""
-    return jsonify(answer)
-
-
-def terminal_edit(arg, term_id):
-    """Редактируем терминал"""
-    answer = dict(error='yes', message='')
-
-    term = Term.query.get(int(term_id))
-    if not term:
-        abort(404)
-
-    form = TermAddForm.from_json(arg)
-
-    if form.validate():
-        form.populate_obj(term)
-
-        if term.save():
-            answer['error'] = 'no'
-            answer['message'] = u'Данные сохранены'
-    else:
-        answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
-    return jsonify(answer)
-
-
 @mod.route('/terminal/<int:term_id>/<action>', methods=['POST'])
 @login_required
 @json_headers
 def terminal_save(term_id, action):
     """Добавляем или редактируем терминал"""
+    answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
+    action_list = ('add', 'edit')
 
-    if 'add' in action:
-        result = terminal_add(arg)
-    elif 'edit' in action:
-        result = terminal_edit(arg, term_id)
-    else:
+    if action not in action_list:
         abort(400)
 
-    return result
+    id = int(arg['id']) if 'id' in arg else None
+
+    if 'hard_id' in arg and arg['hard_id']:
+        term = Term().get_by_hard_id(arg['hard_id'])
+    elif 'edit' in action:
+        term = Term().get_by_id(id)
+    else:
+        term = Term()
+
+    if term and term.id and term.id != id:
+        answer['message'] = u'Терминал с таким SN уже есть в системе'
+    else:
+        form = TermAddForm.from_json(arg)
+        if form.validate():
+            form.populate_obj(term)
+
+            result = False
+            if 'add' in action:
+                result = term.term_add(g.firm_info['id'])
+            elif 'edit' in action:
+                result = term.save()
+
+            if result:
+                answer['error'] = 'no'
+                answer['message'] = u'Данные сохранены'
+        else:
+            answer[
+                'message'] = u'Форма заполнена неверно, проверьте формат полей'
+
+    return jsonify(answer)
 
 
 @mod.route('/terminal/<int:term_id>/locking', methods=['POST'])
@@ -190,20 +173,26 @@ def terminal_locking(term_id):
 @login_required
 @json_headers
 def terminal_remove(term_id):
-    """Удаление терминал"""
+    """Удаление терминала"""
     answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
 
     if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
         abort(403)
 
-    term = Term.query.get(term_id)
+    term = Term().get_info_by_id(term_id)
     if not term:
         abort(404)
 
-    if term.term_remove():
-        answer['error'] = 'no'
-        answer['message'] = u'Операция успешно выполнена'
+    report = Report.query.filter_by(term_id=term.id).first()
+
+    if not report:
+        if term.term_remove():
+            answer['error'] = 'no'
+            answer['message'] = u'Операция успешно выполнена'
+    else:
+        answer['message'] = u"""Невозможно удалить.
+            По терминалу была совершена операция."""
 
     return jsonify(answer)
 

@@ -41,17 +41,23 @@ class Person(db.Model):
         self.creation_date = date_helper.get_curent_date()
         self.name = 'Anonim'
 
-    @cache.cached(timeout=5, key_prefix='select_term_list')
+    @cache.cached(timeout=5, key_prefix='select_person_list')
     def select_person_list(self, firm_id, **kwargs):
         order = kwargs[
             'order'] if 'order' in kwargs else 'name asc'
         limit = kwargs['limit'] if 'limit' in kwargs else 10
         page = kwargs['page'] if 'page' in kwargs else 1
         status = kwargs['status'] if 'status' in kwargs else 1
+        person_name = kwargs[
+            'person_name'] if 'person_name' in kwargs else False
 
         query = Person.query.filter(Person.firm_id == firm_id)
         query = query.filter(Person.status == status)
         query = query.order_by(order)
+
+        if person_name:
+            query = query.filter(Person.name.like('%' + person_name + '%'))
+
         persons = query.paginate(page, limit, False).items
 
         result = []
