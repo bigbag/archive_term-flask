@@ -46,10 +46,15 @@ angular.module('term').controller('GeneralController',
   };
 
   //Тригер на запрос табличных данных по параметрам
-  $scope.$watch('pagination.cur + search.period  + search.status', function() {
+  $scope.$watch('pagination.cur + search.period  + search.status + search.person_name', function() {
     if (!$scope.search) return false;
     var search = $scope.search;
     search.page = $scope.pagination.cur;
+
+    if (!angular.isUndefined($scope.search.person_name)){
+      $scope.search.custom_filer = 1;
+    }
+
     if (search.action_type === 'get_grid_content') {
       $scope.getGridContent(search);
     }
