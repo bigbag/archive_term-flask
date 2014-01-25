@@ -116,44 +116,44 @@ def login_form():
 @mod.route('/login', methods=['POST'])
 def login():
     """Логин"""
-    answer = dict(error='yes', message='')
-    user = request.get_json()
+    answer = dict(content='', error='yes')
+    arg = json.loads(request.stream.read())
 
-    if not 'email' in user or not 'password' in user:
+    if not 'email' in arg or not 'password' in arg:
         abort(400)
 
     firm_info = g.firm_info
     if not firm_info:
         abort(403)
 
-    term_user = TermUser().get_by_email(user['email'])
+    term_user = TermUser().get_by_email(arg['email'])
 
     if not term_user:
-        answer['message'] = u"""У нас на сайте нет пользователя с такой парой "логин - пароль".
+        answer['content'] = u"""На сайте нет пользователя с такой парой "логин - пароль".
                             Пожалуйста, проверьте введенные данные или
                             воспользуйтесь функцией восстановления пароля."""
-        return set_json_response(answer)
+        return jsonify(answer)
 
     if term_user.status == TermUser.STATUS_NOACTIVE:
-        answer['message'] = u'Пользователь не активирован'
-        return set_json_response(answer)
+        answer['content'] = u'Пользователь не активирован'
+        return jsonify(answer)
     elif term_user.status == TermUser.STATUS_BANNED:
-        answer['message'] = u'Пользователь заблокирован'
-        return set_json_response(answer)
+        answer['content'] = u'Пользователь заблокирован'
+        return jsonify(answer)
 
-    if not hash_helper.check_password(term_user.password, user['password']):
-        answer['message'] = u'Пароль не верен'
-        return set_json_response(answer)
+    if not hash_helper.check_password(term_user.password, arg['password']):
+        answer['content'] = u'Пароль не верен'
+        return jsonify(answer)
 
     user_firm = TermUserFirm.query.filter_by(
         user_id=term_user.id, firm_id=firm_info['id']).first()
     if not user_firm:
-        answer['message'] = u'У вас нет доступа к данной фирме'
-        return set_json_response(answer)
+        answer['content'] = u'У вас нет доступа к данной фирме'
+        return jsonify(answer)
 
     login_user(term_user, True)
     answer['error'] = 'no'
-    return set_json_response(answer)
+    return jsonify(answer)
 
 
 @mod.route('/logout')
@@ -170,6 +170,34 @@ def forgot():
     """Страница востановления пароля"""
     return render_template(
         'term/forgot.html')
+
+
+@mod.route('/forgot', methods=['POST'])
+def forgot_request():
+    """Обработка запроса на востановление пароля"""
+
+    answer = dict(content='', error='yes')
+    arg = json.loads(request.stream.read())
+
+    term_user = TermUser().get_by_email(arg['email'])
+
+    if not term_user:
+        answer['content'] = u"""На сайте нет пользователя с таким логином".
+                            Пожалуйста, проверьте введенные данные."""
+        return jsonify(answer)
+
+    if term_user.status == TermUser.STATUS_NOACTIVE:
+        answer['content'] = u'Пользователь не активирован'
+        return jsonify(answer)
+    elif term_user.status == TermUser.STATUS_BANNED:
+        answer['content'] = u'Пользователь заблокирован'
+        return jsonify(answer)
+
+    answer['content'] = u"""По указанному вами адресу отправлено письмо
+                        с информацией о востановлении пароля."""
+    answer['error'] = 'no'
+
+    return jsonify(answer)
 
 
 @mod.route('/report/', methods=['GET'])

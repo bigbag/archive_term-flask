@@ -8,7 +8,7 @@ angular.module('term').controller('UserController',
     if (!valid) return false;
     $http.post('/login', user).success(function(data) {
       if (data.error === 'yes') {
-        contentService.setModal(data.message, 'error');
+        contentService.setModal(data.content, 'error');
 
         angular.element('.f-login input[name=email]').addClass('error');
         angular.element('.f-login input[name=password]').addClass('error');
@@ -28,24 +28,17 @@ angular.module('term').controller('UserController',
   });
 
   // Восстановление пароля
-  $scope.recovery = function(recovery, valid){
+  $scope.forgot = function(recovery, valid){
     if (!valid) return false;
 
-    var user = $scope.user;
-    user.email = recovery.email;
-
-    $http.post('/service/recoveryMail', user).success(function(data) {
+    $http.post('/forgot', recovery).success(function(data) {
       if (data.error === 'yes') {
-        angular.element('#recPassForm input[name=email]').addClass('error');
         contentService.setModal(data.content, 'error');
-      } else if (data.error === 'no'){
-        angular.element('#recPassForm').slideUp(400, function() {
-          contentService.setModal(data.content, 'none');
-        });
-
-        $scope.user.email="";
-        $scope.recovery.email="";
-        angular.element('#recPassForm input[name=email]').removeClass('error');
+      } else {
+        contentService.setModal(data.content, 'none');
+        setTimeout(function(){
+          $(location).attr('href','/');
+        }, 2000);
       }
     });
   };

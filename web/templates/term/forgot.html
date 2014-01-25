@@ -2,20 +2,21 @@
 {% block header %}
 {% endblock %}
 {% block body %}
-<div class="row m-content block-center" ng-controller="UserController">
-    <div class="f-login">
-        <form class="f-login_box" name="recoveryForm">
+<div class="row m-content block-center" ng-controller="UserController"  >
+    <div class="f-login" ng-init="recovery.token='{{g.token}}'">
+        <form id="recPassForm" class="f-login_box" name="recoveryForm">
             <hgroup>
                 <h5>Восстановление пароля</h5>
             </hgroup>
             <input 
+                name="email"
                 type="email" 
                 placeholder="Email"
                 ng-model="recovery.email"
-                autocomplete="off"
+                autocomplete="on"
                 maxlength="300"
                 required >
-            <a href="javascript:;" class="f-spot-button" ng-click="recovery(recovery, recoveryForm.$valid)">
+            <a href="javascript:;" class="f-spot-button" ng-click="forgot(recovery, recoveryForm.$valid)">
                 Отправить
             </a>
             <a class="right f-link f-link__pd" href="/">Отмена</a>
