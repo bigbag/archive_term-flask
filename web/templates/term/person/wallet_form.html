@@ -5,24 +5,42 @@
 <div class="m-block" ng-controller="PersonController">
     <span ng-init="person_wallet.type=0;person_wallet.person_id=person.id"></span>
     <form class="custom" name="walletForm">
+        <div class="g-clear-b g-clearfix">
+            <div class="content-row g-clearfix">
+                <div class="row">
+                    <div class="large-6 columns">
+                        <label for="add-card-code">Сумма*</label>
+                        <input id="add-wallet-amount" 
+                            name="wallet_amount"
+                            maxlength="4"
+                            minlength="3"
+                            ng-minlength="3"
+                            ng-maxlength="4"
+                            type="text"
+                            ng-model="person_wallet.amount"
+                            required>
+                    </div>
+                    <div class="large-6 columns">
+                        <label for="add-hard_id">Сбрасывать лимит</label>
+                        <select id="add-type" 
+                            ng-model="person_wallet.interval"
+                            ng-init="person_wallet.interval=0">
+                            {% for interval in corp_wallet_interval %}
+                            <option value="{{interval['id']}}">
+                                    {{interval['name']}}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="content-row g-clearfix">
-        <label for="add-card-code">Сумма*</label>
-        <input id="add-wallet-amount" 
-            name="wallet_amount"
-            maxlength="4"
-            minlength="3"
-            ng-minlength="3"
-            ng-maxlength="4"
-            type="text"
-            ng-model="person_wallet.amount"
-            required>
-    </div>
-    <div class="content-row g-clearfix">
-        <a ng-click="saveWalletPerson(person_wallet, walletForm.$valid)"
-            class="f-spot-button">Сохранить</span>
-        </a>
-    </div>
-    
+            <a ng-click="saveWalletPerson(person_wallet, walletForm.$valid)"
+                class="f-spot-button">Сохранить</span>
+            </a>
+        </div>
+    </form>    
 </div>
 <div class="content-row">
     <p>Как только баланс на кошельке станет меньше 40 рублей, человек будет заблокирован. </p>

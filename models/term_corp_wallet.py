@@ -44,7 +44,7 @@ class TermCorpWallet(db.Model):
 
     def get_interval_list(self):
         return [
-            {'id': self.INTERVAL_ONCE, 'name': u"Не сбрасывать"},
+            {'id': self.INTERVAL_ONCE, 'name': u"Нет"},
             {'id': self.INTERVAL_WEEK, 'name': u"Еженедельно"},
             {'id': self.INTERVAL_MONTH, 'name': u"Ежемесячно"}
         ]

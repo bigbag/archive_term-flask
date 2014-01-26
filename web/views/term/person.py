@@ -398,12 +398,14 @@ def person_type_block(person_id):
             person.wallet_status = Person.STATUS_BANNED
             answer['content'] = render_template(
                 'term/person/wallet_form.html',
-                corp_wallet=corp_wallet)
+                corp_wallet=corp_wallet,
+                corp_wallet_interval=TermCorpWallet().get_interval_list())
 
         else:
             answer['content'] = render_template(
                 'term/person/wallet_view.html',
-                corp_wallet=corp_wallet)
+                corp_wallet=corp_wallet,
+                corp_wallet_interval=TermCorpWallet().get_interval_list())
 
     person.save()
 
@@ -425,6 +427,8 @@ def person_wallet(person_id):
 
     person_type = arg['type'] if 'type' in arg else False
     person_amount = arg['amount'] if 'amount' in arg else False
+    interval = arg[
+        'interval'] if 'interval' in arg else TermCorpWallet.INTERVAL_ONCE
 
     person = Person.query.get(person_id)
     if not person:
@@ -433,6 +437,7 @@ def person_wallet(person_id):
     corp_wallet = TermCorpWallet()
     corp_wallet.person_id = person.id
     corp_wallet.balance = int(person_amount) * 100
+    corp_wallet.interval = interval
     corp_wallet.limit = corp_wallet.balance
     corp_wallet.status = TermCorpWallet.STATUS_ACTIVE
     person.wallet_status = Person.STATUS_VALID

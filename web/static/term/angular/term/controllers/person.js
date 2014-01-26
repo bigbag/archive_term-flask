@@ -175,6 +175,7 @@ angular.module('term').controller('PersonController',
     $http.post(url, person).success(function(data) {
       if (data.error === 'no') {
         angular.element('#person-type').html($compile(data.content)($scope));
+        // $(document).foundation();
       }
     });  
   }
