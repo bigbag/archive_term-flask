@@ -138,25 +138,35 @@ def api_admin_linking_spot():
     return response
 
 
-@mod.route('/spot/<int:hard_id>', methods=['GET'])
+@mod.route('/spot/hard_id/<int:hard_id>', methods=['GET'])
+@mod.route('/spot/ean/<barcode>', methods=['GET'])
 @xml_headers
-def api_admin_get_info(hard_id):
-    """Возвращает информацию о споте по его HID"""
+def api_admin_get_info(hard_id=False, barcode=False):
+    """Возвращает информацию о споте по его HID или EAN"""
     api_admin_access(request)
 
-    hard_id = int(hard_id)
+    if not hard_id and not barcode:
+        abort(405)
 
-    if not len(str(hard_id)) == 16:
-        abort(404)
+    if hard_id:
+        wallet = PaymentWallet.query.filter_by(
+            hard_id=hard_id).first()
 
-    wallet = PaymentWallet.query.filter_by(
-        hard_id=hard_id).first()
+        if not wallet:
+            abort(404)
 
-    if not wallet:
-        abort(404)
+        spot = Spot.query.filter_by(
+            discodes_id=wallet.discodes_id).first()
 
-    spot = Spot.query.filter_by(
-        discodes_id=wallet.discodes_id).first()
+    if barcode:
+        spot = Spot.query.filter_by(
+            barcode=barcode).first()
+
+        if not spot:
+            abort(404)
+
+        wallet = PaymentWallet.query.filter_by(
+            discodes_id=spot.discodes_id).first()
 
     info_xml = render_template(
         'api/admin/spot_info.xml',
