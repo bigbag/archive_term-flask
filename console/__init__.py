@@ -8,8 +8,9 @@ from flask.ext.cache import Cache
 cache = Cache(app)
 
 from flask.ext.mail import Mail
-
 mail = Mail(app)
+
+from console.celery import celery
 
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)

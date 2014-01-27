@@ -17,7 +17,6 @@ from console.view.check_likes import CheckLikes
 
 manager = Manager(app)
 
-manager.add_command('mail', MailSend())
 manager.add_command('report_parser', ReportParser())
 manager.add_command('payment_info', PaymentInfo())
 manager.add_command('payment_auto', PaymentAuto())

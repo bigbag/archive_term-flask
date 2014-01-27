@@ -26,9 +26,8 @@ from models.spot import Spot
 from models.spot_dis import SpotDis
 
 from console.configs.payment import UnitellerConfig
-from console.configs.smsru import SmsruConfig
 from libs.uniteller_api import UnitellerApi
-from libs.smsru_api import SmsruApi
+
 
 from helpers import hash_helper
 
@@ -189,44 +188,6 @@ class TestCommand(Command):
                 wallet.save()
 
     def run(self):
-        terms = Term.query.all()
-        for term in terms:
-            term_events = TermEvent.query.filter_by(term_id=term.hard_id).all()
-            for row in term_events:
-                row.term_id = term.id
-                db.session.add(row)
+        from console.tasks import sms
 
-            firm_terms = FirmTerm.query.filter_by(term_id=term.hard_id).all()
-            for row in firm_terms:
-                row.term_id = term.id
-                db.session.add(row)
-
-            payment_history = PaymentHistory.query.filter_by(
-                term_id=term.hard_id).all()
-            for row in payment_history:
-                row.term_id = term.id
-                db.session.add(row)
-
-            payment_lost = PaymentLost.query.filter_by(
-                term_id=term.hard_id).all()
-            for row in payment_lost:
-                row.term_id = term.id
-                db.session.add(row)
-
-            person_event = PersonEvent.query.filter_by(
-                term_id=term.hard_id).all()
-            for row in person_event:
-                row.term_id = term.id
-                db.session.add(row)
-
-            reports = Report.query.filter_by(
-                term_id=term.hard_id).all()
-            for row in reports:
-                row.term_id = term.id
-                db.session.add(row)
-
-        db.session.commit()
-        # sms = SmsruApi(SmsruConfig)
-        # to = '79627056382'
-        # text = 'Test'
-        # print sms.sms_send(to, text)
+        result = sms.send.delay('79627056382', 'Test')
