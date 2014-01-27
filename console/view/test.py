@@ -190,4 +190,4 @@ class TestCommand(Command):
     def run(self):
         from console.tasks import sms
 
-        result = sms.send.delay('79627056382', 'Test')
+        result = sms.send.delay('79627056382', u'тест')
