@@ -7,8 +7,8 @@
 """
 from web.views.term.general import *
 
-from web.form.term import TermAddForm
-from web.form.event import TermEventAddForm
+from web.form.term.term import TermAddForm
+from web.form.term.event import TermEventAddForm
 
 from models.term import Term
 from models.report import Report

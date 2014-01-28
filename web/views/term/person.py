@@ -8,8 +8,8 @@
 
 from web.views.term.general import *
 
-from web.form.person import PersonAddForm
-from web.form.event import PersonEventAddForm
+from web.form.term.person import PersonAddForm
+from web.form.term.event import PersonEventAddForm
 
 from models.person import Person
 from models.report import Report
