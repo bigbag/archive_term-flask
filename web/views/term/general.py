@@ -24,6 +24,9 @@ from models.term_user import TermUser
 from models.term_user_firm import TermUserFirm
 from models.firm import Firm
 
+from web.tasks import mail
+from web.emails.term.user_forgot_password import UserForgotPasswordMessage
+
 mod = Blueprint('term', __name__)
 
 
@@ -167,6 +170,13 @@ def logout():
 
 @mod.route('/forgot', methods=['GET'])
 def forgot():
+    """Страница запроса на восстановление пароля"""
+    return render_template(
+        'term/forgot.html')
+
+
+@mod.route('/change/<user_id>/<recovery_token>', methods=['GET'])
+def change(user_id, recovery_token):
     """Страница востановления пароля"""
     return render_template(
         'term/forgot.html')
@@ -192,6 +202,14 @@ def forgot_request():
     elif term_user.status == TermUser.STATUS_BANNED:
         answer['content'] = u'Пользователь заблокирован'
         return jsonify(answer)
+
+    recovery_url = term_user.get_change_password_url(
+        request.headers.get('Origin'))
+
+    mail.send.delay(
+        UserForgotPasswordMessage,
+        to=term_user.email,
+        recovery_url=recovery_url)
 
     answer['content'] = u"""По указанному вами адресу отправлено письмо
                         с информацией о востановлении пароля."""

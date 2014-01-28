@@ -6,8 +6,19 @@
     :license: BSD, see LICENSE for more details.
 """
 from __future__ import absolute_import
-from console import app
+from web import app
 from celery import Celery
+from celery.schedules import crontab
+
+# app.config.update(
+#     CELERYBEAT_SCHEDULE={
+#         'every-minute': {
+#             'task': 'console.tasks.sms.send',
+#             'schedule': crontab(minute='*/1'),
+#             'args': ('7', 'test1'),
+#         },
+#     }
+# )
 
 
 def make_celery(app):
@@ -26,4 +37,4 @@ def make_celery(app):
 
 celery = make_celery(app)
 
-from console.tasks import *
+from web.tasks import *

@@ -6,11 +6,13 @@ app.config.from_object('configs.general.Config')
 from libs.redis_cache import SimpleRedisCache
 cache = SimpleRedisCache(app)
 
-from flask.ext.mail import Mail
-mail = Mail(app)
+from libs.mailer import Mailer
+mailer = Mailer(app)
 
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
+
+from web.celery import celery
 
 from libs.redis_sessions import RedisSessionInterface
 app.session_interface = RedisSessionInterface()

@@ -5,8 +5,8 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from console import app
-from console.celery import celery
+from web import app
+from web.celery import celery
 
 from flask.ext.mail import Mail
 

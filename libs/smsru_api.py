@@ -101,13 +101,12 @@ class SmsruApi(object):
 
     def sms_send(self, to, text):
         """Отправляем смс"""
-
         data = dict(
             login=self.const.LOGIN,
             token=self._get_token(),
             sha512=self._get_sing(),
             to=to,
-            text=text
+            text=text.encode("utf-8")
         )
 
         if self.const.PARTNER_ID:

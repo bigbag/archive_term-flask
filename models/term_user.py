@@ -62,6 +62,12 @@ class TermUser(db.Model):
     def get_by_id(self, id):
         return self.query.get(int(id))
 
+    def get_change_password_url(self, url):
+        return "%s/change/%s/%s" % (
+            url,
+            self.id,
+            self.activkey)
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
