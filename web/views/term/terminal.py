@@ -255,13 +255,13 @@ def terminal_event_save(term_id, term_event_id):
         if term_event_old and (term_event.id != term_event_old.id):
             answer['message'] = u"""Такое событие уже есть,
                                     удалите старое или измените тип нового"""
-
-        elif term_event.term_event_save(g.firm_info['id'], term.id):
-            if term_event_id == 0:
-                term_event.save()
-
+        else:
+            term_event.save()
             answer['error'] = 'no'
             answer['message'] = u'Данные сохранены'
+        # elif term_event.term_event_save(g.firm_info['id'], term.id):
+        #     if term_event_id == 0:
+        #         term_event.save()
     else:
         answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
 
