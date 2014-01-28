@@ -175,13 +175,6 @@ def forgot():
         'term/forgot.html')
 
 
-@mod.route('/change/<user_id>/<recovery_token>', methods=['GET'])
-def change(user_id, recovery_token):
-    """Страница востановления пароля"""
-    return render_template(
-        'term/forgot.html')
-
-
 @mod.route('/forgot', methods=['POST'])
 def forgot_request():
     """Обработка запроса на востановление пароля"""
@@ -214,6 +207,58 @@ def forgot_request():
     answer['content'] = u"""По указанному вами адресу отправлено письмо
                         с информацией о востановлении пароля."""
     answer['error'] = 'no'
+
+    return jsonify(answer)
+
+
+@mod.route('/change/<int:user_id>/<recovery_token>', methods=['GET'])
+def change(user_id, recovery_token):
+    """Страница востановления пароля"""
+
+    term_user = TermUser.query.get(user_id)
+
+    if term_user.activkey != recovery_token:
+        abort(404)
+
+    return render_template(
+        'term/change_password.html',
+        user=term_user)
+
+
+@mod.route('/change', methods=['POST'])
+def change_request():
+    """Запрос на смену пароля"""
+
+    answer = dict(content='', error='yes')
+    arg = json.loads(request.stream.read())
+
+    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+        abort(403)
+
+    term_user = TermUser.query.get(arg['id'])
+
+    if term_user.activkey != arg['recovery_token']:
+        abort(404)
+
+    firm_info = g.firm_info
+    if not firm_info:
+        abort(403)
+
+    user_firm = TermUserFirm.query.filter_by(
+        user_id=term_user.id, firm_id=firm_info['id']).first()
+    if not user_firm:
+        answer['content'] = u'У вас нет доступа к данной фирме'
+        return jsonify(answer)
+
+    term_user.password = hash_helper.get_password_hash(arg['password'])
+    term_user.activkey = hash_helper.get_activkey(term_user.password)
+
+    if term_user.save():
+        answer[
+            'content'] = u'Смена пароля завершена'
+        answer['error'] = 'no'
+
+        login_user(term_user, True)
 
     return jsonify(answer)
 

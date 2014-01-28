@@ -3,7 +3,7 @@
 {% endblock %}
 {% block body %}
 <div class="row m-content block-center" ng-controller="UserController"  >
-    <div class="f-login" ng-init="recovery.token='{{g.token}}'">
+    <div class="f-login" ng-init="user.token='{{g.token}}'">
         <form id="recPassForm" class="f-login_box" name="recoveryForm">
             <hgroup>
                 <h5>Восстановление пароля</h5>
@@ -12,12 +12,12 @@
                 name="email"
                 type="email" 
                 placeholder="Email"
-                ng-model="recovery.email"
-                ng-keypress="($event.keyCode == 13)?forgot(recovery, recoveryForm.$valid):''"
+                ng-model="user.email"
+                ng-keypress="($event.keyCode == 13)?forgot(user, recoveryForm.$valid):''"
                 autocomplete="on"
                 maxlength="300"
                 required >
-            <a href="javascript:;" class="f-spot-button" ng-click="forgot(recovery, recoveryForm.$valid)">
+            <a href="javascript:;" class="f-spot-button" ng-click="forgot(user, recoveryForm.$valid)">
                 Отправить
             </a>
             <a class="right f-link f-link__pd" href="/">Отмена</a>

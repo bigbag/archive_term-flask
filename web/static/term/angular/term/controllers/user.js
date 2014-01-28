@@ -28,10 +28,10 @@ angular.module('term').controller('UserController',
   });
 
   // Восстановление пароля
-  $scope.forgot = function(recovery, valid){
+  $scope.forgot = function(user, valid){
     if (!valid) return false;
 
-    $http.post('/forgot', recovery).success(function(data) {
+    $http.post('/forgot', user).success(function(data) {
       if (data.error === 'yes') {
         contentService.setModal(data.content, 'error');
       } else {
@@ -47,12 +47,14 @@ angular.module('term').controller('UserController',
   $scope.change = function(user, valid){
     if (!valid) return false;
 
-    $http.post('/service/changepassword', user).success(function(data) {
+    $http.post('/change', user).success(function(data) {
       if (data.error === 'yes') {
-        angular.element('#changePassForm input[name=password]').addClass('error');
-        angular.element('#changePassForm input[name=confirmPassword]').addClass('error');
-      } else if (data.error === 'no'){
-        $(location).attr('href','/wallet/');
+        contentService.setModal(data.content, 'error');
+      } else {
+        contentService.setModal(data.content, 'none');
+        setTimeout(function(){
+          $(location).attr('href','/');
+        }, 2000);
       }
     });
   };
