@@ -21,6 +21,9 @@ class SocnetsApi():
         if type == Loyalty.FACEBOOK_LIKE:
             facebookApi = FacebookApi()
             netShared = facebookApi.check_like(url, token_id)
+        elif type == Loyalty.FACEBOOK_SHARE:
+            facebookApi = FacebookApi()
+            netShared = facebookApi.check_sharing(url, token_id)
         elif type == Loyalty.TWITTER_SHARE:
             twitterApi = TwitterApi()
             netShared = twitterApi.checkSharing(url, token_id)
