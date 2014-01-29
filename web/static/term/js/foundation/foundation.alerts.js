@@ -6,24 +6,22 @@
   Foundation.libs.alerts = {
     name : 'alerts',
 
-    version : '4.3.2',
+    version : '4.0.0',
 
     settings : {
-      animation: 'fadeOut',
       speed: 300, // fade out speed
       callback: function (){}
     },
 
     init : function (scope, method, options) {
       this.scope = scope || this.scope;
-      Foundation.inherit(this, 'data_options');
 
       if (typeof method === 'object') {
         $.extend(true, this.settings, method);
       }
 
-      if (typeof method !== 'string') {
-        if (!this.settings.init) { this.events(); }
+      if (typeof method != 'string') {
+        if (!this.settings.init) this.events();
 
         return this.settings.init;
       } else {
@@ -35,13 +33,10 @@
       var self = this;
 
       $(this.scope).on('click.fndtn.alerts', '[data-alert] a.close', function (e) {
-          var alertBox = $(this).closest("[data-alert]"),
-              settings = $.extend({}, self.settings, self.data_options(alertBox));
-
         e.preventDefault();
-        alertBox[settings.animation](settings.speed, function () {
+        $(this).closest("[data-alert]").fadeOut(self.speed, function () {
           $(this).remove();
-          settings.callback();
+          self.settings.callback();
         });
       });
 
@@ -50,8 +45,6 @@
 
     off : function () {
       $(this.scope).off('.fndtn.alerts');
-    },
-
-    reflow : function () {}
+    }
   };
 }(Foundation.zj, this, this.document));

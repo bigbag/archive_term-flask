@@ -7,18 +7,14 @@
         <br />
         <p class="m-hint">Кликните на строку с определенным сотрудником, чтобы восстановить учетную запись</p>
     </div>
-    
-
-            <div class="m-grid-search">
-            <input type="text"
+    <div class="m-grid-search">
+        <input type="text"
             name="person_name"
             ng-init="search.person_name=''"
-            ng-minlength="4"]
+            ng-minlength="3"]
             ng-model="search.person_name"
-            placeholder="Поиск по имени">
-            </div>
-
-    
+            placeholder="Поиск по имени (минимум 3 символа)">
+    </div>
     <table class="m-spot-table" ng-controller="PersonController">
         <thead>
             <tr>

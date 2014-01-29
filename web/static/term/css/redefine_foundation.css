@@ -360,3 +360,44 @@ form.custom .custom.checkbox:before{
 		height: 51px;
 	}
 }
+
+.row .large-3 {
+	position: relative;
+	width: 25%;
+}
+.row .large-9 {
+	position: relative;
+	width: 75%;
+}
+.section-container.auto section.active .title, .section-container.auto .section.active .title {
+	background: none;
+	z-index: 11;
+	border-bottom: 0;
+}
+.section-container, .section-container.auto{
+	border: none;
+}
+.section-container section, .section-container .section, .section-container.auto section, .section-container.auto .section{
+	border: 0;
+	position: static;
+}
+.section-container.auto section .title, .section-container.auto .section .title {
+	width: auto;
+	border-right: 0;
+	border-bottom: 0;
+	position: absolute;
+	z-index: 1;
+}
+.section-container.auto {
+	border: 0;
+	position: relative;
+}
+
+.section-container.auto section.active .content, .section-container.auto .section.active .content{
+	width: 720px;
+}
+ .lt-ie9 .section-container.auto section .title a,
+ .lt-ie9 .section-container.auto .section .title a{
+	padding: 17px 0 9px;
+	behavior:  url(/css/PIE.htc);
+}

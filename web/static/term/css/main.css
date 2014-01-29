@@ -1,3 +1,6 @@
+
+
+
 .m-header-page{
 	padding: 25px 0 27px;
 	height: 91px;
@@ -51,6 +54,7 @@
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 	padding-left: 65px;
+	margin-bottom: 2em;
 }
 .m-grid-search:after{
 	content: '';
@@ -63,13 +67,19 @@
 	top:12px;
 	left: 59px;
 }
+.lt-ie9 .m-grid-search:after{
+	background: url(../img/icons.png) no-repeat;
+}
 .m-spot-table{
 	width: 100%;
 	border: 0;
 }
-.m-spot-table td,
-.m-spot-table th{
+.m-spot-table td{
 	padding: 14px 40px 14px 0;
+}
+.m-spot-table th{
+	padding: 15px 40px 15px 0;
+	position: relative;
 }
 .m-spot-table td:first-child,
 .m-spot-table th:first-child{
@@ -79,7 +89,7 @@
 	cursor: pointer;
 }
 .m-spot-table th{
-	background: #fff;
+	background: #F8F9F9;
 	font-size: 18px;
 	font-family: Mobispot, arial, sans-serif;
 	font-weight: 100;
@@ -123,6 +133,11 @@
 	width: 32px;
 	background: #0061FF url(../img/icons.32x2.png) no-repeat 0 9px;
 	background-size: 100%;
+	position: relative;
+}
+
+.lt-ie9 .m-card-act{
+	background: #0061FF url(../img/icons.32.png) no-repeat 0 9px;
 }
 .m-card-act.active{
 	background-position: 0 -37px;
@@ -462,6 +477,8 @@ form.custom:first-child{
 }
 .content-row:first-child .m-hint{
 	padding-top: 25px;
+	margin-top: 0;
+	margin-bottom: 0;
 }
 .content-wrap{
 	padding-top: 25px !important;
@@ -506,6 +523,7 @@ form.custom:first-child{
 }
 .mess-bottom{
 	background: rgba(255, 255, 255, 0.95);
+	background: rgb(255, 255, 255);
 	opacity: 0.7;
 	position: fixed;
 	left: 0;
@@ -524,7 +542,7 @@ form.custom:first-child{
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	border-radius: 5px;
-	behavior:  url(file:///E:/PIE.htc);
+	behavior:  url(/css/PIE.htc);
 	overflow: hidden;
 	margin:-3px 0 14px;
 	opacity: 0;
@@ -630,4 +648,162 @@ table tr:nth-of-type(2n) .table-control a:hover{
 }
 .txt-s{
 	font-size: 12px;
+}
+.radio-list,
+.checkbox-list {
+	clear: both;
+	overflow: hidden;
+}
+
+.checkbox-list .checkbox{
+	display: inline-block;
+	float: left;
+	clear: both;
+}
+.checkbox-list_3{
+	overflow: hidden;
+}
+.checkbox-list_3 .checkbox{
+	width: 30%;
+	display: block;
+	float: left;
+}
+.sub-slide-box {
+	display: none;
+	border-top: 2px solid #FFF;
+}
+.nav-bar_form .open{
+	display: none;
+}
+.nav-bar_form .f-spot-button{
+	margin: 0 20px 0 0;
+}
+.step_nav h6{
+	font-size: 14px;
+	color: #B0B3B5;
+}
+.nav-bar_form{
+	padding-bottom: 7px !important;
+}
+.period-select{
+	margin: 0;
+	height: 20px;
+	margin-top: 2px;
+	margin-top: 4px;
+}
+.period-select dd {
+	overflow: hidden;
+	margin-bottom: 0;
+}
+.period-select div{
+	display: inline-block;
+}
+.period-select .f-spot-button.small{
+	height: 20px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding: 0 5px;
+	line-height: 20px;
+	text-align: center;
+	font-size: 10px;
+	margin-left: 5px;
+}
+}
+.period-select dd{
+	display: inline-block;
+	margin: 0;
+	float: right;
+}
+
+.t-date{
+	vertical-align: top;
+	padding-top: 26px !important;
+	font-size: 15px;
+}
+.page-report{
+	background: #fff;
+}
+.page-report .row{
+	max-width: 100%;
+}
+.page-report .columns{
+	padding: 0 60px;
+}
+.report-control{
+	position: fixed;
+	top:0;
+	left: 0;
+	background: rgb(233, 237, 242);
+	background: rgba(233, 237, 242, 0.95);
+	width: 100%;
+	padding: 10px 60px;
+	z-index: 10;
+}
+.report-control .f-spot-button{
+	margin-top: 0;
+	margin-bottom: 0;
+	background: #fff;
+}
+.report-control .f-spot-button:hover{
+	color: #fff;
+	background: #0061ff;
+}
+.report-body{
+	padding-top: 45px;
+}
+.report-body .table-wrapper{
+	border: 1px solid #F8F9FA;
+	border-radius: 5px;
+	margin: 20px 0;
+}
+.report-body table{
+	width: 100%;
+	border: 0;
+	margin-bottom: 0;
+}
+.report-body thead td{
+	padding: 10px 30px;
+}
+.report-body td{
+	padding: 10px 30px;
+}
+.report-descriptions{
+	color: #838383;
+	font-size: 14px;
+}
+.wallet-block{
+	margin-bottom: 50px;
+	position: relative;
+	padding-left: 32px;
+}
+.wallet-block .content-row.left + .content-row.left{
+	padding-right: 0 !important;
+}
+.wallet-block table{
+	width: 100%;
+	border: 0;
+}
+.wallet-block.disable .cover{
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	z-index: 99;
+}
+.wallet-block.disable,
+.wallet-block.disable label,
+.wallet-block.disable td{
+	color: #7F7F7F !important;
+}
+.wallet-block.disable input,
+.wallet-block.disable .f-spot-button,
+.wallet-block.disable .dropdown{
+	opacity: .5;
+}
+.radio-list li{
+	cursor: pointer;
+}
+.hint-txt{
+	font-size: 14px;
+	clear: both;
 }

@@ -37,9 +37,6 @@ class TermUserFirm(db.Model):
 
     def save(self):
         try:
-            if not self.activkey:
-                self.password = hash_helper.get_password_hash(self.password)
-            self.activkey = hash_helper.get_activkey(self.password)
             db.session.add(self)
             db.session.commit()
         except Exception as e:

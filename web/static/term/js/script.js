@@ -13,6 +13,7 @@ var showPopup = function(){
 };
 
 var addActive = function () {
+
 	if( $(this).hasClass('radio-link_slide')){
 		var idLink = $(this).attr('id');
 		var idBox ='#'+ idLink + 'Form';
@@ -20,6 +21,7 @@ var addActive = function () {
 	} else {
 		$(this).parents('.m-block').find('.slide-setting').slideUp('400');
 	}
+
 	$(this).addClass('active').siblings().removeClass('active');
 };
 
@@ -62,6 +64,7 @@ $(document).on('click','.popup-window', function(event){
 });
 
 $(document).on('click','.add-active > *', addActive);
+
 $(document).on('click','.toggle-active > *', toggleActive);
 
 

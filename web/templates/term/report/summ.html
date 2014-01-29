@@ -9,19 +9,14 @@
             <div class="content-row">
                 <p class="m-hint">Здесь вы можете посмотреть отчет по денежным оборотам</p>
             </div>
-            <div class="content-row">
-                <div class="large-9 columns">
-                    <dl class="sub-nav period-select">
-                      <span ng-repeat="period in report_detaled_periods">
-                          <dd ng-class="{active: search.period==period.value}">
-                            <a 
-                                class="f-spot-button small"
-                                ng-click="search.period=period.value;search.page=1;pagination.cur=1">
-                                {[{period.name}]}
-                            </a>
-                        </dd>
-                      </span>
-                    </dl>
+            <div class="large-6 content-row f-content-row_button g-clearfix">
+                <div class="add-active">
+                    <a ng-repeat="period in report_detaled_periods"
+                        ng-class="{active: search.period==period.value}"
+                        class="f-spot-button small"
+                        ng-click="search.period=period.value;search.page=1;pagination.cur=1">
+                        {[{period.name}]}
+                    </a>
                 </div>
             </div>
             <table class="m-spot-table">

@@ -88,7 +88,6 @@ form input.duble-input{
 	height: 50px;
 	padding: 16px 70px 16px 25px;
 	margin-right: 10px;
-	min-width: 264px;
 	position: relative;
 	cursor: default;
 }
@@ -102,6 +101,9 @@ form input.duble-input{
 	background: #fff url(../img/icons.32x2.png) no-repeat 0 -13px;
 	background-size: 100%;
 	cursor: pointer;
+}
+.lt-ie9 .f-email-case i{
+	background: #fff url(../img/icons.32.png) no-repeat 0 -13px;
 }
 .f-email-case i:hover{
 	background-color: #0061FF;
@@ -340,9 +342,14 @@ form .error input,form input.error,form .error textarea,form textarea.error {
 input.error:-moz-placeholder { color:#C60F13;!important; }
 
 .f-spot-button:hover,
-.f-spot-button.active{
+.f-spot-button.active,
+.f-spot-button:hover,
+.period-select dd.active a{
 	background: rgb(0, 97, 255);
 	color: #fff;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
 }
 .f-spot-button.bg-red:hover,
 .f-spot-button.bg-red.active{
@@ -361,6 +368,12 @@ input.error:-moz-placeholder { color:#C60F13;!important; }
 	height: 30px;
 	font-size: 14px;
 	padding: 9px 10px;
+	line-height: 14px;
+}
+.f-spot-button.large{
+	height: 40px;
+	font-size: 14px;
+	padding: 13px 20px;
 	line-height: 14px;
 }
 .f-spot-button.f-spot-button_plus.small{
@@ -385,7 +398,8 @@ form input.small{
 .f-datepicker.small input{
 	padding-left: 38px !important;
 }
-.radio-link.open i, .radio-link.active i{
+
+.radio-link.open i, .radio-link.active i, .active > .radio-link i {
 	background: #0062FF;
 	border: 4px solid #0062FF;
 }
@@ -402,7 +416,7 @@ form input.small{
 	-webkit-border-radius: 50%;
 	-moz-border-radius: 50%;
 	border-radius: 50%;
-	behavior: url(file:///E:/PIE.htc);
+	behavior: url(/css/PIE.htc);
 	background: #FFF;
 	border: 3px solid #0062FF;
 	margin-right: 7px;
@@ -494,6 +508,7 @@ div.switch.small{
 .radio-link.radio-link_slide.active:after{
 	border-top-color: #0063ff;
 }
+
 .checkbox i {
 	display: inline-block;
 	height: 20px;
@@ -502,7 +517,7 @@ div.switch.small{
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	behavior: url(file:///E:/PIE.htc);
+	behavior: url(/css/PIE.htc);
 	background: #FFF url("../img/i-small.png") no-repeat -100%;
 	margin-right: 7px;
 	position: relative;
@@ -527,4 +542,7 @@ div.switch.small{
 }
 .slide-setting .content-row.left{
 	margin-right: 40px;
+}
+.m-spot-table td strong{
+	font-size: 15px;
 }

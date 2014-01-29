@@ -1,0 +1,17 @@
+form input[type="text"],
+form input[type="password"],
+form input[type="date"],
+form input[type="datetime"],
+form input[type="datetime-local"],
+form input[type="month"],
+form input[type="week"],
+form input[type="email"],
+form input[type="number"],
+form input[type="search"],
+form input[type="tel"],
+form input[type="time"],
+form input[type="url"]{
+	max-width: 200px;
+	min-width: 200px;
+	padding-top: 16px;
+}

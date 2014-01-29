@@ -6,14 +6,14 @@
   Foundation.libs.clearing = {
     name : 'clearing',
 
-    version: '4.3.2',
+    version : '4.0.0',
 
     settings : {
       templates : {
         viewing : '<a href="#" class="clearing-close">&times;</a>' +
           '<div class="visible-img" style="display: none"><img src="//:0">' +
-          '<p class="clearing-caption"></p><a href="#" class="clearing-main-prev"><span></span></a>' +
-          '<a href="#" class="clearing-main-next"><span></span></a></div>'
+          '<p class="clearing-caption"></p><a href="#" class="clearing-main-left"><span></span></a>' +
+          '<a href="#" class="clearing-main-right"><span></span></a></div>'
       },
 
       // comma delimited list of selectors that, on click, will close clearing,
@@ -26,24 +26,24 @@
     },
 
     init : function (scope, method, options) {
-      var self = this;
-      Foundation.inherit(this, 'set_data get_data remove_data throttle data_options');
+      this.scope = this.scope || scope;
+      Foundation.inherit(this, 'set_data get_data remove_data throttle');
 
       if (typeof method === 'object') {
         options = $.extend(true, this.settings, method);
       }
 
-      if (typeof method !== 'string') {
+      if (typeof method != 'string') {
         $(this.scope).find('ul[data-clearing]').each(function () {
-          var $el = $(this),
+          var self = Foundation.libs.clearing,
+              $el = $(this),
               options = options || {},
-              lis = $el.find('li'),
               settings = self.get_data($el);
 
-          if (!settings && lis.length > 0) {
+          if (!settings) {
             options.$parent = $el.parent();
 
-            self.set_data($el, $.extend({}, self.settings, options, self.data_options($el)));
+            self.set_data($el, $.extend(true, self.settings, options));
 
             self.assemble($el.find('li'));
 
@@ -70,30 +70,19 @@
           function (e, current, target) {
             var current = current || $(this),
                 target = target || current,
-                next = current.next('li'),
-                settings = self.get_data(current.parent()),
-                image = $(e.target);
+                settings = self.get_data(current.parent());
 
             e.preventDefault();
             if (!settings) self.init();
 
-            // if clearing is open and the current image is
-            // clicked, go to the next image in sequence
-            if (target.hasClass('visible') && 
-              current[0] === target[0] && 
-              next.length > 0 && self.is_open(current)) {
-              target = next;
-              image = target.find('img');
-            }
-
             // set current and target to the clicked li if not otherwise defined.
-            self.open(image, current, target);
+            self.open($(e.target), current, target);
             self.update_paddles(target);
           })
 
-        .on('click.fndtn.clearing', '.clearing-main-next',
+        .on('click.fndtn.clearing', '.clearing-main-right',
           function (e) { this.nav(e, 'next') }.bind(this))
-        .on('click.fndtn.clearing', '.clearing-main-prev',
+        .on('click.fndtn.clearing', '.clearing-main-left',
           function (e) { this.nav(e, 'prev') }.bind(this))
         .on('click.fndtn.clearing', this.settings.close_selectors,
           function (e) { Foundation.libs.clearing.close(e, this) })
@@ -101,7 +90,7 @@
           function (e) { this.keydown(e) }.bind(this));
 
       $(window).on('resize.fndtn.clearing',
-        function () { this.resize() }.bind(this));
+        function (e) { this.resize() }.bind(this));
 
       this.settings.init = true;
       return this;
@@ -155,10 +144,7 @@
     },
 
     assemble : function ($li) {
-      var $el = $li.parent();
-      $el.after('<div id="foundationClearingHolder"></div>');
-
-      var holder = $('#foundationClearingHolder'),
+      var $el = $li.parent(),
           settings = this.get_data($el),
           grid = $el.detach(),
           data = {
@@ -168,7 +154,7 @@
           wrapper = '<div class="clearing-assembled"><div>' + data.viewing +
             data.grid + '</div></div>';
 
-      return holder.after(wrapper).remove();
+      return settings.$parent.append(wrapper);
     },
 
     // event callbacks
@@ -181,12 +167,9 @@
 
       if (!this.locked()) {
         // set the image to the selected thumbnail
-        image
-          .attr('src', this.load($image))
-          .css('visibility', 'hidden');
+        image.attr('src', this.load($image));
 
         this.loaded(image, function () {
-          image.css('visibility', 'visible');
           // toggle the gallery
           root.addClass('clearing-blackout');
           container.addClass('clearing-container');
@@ -214,7 +197,7 @@
           }($(el))), container, visible_image;
 
       if (el === e.target && root) {
-        container = root.find('div').first();
+        container = root.find('div').first(),
         visible_image = container.find('.visible-img');
         this.settings.prev_index = 0;
         root.find('ul[data-clearing]')
@@ -225,10 +208,6 @@
       }
 
       return false;
-    },
-
-    is_open : function (current) {
-      return current.parent().prop('style').length > 0;
     },
 
     keydown : function (e) {
@@ -278,50 +257,39 @@
         .closest('.carousel')
         .siblings('.visible-img');
 
-      if (target.next().length > 0) {
+      if (target.next().length) {
         visible_image
-          .find('.clearing-main-next')
+          .find('.clearing-main-right')
           .removeClass('disabled');
       } else {
         visible_image
-          .find('.clearing-main-next')
+          .find('.clearing-main-right')
           .addClass('disabled');
       }
 
-      if (target.prev().length > 0) {
+      if (target.prev().length) {
         visible_image
-          .find('.clearing-main-prev')
+          .find('.clearing-main-left')
           .removeClass('disabled');
       } else {
         visible_image
-          .find('.clearing-main-prev')
+          .find('.clearing-main-left')
           .addClass('disabled');
       }
     },
 
     center : function (target) {
-      if (!this.rtl) {
-        target.css({
-          marginLeft : -(this.outerWidth(target) / 2),
-          marginTop : -(this.outerHeight(target) / 2)
-        });
-      } else {
-        target.css({
-          marginRight : -(this.outerWidth(target) / 2),
-          marginTop : -(this.outerHeight(target) / 2)
-        });
-      }
+      target.css({
+        marginLeft : -(this.outerWidth(target) / 2),
+        marginTop : -(this.outerHeight(target) / 2)
+      });
       return this;
     },
 
     // image loading and preloading
 
     load : function ($image) {
-      if ($image[0].nodeName === "A") {
-        var href = $image.attr('href');
-      } else {
-        var href = $image.parent().attr('href');
-      }
+      var href = $image.parent().attr('href');
 
       this.preload($image);
 
@@ -360,7 +328,7 @@
         return;
       }
 
-      if (image[0].complete || image[0].readyState === 4) {
+      if (this.complete || this.readyState === 4) {
         loaded();
       } else {
         bindLoad.call(image);
@@ -388,7 +356,7 @@
 
       if (caption) {
         container
-          .html(caption)
+          .text(caption)
           .show();
       } else {
         container
@@ -506,10 +474,6 @@
       $(window).off('.fndtn.clearing');
       this.remove_data(); // empty settings cache
       this.settings.init = false;
-    },
-
-    reflow : function () {
-      this.init();
     }
   };
 
