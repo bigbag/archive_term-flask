@@ -66,7 +66,8 @@ class Person(db.Model):
                 id=person.id,
                 name=person.name,
                 card=person.card,
-                status=int(person.status == self.STATUS_VALID),
+                status=int(
+                    person.status == self.STATUS_VALID and person.wallet_status == self.STATUS_VALID),
                 hard_id=int(person.payment_id is not None),
             )
             result.append(data)
