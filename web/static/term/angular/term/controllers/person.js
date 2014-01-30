@@ -3,6 +3,7 @@
 angular.module('term').controller('PersonController', 
     function($scope, $http, $compile, contentService) {
 
+
   //Просмотр списка операций человека
   $scope.getPersonReport = function(person) {
     var url = "/person/"+ person.id + "/report/"
@@ -153,30 +154,46 @@ angular.module('term').controller('PersonController',
   }
 
   //Добавляем корпоративный кошелёк
-  $scope.saveWalletPerson = function(person_wallet, valid){
+  $scope.saveCorpWallet = function(corp_wallet, valid){
     if (!valid) return false;
+    if (corp_wallet.amount < 100) return false;
 
-    person_wallet.csrf_token = $scope.token;
-    var url = '/person/' + person_wallet.person_id + '/wallet';
-    $http.post(url, person_wallet).success(function(data) {
+    corp_wallet.csrf_token = $scope.token;
+    var url = '/person/' + corp_wallet.person_id + '/wallet/save';
+    $http.post(url, corp_wallet).success(function(data) {
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
       } else {
         contentService.setModal(data.message, 'success');
-        $scope.getPersonTypeBlock($scope.person);
+        angular.element('#wallet-info').html($compile(data.content)($scope));
       }
     });  
   }
 
-  //Получаем блок управления расчетами пользователя, из корп. кошелька или с учетом тайм-аутов
-  $scope.getPersonTypeBlock = function(person){
-    person.csrf_token = $scope.token;
-    var url = '/person/' + person.id + '/get_type_block';
-    $http.post(url, person).success(function(data) {
-      if (data.error === 'no') {
-        angular.element('#person-type').html($compile(data.content)($scope));
-        // $(document).foundation();
+  //Удаляем корпоративный кошелёк
+  $scope.removeCorpWallet = function(corp_wallet){
+    corp_wallet.csrf_token = $scope.token;
+    var url = '/person/' + corp_wallet.person_id + '/wallet/remove';
+    $http.post(url, corp_wallet).success(function(data) {
+      if (data.error === 'yes') {
+        contentService.setModal(data.message, 'error');
+      } else {
+        contentService.setModal(data.message, 'success');
+        $scope.person.type = 0;
+        $scope.corp_wallet.id = 0;
       }
     });  
   }
+
+  // //Получаем блок управления расчетами пользователя, из корп. кошелька или с учетом тайм-аутов
+  // $scope.getPersonTypeBlock = function(person){
+  //   person.csrf_token = $scope.token;
+  //   var url = '/person/' + person.id + '/get_type_block';
+  //   $http.post(url, person).success(function(data) {
+  //     if (data.error === 'no') {
+  //       angular.element('#person-type').html($compile(data.content)($scope));
+  //       // $(document).foundation();
+  //     }
+  //   });  
+  // }
 });

@@ -92,7 +92,8 @@ def person_info(person_id):
         person_events=PersonEvent().get_by_person_id(person.id),
         term_event=term_event,
         term_events=term_events,
-        corp_wallet=corp_wallet
+        corp_wallet=corp_wallet,
+        corp_wallet_interval=TermCorpWallet().get_interval_list()
     )
 
 
@@ -193,10 +194,7 @@ def person_lock(person_id):
     """Блокировка сотрудника"""
 
     answer = dict(error='yes', message='', status=False)
-    arg = json.loads(request.stream.read())
-
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    arg = get_post_arg(request, True)
 
     if 'status' not in arg or 'id' not in arg:
         abort(400)
@@ -237,10 +235,7 @@ def person_remove(person_id):
     """Удаление сотрудника"""
 
     answer = dict(error='yes', message='', status=False)
-    arg = json.loads(request.stream.read())
-
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    arg = get_post_arg(request, True)
 
     person = Person.query.get(person_id)
     if not person:
@@ -296,13 +291,11 @@ def person_event_save(person_id, person_event_id):
     """Сохраняем событие привязаное к человеку"""
 
     answer = dict(error='yes', message='')
-    arg = json.loads(request.stream.read())
-
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    arg = get_post_arg(request, True)
 
     if 'term_event_id' not in arg:
         abort(400)
+
     term_event_id = arg['term_event_id']
 
     term_event = TermEvent.query.get(term_event_id)
@@ -349,11 +342,9 @@ def person_event_save(person_id, person_event_id):
 @json_headers
 def person_event_delete(person_id, person_event_id):
     """Удаляем событие привязаное к человеку"""
-    answer = dict(error='yes', message='')
 
-    arg = json.loads(request.stream.read())
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    answer = dict(error='yes', message='')
+    arg = get_post_arg(request, True)
 
     person_event = PersonEvent.query.filter_by(
         person_id=person_id, id=person_event_id).first()
@@ -368,65 +359,63 @@ def person_event_delete(person_id, person_event_id):
     return jsonify(answer)
 
 
-@mod.route('/person/<int:person_id>/get_type_block', methods=['POST'])
+# @mod.route('/person/<int:person_id>/get_type_block', methods=['POST'])
+# @login_required
+# @json_headers
+# def person_type_block(person_id):
+#     """Получаем блок управления типом пользователя"""
+#     answer = dict(error='yes', content='')
+
+#     arg = json.loads(request.stream.read())
+#     if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+#         abort(403)
+
+#     person = Person.query.get(person_id)
+#     if not person:
+#         abort(404)
+
+#     person_type = int(arg['type']) if 'type' in arg else False
+#     corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id).first()
+
+#     if person_type == Person.TYPE_TIMEOUT:
+#         person.type = Person.TYPE_TIMEOUT
+#         person.wallet_status = Person.STATUS_VALID
+#         if corp_wallet:
+#             corp_wallet.delete()
+
+#     elif person_type == Person.TYPE_WALLET:
+#         if not corp_wallet:
+#             person.type = Person.TYPE_WALLET
+#             person.wallet_status = Person.STATUS_BANNED
+#             answer['content'] = render_template(
+#                 'term/person/wallet_form.html',
+#                 corp_wallet=corp_wallet,
+#                 corp_wallet_interval=TermCorpWallet().get_interval_list())
+
+#         else:
+#             answer['content'] = render_template(
+#                 'term/person/wallet_view.html',
+#                 corp_wallet=corp_wallet,
+#                 corp_wallet_interval=TermCorpWallet().get_interval_list())
+
+#     person.save()
+
+#     answer['error'] = 'no'
+
+#     return jsonify(answer)
+
+
+@mod.route('/person/<int:person_id>/wallet/save', methods=['POST'])
 @login_required
 @json_headers
-def person_type_block(person_id):
-    """Получаем блок управления типом пользователя"""
-    answer = dict(error='yes', content='')
+def person_save_corp_wallet(person_id):
+    """Добавляем или редактируем корпоративный кошелёк"""
 
-    arg = json.loads(request.stream.read())
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
-
-    person = Person.query.get(person_id)
-    if not person:
-        abort(404)
-
-    person_type = int(arg['type']) if 'type' in arg else False
-    corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id).first()
-
-    if person_type == Person.TYPE_TIMEOUT:
-        person.type = Person.TYPE_TIMEOUT
-        person.wallet_status = Person.STATUS_VALID
-        if corp_wallet:
-            corp_wallet.delete()
-
-    elif person_type == Person.TYPE_WALLET:
-        if not corp_wallet:
-            person.type = Person.TYPE_WALLET
-            person.wallet_status = Person.STATUS_BANNED
-            answer['content'] = render_template(
-                'term/person/wallet_form.html',
-                corp_wallet=corp_wallet,
-                corp_wallet_interval=TermCorpWallet().get_interval_list())
-
-        else:
-            answer['content'] = render_template(
-                'term/person/wallet_view.html',
-                corp_wallet=corp_wallet,
-                corp_wallet_interval=TermCorpWallet().get_interval_list())
-
-    person.save()
-
-    answer['error'] = 'no'
-
-    return jsonify(answer)
-
-
-@mod.route('/person/<int:person_id>/wallet', methods=['POST'])
-@login_required
-@json_headers
-def person_wallet(person_id):
-    """Включаем или выключаем корпоративный кошелёк"""
     answer = dict(error='yes', message='')
+    arg = get_post_arg(request, True)
 
-    arg = json.loads(request.stream.read())
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    person_limit = arg['limit'] if 'limit' in arg else False
 
-    person_type = arg['type'] if 'type' in arg else False
-    person_amount = arg['amount'] if 'amount' in arg else False
     interval = arg[
         'interval'] if 'interval' in arg else TermCorpWallet.INTERVAL_ONCE
 
@@ -436,11 +425,12 @@ def person_wallet(person_id):
 
     corp_wallet = TermCorpWallet()
     corp_wallet.person_id = person.id
-    corp_wallet.balance = int(person_amount) * 100
+    corp_wallet.balance = int(person_limit) * 100
     corp_wallet.interval = interval
     corp_wallet.limit = corp_wallet.balance
     corp_wallet.status = TermCorpWallet.STATUS_ACTIVE
     person.wallet_status = Person.STATUS_VALID
+    person.type = Person.TYPE_WALLET
 
     person_events = PersonEvent().get_by_person_id(person.id)
     for person_event in person_events:
@@ -451,6 +441,42 @@ def person_wallet(person_id):
         corp_wallet.save()
         answer['error'] = 'no'
         answer['message'] = u'Операция выполнена'
+        answer['content'] = render_template(
+            'term/person/wallet_view.html',
+            corp_wallet=corp_wallet,
+            corp_wallet_interval=TermCorpWallet().get_interval_list())
+
+    return jsonify(answer)
+
+
+@mod.route('/person/<int:person_id>/wallet/remove', methods=['POST'])
+@login_required
+@json_headers
+def person_remove_corp_wallet(person_id):
+    """Удаляем корпоративный кошелёк"""
+
+    answer = dict(error='yes', message='')
+    arg = get_post_arg(request, True)
+
+    wallet_id = arg['id'] if 'id' in arg else False
+
+    if not wallet_id:
+        abort(405)
+
+    person = Person.query.get(person_id)
+    if not person:
+        abort(404)
+
+    if person.type == Person.TYPE_WALLET:
+        person.type = Person.TYPE_TIMEOUT
+
+    corp_wallet = TermCorpWallet.query.get(wallet_id)
+    if corp_wallet:
+        corp_wallet.delete()
+        person.save()
+        answer['error'] = 'no'
+        answer['message'] = u'Корпоративный кошелек удален'
+
     return jsonify(answer)
 
 
@@ -459,9 +485,8 @@ def person_wallet(person_id):
 @json_headers
 def person_report(person_id):
     """Отчет по операциям человека"""
-    arg = json.loads(request.stream.read())
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+
+    arg = get_post_arg(request, True)
 
     arg['type'] = 'person'
     arg['id'] = person_id

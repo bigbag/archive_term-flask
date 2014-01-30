@@ -31,9 +31,7 @@ def report_report_action(action):
 @login_required
 @json_headers
 def report_get_person_report():
-    arg = json.loads(request.stream.read())
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    arg = get_post_arg(request, True)
 
     arg['type'] = 'firm'
     arg['id'] = g.firm_info['id']
@@ -46,9 +44,7 @@ def report_get_person_report():
 @login_required
 @json_headers
 def report_get_terminal_report():
-    arg = json.loads(request.stream.read())
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    arg = get_post_arg(request, True)
 
     arg['payment_type'] = Report.TYPE_WHITE
     answer = Report().get_firm_interval_report(
@@ -61,9 +57,7 @@ def report_get_terminal_report():
 @login_required
 @json_headers
 def report_get_summ_report():
-    arg = json.loads(request.stream.read())
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    arg = get_post_arg(request, True)
 
     arg['payment_type'] = Report.TYPE_PAYMENT
     answer = Report().get_firm_interval_report(

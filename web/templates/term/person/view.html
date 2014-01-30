@@ -3,9 +3,7 @@
 {% block content %}
 <span ng-init="person.id={{person.id}};person.status={{person.status}}"></span>
 <h2 class="g-color-blue m-page-name" ng-controller="PersonController">
-    <div>
-        {{person.name}}
-    </div>
+    {{person.name}}
     <div class="right">
         <a ng-click="removePerson(person)" 
             class="f-spot-button bg-red small">
@@ -27,35 +25,10 @@
     <section class="section active">
         <p class="title"><a>События</a></p>
         <span ng-init="person.type={{person.type}}"></span>
-        <span ng-init="getPersonTypeBlock(person)"></span>
         <div class="content">
-            <div class="content-row">
-                <p class="m-hint">Вы можете выбрать способ управления событиями</p>
+            <div>
                 <br />
-                <form>
-                <div class="row">
-                    <div class="large-6 columns">
-                        <label ng-click="getPersonTypeBlock(person)">
-                        <input  
-                            type="radio" 
-                            ng-model="person.type" 
-                            type="radio" 
-                            value=1>
-                            Кошелёк
-                        </label>
-                    </div>
-                    <div class="large-6 columns">
-                        <label ng-click="getPersonTypeBlock(person)">
-                        <input  
-                            type="radio" 
-                            ng-model="person.type" 
-                            type="radio" 
-                            value=0>
-                            Тайм-аут
-                        </label>
-                    </div>
-                </form>
-                </div>
+                {% include 'term/person/wallet_form.html' %}
             </div>
             <div id="person-type"></div>
             <div class="content-row">

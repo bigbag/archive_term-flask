@@ -51,8 +51,12 @@ def unauthorized():
     return login_form()
 
 
-def set_json_response(data, code=200):
-    return make_response(jsonify(data), code)
+def get_post_arg(request, token=False):
+    arg = json.loads(request.stream.read())
+    if token:
+        if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
+            abort(403)
+    return arg
 
 
 def get_firm_name(request):
@@ -230,10 +234,7 @@ def change_request():
     """Запрос на смену пароля"""
 
     answer = dict(content='', error='yes')
-    arg = json.loads(request.stream.read())
-
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    arg = get_post_arg(request, True)
 
     term_user = TermUser.query.get(arg['id'])
 

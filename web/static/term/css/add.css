@@ -78,3 +78,20 @@
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
+
+.animate-show {
+-webkit-transition: opacity 600ms ease-out;
+  -moz-transition: opacity 600ms ease-out;
+  -o-transition: opacity 600ms ease-out;
+  transition: opacity 600ms ease-out;
+}
+ 
+.animate-show.ng-hide-add,
+.animate-show.ng-hide-remove {
+  display:block!important;
+}
+ 
+.animate-show.ng-hide {
+  line-height:0;
+  opacity:0;
+}

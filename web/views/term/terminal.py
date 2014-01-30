@@ -71,6 +71,7 @@ def terminal_list():
 @login_required
 def terminal_info(term_id):
     """Информация о терминале"""
+
     if not term_id in FirmTerm().get_list_by_firm_id(g.firm_info['id']):
         abort(403)
 
@@ -101,6 +102,7 @@ def terminal_info(term_id):
 @json_headers
 def terminal_save(term_id, action):
     """Добавляем или редактируем терминал"""
+
     answer = dict(error='yes', message='')
     arg = json.loads(request.stream.read())
     action_list = ('add', 'edit')
@@ -114,7 +116,8 @@ def terminal_save(term_id, action):
         term = Term().get_by_hard_id(arg['hard_id'])
     elif 'edit' in action:
         term = Term().get_by_id(id)
-    else:
+
+    if not term:
         term = Term()
 
     if term and term.id and term.id != id:
@@ -145,11 +148,9 @@ def terminal_save(term_id, action):
 @json_headers
 def terminal_locking(term_id):
     """Блокировка и разблокировка терминал"""
-    answer = dict(error='yes', message='')
-    arg = json.loads(request.stream.read())
 
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    answer = dict(error='yes', message='')
+    arg = get_post_arg(request, True)
 
     if 'status' not in arg or 'id' not in arg:
         abort(400)
@@ -174,11 +175,9 @@ def terminal_locking(term_id):
 @json_headers
 def terminal_remove(term_id):
     """Удаление терминала"""
-    answer = dict(error='yes', message='')
-    arg = json.loads(request.stream.read())
 
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    answer = dict(error='yes', message='')
+    arg = get_post_arg(request, True)
 
     term = Term().get_info_by_id(term_id)
     if not term:
@@ -228,11 +227,9 @@ def terminal_event_info(term_id, term_event_id):
 @json_headers
 def terminal_event_save(term_id, term_event_id):
     """Сохраняем событие привязаное к терминалу"""
-    answer = dict(error='yes', message='')
-    arg = json.loads(request.stream.read())
 
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    answer = dict(error='yes', message='')
+    arg = get_post_arg(request, True)
 
     term = Term.query.get(term_id)
     if not term:
@@ -273,11 +270,9 @@ def terminal_event_save(term_id, term_event_id):
 @json_headers
 def terminal_event_delete(term_id, term_event_id):
     """Удаляем событие привязаное к терминалу"""
-    answer = dict(error='yes', message='')
 
-    arg = json.loads(request.stream.read())
-    if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-        abort(403)
+    answer = dict(error='yes', message='')
+    arg = get_post_arg(request, True)
 
     firm_term = FirmTerm().get_list_by_firm_id(g.firm_info['id'])
     if term_id not in firm_term:

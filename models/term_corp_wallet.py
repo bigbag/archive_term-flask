@@ -49,6 +49,17 @@ class TermCorpWallet(db.Model):
             {'id': self.INTERVAL_MONTH, 'name': u"Ежемесячно"}
         ]
 
+    def to_json(self):
+        corp_wallet_interval = self.get_interval_list()
+        items = dict(
+            id=self.id,
+            person_id=self.person_id,
+            balance=self.balance / 100,
+            limit=self.limit / 100,
+            interval=corp_wallet_interval[self.interval]['name'],
+        )
+        return items
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
