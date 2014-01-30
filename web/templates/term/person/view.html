@@ -5,6 +5,10 @@
 <h2 class="g-color-blue m-page-name" ng-controller="PersonController">
     {{person.name}}
     <div class="right">
+        <a ng-click="unbindCard(person)" 
+            class="f-spot-button bg-red small">
+            Отвязать карту
+        </a>
         <a ng-click="removePerson(person)" 
             class="f-spot-button bg-red small">
             Удалить

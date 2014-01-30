@@ -113,12 +113,12 @@ def person_save(person_id):
         person = Person()
 
         if code:
-            linking_card = person_linking_card(code)
-            if not linking_card['wallet']:
-                answer['message'] = u'Код активации не верен'
+            bind_card = person_bind_card(code)
+            if not bind_card['wallet']:
+                answer['message'] = bind_card['message']
                 return jsonify(answer)
             else:
-                wallet = linking_card['wallet']
+                wallet = bind_card['wallet']
                 person.payment_id = wallet.payment_id
                 person.hard_id = wallet.hard_id
     else:
@@ -156,35 +156,49 @@ def person_add_card(person_id):
     if not person:
         abort(404)
 
-    linking_card = person_linking_card(code)
-    if not linking_card['wallet']:
-        answer['message'] = linking_card['message']
-    else:
-        wallet = linking_card['wallet']
-        person.payment_id = wallet.payment_id
-        person.hard_id = wallet.hard_id
-        if person.save():
-            answer['error'] = 'no'
-            answer['message'] = u'Карта успешно привязана'
+    bind_card = person_bind_card(code)
+    if not bind_card['wallet']:
+        answer['message'] = bind_card['message']
+        return jsonify(answer)
+
+    wallet = bind_card['wallet']
+    person.payment_id = wallet.payment_id
+    person.hard_id = wallet.hard_id
+    if person.save():
+        answer['error'] = 'no'
+        answer['message'] = u'Карта успешно привязана'
 
     return jsonify(answer)
 
 
-def person_linking_card(code):
+def person_bind_card(code):
     answer = dict(error='yes', message='', wallet=False)
 
     spot = Spot().get_valid_by_code(code)
     if not spot:
         answer['message'] = u'Код активации не верен'
-    else:
-        wallet = PaymentWallet.query.filter_by(
-            discodes_id=spot.discodes_id).first()
+        return answer
 
-        if not wallet:
-            answer['message'] = u'Привязываемая карта отсутсвует'
-        else:
-            answer['wallet'] = wallet
+    wallet = PaymentWallet.query.filter_by(
+        discodes_id=spot.discodes_id).first()
 
+    if not wallet:
+        answer['message'] = u'Привязываемая карта отсутсвует'
+        return answer
+
+    firm_info = g.firm_info
+    person = Person.query.filter_by(
+        payment_id=wallet.payment_id,
+        firm_id=firm_info['id']).first()
+    print 1
+    if person:
+        answer['message'] = u'Данная карта уже привязана'
+        print 3
+        return answer
+
+    answer['wallet'] = wallet
+
+    print 2
     return answer
 
 
@@ -357,52 +371,6 @@ def person_event_delete(person_id, person_event_id):
     answer['message'] = u'Событие удалено'
 
     return jsonify(answer)
-
-
-# @mod.route('/person/<int:person_id>/get_type_block', methods=['POST'])
-# @login_required
-# @json_headers
-# def person_type_block(person_id):
-#     """Получаем блок управления типом пользователя"""
-#     answer = dict(error='yes', content='')
-
-#     arg = json.loads(request.stream.read())
-#     if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
-#         abort(403)
-
-#     person = Person.query.get(person_id)
-#     if not person:
-#         abort(404)
-
-#     person_type = int(arg['type']) if 'type' in arg else False
-#     corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id).first()
-
-#     if person_type == Person.TYPE_TIMEOUT:
-#         person.type = Person.TYPE_TIMEOUT
-#         person.wallet_status = Person.STATUS_VALID
-#         if corp_wallet:
-#             corp_wallet.delete()
-
-#     elif person_type == Person.TYPE_WALLET:
-#         if not corp_wallet:
-#             person.type = Person.TYPE_WALLET
-#             person.wallet_status = Person.STATUS_BANNED
-#             answer['content'] = render_template(
-#                 'term/person/wallet_form.html',
-#                 corp_wallet=corp_wallet,
-#                 corp_wallet_interval=TermCorpWallet().get_interval_list())
-
-#         else:
-#             answer['content'] = render_template(
-#                 'term/person/wallet_view.html',
-#                 corp_wallet=corp_wallet,
-#                 corp_wallet_interval=TermCorpWallet().get_interval_list())
-
-#     person.save()
-
-#     answer['error'] = 'no'
-
-#     return jsonify(answer)
 
 
 @mod.route('/person/<int:person_id>/wallet/save', methods=['POST'])
