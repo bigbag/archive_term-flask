@@ -29,6 +29,7 @@ class SocToken(db.Model):
     type = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer)
     soc_id = db.Column(db.Integer)
+    soc_username = db.Column(db.String(128))
     soc_email = db.Column(db.String(512))
     user_token = db.Column(db.String(512))
     token_secret = db.Column(db.String(512))
