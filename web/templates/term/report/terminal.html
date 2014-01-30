@@ -27,7 +27,7 @@
                         <table  class="m-spot-table">
                         <tr>
                             <th width="300">Терминал</th>
-                            <th>Количество</th>
+                            <th>Суммы</th>
                         </tr>
                         </table>
                     </th>
@@ -40,11 +40,11 @@
                     <table  class="m-spot-table">
                         <tr ng-repeat="row in report.detaled">
                             <td width="300">{[{row.term}]}</td>
-                            <td>{[{row.count}]}</td>
+                            <td>{[{row.amount}]}</td>
                         </tr>
                         <tr>
                             <td><strong>Всего</strong></td>
-                            <td><strong>{[{report.count}]}</strong></td>
+                            <td><strong>{[{report.amount}]}</strong></td>
                         </tr>
                     </table>
                     </td>
