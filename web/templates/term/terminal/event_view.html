@@ -3,9 +3,7 @@
 {% block content %}
 <span ng-init="term.id={{term.id}};"></span>
 <h2 class="g-color-blue m-page-name">
-    <div>
-        {{term_event.event.name}}
-    </div>
+    {{term_event.event.name}}
     <div class="block-nav">
         <a href="/terminal">Терминалы</a>
         <a href="/terminal/{{term.id}}">{{term.name}}</a>

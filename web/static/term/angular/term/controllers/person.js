@@ -59,7 +59,7 @@ angular.module('term').controller('PersonController',
   });
 
   //Привязываем карту к человеку
-  $scope.saveCard = function(person, valid) {
+  $scope.bindCard = function(person, valid) {
     if (!valid) {
       angular.element('input[name=card_code]').addClass('error');
       return false;

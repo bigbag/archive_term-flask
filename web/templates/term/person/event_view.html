@@ -3,9 +3,7 @@
 {% block content %}
 <span ng-init="person.id={{person.id}};"></span>
 <h2 class="g-color-blue m-page-name">
-    <div>
-        {{person_event.term.name}}, {{person_event.event.name}}
-    </div>
+    {{person_event.term.name}}, {{person_event.event.name}}
     <div class="block-nav">
         <a href="/person">Люди</a>
         <a href="/person/{{person.id}}">{{person.name}}</a>

@@ -3,9 +3,7 @@
 {% block content %}
 <span ng-init="person.id={{person.id}};person.status={{person.status}}"></span>
 <h2 class="g-color-blue m-page-name" ng-controller="PersonController">
-    <div>
-        {{person.name}}
-    </div>
+    {{person.name}}
     <div class="right">
         <a ng-click="removePerson(person)" 
             class="f-spot-button bg-red small">
@@ -36,7 +34,7 @@
                         required>
                 </div>
                 <div class="content-row g-clearfix">
-                    <a ng-click="saveCard(person, cardForm.$valid)"
+                    <a ng-click="bindCard(person, cardForm.$valid)"
                         class="f-spot-button">
                        Сохранить
                     </a>
