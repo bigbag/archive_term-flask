@@ -19,6 +19,7 @@
         <thead>
             <tr>
                 <th><span >Имя</span></th>
+                <th>Номер карты</th>
                 <th>Карта</th>
                 <th>Статус</th>
             </tr>
@@ -28,6 +29,7 @@
                 ng-repeat="person in result" 
                 class="m-t-cont-row">
                 <td>{[{person.name}]}</td>
+                <td>{[{person.card}]}</td>
                 <td>
                     <span class="m-card-act g-round"
                         ng-class="(person.hard_id==1)?'active':''"></span>
