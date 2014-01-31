@@ -103,7 +103,7 @@ def terminal_info(term_id):
 def terminal_save(term_id, action):
     """Добавляем или редактируем терминал"""
 
-    answer = dict(error='yes', message='')
+    answer = dict(error='yes', message='Произошла ошибка')
     arg = json.loads(request.stream.read())
     action_list = ('add', 'edit')
 
@@ -122,23 +122,25 @@ def terminal_save(term_id, action):
 
     if term and term.id and term.id != id:
         answer['message'] = u'Терминал с таким SN уже есть в системе'
-    else:
-        form = TermAddForm.from_json(arg)
-        if form.validate():
-            form.populate_obj(term)
+        return jsonify(answer)
 
-            result = False
-            if 'add' in action:
-                result = term.term_add(g.firm_info['id'])
-            elif 'edit' in action:
-                result = term.save()
+    form = TermAddForm.from_json(arg)
+    if not form.validate():
+        answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
+        return jsonify(answer)
 
-            if result:
-                answer['error'] = 'no'
-                answer['message'] = u'Данные сохранены'
-        else:
-            answer[
-                'message'] = u'Форма заполнена неверно, проверьте формат полей'
+    form.populate_obj(term)
+
+    result = False
+    if 'add' in action:
+        result = term.term_add(g.firm_info['id'])
+    elif 'edit' in action:
+        result = term.save()
+
+    if result:
+        answer['error'] = 'no'
+        answer['message'] = u'Данные сохранены'
+        return jsonify(answer)
 
     return jsonify(answer)
 
@@ -149,7 +151,7 @@ def terminal_save(term_id, action):
 def terminal_locking(term_id):
     """Блокировка и разблокировка терминал"""
 
-    answer = dict(error='yes', message='')
+    answer = dict(error='yes', message='Произошла ошибка')
     arg = get_post_arg(request, True)
 
     if 'status' not in arg or 'id' not in arg:
@@ -176,7 +178,7 @@ def terminal_locking(term_id):
 def terminal_remove(term_id):
     """Удаление терминала"""
 
-    answer = dict(error='yes', message='')
+    answer = dict(error='yes', message='Произошла ошибка')
     arg = get_post_arg(request, True)
 
     term = Term().get_info_by_id(term_id)
@@ -185,13 +187,15 @@ def terminal_remove(term_id):
 
     report = Report.query.filter_by(term_id=term.id).first()
 
-    if not report:
-        if term.term_remove():
-            answer['error'] = 'no'
-            answer['message'] = u'Операция успешно выполнена'
-    else:
+    if report:
         answer['message'] = u"""Невозможно удалить.
             По терминалу была совершена операция."""
+        return jsonify(answer)
+
+    if term.term_remove():
+        answer['error'] = 'no'
+        answer['message'] = u'Операция успешно выполнена'
+        return jsonify(answer)
 
     return jsonify(answer)
 
@@ -228,7 +232,7 @@ def terminal_event_info(term_id, term_event_id):
 def terminal_event_save(term_id, term_event_id):
     """Сохраняем событие привязаное к терминалу"""
 
-    answer = dict(error='yes', message='')
+    answer = dict(error='yes', message='Произошла ошибка')
     arg = get_post_arg(request, True)
 
     term = Term.query.get(term_id)
@@ -243,24 +247,23 @@ def terminal_event_save(term_id, term_event_id):
             abort(404)
 
     form = TermEventAddForm.from_json(arg)
-    if form.validate():
-        form.populate_obj(term_event)
-
-        term_event_old = TermEvent.query.filter_by(
-            term_id=term.id, event_id=term_event.event_id).first()
-
-        if term_event_old and (term_event.id != term_event_old.id):
-            answer['message'] = u"""Такое событие уже есть,
-                                    удалите старое или измените тип нового"""
-        else:
-            term_event.save()
-            answer['error'] = 'no'
-            answer['message'] = u'Данные сохранены'
-        # elif term_event.term_event_save(g.firm_info['id'], term.id):
-        #     if term_event_id == 0:
-        #         term_event.save()
-    else:
+    if not form.validate():
         answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
+        return jsonify(answer)
+
+    form.populate_obj(term_event)
+    term_event_old = TermEvent.query.filter_by(
+        term_id=term.id, event_id=term_event.event_id).first()
+
+    if term_event_old and (term_event.id != term_event_old.id):
+        answer['message'] = u"""Такое событие уже есть,
+                                удалите старое или измените тип нового"""
+        return jsonify(answer)
+
+    if term_event.save():
+        answer['error'] = 'no'
+        answer['message'] = u'Данные сохранены'
+        return jsonify(answer)
 
     return jsonify(answer)
 
@@ -271,7 +274,7 @@ def terminal_event_save(term_id, term_event_id):
 def terminal_event_delete(term_id, term_event_id):
     """Удаляем событие привязаное к терминалу"""
 
-    answer = dict(error='yes', message='')
+    answer = dict(error='yes', message='Произошла ошибка')
     arg = get_post_arg(request, True)
 
     firm_term = FirmTerm().get_list_by_firm_id(g.firm_info['id'])

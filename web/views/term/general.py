@@ -64,18 +64,19 @@ def get_firm_name(request):
 
     if 'firm_info' in session:
         return session['firm_info']
-    else:
-        result = False
-        headers = request.headers
-        if 'Host' in headers:
-            host = request.headers['Host']
-            host_name = host.split('.')
-            firm = Firm().get_by_sub_domain(host_name[0])
-            if firm:
-                name = firm.name
-                result = dict(name=firm.name, id=firm.id)
-                session['firm_info'] = result
-        return result
+
+    result = False
+    headers = request.headers
+    if 'Host' in headers:
+        host = request.headers['Host']
+        host_name = host.split('.')
+        firm = Firm().get_by_sub_domain(host_name[0])
+
+        if firm:
+            name = firm.name
+            result = dict(name=firm.name, id=firm.id)
+            session['firm_info'] = result
+    return result
 
 
 def get_error(message, code):
@@ -144,7 +145,8 @@ def login():
     if term_user.status == TermUser.STATUS_NOACTIVE:
         answer['content'] = u'Пользователь не активирован'
         return jsonify(answer)
-    elif term_user.status == TermUser.STATUS_BANNED:
+
+    if term_user.status == TermUser.STATUS_BANNED:
         answer['content'] = u'Пользователь заблокирован'
         return jsonify(answer)
 
@@ -196,7 +198,8 @@ def forgot_request():
     if term_user.status == TermUser.STATUS_NOACTIVE:
         answer['content'] = u'Пользователь не активирован'
         return jsonify(answer)
-    elif term_user.status == TermUser.STATUS_BANNED:
+
+    if term_user.status == TermUser.STATUS_BANNED:
         answer['content'] = u'Пользователь заблокирован'
         return jsonify(answer)
 

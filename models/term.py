@@ -106,12 +106,10 @@ class Term(db.Model):
             hard_id=hard_id,
             status=self.STATUS_VALID).first()
 
-    #@cache.cached(timeout=60, key_prefix='term_by_hard_id')
     def get_by_hard_id(self, hard_id):
         return self.query.filter_by(
             hard_id=int(hard_id)).first()
 
-    #@cache.cached(timeout=60, key_prefix='term_by_id')
     def get_by_id(self, id):
         return self.query.filter_by(
             id=int(id)).first()
@@ -152,7 +150,6 @@ class Term(db.Model):
             self.download_start = term.download_start
         return self
 
-    #@cache.cached(timeout=10, key_prefix='select_term_list')
     def select_term_list(self, firm_id, **kwargs):
         tz = app.config['TZ']
         date_pattern = '%H:%M %d.%m.%y'

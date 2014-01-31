@@ -41,7 +41,6 @@ class Person(db.Model):
         self.creation_date = date_helper.get_curent_date()
         self.name = 'Anonim'
 
-    @cache.cached(timeout=5, key_prefix='select_person_list')
     def select_person_list(self, firm_id, **kwargs):
         order = kwargs[
             'order'] if 'order' in kwargs else 'name asc'

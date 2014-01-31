@@ -104,7 +104,7 @@ def person_info(person_id):
 def person_save(person_id):
     """Добавляем или редактируем человека"""
 
-    answer = dict(error='yes', message='', person_id=0)
+    answer = dict(error='yes', message='Произошла ошибка', person_id=0)
     arg = json.loads(request.stream.read())
     form = PersonAddForm.from_json(arg)
 
@@ -126,16 +126,18 @@ def person_save(person_id):
         if not person:
             abort(404)
 
-    if form.validate():
-        form.populate_obj(person)
+    if not form.validate():
+        answer['message'] = u"""Форма заполнена неверно,
+                            проверьте формат полей"""
+        return jsonify(answer)
 
-        if person.save():
-            answer['person_id'] = person.id
-            answer['error'] = 'no'
-            answer['message'] = u'Данные сохранены'
-        else:
-            answer[
-                'message'] = u'Форма заполнена неверно, проверьте формат полей'
+    form.populate_obj(person)
+    if person.save():
+        answer['person_id'] = person.id
+        answer['error'] = 'no'
+        answer['message'] = u'Данные сохранены'
+        return jsonify(answer)
+
     return jsonify(answer)
 
 
@@ -145,7 +147,7 @@ def person_save(person_id):
 def person_add_card(person_id):
     """Привязываем к человеку карту"""
 
-    answer = dict(error='yes', message='')
+    answer = dict(error='yes', message='Произошла ошибка')
     arg = json.loads(request.stream.read())
 
     code = arg['card_code'] if 'card_code' in arg else False
@@ -172,7 +174,7 @@ def person_add_card(person_id):
 
 
 def person_bind_card(code):
-    answer = dict(error='yes', message='', wallet=False)
+    answer = dict(error='yes', message='Произошла ошибка', wallet=False)
 
     spot = Spot().get_valid_by_code(code)
     if not spot:
@@ -190,15 +192,12 @@ def person_bind_card(code):
     person = Person.query.filter_by(
         payment_id=wallet.payment_id,
         firm_id=firm_info['id']).first()
-    print 1
+
     if person:
         answer['message'] = u'Данная карта уже привязана'
-        print 3
         return answer
 
     answer['wallet'] = wallet
-
-    print 2
     return answer
 
 
@@ -207,7 +206,7 @@ def person_bind_card(code):
 def person_lock(person_id):
     """Блокировка сотрудника"""
 
-    answer = dict(error='yes', message='', status=False)
+    answer = dict(error='yes', message='Произошла ошибка', status=False)
     arg = get_post_arg(request, True)
 
     if 'status' not in arg or 'id' not in arg:
@@ -248,24 +247,16 @@ def person_lock(person_id):
 def person_remove(person_id):
     """Удаление сотрудника"""
 
-    answer = dict(error='yes', message='', status=False)
+    answer = dict(error='yes', message='Произошла ошибка', status=False)
     arg = get_post_arg(request, True)
 
     person = Person.query.get(person_id)
     if not person:
         abort(404)
 
-    report = None
-    if person.payment_id:
-        report = Report.query.filter_by(payment_id=person.payment_id).first()
-
-    if report:
-        answer['message'] = u"""Невозможно удалить.
-            По карте была совершена операция."""
-    else:
-        person.delete()
-        answer['error'] = 'no'
-        answer['message'] = u'Операция успешно выполнена'
+    person.delete()
+    answer['error'] = 'no'
+    answer['message'] = u'Операция успешно выполнена'
 
     return jsonify(answer)
 
@@ -304,7 +295,7 @@ def person_event_info(person_id, person_event_id):
 def person_event_save(person_id, person_event_id):
     """Сохраняем событие привязаное к человеку"""
 
-    answer = dict(error='yes', message='')
+    answer = dict(error='yes', message='Произошла ошибка')
     arg = get_post_arg(request, True)
 
     if 'term_event_id' not in arg:
@@ -328,25 +319,29 @@ def person_event_save(person_id, person_event_id):
             abort(404)
 
     form = PersonEventAddForm.from_json(arg)
-    if form.validate():
-        form.populate_obj(person_event)
-        person_event.term_id = term_event.term_id
-        person_event.event_id = term_event.event_id
-        person_event.firm_id = g.firm_info['id']
-
-        person_event_old = PersonEvent.query.filter_by(
-            person_id=person.id,
-            term_id=term_event.term_id,
-            event_id=term_event.event_id).first()
-
-        if person_event_old and (person_event.id != person_event_old.id):
-            answer['message'] = u"""Такое событие уже есть,
-                                    удалите старое или измените тип нового"""
-        elif person_event.save():
-            answer['error'] = 'no'
-            answer['message'] = u'Данные сохранены'
-    else:
+    if not form.validate():
         answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
+        return jsonify(answer)
+
+    form.populate_obj(person_event)
+    person_event.term_id = term_event.term_id
+    person_event.event_id = term_event.event_id
+    person_event.firm_id = g.firm_info['id']
+
+    person_event_old = PersonEvent.query.filter_by(
+        person_id=person.id,
+        term_id=term_event.term_id,
+        event_id=term_event.event_id).first()
+
+    if person_event_old and (person_event.id != person_event_old.id):
+        answer['message'] = u"""Такое событие уже есть,
+                                удалите старое или измените тип нового"""
+        return jsonify(answer)
+
+    if person_event.save():
+        answer['error'] = 'no'
+        answer['message'] = u'Данные сохранены'
+        return jsonify(answer)
 
     return jsonify(answer)
 
@@ -357,7 +352,7 @@ def person_event_save(person_id, person_event_id):
 def person_event_delete(person_id, person_event_id):
     """Удаляем событие привязаное к человеку"""
 
-    answer = dict(error='yes', message='')
+    answer = dict(error='yes', message='Произошла ошибка')
     arg = get_post_arg(request, True)
 
     person_event = PersonEvent.query.filter_by(
@@ -379,7 +374,7 @@ def person_event_delete(person_id, person_event_id):
 def person_save_corp_wallet(person_id):
     """Добавляем или редактируем корпоративный кошелёк"""
 
-    answer = dict(error='yes', message='')
+    answer = dict(error='yes', message='Произошла ошибка')
     arg = get_post_arg(request, True)
 
     person_limit = arg['limit'] if 'limit' in arg else False
@@ -423,7 +418,7 @@ def person_save_corp_wallet(person_id):
 def person_remove_corp_wallet(person_id):
     """Удаляем корпоративный кошелёк"""
 
-    answer = dict(error='yes', message='')
+    answer = dict(error='yes', message='Произошла ошибка')
     arg = get_post_arg(request, True)
 
     wallet_id = arg['id'] if 'id' in arg else False

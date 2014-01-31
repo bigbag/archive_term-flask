@@ -11,6 +11,12 @@
         <div class="content">{% include 'term/person/list.html' %}</div>
     </section>
     <section class="section">
+        <p class="title" ng-click="getContent($event, 'person', 'list')">
+            <a ng-click="search.status=0">Заблокированные</a>
+        </p>
+        <div class="content"></div>
+    </section>
+    <section class="section">
         <p class="title">
             <a>Добавить</a>
         </p>
@@ -18,12 +24,6 @@
             {% include 'term/person/form.html' %}
             <!-- {% include 'term/person/import.html' %} -->
         </div>
-    </section>
-    <section class="section">
-        <p class="title" ng-click="getContent($event, 'person', 'list')">
-            <a ng-click="search.status=0">Заблокированные</a>
-        </p>
-        <div class="content"></div>
     </section>
 </div>
 {% endblock %}
