@@ -70,16 +70,18 @@ class ReportParser(Command):
         if not wallet or wallet.user_id == 0:
             lost = PaymentLost()
             lost.add_lost_payment(report)
-        else:
-            wallet.balance = int(
-                wallet.balance) - int(
-                    report.amount)
+            return error
 
-            if not wallet.save():
-                error = True
-            else:
-                history = PaymentHistory()
-                history.add_history(wallet, report)
+        wallet.balance = int(
+            wallet.balance) - int(
+                report.amount)
+
+        if not wallet.save():
+            error = True
+            return error
+
+        history = PaymentHistory()
+        history.add_history(wallet, report)
 
         return error
 
@@ -173,10 +175,9 @@ class ReportParser(Command):
                 os.makedirs(new_file_patch)
 
             os.rename(file_name, new_file_name)
-
             return True
-        else:
-            return False
+
+        return False
 
     def set_reccurent_on(self):
         reccurents = PaymentReccurent.query.filter_by(

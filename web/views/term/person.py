@@ -141,10 +141,10 @@ def person_save(person_id):
     return jsonify(answer)
 
 
-@mod.route('/person/<int:person_id>/add_card', methods=['POST'])
+@mod.route('/person/<int:person_id>/bind_card', methods=['POST'])
 @login_required
 @json_headers
-def person_add_card(person_id):
+def person_bind_card(person_id):
     """Привязываем к человеку карту"""
 
     answer = dict(error='yes', message='Произошла ошибка')
@@ -166,6 +166,7 @@ def person_add_card(person_id):
     wallet = bind_card['wallet']
     person.payment_id = wallet.payment_id
     person.hard_id = wallet.hard_id
+    person.status = Person.STATUS_VALID
     if person.save():
         answer['error'] = 'no'
         answer['message'] = u'Карта успешно привязана'
@@ -199,6 +200,29 @@ def person_bind_card(code):
 
     answer['wallet'] = wallet
     return answer
+
+
+@mod.route('/person/<int:person_id>/unbind_card', methods=['POST'])
+@login_required
+@json_headers
+def person_unbind_card(person_id):
+    """Отвязываем карту от человека"""
+
+    answer = dict(error='yes', message='Произошла ошибка')
+    arg = json.loads(request.stream.read())
+
+    person = Person.query.get(person_id)
+    if not person:
+        abort(404)
+
+    person.payment_id = None
+    person.hard_id = None
+    person.status = Person.STATUS_BANNED
+    if person.save():
+        answer['error'] = 'no'
+        answer['message'] = u'Карта успешно отвязана'
+
+    return jsonify(answer)
 
 
 @mod.route('/person/<int:person_id>/lock', methods=['POST'])

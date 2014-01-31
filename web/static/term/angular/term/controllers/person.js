@@ -64,12 +64,28 @@ angular.module('term').controller('PersonController',
       angular.element('input[name=card_code]').addClass('error');
       return false;
     };
-    person.action = 'add_card';
+    person.action = 'bind_card';
     
     var url = '/person/' + person.id + '/' + person.action;
     person.csrf_token = $scope.token;
     $http.post(url, person).success(function(data) {
       contentService.scrollPage('.m-page-name');
+      if (data.error === 'yes') {
+        contentService.setModal(data.message, 'error');
+      } else {
+        contentService.setModal(data.message, 'success');
+        setTimeout(function(){
+          $(location).attr('href', '/person/' + person.id);
+        }, 2000);
+      }
+    });  
+  };
+
+  //Отвязываем карту от человеку
+  $scope.unbindCard = function(person) {
+    var url = '/person/' + person.id + '/unbind_card';
+    person.csrf_token = $scope.token;
+    $http.post(url, person).success(function(data) {
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
       } else {
