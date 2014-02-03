@@ -1,13 +1,10 @@
-from flask import Flask
+from flask import Flask, g
 
 app = Flask(__name__)
 app.config.from_object('configs.general.Config')
 
 from libs.redis_cache import SimpleRedisCache
 cache = SimpleRedisCache(app)
-
-from libs.mailer import Mailer
-mailer = Mailer(app)
 
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)

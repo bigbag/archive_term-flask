@@ -10,15 +10,21 @@ from web import app
 from celery import Celery
 from celery.schedules import crontab
 
-# app.config.update(
-#     CELERYBEAT_SCHEDULE={
-#         'every-minute': {
-#             'task': 'console.tasks.sms.send',
-#             'schedule': crontab(minute='*/1'),
-#             'args': ('7', 'test1'),
-#         },
-#     }
-# )
+app.config.update(
+    CELERYBEAT_SCHEDULE={
+        'every-wheek': {
+            'task': 'web.tasks.corp_wallet.recovery_limit',
+            'schedule': crontab(hour=0, minute=11, day_of_week=1),
+            'args': ('1',),
+        },
+        'every-month': {
+            'task': 'web.tasks.corp_wallet.recovery_limit',
+            'schedule': crontab(hour=0, minute=22, day_of_month=1),
+            'args': ('2',),
+        },
+    },
+    CELERY_TIMEZONE='Europe/Moscow'
+)
 
 
 def make_celery(app):
