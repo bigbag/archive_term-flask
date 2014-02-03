@@ -1,5 +1,5 @@
 <div class="m-block" ng-controller="PersonController">
-    <form class="custom" name="eventForm">
+    <form name="eventForm">
         <div class="row"
             ng-init="person_event.id={{person_event.id|replace("None", 0)}};person_event.person_id={{person.id}}">
             <div class="large-5 columns">
@@ -12,11 +12,13 @@
                         ng-model="person_event.term_event_id"
                         required>
                         {% for row in term_events %}
-                        <option 
-                            {% if row.id == term_event.id %} selected {% endif %} 
-                            value="{{row.id}}">
-                            {{row.term.name}}, {{row.event.name}}
-                        </option>
+                            {% if row.term.hard_id %}
+                            <option 
+                                {% if row.id == term_event.id %} selected {% endif %} 
+                                value="{{row.id}}">
+                                №{{row.term.hard_id}}, {{row.term.name}}, {{row.event.name}}
+                            </option>
+                            {% endif %}
                         {% endfor %}
                     </select>
                    
