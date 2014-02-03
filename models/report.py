@@ -175,7 +175,8 @@ class Report(db.Model):
         payment_type = kwargs[
             'payment_type'] if 'payment_type' in kwargs else self.TYPE_WHITE
 
-        firm_term = FirmTerm().get_list_by_firm_id(firm_id)
+        child_firm = True if payment_type == self.TYPE_WHITE else False
+        firm_term = FirmTerm().get_list_by_firm_id(firm_id, child_firm)
         g.firm_term = firm_term
 
         query = db.session.query(
@@ -230,7 +231,7 @@ class Report(db.Model):
 
         return answer
 
-    @cache.cached(timeout=120, key_prefix='report_interval')
+    #@cache.cached(timeout=120, key_prefix='report_interval')
     def get_firm_interval_report(self, firm_id, **kwargs):
         payment_type = self.TYPE_WHITE
 

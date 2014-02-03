@@ -45,9 +45,15 @@ class FirmTerm(db.Model):
         return firm_id_list
 
     @cache.cached(timeout=30, key_prefix='list_by_firm_id')
-    def get_list_by_firm_id(self, firm_id):
-        firm_terms = self.query.filter_by(
-            child_firm_id=firm_id).all()
+    def get_list_by_firm_id(self, firm_id, child=False):
+        query = self.query
+
+        if child:
+            query = query.filter_by(child_firm_id=firm_id)
+        else:
+            query = query.filter_by(firm_id=firm_id)
+
+        firm_terms = query.all()
 
         firm_id_list = []
         for firm_term in firm_terms:
