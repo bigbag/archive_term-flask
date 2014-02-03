@@ -23,11 +23,6 @@ app.config.update(
             'schedule': crontab(hour=0, minute=22, day_of_month=1),
             'args': ('2',),
         },
-        'every-test': {
-            'task': 'web.tasks.corp_wallet.recovery_limit_test',
-            'schedule': crontab(hour=18, minute=00),
-            'args': ('1',),
-        },
     },
 )
 
