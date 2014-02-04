@@ -23,7 +23,7 @@
         <div class="content-row">
             <p class="hint-txt">Для того что бы задействовать корпоративный кошелёк, введите лимит операций для данного человека, а так же укажите сбрасывать ли лимит. Минимальная сумма 100 рублей</p>
         </div>
-        <span ng-init="corp_wallet.type=0;corp_wallet.person_id=person.id"></span>
+        <span ng-init="corp_wallet.type={{corp_wallet.interval}};corp_wallet.person_id=person.id;corp_wallet.limit={{corp_wallet.limit/100}}"></span>
         <form name="myForm" class="custom">
             <div class="content-row left g-clearfix pad_b_0">
                 <label for="amount-limit">Сумма*</label>

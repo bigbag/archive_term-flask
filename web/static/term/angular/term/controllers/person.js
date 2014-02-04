@@ -171,7 +171,10 @@ angular.module('term').controller('PersonController',
 
   //Добавляем корпоративный кошелёк
   $scope.saveCorpWallet = function(corp_wallet, valid){
-    if (!valid) return false;
+    if (!valid) {
+      angular.element('input[name=corp_wallet_limit]').addClass('error');
+      return false;
+    };
     if (corp_wallet.amount < 100) return false;
 
     corp_wallet.csrf_token = $scope.token;
@@ -182,8 +185,14 @@ angular.module('term').controller('PersonController',
       } else {
         contentService.setModal(data.message, 'success');
         angular.element('#wallet-info').html($compile(data.content)($scope));
+        $scope.corp_wallet = data.corp_wallet;
       }
     });  
+  }
+
+  //Редактируем кошелёк
+  $scope.editCorpWallet = function(corp_wallet){
+    $scope.corp_wallet.id = 0;
   }
 
   //Удаляем корпоративный кошелёк
@@ -200,16 +209,4 @@ angular.module('term').controller('PersonController',
       }
     });  
   }
-
-  // //Получаем блок управления расчетами пользователя, из корп. кошелька или с учетом тайм-аутов
-  // $scope.getPersonTypeBlock = function(person){
-  //   person.csrf_token = $scope.token;
-  //   var url = '/person/' + person.id + '/get_type_block';
-  //   $http.post(url, person).success(function(data) {
-  //     if (data.error === 'no') {
-  //       angular.element('#person-type').html($compile(data.content)($scope));
-  //       // $(document).foundation();
-  //     }
-  //   });  
-  // }
 });

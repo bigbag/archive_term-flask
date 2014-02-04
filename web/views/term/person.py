@@ -410,12 +410,17 @@ def person_save_corp_wallet(person_id):
     if not person:
         abort(404)
 
-    corp_wallet = TermCorpWallet()
-    corp_wallet.person_id = person.id
+    corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id).first()
+
+    if not corp_wallet:
+        corp_wallet = TermCorpWallet()
+        corp_wallet.person_id = person.id
+
     corp_wallet.balance = int(person_limit) * 100
     corp_wallet.interval = interval
     corp_wallet.limit = corp_wallet.balance
     corp_wallet.status = TermCorpWallet.STATUS_ACTIVE
+
     person.wallet_status = Person.STATUS_VALID
     person.type = Person.TYPE_WALLET
 
@@ -428,6 +433,7 @@ def person_save_corp_wallet(person_id):
         corp_wallet.save()
         answer['error'] = 'no'
         answer['message'] = u'Операция выполнена'
+        answer['corp_wallet'] = corp_wallet.to_json()
         answer['content'] = render_template(
             'term/person/wallet_view.html',
             corp_wallet=corp_wallet,

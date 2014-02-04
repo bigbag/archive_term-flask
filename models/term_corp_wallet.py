@@ -56,7 +56,8 @@ class TermCorpWallet(db.Model):
             person_id=self.person_id,
             balance=self.balance / 100,
             limit=self.limit / 100,
-            interval=corp_wallet_interval[self.interval]['name'],
+            interval=self.interval,
+            interval_name=corp_wallet_interval[self.interval]['name'],
         )
         return items
 
