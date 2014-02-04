@@ -44,7 +44,7 @@
                 required>
         </div>
         <div class="content-row"
-            ng-init="term_event.cost='{{term_event.cost}}'">
+            ng-init="term_event.cost='{{term_event.cost / factor}}'">
             <label for="price">Стоимость события</label>
             <input id="price" 
                 class="f-input-small" 

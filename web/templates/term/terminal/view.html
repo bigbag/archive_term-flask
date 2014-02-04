@@ -86,7 +86,7 @@
                             <td>{{term_event.event.name}}</td>
                             <td>{{term_event.start}}</td>
                             <td>{{term_event.stop}}</td>
-                            <td>{{term_event.cost}}</td>
+                            <td>{{term_event.cost / term_event.term.factor}}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

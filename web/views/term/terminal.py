@@ -81,6 +81,7 @@ def terminal_info(term_id):
 
     events = Event().get_events()
     term_event = TermEvent()
+    factor = 1
 
     term_access = FirmTerm().get_access_by_firm_id(g.firm_info['id'], term_id)
     term_events = TermEvent.query.filter(TermEvent.term_id == term_id)
@@ -90,6 +91,7 @@ def terminal_info(term_id):
         term=term,
         events=events,
         term_event=term_event,
+        factor=factor,
         term_events=term_events,
         term_access=term_access,
         term_types=Term().get_type_list(),
@@ -222,7 +224,8 @@ def terminal_event_info(term_id, term_event_id):
         'term/terminal/event_view.html',
         term=term,
         events=events,
-        term_event=term_event
+        term_event=term_event,
+        factor=term_event.term.factor
     )
 
 
@@ -246,6 +249,7 @@ def terminal_event_save(term_id, term_event_id):
         if not term_event:
             abort(404)
 
+    arg['cost'] = int(float(arg['cost']))
     form = TermEventAddForm.from_json(arg)
     if not form.validate():
         answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
@@ -260,6 +264,7 @@ def terminal_event_save(term_id, term_event_id):
                                 удалите старое или измените тип нового"""
         return jsonify(answer)
 
+    term_event.cost = term_event.cost * term.factor
     if term_event.save():
         answer['error'] = 'no'
         answer['message'] = u'Данные сохранены'
