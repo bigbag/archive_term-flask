@@ -13,6 +13,7 @@ from web.form.term.event import TermEventAddForm
 from models.term import Term
 from models.report import Report
 from models.event import Event
+from models.firm import Firm
 from models.firm_term import FirmTerm
 from models.term_event import TermEvent
 
@@ -60,7 +61,7 @@ def terminal_view():
 def terminal_list():
     """Получаем список терминалов принадлежащих фирме"""
 
-    arg = json.loads(request.stream.read())
+    arg = get_post_arg(request, True)
     answer = Term().select_term_list(
         g.firm_info['id'], **arg)
 
@@ -72,31 +73,131 @@ def terminal_list():
 def terminal_info(term_id):
     """Информация о терминале"""
 
-    if not term_id in FirmTerm().get_list_by_firm_id(g.firm_info['id']):
+    firm_terms = FirmTerm().get_list_by_firm_id(g.firm_info['id'])
+    if not term_id in firm_terms:
         abort(403)
 
     term = Term().get_info_by_id(term_id)
     if not term:
         abort(404)
 
-    events = Event().get_events()
-    term_event = TermEvent()
-    factor = 1
-
     term_access = FirmTerm().get_access_by_firm_id(g.firm_info['id'], term_id)
-    term_events = TermEvent.query.filter(TermEvent.term_id == term_id)
+    term_events = TermEvent.query.filter(TermEvent.term_id == term_id).all()
 
     return render_template(
         'term/terminal/view.html',
         term=term,
-        events=events,
-        term_event=term_event,
-        factor=factor,
+        events=Event().get_events(),
+        term_event=TermEvent(),
+        factor=Term.DEFAULT_FACTOR,
         term_events=term_events,
         term_access=term_access,
         term_types=Term().get_type_list(),
         term_blacklist=Term().get_blacklist_list(),
     )
+
+
+@mod.route('/terminal/<int:term_id>/rent/info', methods=['POST'])
+@login_required
+def terminal_rent_info(term_id):
+    """Информация о сдачи терминала в аренду"""
+
+    answer = dict(error='yes', message='Произошла ошибка')
+
+    term = Term().get_info_by_id(term_id)
+    if not term:
+        abort(404)
+
+    firm_terms = FirmTerm.query.filter(
+        FirmTerm.term_id == term.id).filter(
+            FirmTerm.firm_id == g.firm_info[
+                'id']).filter(
+                    FirmTerm.firm_id != FirmTerm.child_firm_id).all(
+                    )
+
+    rents = []
+    for row in firm_terms:
+        rents.append(row.to_json())
+
+    answer['error'] = 'no'
+    answer['message'] = ''
+    answer['rents'] = rents
+    return jsonify(answer)
+
+
+@mod.route('/terminal/<int:term_id>/rent/add', methods=['POST'])
+@login_required
+def terminal_rent_add(term_id):
+    """Сдаём терминал в аренду"""
+
+    answer = dict(error='yes', message='Произошла ошибка')
+    arg = get_post_arg(request, True)
+    error = False
+
+    term = Term().get_info_by_id(term_id)
+    if not term:
+        abort(404)
+
+    firm_terms = FirmTerm.query.filter_by(
+        term_id=term_id,
+        firm_id=g.firm_info['id']).all()
+    if not firm_terms:
+        abort(405)
+
+    child_firm = Firm.query.filter_by(sub_domain=arg['sub_domain']).first()
+    if not child_firm:
+        answer['message'] = u'Фирма с таким поддоменом не найдена'
+        return jsonify(answer)
+
+    if child_firm.id == g.firm_info['id']:
+        answer['message'] = u'Вы не можете сдать терминал сами себе'
+        return jsonify(answer)
+
+    parent_firm_id = False
+    for firm_term in firm_terms:
+        parent_firm_id = firm_term.firm_id
+        if firm_term.child_firm_id == child_firm.id:
+            error = True
+
+    if error:
+        answer['message'] = u'Вы уже сдаете этот терминал данной фирме'
+        return jsonify(answer)
+
+    firm_term = FirmTerm()
+    firm_term.term_id = term.id
+    firm_term.firm_id = parent_firm_id
+    firm_term.child_firm_id = child_firm.id
+
+    if firm_term.save():
+        answer['error'] = 'no'
+        answer['message'] = u'Операция выполнена'
+
+    return jsonify(answer)
+
+
+@mod.route('/terminal/<int:term_id>/rent/remove', methods=['POST'])
+@login_required
+def terminal_rent_remove(term_id):
+    """Удаляем аренду терминала"""
+
+    answer = dict(error='yes', message='Произошла ошибка')
+    arg = get_post_arg(request, True)
+
+    if 'id' not in arg:
+        abort(405)
+
+    term = Term().get_info_by_id(term_id)
+    if not term:
+        abort(404)
+
+    firm_term = FirmTerm.query.get(int(arg['id']))
+    if not firm_term:
+        abort(404)
+
+    firm_term.delete()
+    answer['error'] = 'no'
+    answer['message'] = u'Операция выполнена'
+    return jsonify(answer)
 
 
 @mod.route('/terminal/<int:term_id>/<action>', methods=['POST'])
@@ -106,7 +207,7 @@ def terminal_save(term_id, action):
     """Добавляем или редактируем терминал"""
 
     answer = dict(error='yes', message='Произошла ошибка')
-    arg = json.loads(request.stream.read())
+    arg = get_post_arg(request, True)
     action_list = ('add', 'edit')
 
     if action not in action_list:

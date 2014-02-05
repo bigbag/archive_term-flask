@@ -1,0 +1,59 @@
+<div class="content-wrap content-separation">
+    <div class="content-row right">
+        <h6>Последние сеансы связи:</h6>
+        <table class="m-session-table">
+            <tr>
+                <td>Загрузка отчета</td>
+                <td>{{term.report_date|replace("None", "не было")}}</td>
+            </tr>
+            <tr>
+                <td>Загрузка настроек</td>
+                <td>{{term.config_date|replace("None", "не было")}}</td>
+            </tr>
+            <tr>
+                <td>Загрузка черного списка</td>
+                <td> {{term.blacklist_date|replace("None", "не было")}}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="content-row row-separation-l">
+        <p class="m-hint">Для изменения события кликните по соотвествующей строке в таблице</p>
+    </div>
+    {% if term_access %}
+    <div class="content-row f-main-slide-link">
+        <div class="toggle-active">
+            <a id="event" class="loc-link f-spot-button small">
+                + Добавить событие
+            </a>
+            
+        </div>
+    </div>
+    <div id="eventForm" class="slide-box slide-setting">
+        {% include 'term/terminal/event_form.html' %}
+    </div>
+    {% endif %}
+    <table class="m-spot-table">
+        <thead>
+        <tr>
+            <th><span>Событие</span></th>
+            <th>Начало</th>
+            <th>Конец</th>
+            <th>Стоимость</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for term_event in term_events %}
+            <tr 
+                {% if term_access %}
+                    ng-click="getTermEventEdit({{term_event.term_id}}, {{term_event.id}})"
+                {% endif %}
+                class="m-t-cont-row">
+                <td>{{term_event.event.name}}</td>
+                <td>{{term_event.start}}</td>
+                <td>{{term_event.stop}}</td>
+                <td>{{term_event.cost / term_event.term.factor}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

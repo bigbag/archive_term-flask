@@ -114,4 +114,47 @@ angular.module('term').controller('TerminalController',
     });  
   }
 
+  //Запрос на информацию об сдаче в аренду терминала
+  $scope.getRentTerminal= function(){
+    var url = window.location.pathname + '/rent/info';
+    $http.post(url, {}).success(function(data) {
+      if (data.error === 'yes') {
+        contentService.setModal(data.message, 'error');
+      } else {
+        $scope.rents = data.rents;
+      }
+    });  
+  }
+
+  //Сохраняем аренду терминала
+  $scope.addRentTerminal = function(info, valid) {
+    if (!valid) return false;
+    var url = window.location.pathname + '/rent/add';
+    info.csrf_token = $scope.token;
+    $http.post(url, info).success(function(data) {
+      if (data.error === 'yes') {
+        contentService.setModal(data.message, 'error');
+      } else {
+        contentService.setModal(data.message, 'success');
+        setTimeout(function(){
+          $(location).attr('href', window.location.pathname);
+        }, 2000);
+      }
+    });  
+  } 
+
+  //Удаляем аренду терминала
+  $scope.removeRentTerminal = function(id) {
+    var url = window.location.pathname + '/rent/remove';
+    var data = {csrf_token: $scope.token, id: id};
+    $http.post(url, data).success(function(data) {
+      if (data.error === 'yes') {
+        contentService.setModal(data.message, 'error');
+      } else {
+        contentService.setModal(data.message, 'success');
+        $scope.getRentTerminal();
+      }
+    });  
+  } 
+
 });

@@ -72,6 +72,23 @@ class FirmTerm(db.Model):
 
         return result
 
+    def to_json(self):
+        date_pattern = '%H:%M %d.%m.%Y'
+        creation_date = date_helper.from_utc(
+            self.creation_date,
+            app.config['TZ'])
+
+        items = dict(
+            id=self.id,
+            term_id=self.term_id,
+            firm_id=self.firm_id,
+            child_firm_id=self.child_firm_id,
+            child_firm_name=self.child_firm.name,
+            creation_date=creation_date.strftime(date_pattern)
+
+        )
+        return items
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

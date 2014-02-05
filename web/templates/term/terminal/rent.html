@@ -1,0 +1,55 @@
+<div class="content-wrap">
+    <div class="content-row f-main-slide-link">
+        <div class="toggle-active">
+            <a id="rent" class="loc-link f-spot-button small">Сдать в аренду</a>
+        </div>
+    </div>
+    <div id="rentForm" class="slide-box slide-setting">
+        <div class="m-block" ng-controller="TerminalController">
+            <form class="custom" name="rentForm">
+                <div class="content-row left g-clearfix">
+                    <label for="sub-domain">Поддомен фирмы арендатора*</label>
+                    <input id="sub-domain" 
+                        type="text"
+                        name="sub-domain"
+                        ng-maxlength="300"
+                        ng-model="info.sub_domain"
+                        required>
+                </div>
+            </form>
+            <br />
+            <div class="content-row g-clearfix">
+                <a ng-click="addRentTerminal(info, rentForm.$valid)"
+                    class="f-spot-button">Сохранить
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="content-row"  ng-hide="rents">
+        <p class="m-hint">
+            Вы не сдавали данный терминал в аренду.
+        </p>
+    </div>
+    <table class="m-spot-table" ng-show="rents">
+
+        <thead>
+        <tr>
+            <th>Фирма арендатор</th>
+            <th>Дата сдачи в аренду</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr class="m-t-cont-row"
+                ng-repeat="rent in rents">
+                <td>{[{rent.child_firm_name}]}</td>
+                <td>{[{rent.creation_date}]}</td>
+                <td>{[{rent.child_firm_name}]}</td>
+                <td ng-click="removeRentTerminal(rent.id)">
+                    <span class="m-card-act g-round"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+</div>
