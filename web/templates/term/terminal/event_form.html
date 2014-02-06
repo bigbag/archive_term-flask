@@ -43,6 +43,30 @@
                 ng-model="term_event.stop"
                 required>
         </div>
+        {% if term.type == 1%}
+        <div class="content-row left g-clearfix"
+            ng-init="term_event.min_item={{term_event.min_item}}">
+            <label for="min-item">Минимальное значение ячейки*</label>
+            <input id="min-item" 
+                class="f-input-small" 
+                type="text"
+                minlength="5"
+                maxlength="5"
+                ng-model="term_event.min_item"
+                required>
+        </div>
+        <div class="content-row g-clearfix"
+            ng-init="term_event.max_item={{term_event.max_item}}">
+            <label for="max-item">Максимальное значение ячейки*</label>
+            <input id="max-item" 
+                class="f-input-small" 
+                type="text"
+                minlength="6"
+                maxlength="6"
+                ng-model="term_event.max_item"
+                required>
+        </div>
+        {% endif %}
         <div class="content-row"
             ng-init="term_event.cost='{{term_event.cost / factor}}'">
             <label for="price">Стоимость события</label>

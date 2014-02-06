@@ -27,6 +27,9 @@ class TermEventAddForm(TokenSecureForm):
     stop = TextField(validators=[Optional(), base.time_check])
     term_id = IntegerField(InputRequired())
     event_id = IntegerField(InputRequired())
+    min_item = IntegerField(InputRequired())
+    max_item = IntegerField(InputRequired())
+
 
 class PersonEventAddForm(TokenSecureForm):
 
