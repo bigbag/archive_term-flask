@@ -23,6 +23,8 @@ class TermEvent(db.Model):
     timeout = db.Column(db.Integer, nullable=False)
     start = db.Column(db.String(10), nullable=False)
     stop = db.Column(db.String(10), nullable=False)
+    min_item = db.Column(db.Integer, nullable=False)
+    max_item = db.Column(db.Integer, nullable=False)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
@@ -34,6 +36,8 @@ class TermEvent(db.Model):
         self.start = "00:01"
         self.stop = "23:59"
         self.timeout = 300
+        self.min_item = 0
+        self.max_item = 65535
         self.event_id = 1
 
     def __repr__(self):

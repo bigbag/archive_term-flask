@@ -61,7 +61,7 @@
     {% endif %}
     {% endif %}
     {% for term_event in term_events %}
-    <event type="{{term_event.event.key}}" translation="{{term_event.event.name}}" min_time="{{term_event.start}}:00" max_time="{{term_event.stop}}:00" age_limit="{{term_event.age}}"  price="{{term_event.cost}}">
+    <event type="{{term_event.event.key}}" translation="{{term_event.event.name}}" min_time="{{term_event.start}}:00" max_time="{{term_event.stop}}:00" age_limit="{{term_event.age}}"  price="{{term_event.cost}}" {% if term.type == 'Vending' %}min_item="{{term_event.min_item}}" max_item="{{term_event.max_item}}"{% endif %}>
         {% for person_event in person_events %}
             {% if person_event.event_id == term_event.event_id %}
             {% set payment_id = person_event.person.payment_id %}
