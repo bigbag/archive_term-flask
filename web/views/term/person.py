@@ -429,8 +429,7 @@ def person_save_corp_wallet(person_id):
         person_event.timeout = 0
         person_event.save()
 
-    if person.save():
-        corp_wallet.save()
+    if person.save() and corp_wallet.save():
         answer['error'] = 'no'
         answer['message'] = u'Операция выполнена'
         answer['corp_wallet'] = corp_wallet.to_json()
@@ -462,13 +461,14 @@ def person_remove_corp_wallet(person_id):
 
     if person.type == Person.TYPE_WALLET:
         person.type = Person.TYPE_TIMEOUT
+        person.wallet_status = Person.STATUS_VALID
 
     corp_wallet = TermCorpWallet.query.get(wallet_id)
     if corp_wallet:
         corp_wallet.delete()
-        person.save()
-        answer['error'] = 'no'
-        answer['message'] = u'Корпоративный кошелек удален'
+        if person.save():
+            answer['error'] = 'no'
+            answer['message'] = u'Корпоративный кошелек удален'
 
     return jsonify(answer)
 
