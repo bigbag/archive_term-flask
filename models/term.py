@@ -32,7 +32,7 @@ class Term(db.Model):
 
     SEANS_ALARM = 86400
 
-    DEFAULT_FACTOR = 1
+    DEFAULT_FACTOR = 100
 
     id = db.Column(db.Integer, primary_key=True)
     hard_id = db.Column(db.Integer)

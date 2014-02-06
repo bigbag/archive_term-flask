@@ -17,6 +17,9 @@ class TermEvent(db.Model):
     __bind_key__ = 'term'
     __tablename__ = 'term_event'
 
+    DEFAULT_MIN_ITEM = 0
+    DEFAULT_MAX_ITEM = 65535
+
     id = db.Column(db.Integer, primary_key=True)
     age = db.Column(db.Integer, nullable=False)
     cost = db.Column(db.Integer, nullable=False)
@@ -36,8 +39,8 @@ class TermEvent(db.Model):
         self.start = "00:01"
         self.stop = "23:59"
         self.timeout = 300
-        self.min_item = 0
-        self.max_item = 65535
+        self.min_item = self.DEFAULT_MIN_ITEM
+        self.max_item = self.DEFAULT_MAX_ITEM
         self.event_id = 1
 
     def __repr__(self):
@@ -93,6 +96,10 @@ class TermEvent(db.Model):
 
     def save(self):
         try:
+            if not self.min_item:
+                self.max_item = self.DEFAULT_MIN_ITEM
+            if not self.min_item:
+                self.max_item = self.DEFAULT_MAX_ITEM
             db.session.add(self)
             db.session.commit()
         except Exception as e:

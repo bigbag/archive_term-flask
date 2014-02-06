@@ -68,13 +68,12 @@
         </div>
         {% endif %}
         <div class="content-row"
-            ng-init="term_event.cost='{{term_event.cost / factor}}'">
-            <label for="price">Стоимость события</label>
+            ng-init="term_event.cost='{{term_event.cost / 100}}'">
+            <label for="price">Стоимость события руб</label>
             <input id="price" 
-                class="f-input-small" 
                 type="text"
                 minlength="1"
-                maxlength="5"
+                maxlength="7"
                 ng-model="term_event.cost">
         </div>
         <div class="content-row g-clearfix"

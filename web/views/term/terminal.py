@@ -89,7 +89,6 @@ def terminal_info(term_id):
         term=term,
         events=Event().get_events(),
         term_event=TermEvent(),
-        factor=Term.DEFAULT_FACTOR,
         term_events=term_events,
         term_access=term_access,
         term_types=Term().get_type_list(),
@@ -350,7 +349,7 @@ def terminal_event_save(term_id, term_event_id):
         if not term_event:
             abort(404)
 
-    arg['cost'] = int(float(arg['cost']))
+    arg['cost'] = int(float(arg['cost']) * Term.DEFAULT_FACTOR)
     form = TermEventAddForm.from_json(arg)
     if not form.validate():
         answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
@@ -365,7 +364,7 @@ def terminal_event_save(term_id, term_event_id):
                                 удалите старое или измените тип нового"""
         return jsonify(answer)
 
-    term_event.cost = term_event.cost * term.factor
+    term_event.cost = term_event.cost
     if term_event.save():
         answer['error'] = 'no'
         answer['message'] = u'Данные сохранены'
