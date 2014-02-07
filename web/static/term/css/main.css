@@ -807,3 +807,60 @@ table tr:nth-of-type(2n) .table-control a:hover{
 	font-size: 14px;
 	clear: both;
 }
+.block-table .row{
+	margin: 0 !important;
+}
+.block-table .columns{
+	padding-right: 40px;
+	padding-left: 40px;
+}
+.block-table_content{
+	padding: 14px 0 4px;
+}
+.block-table_content li{
+	font-size: 14px;
+}
+.block-table_title {
+	background: #F8F9F9;
+	font-size: 18px;
+	font-family: Mobispot, arial, sans-serif;
+	font-weight: 100;
+	padding: 15px 0 15px;
+	position: relative;
+}
+.block-table_title li{
+	padding: 0;
+}
+.block-table_title ul{
+	margin: 0;
+}
+.block-table_title li span{
+	position: relative;
+	cursor: pointer;
+	margin-right: 6px;
+}
+.block-table_title li span:after {
+	content: '';
+	display: block;
+	height: 0;
+	width: 0;
+	border-left: 6px solid rgba(0, 0, 0, 0);
+	border-right: 6px solid rgba(0, 0, 0, 0);
+	border-top: 6px solid #2F2F2F;
+	position: absolute;
+	right: -15px;
+	top: 50%;
+	margin-top: -3px;
+}
+.block-table_title li.active span{
+	color: #0061ff;
+}
+.block-table_title li.active span:after{
+	border-top-color: #0061ff;;
+}
+.block-table .row:nth-child(odd) {
+	background-color: #F8F9F9;
+}
+.block-table .pagination{
+	margin-bottom: 10px;
+}

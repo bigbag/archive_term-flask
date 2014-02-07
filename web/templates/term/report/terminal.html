@@ -19,37 +19,45 @@
                     </a>
                 </div>
             </div>
-            <div class="report-table">
-                <div class="row report-title">
+            <div class="block-table">
+                <div class="row block-table_title">
                     <div class="large-2 columns">
                         <ul class="small-block-grid-1">
-                            <li>Дата</li>
+                            <li class="text-center">Дата</li>
                         </ul>
                     </div>
                     <div class="large-10 columns">
                         <ul class="small-block-grid-3">
-                            <li>Терминал</li>
-                            <li class="report-date-amount">Количество</li>
-                            <li class="report-date-amount">Сумма</li>
+                            <li class="active">Терминал</li>
+                            <li class="text-right">Количество</li>
+                            <li class="text-right">Сумма</li>
                         </ul>
                     </div>
                 </div>
-                <div class="row report-content" ng-repeat="report in result">
+                <div class="row block-table_content" ng-repeat="report in result">
                     <div class="large-2 columns report-date">
                         <ul class="small-block-grid-1">
-                            <li>{[{report.creation_date}]}</li>
+                            <li class="text-center">{[{report.creation_date}]}</li>
                         </ul>
                     </div>
                     <div class="large-10 columns">
-                        <ul class="small-block-grid-3"  ng-repeat="row in report.detaled">
-                            <li>{[{row.term}]}</li>
-                            <li class="report-date-count">{[{row.count}]}</li>
-                            <li class="report-date-amount">{[{row.amount}]}</li>
+                        <ul class="small-block-grid-3" ng-repeat="row in report.detaled">
+                            <li class="ng-binding">{[{row.term}]}</li>
+                            <li class="report-date-count text-right">
+                                {[{row.count}]}
+                            </li>
+                            <li class="report-date-amount text-right">
+                                {[{row.amount}]}
+                            </li>
                         </ul>
                         <ul class="small-block-grid-3 report-content-result">
-                            <li>Всего</li>
-                            <li class="report-date-count">{[{report.count}]}</li>
-                            <li class="report-date-amount">{[{report.amount}]}</li>
+                            <li><strong>Всего</strong></li>
+                            <li class="report-date-count text-right">
+                                <strong>{[{report.count}]}</strong>
+                            </li>
+                            <li class="report-date-amount text-right">
+                                <strong>{[{report.amount}]}</strong>
+                            </li>
                         </ul>
                     </div>
                 </div>

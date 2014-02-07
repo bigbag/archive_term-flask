@@ -546,3 +546,12 @@ div.switch.small{
 .m-spot-table td strong{
 	font-size: 15px;
 }
+form.custom textarea{
+	border: none;
+	box-shadow: none;
+	background: #E9EDF2;
+	border-radius: 5px;
+	min-height: 150px;
+	padding: 20px 25px;
+	max-width: 100%;
+}
