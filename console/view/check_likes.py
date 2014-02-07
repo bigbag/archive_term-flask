@@ -34,8 +34,8 @@ class CheckLikes(Command):
                 if pageLiked:
                     PersonEvent.add_by_user_loyalty_id(
                         socToken.user_id, stackItem.loyalty_id)
-                    print 'user complied with the conditions for ' + url
-                    # stackItem.delete()
+                    # print 'user complied with the conditions for ' + url
+                    stackItem.delete()
 
                 else:
                     print 'user not complied with the conditions for ' + url

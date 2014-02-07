@@ -10,6 +10,7 @@ from libs.mock_facebook_api import MockFacebookApi
 from libs.twitter_api import TwitterApi
 from libs.mock_twitter_api import MockTwitterApi
 from libs.foursquare_api import FoursquareApi
+from libs.instagram_api import InstagramApi
 from models.loyalty import Loyalty
 
 
@@ -46,5 +47,11 @@ class SocnetsApi():
         elif type == Loyalty.FOURSQUARE_BADGE:
             fsqApi = FoursquareApi()
             netShared = fsqApi.check_badge(url, token_id, loyalty_id)
+        elif type == Loyalty.INSTAGRAM_LIKE:
+            instApi = InstagramApi()
+            netShared = instApi.check_like(url, token_id)
+        elif type == Loyalty.INSTAGRAM_FOLLOWING:
+            instApi = InstagramApi()
+            netShared = instApi.check_following(url, token_id)
 
         return netShared
