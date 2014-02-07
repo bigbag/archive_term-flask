@@ -41,7 +41,7 @@
                     </div>
                     <div class="large-10 columns">
                         <ul class="small-block-grid-2" 
-                            ng-repeat="row in report.detaled | orderBy:-term:true">
+                            ng-repeat="row in report.detaled | orderBy:'amount'">
                             <li class="ng-binding">{[{row.term}]}</li>
                             <li class="report-date-amount text-right">
                                 {[{row.amount}]}
