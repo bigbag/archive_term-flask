@@ -89,6 +89,22 @@ class FirmTerm(db.Model):
         )
         return items
 
+    def term_remove(self):
+        from models.term_event import TermEvent
+        from models.person_event import PersonEvent
+
+        term_events = TermEvent().query.filter_by(term_id=self.term_id).all()
+        for term_event in term_events:
+            PersonEvent(
+            ).query.filter_by(
+                term_id=self.term_id,
+                firm_id=self.child_firm_id,
+                event_id=term_event.event_id).delete(
+                )
+        self.delete()
+
+        return True
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

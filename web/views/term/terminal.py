@@ -193,7 +193,7 @@ def terminal_rent_remove(term_id):
     if not firm_term:
         abort(404)
 
-    firm_term.delete()
+    firm_term.term_remove()
     answer['error'] = 'no'
     answer['message'] = u'Операция выполнена'
     return jsonify(answer)
