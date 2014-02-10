@@ -78,7 +78,8 @@ def person_info(person_id):
 
     term_events = TermEvent().get_by_firm_id(g.firm_info['id'])
     term_event = TermEvent()
-    term_event.id = term_events[0].id
+    if term_events:
+        term_event.id = term_events[0].id
 
     corp_wallet = TermCorpWallet.query.filter_by(
         person_id=person.id).first()

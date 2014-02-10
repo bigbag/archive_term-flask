@@ -30,14 +30,17 @@
         <p class="title"><a>События</a></p>
         <span ng-init="person.type={{person.type}}"></span>
         <div class="content">
+            {% if term_events %}
             <div>
                 <br />
                 {% include 'term/person/wallet_form.html' %}
             </div>
             <div id="person-type"></div>
+            
             <div class="content-row">
                 <p class="m-hint">Для изменения времени начала и конца события два раза кликните по нему. </p>
             </div>
+           
             <div class="content-row f-main-slide-link">
                 <div class="toggle-active">
                     <a id="event" class="loc-link f-spot-button small">
@@ -67,6 +70,11 @@
                 {% endfor %}
                 </tbody>
             </table>
+            {% else %}
+            <div class="content-row">
+                 <p class="m-hint">У компании нет ни одного терминала. Что бы добавить событие данному человеку - добавьте новый терминал.</p>
+            </div>
+            {% endif %}
         </div>
 
     </section>
