@@ -80,6 +80,7 @@ class Report(db.Model):
             if not person:
                 continue
 
+            self.name = person.name
             self.person_id = person.id
             self.person_firm_id = person.firm_id
             break
@@ -236,7 +237,7 @@ class Report(db.Model):
 
         return answer
 
-    # @cache.cached(timeout=60, key_prefix='report_interval')
+    @cache.cached(timeout=60, key_prefix='report_interval')
     def get_firm_interval_report(self, firm_id, **kwargs):
         payment_type = self.TYPE_WHITE
 
