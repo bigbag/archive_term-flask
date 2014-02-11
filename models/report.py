@@ -56,6 +56,7 @@ class Report(db.Model):
     def __init__(self):
         self.amount = 0
         self.person_id = 0
+        self.person_firm_id = 0
         self.firm_id = 0
         self.corp_type = self.CORP_TYPE_OFF
         self.type = self.TYPE_WHITE
@@ -72,19 +73,20 @@ class Report(db.Model):
         date_pattern = '%Y-%m-%d %H:%M:%S'
         self.payment_id = str(data.text).rjust(20, '0')
 
-        persons = Person.query.filter_by(
-            payment_id=self.payment_id).all()
-
         firm_id_list = FirmTerm().get_list_by_term_id(self.term.id)
-        for person in persons:
-            if person.firm_id in firm_id_list:
-                firm_term = FirmTerm().query.filter_by(
-                    term_id=self.term.id).first()
-                self.name = person.name
-                self.person_id = person.id
-                self.person_firm_id = person.firm_id
-                self.term_firm_id = firm_term.firm_id
+        for firm_id in firm_id_list:
+            person = Person.query.filter_by(
+                payment_id=self.payment_id, firm_id=firm_id).first()
+            if not person:
                 continue
+
+            self.person_id = person.id
+            self.person_firm_id = person.firm_id
+            break
+
+        firm_term = FirmTerm().query.filter_by(
+            term_id=self.term.id).first()
+        self.term_firm_id = firm_term.firm_id
 
         if data.get('summ'):
             self.amount = int(data.get('summ')) * int(self.term.factor)
@@ -214,8 +216,6 @@ class Report(db.Model):
         answer = {}
 
         interval = date_helper.get_date_interval(search_date, period)
-        start_date = interval[0]
-        end_date = interval[1]
 
         query = db.session.query(
             Report.term_id,
@@ -223,7 +223,7 @@ class Report(db.Model):
             func.count(Report.id))
         query = query.filter(Report.type == payment_type)
         query = query.filter(
-            Report.creation_date.between(start_date, end_date))
+            Report.creation_date.between(interval[0], interval[1]))
 
         if payment_type == self.TYPE_WHITE:
             query = query.filter(
@@ -231,15 +231,12 @@ class Report(db.Model):
         else:
             query = query.filter(Report.term_firm_id == firm_id)
 
-        query = query.group_by('term_id')
-        query = query.order_by('amount')
-
-        answer['reports_count'] = query.count()
+        query = query.group_by('term_id').order_by('amount')
         answer['reports'] = query.all()
 
         return answer
 
-    @cache.cached(timeout=60, key_prefix='report_interval')
+    # @cache.cached(timeout=60, key_prefix='report_interval')
     def get_firm_interval_report(self, firm_id, **kwargs):
         payment_type = self.TYPE_WHITE
 
