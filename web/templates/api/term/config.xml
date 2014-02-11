@@ -19,10 +19,17 @@
     </upload>
     {% endif %}
     {% if config.update_status == 1 %}
-    {% if term.version %}
+    {% if term.update_qid %}
+    <keyload>
+        <qid>{{term.keyload_qid}}</qid>
+    </keyload>
+    {% endif %}
+    {% endif %}
+    {% if config.update_status == 1 %}
+    {% if term.update_qid %}
     <update force_on_restart="1">
         <period>1440</period>
-        <qid>{{term.version}}</qid>
+        <qid>{{term.update_qid}}</qid>
     </update>
     {% endif %}
     {% endif %}
@@ -51,7 +58,6 @@
     </server>
     {% endif %}
     {% if config.update_status == 1 %}
-    {% if term.version %}
     <server goal="update">
         <ip>{{ config.update_ip }}</ip>
         <port>{{ config.update_port }}</port>
@@ -59,6 +65,13 @@
         <link>{{ config.update_link_type }}</link>
     </server>
     {% endif %}
+    {% if config.keyload_status == 1 %}
+    <server goal="keyload">
+        <ip>{{ config.keyload_ip }}</ip>
+        <port>{{ config.keyload_port }}</port>
+        <proto upload_method="PUT">{{ config.keyload_proto }}</proto>
+        <link>{{ config.keyload_link_type }}</link>
+    </server>
     {% endif %}
     {% for term_event in term_events %}
     <event type="{{term_event.event.key}}" translation="{{term_event.event.name}}" min_time="{{term_event.start}}:00" max_time="{{term_event.stop}}:00" age_limit="{{term_event.age}}"  price="{{term_event.cost // term.factor}}" {% if term.type == 'Vending' %}min_item="{{term_event.min_item}}" max_item="{{term_event.max_item}}"{% endif %}>

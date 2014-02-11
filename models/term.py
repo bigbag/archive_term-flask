@@ -52,7 +52,8 @@ class Term(db.Model):
     download_stop = db.Column(db.String(256))
     download_period = db.Column(db.Integer, nullable=False)
     factor = db.Column(db.Integer)
-    version = db.Column(db.String(128))
+    update_qid = db.Column(db.String(128))
+    keyload_qid = db.Column(db.String(128))
 
     def __init__(self):
         self.type = self.TYPE_VENDING
