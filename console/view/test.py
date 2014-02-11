@@ -34,14 +34,6 @@ from helpers import hash_helper
 
 class TestCommand(Command):
 
-    def rate(self, count, all):
-        random.seed()
-        data = range(1, all + 1)
-        random.shuffle(data)
-        rate = sorted(random.sample(data, count))
-
-        return rate
-
     def importCsv(self, file):
         spamreader = False
         with open(file, 'rb') as csvfile:
@@ -188,4 +180,19 @@ class TestCommand(Command):
                 wallet.save()
 
     def run(self):
-        print '1'
+        firm_terms_dict = {}
+        firm_terms = FirmTerm.query.all()
+        for firm_term in firm_terms:
+            if firm_term.term_id in firm_terms_dict:
+                continue
+            firm_terms_dict[firm_term.term_id] = firm_term.firm_id
+
+        reports = Report.query.all()
+        for report in reports:
+            if report.term_id in firm_terms_dict:
+                report.term_firm_id = firm_terms_dict[report.term_id]
+            else:
+                report.term_firm_id = report.person_firm_id
+
+            db.session.add(report)
+        db.session.commit()

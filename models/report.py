@@ -17,7 +17,6 @@ from helpers import date_helper
 
 from models.term import Term
 from models.person import Person
-from models.firm import Firm
 from models.event import Event
 from models.firm_term import FirmTerm
 
@@ -46,8 +45,8 @@ class Report(db.Model):
     person = db.relationship('Person')
     name = db.Column(db.Text, nullable=False)
     payment_id = db.Column(db.String(20))
-    firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'), index=True)
-    firm = db.relationship('Firm')
+    term_firm_id = db.Column(db.Integer, nullable=False)
+    person_firm_id = db.Column(db.Integer, nullable=False)
     amount = db.Column(db.Integer, nullable=False)
     corp_type = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Integer, nullable=False)
@@ -79,9 +78,12 @@ class Report(db.Model):
         firm_id_list = FirmTerm().get_list_by_term_id(self.term.id)
         for person in persons:
             if person.firm_id in firm_id_list:
+                firm_term = FirmTerm().query.filter_by(
+                    term_id=self.term.id).first()
                 self.name = person.name
                 self.person_id = person.id
-                self.firm_id = person.firm_id
+                self.person_firm_id = person.firm_id
+                self.term_firm_id = firm_term.firm_id
                 continue
 
         if data.get('summ'):
@@ -117,6 +119,18 @@ class Report(db.Model):
             self.page = kwargs['page']
         return True
 
+    def _set_period_group(self, query, period):
+        if period == 'day':
+            return query.group_by(
+                'YEAR(creation_date), MONTH(creation_date), DAY(creation_date)')
+        if period == 'week':
+            return query.group_by(
+                'YEAR(creation_date), WEEK(creation_date, 1)')
+        if period == 'month':
+            return query.group_by('YEAR(creation_date), MONTH(creation_date)')
+
+        return query
+
     @cache.cached(timeout=120, key_prefix='report_person')
     def get_person_report(self, **kwargs):
 
@@ -129,7 +143,7 @@ class Report(db.Model):
                 Report.person_id == kwargs['id']).order_by(
                     self.order)
         elif 'firm' in kwargs['type']:
-            query = Report.query.filter(Report.firm_id == kwargs['id']).filter(
+            query = Report.query.filter(Report.person_firm_id == kwargs['id']).filter(
                 Report.type == self.TYPE_WHITE).order_by(self.order)
 
         reports_count = query.count()
@@ -175,29 +189,19 @@ class Report(db.Model):
         payment_type = kwargs[
             'payment_type'] if 'payment_type' in kwargs else self.TYPE_WHITE
 
-        child_firm = True if payment_type == self.TYPE_WHITE else False
-        firm_term = FirmTerm().get_list_by_firm_id(firm_id, child_firm)
-        g.firm_term = firm_term
-
         query = db.session.query(
             Report.creation_date,
             func.sum(Report.amount),
             func.count(Report.id))
 
-        if period == 'day':
-            query = query.group_by(
-                'YEAR(creation_date), MONTH(creation_date), DAY(creation_date)')
-        elif period == 'week':
-            query = query.group_by(
-                'YEAR(creation_date), WEEK(creation_date, 1)')
-        elif period == 'month':
-            query = query.group_by('YEAR(creation_date), MONTH(creation_date)')
+        if payment_type == self.TYPE_WHITE:
+            query = query.filter(
+                (Report.person_firm_id == firm_id) | (Report.term_firm_id == firm_id))
+        else:
+            query = query.filter(Report.term_firm_id == firm_id)
 
-        query = query.filter(
-            Report.term_id.in_(
-                firm_term)).filter(
-                    Report.type == payment_type)
-
+        query = query.filter(Report.type == payment_type)
+        query = Report()._set_period_group(query, period)
         query = query.order_by(order)
 
         answer['reports_count'] = query.count()
@@ -205,7 +209,8 @@ class Report(db.Model):
 
         return answer
 
-    def interval_detaled_query(self, period, search_date, payment_type):
+    def interval_detaled_query(
+            self, firm_id, period, search_date, payment_type):
         answer = {}
 
         interval = date_helper.get_date_interval(search_date, period)
@@ -220,8 +225,11 @@ class Report(db.Model):
         query = query.filter(
             Report.creation_date.between(start_date, end_date))
 
-        if g.firm_term:
-            query = query.filter(Report.term_id.in_(g.firm_term))
+        if payment_type == self.TYPE_WHITE:
+            query = query.filter(
+                (Report.person_firm_id == firm_id) | (Report.term_firm_id == firm_id))
+        else:
+            query = query.filter(Report.term_firm_id == firm_id)
 
         query = query.group_by('term_id')
         query = query.order_by('amount')
@@ -231,7 +239,7 @@ class Report(db.Model):
 
         return answer
 
-    #@cache.cached(timeout=120, key_prefix='report_interval')
+    @cache.cached(timeout=60, key_prefix='report_interval')
     def get_firm_interval_report(self, firm_id, **kwargs):
         payment_type = self.TYPE_WHITE
 
@@ -271,8 +279,8 @@ class Report(db.Model):
                 count=int(report[2])
             )
 
-            detaled_answer = self.interval_detaled_query(
-                period, search_date, payment_type)
+            detaled_answer = self.interval_detaled_query(firm_id,
+                                                         period, search_date, payment_type)
             detaled_report = detaled_answer['reports']
             data['detaled'] = []
 
