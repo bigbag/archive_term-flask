@@ -13,15 +13,20 @@ from celery.schedules import crontab
 app.config.update(
     CELERY_TIMEZONE='Europe/Moscow',
     CELERYBEAT_SCHEDULE={
+        'every-day': {
+            'task': 'web.tasks.corp_wallet.recovery_limit',
+            'schedule': crontab(hour=0, minute=11),
+            'args': ('1',),
+        },
         'every-wheek': {
             'task': 'web.tasks.corp_wallet.recovery_limit',
             'schedule': crontab(hour=0, minute=11, day_of_week=1),
-            'args': ('1',),
+            'args': ('2',),
         },
         'every-month': {
             'task': 'web.tasks.corp_wallet.recovery_limit',
             'schedule': crontab(hour=0, minute=22, day_of_month=1),
-            'args': ('2',),
+            'args': ('3',),
         },
     },
 )

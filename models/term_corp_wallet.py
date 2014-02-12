@@ -20,8 +20,9 @@ class TermCorpWallet(db.Model):
     STATUS_BANNED = -1
 
     INTERVAL_ONCE = 0
-    INTERVAL_WEEK = 1
-    INTERVAL_MONTH = 2
+    INTERVAL_DAY = 1
+    INTERVAL_WEEK = 2
+    INTERVAL_MONTH = 3
 
     id = db.Column(db.Integer, primary_key=True)
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
@@ -45,6 +46,7 @@ class TermCorpWallet(db.Model):
     def get_interval_list(self):
         return [
             {'id': self.INTERVAL_ONCE, 'name': u"Нет"},
+            {'id': self.INTERVAL_DAY, 'name': u"Ежедневно"},
             {'id': self.INTERVAL_WEEK, 'name': u"Еженедельно"},
             {'id': self.INTERVAL_MONTH, 'name': u"Ежемесячно"}
         ]
