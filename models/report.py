@@ -199,9 +199,7 @@ class Report(db.Model):
 
         if payment_type == self.TYPE_WHITE:
             query = query.filter(
-                (Report.term_firm_id == firm_id) |
-                ((Report.person_firm_id == firm_id) &
-                    (Report.term_firm_id == Report.person_firm_id)))
+                (Report.term_firm_id == firm_id) | (Report.person_firm_id == firm_id))
         else:
             query = query.filter(Report.term_firm_id == firm_id)
 
@@ -230,9 +228,7 @@ class Report(db.Model):
 
         if payment_type == self.TYPE_WHITE:
             query = query.filter(
-                (Report.term_firm_id == firm_id) |
-                ((Report.person_firm_id == firm_id) &
-                    (Report.term_firm_id == Report.person_firm_id)))
+                (Report.term_firm_id == firm_id) | (Report.person_firm_id == firm_id))
         else:
             query = query.filter(Report.term_firm_id == firm_id)
 
