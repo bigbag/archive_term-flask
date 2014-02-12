@@ -136,8 +136,7 @@ class ReportParser(Command):
                     report.event_id = event.id
                     report = report.get_db_view(card_node)
 
-                    old_report = Report().get_by_check_summ(
-                        report.check_summ)
+                    old_report = Report().get_by_params()
                     if old_report:
                         continue
 

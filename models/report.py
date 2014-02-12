@@ -51,7 +51,6 @@ class Report(db.Model):
     corp_type = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Integer, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
-    check_summ = db.Column(db.String(32), nullable=False, index=True)
 
     def __init__(self):
         self.amount = 0
@@ -65,6 +64,8 @@ class Report(db.Model):
         self.order = 'creation_date desc'
         self.limit = self.POST_ON_PAGE
         self.page = self.DEFAULT_PAGE
+        self.period = 'day'
+        self.payment_type = self.TYPE_WHITE
 
     def __repr__(self):
         return '<id %r>' % (self.id)
@@ -105,21 +106,23 @@ class Report(db.Model):
             date_pattern,
             date_pattern)
         self.creation_date = date_time_utc
-        self.check_summ = self.get_check_summ()
         return self
 
-    def get_by_check_summ(self, check_summ):
-        return self.query.filter_by(check_summ=check_summ).first()
+    def get_by_params(self):
+        return self.query.filter_by(term_id=self.term_id,
+                                    event_id=self.event_id,
+                                    creation_date=self.creation_date,
+                                    payment_id=self.payment_id).first()
 
     def _get_search_params(self, **kwargs):
-        if 'order' in kwargs:
-            self.order = kwargs['order']
 
-        if 'limit' in kwargs:
-            self.limit = kwargs['limit']
+        keys = ['order', 'limit', 'page', 'period', 'payment_type']
 
-        if 'page' in kwargs:
-            self.page = kwargs['page']
+        for key in keys:
+            if key not in kwargs:
+                continue
+            setattr(self, key, kwargs[key])
+
         return True
 
     def _set_period_group(self, query, period):
@@ -132,6 +135,14 @@ class Report(db.Model):
         if period == 'month':
             return query.group_by('YEAR(creation_date), MONTH(creation_date)')
 
+        return query
+
+    def _set_firm_id_filter(self, query, firm_id, payment_type):
+        if payment_type == self.TYPE_WHITE:
+            query = query.filter(
+                (Report.term_firm_id == firm_id) | (Report.person_firm_id == firm_id))
+        else:
+            query = query.filter(Report.term_firm_id == firm_id)
         return query
 
     @cache.cached(timeout=120, key_prefix='report_person')
@@ -184,60 +195,41 @@ class Report(db.Model):
 
     def interval_query(self, firm_id, **kwargs):
         answer = {}
-
-        order = kwargs['order'] if 'order' in kwargs else 'creation_date desc'
-        limit = kwargs['limit'] if 'limit' in kwargs else self.POST_ON_PAGE
-        page = kwargs['page'] if 'page' in kwargs else self.DEFAULT_PAGE
-        period = kwargs['period'] if 'period' in kwargs else 'day'
-        payment_type = kwargs[
-            'payment_type'] if 'payment_type' in kwargs else self.TYPE_WHITE
+        self._get_search_params(**kwargs)
 
         query = db.session.query(
             Report.creation_date,
             func.sum(Report.amount),
             func.count(Report.id))
 
-        if payment_type == self.TYPE_WHITE:
-            query = query.filter(
-                (Report.term_firm_id == firm_id) | (Report.person_firm_id == firm_id))
-        else:
-            query = query.filter(Report.term_firm_id == firm_id)
-
-        query = query.filter(Report.type == payment_type)
-        query = Report()._set_period_group(query, period)
-        query = query.order_by(order)
+        query = query.filter(Report.type == self.payment_type)
+        query = Report()._set_firm_id_filter(query, firm_id, self.payment_type)
+        query = Report()._set_period_group(query, self.period)
+        query = query.order_by(self.order)
 
         answer['reports_count'] = query.count()
-        answer['reports'] = query.limit(limit).offset((page - 1) * limit).all()
+        answer['reports'] = query.limit(
+            self.limit).offset((self.page - 1) * self.limit).all()
 
         return answer
 
-    def interval_detaled_query(
-            self, firm_id, period, search_date, payment_type):
-        answer = {}
-
-        interval = date_helper.get_date_interval(search_date, period)
+    def interval_detaled_query(self, firm_id, search_date):
+        interval = date_helper.get_date_interval(search_date, self.period)
 
         query = db.session.query(
             Report.term_id,
             func.sum(Report.amount),
             func.count(Report.id))
-        query = query.filter(Report.type == payment_type)
+        query = query.filter(Report.type == self.payment_type)
         query = query.filter(
             Report.creation_date.between(interval[0], interval[1]))
 
-        if payment_type == self.TYPE_WHITE:
-            query = query.filter(
-                (Report.term_firm_id == firm_id) | (Report.person_firm_id == firm_id))
-        else:
-            query = query.filter(Report.term_firm_id == firm_id)
-
+        query = Report()._set_firm_id_filter(query, firm_id, self.payment_type)
         query = query.group_by('term_id').order_by('amount')
-        answer['reports'] = query.all()
 
-        return answer
+        return query.all()
 
-    @cache.cached(timeout=60, key_prefix='report_interval')
+    # @cache.cached(timeout=60, key_prefix='report_interval')
     def get_firm_interval_report(self, firm_id, **kwargs):
         payment_type = self.TYPE_WHITE
 
@@ -252,8 +244,7 @@ class Report(db.Model):
         elif period == 'week':
             date_pattern = '%x'
 
-        answer = self.interval_query(
-            firm_id, **kwargs)
+        answer = self.interval_query(firm_id, **kwargs)
 
         result = []
         for report in answer['reports']:
@@ -277,9 +268,7 @@ class Report(db.Model):
                 count=int(report[2])
             )
 
-            detaled_answer = self.interval_detaled_query(firm_id,
-                                                         period, search_date, payment_type)
-            detaled_report = detaled_answer['reports']
+            detaled_report = self.interval_detaled_query(firm_id, search_date)
             data['detaled'] = []
 
             for row in detaled_report:
@@ -301,14 +290,6 @@ class Report(db.Model):
 
         return value
 
-    def get_check_summ(self):
-        return hashlib.md5("%s%s%s%s%s" % (
-            str(self.term_id),
-            str(self.event_id),
-            str(self.type),
-            str(self.creation_date),
-            str(self.payment_id))).hexdigest()
-
     def delete(self):
         db.session.delete(self)
         db.session.commit()
@@ -319,8 +300,6 @@ class Report(db.Model):
     def save(self):
         try:
             self.payment_id = str(self.payment_id).rjust(20, '0')
-            if not self.check_summ:
-                self.check_summ = self.get_check_summ()
             db.session.add(self)
             db.session.commit()
         except Exception as e:

@@ -50,6 +50,9 @@ def report_get_terminal_report():
     answer = Report().get_firm_interval_report(
         g.firm_info['id'], **arg)
 
+    for row in arg:
+        print row
+
     return jsonify(answer)
 
 
