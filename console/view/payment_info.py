@@ -34,6 +34,9 @@ class PaymentInfo(Command):
             (PaymentHistory.creation_date < date_stop)
         ).all()
 
+        if not payment_history:
+            return
+
         un = UnitellerApi(UnitellerConfig)
         un.success = UnitellerApi.SUCCESS_ALL
         info = un.get_payment_info()
@@ -80,6 +83,9 @@ class PaymentInfo(Command):
             (PaymentHistory.creation_date >= date_start) &
             (PaymentHistory.creation_date < date_stop)
         ).all()
+
+        if not payment_history:
+            return
 
         un = UnitellerApi(UnitellerConfig)
         un.success = UnitellerApi.SUCCESS_ALL
