@@ -15,7 +15,6 @@ angular.module('term').controller('PersonController',
     }
   });
 
-
   //Добавляем или редактируем человека
   $scope.savePerson = function(person, valid) {
     if (!valid) {

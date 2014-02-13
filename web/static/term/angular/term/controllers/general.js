@@ -54,7 +54,7 @@ angular.module('term').controller('GeneralController',
     if (!angular.isUndefined($scope.search.person_name)){
       $scope.search.custom_filer = 1;
     }
-
+    
     if (search.action_type === 'get_grid_content') {
       $scope.getGridContent(search);
     }
