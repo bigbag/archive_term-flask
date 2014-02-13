@@ -36,6 +36,7 @@ class SocToken(db.Model):
     token_expires = db.Column(db.Integer)
     is_tech = db.Column(db.Integer)
     allow_login = db.Column(db.Integer)
+    refresh_token = db.Column(db.String(1024))
 
     def __repr__(self):
         return '<id %r>' % (self.id)

@@ -33,6 +33,8 @@ class Loyalty(db.Model):
     FOURSQUARE_BADGE = 9
     INSTAGRAM_LIKE = 10
     INSTAGRAM_FOLLOWING = 11
+    GOOGLE_CIRCLE = 12
+    GOOGLE_PLUS_ONE = 13
 
     id = db.Column(db.Integer, primary_key=True)
     terms_id = db.Column(db.Integer)
