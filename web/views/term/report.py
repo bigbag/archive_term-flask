@@ -32,9 +32,8 @@ def report_report_action(action):
 @json_headers
 def report_get_person_report():
     arg = get_post_arg(request, True)
+    arg['firm_id'] = g.firm_info['id']
 
-    arg['type'] = 'firm'
-    arg['id'] = g.firm_info['id']
     answer = Report().get_person_report(**arg)
 
     return jsonify(answer)
@@ -47,11 +46,9 @@ def report_get_terminal_report():
     arg = get_post_arg(request, True)
 
     arg['payment_type'] = Report.TYPE_WHITE
-    answer = Report().get_firm_interval_report(
-        g.firm_info['id'], **arg)
+    arg['firm_id'] = g.firm_info['id']
 
-    for row in arg:
-        print row
+    answer = Report().get_term_report(**arg)
 
     return jsonify(answer)
 
@@ -63,7 +60,8 @@ def report_get_summ_report():
     arg = get_post_arg(request, True)
 
     arg['payment_type'] = Report.TYPE_PAYMENT
-    answer = Report().get_firm_interval_report(
-        g.firm_info['id'], **arg)
+    arg['firm_id'] = g.firm_info['id']
+
+    answer = Report().get_term_report(**arg)
 
     return jsonify(answer)

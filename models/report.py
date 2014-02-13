@@ -66,6 +66,8 @@ class Report(db.Model):
         self.page = self.DEFAULT_PAGE
         self.period = 'day'
         self.payment_type = self.TYPE_WHITE
+        self.firm_id = 0
+        self.person_id = 0
 
     def __repr__(self):
         return '<id %r>' % (self.id)
@@ -115,8 +117,15 @@ class Report(db.Model):
                                     payment_id=self.payment_id).first()
 
     def _get_search_params(self, **kwargs):
-
-        keys = ['order', 'limit', 'page', 'period', 'payment_type']
+        keys = [
+            'firm_id',
+            'person_id',
+            'type',
+            'order',
+            'limit',
+            'page',
+            'period',
+            'payment_type']
 
         for key in keys:
             if key not in kwargs:
@@ -145,55 +154,7 @@ class Report(db.Model):
             query = query.filter(Report.term_firm_id == firm_id)
         return query
 
-    @cache.cached(timeout=120, key_prefix='report_person')
-    def get_person_report(self, **kwargs):
-
-        time_pattern = '%H:%M'
-        date_pattern = '%d.%m.%Y'
-        self._get_search_params(**kwargs)
-
-        if 'person' in kwargs['type']:
-            query = Report.query.filter(
-                Report.person_id == kwargs['id']).order_by(
-                    self.order)
-        elif 'firm' in kwargs['type']:
-            query = Report.query.filter(Report.person_firm_id == kwargs['id']).filter(
-                Report.type == self.TYPE_WHITE).order_by(self.order)
-
-        reports_count = query.count()
-        reports = query.paginate(self.page, self.limit, False).items
-
-        result = []
-        events = Event().get_events_list()
-        for report in reports:
-
-            creation_date = date_helper.from_utc(
-                report.creation_date,
-                self.tz)
-
-            term = Term().get_by_id(report.term_id)
-            data = dict(
-                id=report.id,
-                term=term.name if term else 'Empty',
-                term_id=term.id if term else 'Empty',
-                date=creation_date.strftime(date_pattern),
-                time=creation_date.strftime(time_pattern),
-                event=events[
-                    report.event_id] if events[
-                        report.event_id] else 'Empty',
-                amount=float(report.amount) / 100,
-                name=report.name,
-            )
-            result.append(data)
-
-        value = dict(
-            result=result,
-            count=reports_count,
-        )
-
-        return value
-
-    def interval_query(self, firm_id, **kwargs):
+    def person_general_query(self, **kwargs):
         answer = {}
         self._get_search_params(**kwargs)
 
@@ -202,8 +163,12 @@ class Report(db.Model):
             func.sum(Report.amount),
             func.count(Report.id))
 
-        query = query.filter(Report.type == self.payment_type)
-        query = Report()._set_firm_id_filter(query, firm_id, self.payment_type)
+        if self.person_id:
+            query = query.filter(Report.person_id == self.person_id)
+        else:
+            query = query.filter(Report.person_firm_id == self.firm_id)
+
+        query = query.filter(Report.type == self.TYPE_WHITE)
         query = Report()._set_period_group(query, self.period)
         query = query.order_by(self.order)
 
@@ -213,7 +178,107 @@ class Report(db.Model):
 
         return answer
 
-    def interval_detaled_query(self, firm_id, search_date):
+    def person_detaled_query(self, search_date):
+        interval = date_helper.get_date_interval(search_date, self.period)
+        query = Report.query.filter(Report.type == self.payment_type)
+        query = query.filter(
+            Report.creation_date.between(interval[0], interval[1]))
+
+        if self.person_id:
+            query = query.filter(Report.person_id == self.person_id)
+        else:
+            query = query.filter(Report.person_firm_id == self.firm_id)
+
+        query = query.filter(Report.type == self.TYPE_WHITE)
+        query = query.order_by('creation_date desc')
+
+        return query.all()
+
+    # @cache.cached(timeout=120, key_prefix='report_person')
+    def get_person_report(self, **kwargs):
+
+        time_pattern = '%H:%M'
+        date_pattern = '%d.%m.%Y'
+        month_pattern = '%m.%Y'
+        self._get_search_params(**kwargs)
+
+        if self.period == 'day':
+            result_date_pattern = date_pattern
+        elif self.period == 'month':
+            result_date_pattern = month_pattern
+
+        answer = self.person_general_query(**kwargs)
+
+        result = []
+        events = Event().get_events_list()
+        term_name_dict = Term().select_name_dict()
+        for report in answer['reports']:
+            search_date = date_helper.from_utc(
+                report[0],
+                self.tz)
+            creation_date = search_date.strftime(date_pattern)
+
+            data = dict(
+                creation_date=search_date.strftime(result_date_pattern),
+                amount=float(report[1]) / 100,
+                count=int(report[2])
+            )
+
+            data['detaled'] = []
+            detaled_reports = self.person_detaled_query(search_date)
+            for row in detaled_reports:
+
+                creation_date = date_helper.from_utc(
+                    row.creation_date,
+                    self.tz)
+
+                term_name = 'Empty'
+                if row.term_id in term_name_dict:
+                    term_name = term_name_dict[row.term_id]
+
+                detaled_data = dict(
+                    id=row.id,
+                    term=term_name,
+                    time=creation_date.strftime(time_pattern),
+                    date=creation_date.strftime(date_pattern),
+                    event=events[
+                        row.event_id] if events[
+                            row.event_id] else 'Empty',
+                    amount=float(row.amount) / 100,
+                    name=row.name,
+                )
+                data['detaled'].append(detaled_data)
+
+            result.append(data)
+
+        value = dict(
+            result=result,
+            count=answer['reports_count'],
+        )
+        return value
+
+    def term_general_query(self, **kwargs):
+        answer = {}
+        self._get_search_params(**kwargs)
+
+        query = db.session.query(
+            Report.creation_date,
+            func.sum(Report.amount),
+            func.count(Report.id))
+
+        query = query.filter(Report.type == self.payment_type)
+        query = Report()._set_firm_id_filter(
+            query, self.firm_id, self.payment_type)
+        query = Report()._set_period_group(query, self.period)
+        query = query.order_by(self.order)
+
+        answer['reports_count'] = query.count()
+        answer['reports'] = query.limit(
+            self.limit).offset((self.page - 1) * self.limit).all()
+
+        return answer
+
+    def term_detaled_query(self, search_date):
         interval = date_helper.get_date_interval(search_date, self.period)
 
         query = db.session.query(
@@ -224,37 +289,35 @@ class Report(db.Model):
         query = query.filter(
             Report.creation_date.between(interval[0], interval[1]))
 
-        query = Report()._set_firm_id_filter(query, firm_id, self.payment_type)
+        query = Report()._set_firm_id_filter(
+            query, self.firm_id, self.payment_type)
         query = query.group_by('term_id').order_by('amount')
 
         return query.all()
 
-    # @cache.cached(timeout=60, key_prefix='report_interval')
-    def get_firm_interval_report(self, firm_id, **kwargs):
-        payment_type = self.TYPE_WHITE
+    @cache.cached(timeout=60, key_prefix='report_interval')
+    def get_term_report(self, **kwargs):
 
-        if 'payment_type' in kwargs:
-            payment_type = kwargs['payment_type']
-
-        period = kwargs['period'] if 'period' in kwargs else 'day'
-        if period == 'day':
+        if self.period == 'day':
             date_pattern = '%d.%m.%Y'
-        elif period == 'month':
+        elif self.period == 'month':
             date_pattern = '%m.%Y'
-        elif period == 'week':
+        elif self.period == 'week':
             date_pattern = '%x'
 
-        answer = self.interval_query(firm_id, **kwargs)
+        answer = self.term_general_query(**kwargs)
 
         result = []
+        term_name_dict = Term().select_name_dict()
         for report in answer['reports']:
 
             search_date = date_helper.from_utc(
                 report[0],
                 self.tz)
 
-            if period == 'week':
-                interval = date_helper.get_date_interval(search_date, period)
+            if self.period == 'week':
+                interval = date_helper.get_date_interval(
+                    search_date, self.period)
                 interval = (
                     interval[0].strftime('%d.%m.%Y'),
                     interval[1].strftime('%d.%m.%Y'))
@@ -268,14 +331,15 @@ class Report(db.Model):
                 count=int(report[2])
             )
 
-            detaled_report = self.interval_detaled_query(firm_id, search_date)
+            detaled_report = self.term_detaled_query(search_date)
             data['detaled'] = []
 
             for row in detaled_report:
-
-                term = Term().get_by_id(row[0])
+                term_name = 'Empty'
+                if row[0] in term_name_dict:
+                    term_name = term_name_dict[row[0]]
                 detaled_data = dict(
-                    term=term.name if term else 'Empty',
+                    term=term_name,
                     amount=float(row[1]) / 100,
                     count=int(row[2])
                 )

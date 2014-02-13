@@ -153,6 +153,16 @@ class Term(db.Model):
             self.download_start = term.download_start
         return self
 
+    @cache.cached(timeout=60, key_prefix='term_name_dict')
+    def select_name_dict(self):
+        terms = Term.query.all()
+
+        result = {}
+        for term in terms:
+            result[term.id] = term.name
+
+        return result
+
     def select_term_list(self, firm_id, **kwargs):
         tz = app.config['TZ']
         date_pattern = '%H:%M %d.%m.%y'

@@ -138,7 +138,7 @@ def api_admin_linking_spot():
     return response
 
 
-@mod.route('/spot/hard_id/<int:hard_id>', methods=['GET'])
+@mod.route('/spot/hid/<int:hard_id>', methods=['GET'])
 @mod.route('/spot/ean/<barcode>', methods=['GET'])
 @xml_headers
 def api_admin_get_info(hard_id=False, barcode=False):
