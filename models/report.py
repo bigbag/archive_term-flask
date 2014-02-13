@@ -194,7 +194,7 @@ class Report(db.Model):
 
         return query.all()
 
-    # @cache.cached(timeout=120, key_prefix='report_person')
+    @cache.cached(timeout=120, key_prefix='report_person')
     def get_person_report(self, **kwargs):
 
         time_pattern = '%H:%M'
