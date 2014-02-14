@@ -14,7 +14,10 @@ class WebApiTestCase(unittest.TestCase):
 
     API_URL = '/term/v1.0'
     GARBAGE_URL = '/123456'
-    CALLBACK_URL = '/api/term/configs/callback/0000000021_config'
+    CALLBACK_CONFIG_URL = '/api/term/configs/callback/0000000021_config'
+    CALLBACK_FAIL_CONFIG_URL = '/api/term/configs/callback/0000000021_1213'
+    CALLBACK_BLACKLIST_URL = '/api/term/configs/callback/0000000021_blacklist'
+    CALLBACK_VERSION_URL = '/api/term/configs/callback/0000000021_config_1.0m.316'
     BLACKLIST_URL = '/api/term/configs/blacklist.xml'
     TERM_URL = '/api/term/configs/config_0000000021.xml'
     FAIL_TERM_URL = '/api/term/configs/config_9999999999.xml'
@@ -80,10 +83,29 @@ class WebApiTestCase(unittest.TestCase):
         rv = self.app.get(self.REPORT_URL, data=data)
         self.assertEqual(rv.status_code, 405)
 
-    def test_callback(self):
+    def test_callback_method(self):
+        rv = self.app.get(self.CALLBACK_CONFIG_URL)
+        self.assertEqual(rv.status_code, 405)
+
+    def test_callback_fail_action(self):
+        data = dict(
+            term=self.TERM,
+        )
+        rv = self.app.post(self.CALLBACK_FAIL_CONFIG_URL, data=data)
+        self.assertEqual(rv.status_code, 405)
+
+    def test_callback_config(self):
         data = dict(
             type='config',
             term=self.TERM,
         )
-        rv = self.app.post(self.CALLBACK_URL, data=data)
+        rv = self.app.post(self.CALLBACK_CONFIG_URL, data=data)
+        self.assertEqual(rv.status_code, 201)
+
+    def test_callback_blacklist(self):
+        data = dict(
+            type='blacklist',
+            term=self.TERM,
+        )
+        rv = self.app.post(self.CALLBACK_BLACKLIST_URL, data=data)
         self.assertEqual(rv.status_code, 201)

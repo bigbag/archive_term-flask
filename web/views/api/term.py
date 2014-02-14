@@ -201,7 +201,7 @@ def api_set_callback(term_id, action, version=None):
         'blacklist'
     )
     if not action in VALID_ACTITON:
-        abort(404)
+        abort(405)
 
     term = Term().get_valid_term(term_id)
 
