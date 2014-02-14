@@ -114,7 +114,7 @@ def person_save(person_id):
         person = Person()
 
         if code:
-            bind_card = person_bind_card(code)
+            bind_card = set_person_card(code)
             if not bind_card['wallet']:
                 answer['message'] = bind_card['message']
                 return jsonify(answer)
@@ -159,7 +159,7 @@ def person_bind_card(person_id):
     if not person:
         abort(404)
 
-    bind_card = person_bind_card(code)
+    bind_card = set_person_card(code)
     if not bind_card['wallet']:
         answer['message'] = bind_card['message']
         return jsonify(answer)
@@ -175,7 +175,7 @@ def person_bind_card(person_id):
     return jsonify(answer)
 
 
-def person_bind_card(code):
+def set_person_card(code):
     answer = dict(error='yes', message='Произошла ошибка', wallet=False)
 
     spot = Spot().get_valid_by_code(code)
@@ -192,8 +192,7 @@ def person_bind_card(code):
 
     firm_info = g.firm_info
     person = Person.query.filter_by(
-        payment_id=wallet.payment_id,
-        firm_id=firm_info['id']).first()
+        payment_id=wallet.payment_id).first()
 
     if person:
         answer['message'] = u'Данная карта уже привязана'
