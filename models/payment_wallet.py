@@ -66,6 +66,7 @@ class PaymentWallet(db.Model):
 
     def update_balance(self, report):
         from models.payment_lost import PaymentLost
+        from models.payment_history import PaymentHistory
 
         error = False
 

@@ -117,34 +117,34 @@ class ReportParser(Command):
                     if old_report:
                         continue
 
-                    if int(report.type) != Report.TYPE_PAYMENT:
-                        person = Person.query.get(report.person_id)
-
-                        # Если человек имеет корпоративный кошелек, обновляем его баланс
-                        if person and person.type == Person.TYPE_WALLET:
-                            report.corp_type = Report.CORP_TYPE_ON
-                            corp_wallet = TermCorpWallet.query.filter_by(
-                                person_id=person.id).first()
-                            if corp_wallet:
-                                corp_wallet.balance = int(
-                                    corp_wallet.balance) - int(
-                                        report.amount)
-                                corp_wallet.save()
-
-                                # Блокируем возможность платежей через корпоративный кошелек
-                                if corp_wallet.balance < PaymentWallet.BALANCE_MIN:
-                                    person.wallet_status = Person.STATUS_BANNED
-                                    person.save()
-
+                    # Если операция платежная, обновляем баланс личного кошелька
+                    # и пишем информацию в историю, сохраняем отчет
+                    if int(report.type) == Report.TYPE_PAYMENT or int(report.type) == Report.TYPE_MPS:
+                        error = PaymentWallet().update_balance(report)
                         report.save()
-                        continue
+
+                    # Если операция по белому списку
+                    person = Person.query.get(report.person_id)
+
+                    # Если человек имеет корпоративный кошелек, обновляем его баланс
+                    if person and person.type == Person.TYPE_WALLET:
+                        report.corp_type = Report.CORP_TYPE_ON
+                        corp_wallet = TermCorpWallet.query.filter_by(
+                            person_id=person.id).first()
+                        if not corp_wallet:
+                            continue
+
+                        corp_wallet.balance = int(
+                            corp_wallet.balance) - int(
+                                report.amount)
+                        corp_wallet.save()
+
+                        # Блокируем возможность платежей через корпоративный кошелек
+                        if corp_wallet.balance < PaymentWallet.BALANCE_MIN:
+                            person.wallet_status = Person.STATUS_BANNED
+                            person.save()
 
                     report.save()
-
-                    # Если операция платежная, обновляем баланс личного кошелька
-                    # и пишем информацию в историю
-                    if int(report.type) == Report.TYPE_PAYMENT:
-                        error = PaymentWallet().update_balance(report)
 
         if not error:
             if not os.path.exists(new_file_patch):
