@@ -2,10 +2,10 @@
 """
     Задачи по обслуживанию корпоративного кошелька
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import app, db
+from web import app
 from web.celery import celery
 
 from models.person import Person

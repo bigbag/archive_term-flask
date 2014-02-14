@@ -139,6 +139,7 @@ def api_get_blacklist():
 @mod.route('/reports/report_<int:term_id>_<report_datetime>.xml', methods=['PUT'])
 def api_upload_report(term_id, report_datetime):
     """Прием и сохранение отчета"""
+    from web.tasks import report
 
     if not len(report_datetime) == 13:
         abort(400)

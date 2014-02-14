@@ -64,6 +64,30 @@ class PaymentWallet(db.Model):
         else:
             return pid
 
+    def update_balance(self, report):
+        from models.payment_lost import PaymentLost
+
+        error = False
+
+        wallet = self.get_by_payment_id(
+            report.payment_id)
+        if not wallet or wallet.user_id == 0:
+            lost = PaymentLost()
+            lost.add_lost_payment(report)
+            return error
+
+        wallet.balance = int(
+            wallet.balance) - int(
+                report.amount)
+
+        if not wallet.save():
+            error = True
+            return error
+
+        history = PaymentHistory()
+        history.add_history(wallet, report)
+        return error
+
     def get_by_payment_id(self, payment_id):
         return self.query.filter_by(payment_id=payment_id).first()
 

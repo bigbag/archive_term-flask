@@ -51,6 +51,30 @@ class PaymentReccurent(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.wallet_id)
 
+    def set_reccurent_on(self):
+        from models.payment_wallet import PaymentWallet
+        from models.payment_history import PaymentHistory
+
+        errors = True
+        reccurents = self.query.filter_by(
+            status=self.STATUS_OFF).all()
+
+        for reccurent in reccurents:
+            if not reccurent.wallet:
+                continue
+            if int(reccurent.wallet.balance) > PaymentWallet.BALANCE_MIN:
+                continue
+
+            history = PaymentHistory().get_new_by_wallet_id(
+                reccurent.wallet.id)
+            if history:
+                continue
+
+            reccurent.status = self.STATUS_ON
+            if reccurent.save():
+                errors = False
+        return errors
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

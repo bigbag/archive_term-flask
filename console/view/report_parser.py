@@ -20,7 +20,7 @@ from models.term import Term
 from models.person import Person
 from models.term_corp_wallet import TermCorpWallet
 from models.payment_wallet import PaymentWallet
-from models.payment_lost import PaymentLost
+
 from models.payment_history import PaymentHistory
 from models.payment_reccurent import PaymentReccurent
 
@@ -61,29 +61,6 @@ class ReportParser(Command):
             report_files.append(result)
 
         return report_files
-
-    def update_wallet_balance(self, report):
-        error = False
-
-        wallet = PaymentWallet().get_by_payment_id(
-            report.payment_id)
-        if not wallet or wallet.user_id == 0:
-            lost = PaymentLost()
-            lost.add_lost_payment(report)
-            return error
-
-        wallet.balance = int(
-            wallet.balance) - int(
-                report.amount)
-
-        if not wallet.save():
-            error = True
-            return error
-
-        history = PaymentHistory()
-        history.add_history(wallet, report)
-
-        return error
 
     def report_parser(self, report_file):
         error = False
@@ -167,7 +144,7 @@ class ReportParser(Command):
                     # Если операция платежная, обновляем баланс личного кошелька
                     # и пишем информацию в историю
                     if int(report.type) == Report.TYPE_PAYMENT:
-                        error = self.update_wallet_balance(report)
+                        error = PaymentWallet().update_balance(report)
 
         if not error:
             if not os.path.exists(new_file_patch):
@@ -178,24 +155,6 @@ class ReportParser(Command):
 
         return False
 
-    def set_reccurent_on(self):
-        reccurents = PaymentReccurent.query.filter_by(
-            status=PaymentReccurent.STATUS_OFF).all()
-
-        for reccurent in reccurents:
-            if not reccurent.wallet:
-                continue
-            if int(reccurent.wallet.balance) > PaymentWallet.BALANCE_MIN:
-                continue
-
-            history = PaymentHistory().get_new_by_wallet_id(
-                reccurent.wallet.id)
-            if history:
-                continue
-
-            reccurent.status = PaymentReccurent.STATUS_ON
-            reccurent.save()
-
     def run(self):
         try:
             report_files = self.get_files()
@@ -205,6 +164,6 @@ class ReportParser(Command):
                 pool.close()
                 pool.join()
 
-            self.set_reccurent_on()
+            PaymentReccurent().set_reccurent_on()
         except Exception as e:
             app.logger.error(e)
