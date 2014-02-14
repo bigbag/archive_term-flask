@@ -5,6 +5,7 @@
     :copyright: (c) 2013 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
+from models.loyalty import Loyalty
 from libs.facebook_api import FacebookApi
 from libs.mock_facebook_api import MockFacebookApi
 from libs.twitter_api import TwitterApi
@@ -12,7 +13,7 @@ from libs.mock_twitter_api import MockTwitterApi
 from libs.foursquare_api import FoursquareApi
 from libs.instagram_api import InstagramApi
 from libs.google_api import GoogleApi
-from models.loyalty import Loyalty
+from libs.youtube_api import YouTubeApi
 
 
 class SocnetsApi():
@@ -60,5 +61,11 @@ class SocnetsApi():
         elif type == Loyalty.GOOGLE_PLUS_ONE:
             gApi = GoogleApi()
             netShared = gApi.check_plus(url, token_id, loyalty_id)
+        elif type == Loyalty.YOUTUBE_FOLLOWING:
+            ytApi = YouTubeApi()
+            netShared = ytApi.check_following(url, token_id, loyalty_id)
+        elif type == Loyalty.YOUTUBE_VIEWS:
+            ytApi = YouTubeApi()
+            netShared = ytApi.check_views(url, token_id, loyalty_id)
 
         return netShared
