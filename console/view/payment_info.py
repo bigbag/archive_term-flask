@@ -102,31 +102,34 @@ class PaymentInfo(Command):
             else:
                 payment_info = info[str(history.id)]
                 if history.status == PaymentHistory.STATUS_FAILURE:
-                    if payment_info['status'] == UnitellerApi.STATUS_COMPLETE:
+                    if payment_info['status'] != UnitellerApi.STATUS_COMPLETE:
+                        continue
 
-                        wallet = PaymentWallet.query.get(history.wallet_id)
-                        wallet.balance = int(
-                            wallet.balance) + int(
-                                history.amount)
+                    wallet = PaymentWallet.query.get(history.wallet_id)
+                    wallet.balance = int(
+                        wallet.balance) + int(
+                            history.amount)
 
-                        if not wallet.save():
-                            continue
+                    if not wallet.save():
+                        continue
 
-                        history.status = PaymentHistory.STATUS_COMPLETE
-                        history.save()
+                    history.status = PaymentHistory.STATUS_COMPLETE
+                    history.save()
+
                 elif history.status == PaymentHistory.STATUS_COMPLETE:
-                    if payment_info['status'] == UnitellerApi.STATUS_CANCELED:
+                    if payment_info['status'] != UnitellerApi.STATUS_CANCELED:
+                        continue
 
-                        wallet = PaymentWallet.query.get(history.wallet_id)
-                        wallet.balance = int(
-                            wallet.balance) - int(
-                                history.amount)
+                    wallet = PaymentWallet.query.get(history.wallet_id)
+                    wallet.balance = int(
+                        wallet.balance) - int(
+                            history.amount)
 
-                        if not wallet.save():
-                            continue
+                    if not wallet.save():
+                        continue
 
-                        history.status = PaymentHistory.STATUS_FAILURE
-                        history.save()
+                    history.status = PaymentHistory.STATUS_FAILURE
+                    history.save()
 
     def run(self):
         try:

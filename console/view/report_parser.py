@@ -103,7 +103,10 @@ class ReportParser(Command):
                     event_key)
 
                 for card_node in card_nodes:
-                    error = Report().add_from_xml(card_node)
+                    report = Report()
+                    report.term = term
+                    report.event_id = event.id
+                    error = report.add_from_xml(card_node)
 
         if not error:
             if not os.path.exists(new_file_patch):

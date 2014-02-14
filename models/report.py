@@ -11,8 +11,6 @@ from datetime import datetime, timedelta
 from web import db, app, cache
 from sqlalchemy.sql import func
 
-from flask import g
-
 from helpers import date_helper
 
 from models.term import Term
@@ -116,11 +114,9 @@ class Report(db.Model):
         from models.term_corp_wallet import TermCorpWallet
 
         error = False
-        self.term = term
-        self.event_id = event.id
         self = self.get_db_view(card_node)
 
-        old_report = sel.get_by_params()
+        old_report = self.get_by_params()
         if old_report:
             return error
 
@@ -134,7 +130,7 @@ class Report(db.Model):
         person = Person.query.get(self.person_id)
 
         # Если человек имеет корпоративный кошелек, обновляем его баланс
-        if person and person.type == self.TYPE_WALLET:
+        if person and person.type == Person.TYPE_WALLET:
             self.corp_type = self.CORP_TYPE_ON
             corp_wallet = TermCorpWallet.query.filter_by(
                 person_id=person.id).first()
