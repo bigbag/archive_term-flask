@@ -17,11 +17,7 @@ from console import app
 from models.report import Report
 from models.event import Event
 from models.term import Term
-from models.person import Person
-from models.term_corp_wallet import TermCorpWallet
-from models.payment_wallet import PaymentWallet
 
-from models.payment_history import PaymentHistory
 from models.payment_reccurent import PaymentReccurent
 
 from helpers import date_helper
@@ -107,44 +103,7 @@ class ReportParser(Command):
                     event_key)
 
                 for card_node in card_nodes:
-
-                    report = Report()
-                    report.term = term
-                    report.event_id = event.id
-                    report = report.get_db_view(card_node)
-
-                    old_report = Report().get_by_params()
-                    if old_report:
-                        continue
-
-                    # Если операция платежная, обновляем баланс личного кошелька
-                    # и пишем информацию в историю, сохраняем отчет
-                    if int(report.type) == Report.TYPE_PAYMENT or int(report.type) == Report.TYPE_MPS:
-                        error = PaymentWallet().update_balance(report)
-                        report.save()
-
-                    # Если операция по белому списку
-                    person = Person.query.get(report.person_id)
-
-                    # Если человек имеет корпоративный кошелек, обновляем его баланс
-                    if person and person.type == Person.TYPE_WALLET:
-                        report.corp_type = Report.CORP_TYPE_ON
-                        corp_wallet = TermCorpWallet.query.filter_by(
-                            person_id=person.id).first()
-                        if not corp_wallet:
-                            continue
-
-                        corp_wallet.balance = int(
-                            corp_wallet.balance) - int(
-                                report.amount)
-                        corp_wallet.save()
-
-                        # Блокируем возможность платежей через корпоративный кошелек
-                        if corp_wallet.balance < PaymentWallet.BALANCE_MIN:
-                            person.wallet_status = Person.STATUS_BANNED
-                            person.save()
-
-                    report.save()
+                    error = Report().add_from_xml(card_node)
 
         if not error:
             if not os.path.exists(new_file_patch):

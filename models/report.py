@@ -110,6 +110,51 @@ class Report(db.Model):
         self.creation_date = date_time_utc
         return self
 
+    def add_from_xml(self, card_node):
+        from models.person import Person
+        from models.payment_wallet import PaymentWallet
+        from models.term_corp_wallet import TermCorpWallet
+
+        error = False
+        self.term = term
+        self.event_id = event.id
+        self = self.get_db_view(card_node)
+
+        old_report = sel.get_by_params()
+        if old_report:
+            return error
+
+        # Если операция платежная, обновляем баланс личного кошелька
+        # и пишем информацию в историю, сохраняем отчет
+        if int(self.type) == self.TYPE_PAYMENT or int(self.type) == self.TYPE_MPS:
+            error = PaymentWallet().update_balance(self)
+            self.save()
+
+        # Если операция по белому списку
+        person = Person.query.get(self.person_id)
+
+        # Если человек имеет корпоративный кошелек, обновляем его баланс
+        if person and person.type == self.TYPE_WALLET:
+            self.corp_type = self.CORP_TYPE_ON
+            corp_wallet = TermCorpWallet.query.filter_by(
+                person_id=person.id).first()
+            if not corp_wallet:
+                return error
+
+            corp_wallet.balance = int(
+                corp_wallet.balance) - int(
+                    self.amount)
+            corp_wallet.save()
+
+            # Блокируем возможность платежей через корпоративный кошелек
+            if corp_wallet.balance < PaymentWallet.BALANCE_MIN:
+                person.wallet_status = Person.STATUS_BANNED
+                person.save()
+
+            if not self.save():
+                error = True
+        return error
+
     def get_by_params(self):
         return self.query.filter_by(term_id=self.term_id,
                                     event_id=self.event_id,

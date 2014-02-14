@@ -52,7 +52,7 @@ class PaymentHistory(db.Model):
     def add_history(self, wallet, report):
         self.user_id = wallet.user_id
         self.wallet_id = wallet.id
-        self.term_id = report.term_id
+        self.term_id = report.term.id
         self.creation_date = report.creation_date
         self.amount = report.amount
         self.type = PaymentHistory.TYPE_MINUS
