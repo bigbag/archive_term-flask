@@ -1,0 +1,17 @@
+# -*- coding: utf-8 -*-
+"""
+    Настройки соцсетей
+
+    :copyright: (c) 2014 by Denis Amelin.
+    :license: BSD, see LICENSE for more details.
+"""
+
+
+
+class SocConfig():
+    
+    TWITTER_KEY = '7qaNhN9pKBEeHgqh6gu28g' 
+    TWITTER_SECRET = 'WStyI4MTuGCbyRuTnt8aekU4NqLN3HjUpELVWLUduo'
+
+    
+

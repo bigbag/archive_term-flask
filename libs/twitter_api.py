@@ -5,15 +5,16 @@
     :copyright: (c) 2014 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
-from libs.soc_config import SocConfig
-from libs.socnet_api_base import SocnetApiBase
-from models.soc_token import SocToken
-from grab import Grab
-from twython import Twython
 import json
 import urllib
-
 import pprint
+
+from grab import Grab
+from twython import Twython
+
+from configs.soc_config import SocConfig
+from libs.socnet_api_base import SocnetApiBase
+from models.soc_token import SocToken
 
 
 class TwitterApi(SocnetApiBase):
@@ -24,8 +25,8 @@ class TwitterApi(SocnetApiBase):
         socToken = SocToken.query.get(token_id)
         twitter = Twython(
             SocConfig.TWITTER_KEY, SocConfig.TWITTER_SECRET, socToken.user_token, socToken.token_secret)
-        #params = {'q': urllib.quote_plus(url), 'count': 1, 'from': socToken.soc_username}
-        #searchResult = twitter.get('search/tweets', params=params)
+        # params = {'q': urllib.quote_plus(url), 'count': 1, 'from': socToken.soc_username}
+        # searchResult = twitter.get('search/tweets', params=params)
 
         searchResult = twitter.get_user_timeline(
             user_id=socToken.soc_id, count=1)
@@ -36,7 +37,7 @@ class TwitterApi(SocnetApiBase):
         retwitted = False
         twit = self.get_tweet(token_id, url)
 
-        if twit.has_key('current_user_retweet') and twit['current_user_retweet'].has_key('id') and twit['current_user_retweet']['id']:
+        if 'current_user_retweet' in twit and 'id' in twit['current_user_retweet'] and twit['current_user_retweet']['id']:
             retwitted = True
 
         return retwitted
@@ -46,7 +47,7 @@ class TwitterApi(SocnetApiBase):
 
         friendship = self.get_friendship(token_id, url)
 
-        if friendship.has_key('relationship') and friendship['relationship'].has_key('source') and friendship['relationship']['source'].has_key('following') and friendship['relationship']['source']['following']:
+        if 'relationship' in friendship and 'source' in friendship['relationship'] and 'following' in friendship['relationship']['source'] and friendship['relationship']['source']['following']:
             reading = True
 
         return reading
@@ -56,7 +57,7 @@ class TwitterApi(SocnetApiBase):
 
         searchHashtag = self.search_hashtag(token_id, url)
 
-        if searchHashtag.has_key('statuses') and len(searchHashtag['statuses']):
+        if 'statuses' in searchHashtag and len(searchHashtag['statuses']):
             posted = True
 
         return posted
