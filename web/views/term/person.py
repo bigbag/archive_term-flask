@@ -279,7 +279,7 @@ def person_remove(person_id):
     if not person:
         abort(404)
 
-    person.delete()
+    person.person_remove()
     answer['error'] = 'no'
     answer['message'] = u'Операция успешно выполнена'
 

@@ -80,6 +80,14 @@ class Person(db.Model):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
+    def person_remove(self):
+        from models.term_corp_wallet import TermCorpWallet
+
+        TermCorpWallet.query.filter_by(person_id=self.id).delete()
+
+        self.delete()
+        return True
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
