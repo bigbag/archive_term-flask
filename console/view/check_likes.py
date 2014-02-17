@@ -29,13 +29,13 @@ class CheckLikes(Command):
             if len(url):
                 socToken = SocToken.query.get(stackItem.token_id)
                 pageLiked = SocnetsApi.check_soc_sharing(
-                    action.sharing_type, url, socToken.id)
+                    action.sharing_type, url, socToken.id, stackItem.loyalty_id)
 
                 if pageLiked:
                     PersonEvent.add_by_user_loyalty_id(
                         socToken.user_id, stackItem.loyalty_id)
-                    print 'user complied with the conditions for ' + url
-                    # stackItem.delete()
+                    # print 'user complied with the conditions for ' + url
+                    stackItem.delete()
 
                 else:
                     print 'user not complied with the conditions for ' + url

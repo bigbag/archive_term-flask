@@ -5,16 +5,12 @@
     :copyright: (c) 2014 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
-import json
-import urllib
-import pprint
-
-from grab import Grab
-from twython import Twython
 
 from configs.soc_config import SocConfig
 from libs.socnet_api_base import SocnetApiBase
 from models.soc_token import SocToken
+from grab import Grab
+from twython import Twython
 
 
 class TwitterApi(SocnetApiBase):
