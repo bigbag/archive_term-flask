@@ -34,3 +34,13 @@ class SocnetApiBase():
         value = SocnetApiBase.rmGetParams(value)
 
         return value
+
+    @staticmethod
+    def make_request(url, parse_json):
+        g = Grab()
+        g.go(url)
+        answer = g.response.body
+        if parse_json:
+            answer = json.loads(answer)
+
+        return answer
