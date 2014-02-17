@@ -10,3 +10,4 @@ gunicorn.conf.py
 /pids/
 /archiv/
 /tmp/
+/configs/soc_config.py

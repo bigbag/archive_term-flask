@@ -5,7 +5,7 @@
     :copyright: (c) 2014 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
-from libs.soc_config import SocConfig
+from configs.soc_config import SocConfig
 from libs.socnet_api_base import SocnetApiBase
 from models.soc_token import SocToken
 from grab import Grab

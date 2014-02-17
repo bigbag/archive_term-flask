@@ -6,7 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from libs.socnet_api_base import SocnetApiBase
-from libs.soc_config import SocConfig
+from configs.soc_config import SocConfig
 from models.soc_token import SocToken
 from models.loyalty import Loyalty
 from grab import Grab
