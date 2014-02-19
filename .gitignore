@@ -11,3 +11,4 @@ gunicorn.conf.py
 /archiv/
 /tmp/
 celerybeat-schedule
+/configs/soc_config.py

@@ -28,6 +28,15 @@ class Loyalty(db.Model):
     TWITTER_RETWIT = 4
     TWITTER_READING = 5
     TWITTER_HASHTAG = 6
+    FOURSQUARE_CHECKIN = 7
+    FOURSQUARE_MAYOR = 8
+    FOURSQUARE_BADGE = 9
+    INSTAGRAM_LIKE = 10
+    INSTAGRAM_FOLLOWING = 11
+    GOOGLE_CIRCLE = 12
+    GOOGLE_PLUS_ONE = 13
+    YOUTUBE_FOLLOWING = 14
+    YOUTUBE_VIEWS = 15
 
     id = db.Column(db.Integer, primary_key=True)
     terms_id = db.Column(db.Integer)
@@ -42,6 +51,7 @@ class Loyalty(db.Model):
     start_date = db.Column(db.DateTime)
     stop_date = db.Column(db.DateTime)
     sharing_type = db.Column(db.Integer)
+    data = db.Column(db.String(1024))
 
     def __init__(self):
         self.rules = self.RULE_FIXED
