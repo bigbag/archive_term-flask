@@ -117,6 +117,7 @@ class Report(db.Model):
         self = self.get_db_view(card_node)
 
         old_report = self.get_by_params()
+
         if old_report:
             return error
 
@@ -124,7 +125,6 @@ class Report(db.Model):
         # и пишем информацию в историю, сохраняем отчет
         if int(self.type) == self.TYPE_PAYMENT or int(self.type) == self.TYPE_MPS:
             error = PaymentWallet().update_balance(self)
-            self.save()
 
         # Если операция по белому списку
         person = Person.query.get(self.person_id)
@@ -147,12 +147,13 @@ class Report(db.Model):
                 person.wallet_status = Person.STATUS_BANNED
                 person.save()
 
-            if not self.save():
-                error = True
+        if not self.save():
+            error = True
+
         return error
 
     def get_by_params(self):
-        return self.query.filter_by(term_id=self.term_id,
+        return self.query.filter_by(term_id=self.term.id,
                                     event_id=self.event_id,
                                     creation_date=self.creation_date,
                                     payment_id=self.payment_id).first()
