@@ -18,12 +18,13 @@ from flask.ext.login import LoginManager
 lm = LoginManager()
 lm.init_app(app)
 
-from web.views.api import admin, term
+from web.views.api import admin, term, social
 from web.views.term import general
 
 app.register_blueprint(term.mod, url_prefix='/api/term')
 app.register_blueprint(admin.mod, url_prefix='/api/admin')
 app.register_blueprint(general.mod, url_prefix='/term')
+app.register_blueprint(social.mod, url_prefix='/api/social')
 
 if app.debug is not True:
     import logging
