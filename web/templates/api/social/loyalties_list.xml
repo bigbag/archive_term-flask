@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <info>
-{% for loyalty in loyalties %}
-    <loyalty>
-        <id>{{loyalty.id}}</id>
-        <start_date>{{loyalty.start_date}}</start_date>
-        <stop_date>{{loyalty.stop_date}}</stop_date>
-        <type>{{loyalty.rules_const()}}</type>
-        <soc_type>{{loyalty.sharing_type}}</soc_type>
-        <desc>{{loyalty.desc}}</desc>
-        <amount>{{loyalty.amount}}</amount>
-        <limit>{{loyalty.limit}}</limit>
-        <timeout>{{loyalty.timeout}}</timeout>
-    </loyalty>
-{% endfor %}
+    <loyalties>
+        {% for loyalty in loyalties %}
+        <loyalty>
+            <id>{{loyalty.id}}</id>
+            <start_date>{{loyalty.start_date}}</start_date>
+            <stop_date>{{loyalty.stop_date}}</stop_date>
+            <type>{{loyalty.rules_const()}}</type>
+            <soc_type>{{loyalty.sharing_type}}</soc_type>
+            <name>{{loyalty.name}}</name>
+            <desc>{{loyalty.desc}}</desc>
+            <amount>{{loyalty.amount}}</amount>
+            <limit>{{loyalty.limit}}</limit>
+            <timeout>{{loyalty.timeout}}</timeout>
+        </loyalty>
+        {% endfor %}
+    </loyalties>
+<count>{{count}}</count>
+<offset>{{offset}}</offset>
 </info>

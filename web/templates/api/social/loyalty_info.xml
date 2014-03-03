@@ -13,8 +13,8 @@
         <spots>
         {% for spot in spots %}
             <spot>
-                <hard_id>{{spot.hard_id}}</hard_id>
-                <barcode>{{spot.barcode}}</barcode>
+                <hard_id>{{spot['hard_id']}}</hard_id>
+                <barcode>{{spot['barcode']}}</barcode>
             </spot>
         {% endfor %}
         </spots>

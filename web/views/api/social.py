@@ -19,6 +19,7 @@ from models.loyalty import Loyalty
 from models.person_event import PersonEvent
 from models.person import Person
 from models.payment_wallet import PaymentWallet
+from models.wallet_loyalty import WalletLoyalty
 from models.soc_token import SocToken
 from models.likes_stack import LikesStack
 from models.spot import Spot
@@ -48,12 +49,26 @@ def api_admin_access(request):
 @xml_headers
 def api_social_get_loyalties():
     """Возвращает список акций"""
+
+    count = Loyalty.DEFAULT_COUNT
+    if 'count' in request.args:
+        count = int(request.args['count'])
+        if count > Loyalty.MAX_COUNT:
+            count = Loyalty.MAX_COUNT
+
+    offset = 0
+    if 'offset' in request.args:
+        offset = int(request.args['offset'])
+
     api_admin_access(request)
-    loyalties = Loyalty.query.filter().all()
+    loyalties = Loyalty.query.filter().order_by(
+        Loyalty.id)[offset:(offset + count)]
 
     info_xml = render_template(
         'api/social/loyalties_list.xml',
-        loyalties=loyalties
+        loyalties=loyalties,
+        count=count,
+        offset=offset
     ).encode('cp1251')
 
     response = make_response(info_xml)
@@ -67,48 +82,17 @@ def api_social_get_loyalty(loyalty_id):
     """Возвращает детализацию по акции"""
     api_admin_access(request)
     loyalty = Loyalty.query.get(loyalty_id)
-    terms = json.loads(loyalty.terms_id)
-    events = PersonEvent.query.filter_by(
-        event_id=loyalty.event_id, firm_id=loyalty.firm_id)
 
-    personList = []
+    wl = WalletLoyalty.query.filter_by(
+        loyalty_id=loyalty.id)
 
-    for event in events:
-        if event.person_id not in personList:
-            personList.append(event.person_id)
-
-    persons = Person.query.filter(Person.id.in_(personList))
-
-    paymentsList = []
-
-    for person in persons:
-        if person.payment_id not in persons:
-            paymentsList.append(person.payment_id)
-
-    wallets = PaymentWallet.query.filter(
-        PaymentWallet.payment_id.in_(paymentsList))
-
-    usersList = []
-    for wallet in wallets:
-        if wallet.user_id not in usersList:
-            usersList.append(wallet.user_id)
-
-    lStack = LikesStack.query.filter().all()
-
-    tokensList = []
-
-    for stackItem in lStack:
-        if stackItem.token_id not in tokensList:
-            tokensList.append(stackItem.token_id)
-
-    tokens = SocToken.query.filter(SocToken.id.in_(tokensList))
-
-    for token in tokens:
-        if token.user_id not in usersList:
-            usersList.append(token.user_id)
+    walletList = []
+    for part in wl:
+        if part.wallet_id not in walletList:
+            walletList.append(part.wallet_id)
 
     partWallets = PaymentWallet.query.filter(
-        PaymentWallet.user_id.in_(usersList))
+        PaymentWallet.id.in_(walletList))
 
     spotList = []
     for partWallet in partWallets:
@@ -117,10 +101,20 @@ def api_social_get_loyalty(loyalty_id):
 
     spots = Spot.query.filter(Spot.discodes_id.in_(spotList))
 
+    spotWallets = []
+    for spot in spots:
+        for partWallet in partWallets:
+            if partWallet.discodes_id == spot.discodes_id:
+                wallet = {}
+                wallet['discodes_id'] = spot.discodes_id
+                wallet['barcode'] = spot.barcode
+                wallet['hard_id'] = partWallet.hard_id
+                spotWallets.append(wallet)
+
     info_xml = render_template(
         'api/social/loyalty_info.xml',
         loyalty=loyalty,
-        spots=spots
+        spots=spotWallets
     ).encode('cp1251')
 
     response = make_response(info_xml)

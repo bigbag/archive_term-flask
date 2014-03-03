@@ -40,6 +40,9 @@ class Loyalty(db.Model):
     YOUTUBE_FOLLOWING = 14
     YOUTUBE_VIEWS = 15
 
+    DEFAULT_COUNT = 20
+    MAX_COUNT = 100
+
     id = db.Column(db.Integer, primary_key=True)
     terms_id = db.Column(db.Integer)
     event_id = db.Column(db.Integer, db.ForeignKey('person_event.id'))
@@ -49,6 +52,7 @@ class Loyalty(db.Model):
     amount = db.Column(db.String(32))
     threshold = db.Column(db.String(32))
     desc = db.Column(db.String(1024))
+    name = db.Column(db.String(128))
     creation_date = db.Column(db.DateTime)
     start_date = db.Column(db.DateTime)
     stop_date = db.Column(db.DateTime)
