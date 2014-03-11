@@ -5,7 +5,7 @@
     :copyright: (c) 2013 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
-from libs.socnet_api_base import SocnetApiBase
+from libs.socnet.socnet_base import SocnetBase
 from models.soc_token import SocToken
 from grab import Grab
 import json
@@ -13,7 +13,7 @@ import urllib
 import pprint
 
 
-class FacebookApi(SocnetApiBase):
+class FacebookApi(SocnetBase):
 
     API_PATH = 'https://graph.facebook.com/'
     FQL_PATH = 'https://graph.facebook.com/fql?q='
@@ -25,15 +25,15 @@ class FacebookApi(SocnetApiBase):
         if 'facebook.com/' in url and ('/photo.php?fbid=' in url or '/posts/' in url):
             if '/posts/' in url:
                 # пост
-                object_id = SocnetApiBase.parse_get_param(url, '/posts/')
+                object_id = SocnetBase.parse_get_param(url, '/posts/')
             else:
                 # фото
-                object_id = SocnetApiBase.parse_get_param(
+                object_id = SocnetBase.parse_get_param(
                     url, '/photo.php?fbid=')
             like = self.get_object_like(object_id, token_id, True)
-            if like.has_key('data') and len(like['data']) > 0 \
-                and like['data'][0].has_key('object_id') \
-                and like['data'][0]['object_id'] == object_id:
+            if 'data' in like and len(like['data']) > 0 \
+                and 'object_id' in like['data'][0] \
+                    and like['data'][0]['object_id'] == object_id:
                 pageLiked = True
         elif 'facebook.com/' in url:
             page = self.get_page(url, token_id, True)
@@ -41,14 +41,14 @@ class FacebookApi(SocnetApiBase):
             if page.get('id'):
                 like = self.get_like(page['id'], token_id, True)
 
-                if like.has_key('data') and len(like['data']) > 0 and like['data'][0].get('id'):
+                if 'data' in like and len(like['data']) > 0 and like['data'][0].get('id'):
                     pageLiked = True
         else:
             # like внешней ссылки
             like = self.get_external_like(url, token_id)
-            if like.has_key('data') and len(like['data']) > 0 \
-                and like['data'][0].has_key('attachment') \
-                and like['data'][0]['attachment'].has_key('href'):
+            if 'data' in like and len(like['data']) > 0 \
+                and 'attachment' in like['data'][0] \
+                    and 'href' in like['data'][0]['attachment']:
                 pageLiked = True
 
         return pageLiked
@@ -57,9 +57,9 @@ class FacebookApi(SocnetApiBase):
         urlShared = False
 
         sharing = self.get_sharing(url, token_id, True)
-        if sharing.has_key('data') and len(sharing['data']) > 0 \
-            and sharing['data'][0].has_key('attachment') \
-            and sharing['data'][0]['attachment'].has_key('href'):
+        if 'data' in sharing and len(sharing['data']) > 0 \
+            and 'attachment' in sharing['data'][0] \
+                and 'href' in sharing['data'][0]['attachment']:
             urlShared = True
 
         return urlShared
@@ -71,7 +71,7 @@ class FacebookApi(SocnetApiBase):
             username = username[
                 username.find('facebook.com/') + len('facebook.com/'):]
 
-        username = SocnetApiBase.rmGetParams(username)
+        username = SocnetBase.rmGetParams(username)
 
         return username
 

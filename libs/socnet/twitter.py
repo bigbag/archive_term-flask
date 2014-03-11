@@ -7,13 +7,13 @@
 """
 
 from configs.soc_config import SocConfig
-from libs.socnet_api_base import SocnetApiBase
+from libs.socnet.socnet_base import SocnetBase
 from models.soc_token import SocToken
 from grab import Grab
 from twython import Twython
 
 
-class TwitterApi(SocnetApiBase):
+class TwitterApi(SocnetBase):
 
     def checkSharing(self, url, token_id):
         # пока решено отказаться от акций такого типа, это заготовка
@@ -82,7 +82,7 @@ class TwitterApi(SocnetApiBase):
 
     @staticmethod
     def search_hashtag(token_id, url):
-        hashtag = '#' + SocnetApiBase.parse_get_param(url, '#')
+        hashtag = '#' + SocnetBase.parse_get_param(url, '#')
         socToken = SocToken.query.get(token_id)
         twitter = Twython(
             SocConfig.TWITTER_KEY, SocConfig.TWITTER_SECRET, socToken.user_token, socToken.token_secret)
@@ -94,8 +94,8 @@ class TwitterApi(SocnetApiBase):
 
     @staticmethod
     def parse_screen_name(url):
-        return SocnetApiBase.parse_get_param(url, 'https://twitter.com/')
+        return SocnetBase.parse_get_param(url, 'https://twitter.com/')
 
     @staticmethod
     def parse_status_id(url):
-        return SocnetApiBase.parse_get_param(url, '/status/')
+        return SocnetBase.parse_get_param(url, '/status/')
