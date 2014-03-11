@@ -5,7 +5,7 @@
     :copyright: (c) 2014 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
-from libs.socnet_api_base import SocnetApiBase
+from libs.socnet.socnet_base import SocnetBase
 from configs.soc_config import SocConfig
 from models.soc_token import SocToken
 from models.loyalty import Loyalty
@@ -17,7 +17,7 @@ import time
 import math
 
 
-class YouTubeApi(SocnetApiBase):
+class YouTubeApi(SocnetBase):
 
     API_PATH = 'https://www.googleapis.com/youtube/'
     TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
@@ -38,14 +38,14 @@ class YouTubeApi(SocnetApiBase):
             g.go(urlApi)
             subscriptions = json.loads(g.response.body)
 
-            if subscriptions.has_key('items') and len(subscriptions['items']) > 0:
+            if 'items' in subscriptions and len(subscriptions['items']) > 0:
                 for subscribe in subscriptions['items']:
-                    if subscribe.has_key('snippet') and subscribe['snippet'].has_key('channelId') and subscribe['snippet']['channelId'] == target['channelId']:
+                    if 'snippet' in subscribe and 'channelId' in subscribe['snippet'] and subscribe['snippet']['channelId'] == target['channelId']:
                         follow = True
             else:
                 break
 
-            if subscriptions.has_key('nextPageToken') and len(subscriptions['nextPageToken']) > 0:
+            if 'nextPageToken' in subscriptions and len(subscriptions['nextPageToken']) > 0:
                     urlApi = self.API_PATH + \
                         'v3/subscriptions?maxResults=50&part=snippet&mine=true'
             else:
@@ -74,12 +74,13 @@ class YouTubeApi(SocnetApiBase):
             g = Grab()
             g.setup(
                 post={
-                    'client_id': SocConfig.GOOGLE_ID, 'client_secret': SocConfig.GOOGLE_SECRET,
+                    'client_id': SocConfig.GOOGLE_ID,
+                    'client_secret': SocConfig.GOOGLE_SECRET,
                     'refresh_token': socToken.refresh_token, 'grant_type': 'refresh_token'})
             g.go(self.TOKEN_URL)
             newToken = json.loads(g.response.body)
 
-            if newToken.has_key('access_token') and newToken.has_key('expires_in'):
+            if 'access_token' in newToken and 'expires_in' in newToken:
                 socToken.user_token = newToken['access_token']
                 socToken.token_expires = math.floor(
                     time.time()) + newToken['expires_in'] - 60

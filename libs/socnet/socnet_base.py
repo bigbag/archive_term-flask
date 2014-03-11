@@ -9,7 +9,7 @@ from grab import Grab
 import json
 
 
-class SocnetApiBase():
+class SocnetBase():
     TOKEN_NOT_SHARED = -1  # для тестов
     TOKEN_FOR_SHARED = -2  # для тестов
 
@@ -31,7 +31,7 @@ class SocnetApiBase():
         if param in value:
             value = value[value.find(param) + len(param):]
 
-        value = SocnetApiBase.rmGetParams(value)
+        value = SocnetBase.rmGetParams(value)
 
         return value
 

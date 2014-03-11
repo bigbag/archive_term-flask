@@ -16,19 +16,15 @@ models_term_test = loader.loadTestsFromModule(models_term_test)
 models_payment_test = loader.loadTestsFromModule(models_payment_test)
 web_api_test = loader.loadTestsFromModule(web_api_test)
 web_api_admin_test = loader.loadTestsFromModule(web_api_admin_test)
-web_term_test = loader.loadTestsFromModule(web_term_test)
-socnets_api_test = loader.loadTestsFromModule(socnets_api_test)
-web_api_social_test = loader.loadTestsFromModule(web_api_social_test)
+web_term_test = loader.loadTestsFromModule(web_term_test))
 
-tests = [
+tests=[
     models_test,
     models_payment_test,
     models_term_test,
     web_api_admin_test,
-    web_api_social_test,
     web_api_test,
-    web_term_test,
-    socnets_api_test]
+    web_term_test]
 
 # tests = [web_term_test]
 

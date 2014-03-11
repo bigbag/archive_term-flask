@@ -6,14 +6,13 @@
     :license: BSD, see LICENSE for more details.
 """
 from models.loyalty import Loyalty
-from libs.facebook_api import FacebookApi
-from libs.mock_facebook_api import MockFacebookApi
-from libs.twitter_api import TwitterApi
-from libs.mock_twitter_api import MockTwitterApi
-from libs.foursquare_api import FoursquareApi
-from libs.instagram_api import InstagramApi
-from libs.google_api import GoogleApi
-from libs.youtube_api import YouTubeApi
+from libs.socnet.facebook import FacebookApi
+from libs.socnet.twitter import TwitterApi
+from libs.socnet.mock_twitter import MockTwitterApi
+from libs.socnet.foursquare import FoursquareApi
+from libs.socnet.instagram import InstagramApi
+from libs.socnet.google import GoogleApi
+from libs.socnet.youtube import YouTubeApi
 
 
 class SocnetsApi():
