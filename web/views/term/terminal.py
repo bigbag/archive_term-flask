@@ -214,17 +214,14 @@ def terminal_save(term_id, action):
 
     id = int(arg['id']) if 'id' in arg else None
 
-    if 'hard_id' in arg and arg['hard_id']:
-        term = Term().get_by_hard_id(arg['hard_id'])
-    elif 'edit' in action:
-        term = Term().get_by_id(id)
-
-    if not term:
-        term = Term()
-
+    term = Term().get_by_hard_id(arg['hard_id'])
     if term and term.id and term.id != id:
         answer['message'] = u'Терминал с таким SN уже есть в системе'
         return jsonify(answer)
+
+    term = Term().get_by_id(id)
+    if not term:
+        term = Term()
 
     form = TermAddForm.from_json(arg)
     if not form.validate():
