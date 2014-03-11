@@ -35,7 +35,7 @@ class Term(db.Model):
     DEFAULT_FACTOR = 100
 
     id = db.Column(db.Integer, primary_key=True)
-    hard_id = db.Column(db.Integer)
+    hard_id = db.Column(db.Integer, unique=True)
     type = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(300), nullable=False)
     tz = db.Column(db.String(300), nullable=False)
