@@ -14,7 +14,7 @@ from models.person_event import PersonEvent
 from models.likes_stack import LikesStack
 from models.soc_token import SocToken
 from console.configs.payment import UnitellerConfig
-from libs.socnets_api import SocnetsApi
+from libs.socnet.socnets_api import SocnetsApi
 
 
 class CheckLikes(Command):

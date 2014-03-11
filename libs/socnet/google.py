@@ -5,7 +5,7 @@
     :copyright: (c) 2014 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
-from libs.socnet_api_base import SocnetApiBase
+from libs.socnet.socnet_base import SocnetBase
 from configs.soc_config import SocConfig
 from models.soc_token import SocToken
 from models.loyalty import Loyalty
@@ -17,7 +17,7 @@ import time
 import math
 
 
-class GoogleApi(SocnetApiBase):
+class GoogleApi(SocnetBase):
 
     API_PATH = 'https://www.googleapis.com/plus/v1/'
     TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
@@ -31,7 +31,7 @@ class GoogleApi(SocnetApiBase):
         tagetUser = self.make_request(
             self.API_PATH + 'people/' + username + '?key=' + SocConfig.GOOGLE_KEY, True)
 
-        if tagetUser.has_key('id') and tagetUser['id']:
+        if 'id' in tagetUser and tagetUser['id']:
             userId = tagetUser['id']
             g = Grab()
             g.setup(headers={'Authorization': 'Bearer ' + socToken.user_token})
@@ -42,14 +42,14 @@ class GoogleApi(SocnetApiBase):
                 g.go(urlApi)
                 circle = json.loads(g.response.body)
 
-                if circle.has_key('items') and len(circle['items']) > 0:
+                if 'items' in circle and len(circle['items']) > 0:
                     for friend in circle['items']:
-                        if friend.has_key('id') and friend['id'] == userId:
+                        if 'id' in friend and friend['id'] == userId:
                             in_circle = True
                 else:
                     break
 
-                if circle.has_key('nextPageToken') and len(circle['nextPageToken']) > 0:
+                if 'nextPageToken' in circle and len(circle['nextPageToken']) > 0:
                     urlApi = self.API_PATH + \
                         'people/me/people/visible?maxResults=100&pageToken=' + \
                         circle['nextPageToken']
@@ -66,7 +66,7 @@ class GoogleApi(SocnetApiBase):
         target = json.loads(action.data)
         socToken = SocToken.query.get(token_id)
         g = Grab()
-        #g.setup(headers={'Authorization':'Bearer ' + socToken.user_token})
+        # g.setup(headers={'Authorization':'Bearer ' + socToken.user_token})
         urlApi = self.API_PATH + 'activities/' + \
             target['id'] + '/people/plusoners?maxResults=100&key=' + \
             SocConfig.GOOGLE_KEY
@@ -76,14 +76,14 @@ class GoogleApi(SocnetApiBase):
             g.go(urlApi)
             plusoners = json.loads(g.response.body)
 
-            if plusoners.has_key('items') and len(plusoners['items']) > 0:
+            if 'items' in plusoners and len(plusoners['items']) > 0:
                 for person in plusoners['items']:
-                    if person.has_key('id') and person['id'] == socToken.soc_id:
+                    if 'id' in person and person['id'] == socToken.soc_id:
                         plused = True
             else:
                 break
 
-            if plusoners.has_key('nextPageToken') and len(plusoners['nextPageToken']) > 0:
+            if 'nextPageToken' in plusoners and len(plusoners['nextPageToken']) > 0:
                     urlApi = self.API_PATH + 'activities/' + \
                         target['id'] + '/people/plusoners?maxResults=100&pageToken=' + plusoners[
                             'nextPageToken'] + '&key=' + SocConfig.GOOGLE_KEY
@@ -98,12 +98,13 @@ class GoogleApi(SocnetApiBase):
             g = Grab()
             g.setup(
                 post={
-                    'client_id': SocConfig.GOOGLE_ID, 'client_secret': SocConfig.GOOGLE_SECRET,
+                    'client_id': SocConfig.GOOGLE_ID,
+                    'client_secret': SocConfig.GOOGLE_SECRET,
                     'refresh_token': socToken.refresh_token, 'grant_type': 'refresh_token'})
             g.go(self.TOKEN_URL)
             newToken = json.loads(g.response.body)
 
-            if newToken.has_key('access_token') and newToken.has_key('expires_in'):
+            if 'access_token' in newToken and 'expires_in' in newToken:
                 socToken.user_token = newToken['access_token']
                 socToken.token_expires = math.floor(
                     time.time()) + newToken['expires_in'] - 60
