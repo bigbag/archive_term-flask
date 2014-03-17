@@ -185,7 +185,7 @@ def terminal_rent_remove(term_id):
     if 'id' not in arg:
         abort(405)
 
-    term = Term().get_info_by_id(term_id)
+    term = Term().get_by_id(term_id)
     if not term:
         abort(404)
 
