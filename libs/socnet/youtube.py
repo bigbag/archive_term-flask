@@ -15,6 +15,7 @@ import urllib
 import pprint
 import time
 import math
+from helpers import request_helper
 
 
 class YouTubeApi(SocnetBase):
@@ -58,7 +59,7 @@ class YouTubeApi(SocnetBase):
         self.refresh_token(token_id)
         socToken = SocToken.query.get(token_id)
 
-        watchHistory = self.make_request(
+        watchHistory = request_helper.make_request(
             'https://gdata.youtube.com/feeds/api/users/default/watch_history?v=2&access_token=' + socToken.user_token, False)
         targetId = self.parse_video_id(url)
 
@@ -90,10 +91,10 @@ class YouTubeApi(SocnetBase):
         videoId = url
 
         if 'watch?v=' in url:
-            videoId = self.parse_get_param(url, 'watch?v=')
+            videoId = request_helper.parse_get_param(url, 'watch?v=')
         elif 'youtube.com/v/' in url:
-            videoId = self.parse_get_param(url, 'youtube.com/v/')
+            videoId = request_helper.parse_get_param(url, 'youtube.com/v/')
         elif '/videos/' in url:
-            videoId = self.parse_get_param(url, '/videos/')
+            videoId = request_helper.parse_get_param(url, '/videos/')
 
         return videoId

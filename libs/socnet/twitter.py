@@ -11,11 +11,12 @@ from libs.socnet.socnet_base import SocnetBase
 from models.soc_token import SocToken
 from grab import Grab
 from twython import Twython
+from helpers import request_helper
 
 
 class TwitterApi(SocnetBase):
 
-    def checkSharing(self, url, token_id):
+    def checkSharing(self, url, token_id, loyalty_id):
         # пока решено отказаться от акций такого типа, это заготовка
         shared = False
         socToken = SocToken.query.get(token_id)
@@ -29,7 +30,7 @@ class TwitterApi(SocnetBase):
 
         return shared
 
-    def checkRetwit(self, url, token_id):
+    def checkRetwit(self, url, token_id, loyalty_id):
         retwitted = False
         twit = self.get_tweet(token_id, url)
 
@@ -38,7 +39,7 @@ class TwitterApi(SocnetBase):
 
         return retwitted
 
-    def checkReading(self, url, token_id):
+    def checkReading(self, url, token_id, loyalty_id):
         reading = False
 
         friendship = self.get_friendship(token_id, url)
@@ -48,7 +49,7 @@ class TwitterApi(SocnetBase):
 
         return reading
 
-    def checkHashtag(self, url, token_id):
+    def checkHashtag(self, url, token_id, loyalty_id):
         posted = False
 
         searchHashtag = self.search_hashtag(token_id, url)
@@ -82,7 +83,7 @@ class TwitterApi(SocnetBase):
 
     @staticmethod
     def search_hashtag(token_id, url):
-        hashtag = '#' + SocnetBase.parse_get_param(url, '#')
+        hashtag = '#' + request_helper.parse_get_param(url, '#')
         socToken = SocToken.query.get(token_id)
         twitter = Twython(
             SocConfig.TWITTER_KEY, SocConfig.TWITTER_SECRET, socToken.user_token, socToken.token_secret)
@@ -94,8 +95,8 @@ class TwitterApi(SocnetBase):
 
     @staticmethod
     def parse_screen_name(url):
-        return SocnetBase.parse_get_param(url, 'https://twitter.com/')
+        return request_helper.parse_get_param(url, 'https://twitter.com/')
 
     @staticmethod
     def parse_status_id(url):
-        return SocnetBase.parse_get_param(url, '/status/')
+        return request_helper.parse_get_param(url, '/status/')

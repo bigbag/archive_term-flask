@@ -48,4 +48,5 @@ def make_celery(app):
 
 celery = make_celery(app)
 
+from web.tasks.soc_sharing import check_sharing
 from web.tasks import *

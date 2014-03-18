@@ -15,6 +15,7 @@ import urllib
 import pprint
 import time
 import math
+from helpers import request_helper
 
 
 class GoogleApi(SocnetBase):
@@ -28,7 +29,7 @@ class GoogleApi(SocnetBase):
 
         socToken = SocToken.query.get(token_id)
         username = self.parse_username(url)
-        tagetUser = self.make_request(
+        tagetUser = request_helper.make_request(
             self.API_PATH + 'people/' + username + '?key=' + SocConfig.GOOGLE_KEY, True)
 
         if 'id' in tagetUser and tagetUser['id']:
@@ -116,10 +117,10 @@ class GoogleApi(SocnetBase):
     def parse_username(self, url):
         userId = url
         if 'google.com/u/0/' in url:
-            userId = self.parse_get_param(url, 'google.com/u/0/')
+            userId = request_helper.parse_get_param(url, 'google.com/u/0/')
         elif 'plus.google.com/' in url:
-            userId = self.parse_get_param(url, 'plus.google.com/')
+            userId = request_helper.parse_get_param(url, 'plus.google.com/')
         elif 'google.com/' in url:
-            userId = self.parse_get_param(url, 'google.com/')
+            userId = request_helper.parse_get_param(url, 'google.com/')
 
         return userId

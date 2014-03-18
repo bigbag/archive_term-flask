@@ -12,6 +12,7 @@ from grab import Grab
 import json
 import urllib
 import pprint
+from helpers import request_helper
 
 
 class FoursquareApi(SocnetBase):
@@ -74,12 +75,13 @@ class FoursquareApi(SocnetBase):
 
     def parse_place(self, placeStr):
         place = {}
-        place['name'] = self.parse_get_param(placeStr, '"')
+        place['name'] = request_helper.parse_get_param(placeStr, '"')
         if '"' in place['name']:
             place['address'] = place['name'][place['name'].find('"') + 1:]
             place['name'] = place['name'][0:place['name'].find('"')]
 
-            place['address'] = self.parse_get_param(place['address'], '"')
+            place['address'] = request_helper.parse_get_param(
+                place['address'], '"')
             if '"' in place['address']:
                 place['address'] = place['address'][
                     0:place['address'].find('"')]

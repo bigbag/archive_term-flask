@@ -11,6 +11,7 @@ from grab import Grab
 import json
 import urllib
 import pprint
+from helpers import request_helper
 
 
 class FacebookApi(SocnetBase):
@@ -18,17 +19,17 @@ class FacebookApi(SocnetBase):
     API_PATH = 'https://graph.facebook.com/'
     FQL_PATH = 'https://graph.facebook.com/fql?q='
 
-    def check_like(self, url, token_id):
+    def check_like(self, url, token_id, loyalty_id):
         pageLiked = False
         object_id = 0
 
         if 'facebook.com/' in url and ('/photo.php?fbid=' in url or '/posts/' in url):
             if '/posts/' in url:
                 # пост
-                object_id = SocnetBase.parse_get_param(url, '/posts/')
+                object_id = request_helper.parse_get_param(url, '/posts/')
             else:
                 # фото
-                object_id = SocnetBase.parse_get_param(
+                object_id = request_helper.parse_get_param(
                     url, '/photo.php?fbid=')
             like = self.get_object_like(object_id, token_id, True)
             if 'data' in like and len(like['data']) > 0 \
@@ -53,7 +54,7 @@ class FacebookApi(SocnetBase):
 
         return pageLiked
 
-    def check_sharing(self, url, token_id):
+    def check_sharing(self, url, token_id, loyalty_id):
         urlShared = False
 
         sharing = self.get_sharing(url, token_id, True)
@@ -71,7 +72,7 @@ class FacebookApi(SocnetBase):
             username = username[
                 username.find('facebook.com/') + len('facebook.com/'):]
 
-        username = SocnetBase.rmGetParams(username)
+        username = request_helper.rmGetParams(username)
 
         return username
 
