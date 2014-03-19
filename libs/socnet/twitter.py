@@ -13,6 +13,11 @@ from grab import Grab
 from twython import Twython
 from helpers import request_helper
 
+URLS_PARTS = {
+    'base': 'twitter.com/',
+    'status': '/status/',
+}
+
 
 class TwitterApi(SocnetBase):
 
@@ -95,8 +100,8 @@ class TwitterApi(SocnetBase):
 
     @staticmethod
     def parse_screen_name(url):
-        return request_helper.parse_get_param(url, 'https://twitter.com/')
+        return request_helper.parse_get_param(url, TwitterApi.URLS_PARTS['base'])
 
     @staticmethod
     def parse_status_id(url):
-        return request_helper.parse_get_param(url, '/status/')
+        return request_helper.parse_get_param(url, TwitterApi.URLS_PARTS['status'])

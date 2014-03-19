@@ -22,6 +22,17 @@ class GoogleApi(SocnetBase):
 
     API_PATH = 'https://www.googleapis.com/plus/v1/'
     TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
+    URLS_PARTS = {
+        'base': 'google.com/',
+        'plus': 'plus.google.com/',
+        'user': 'google.com/u/0/',
+    }
+    API_PARTS = {
+        'plusoners': '/people/plusoners?maxResults=100',
+        'activities': 'activities/',
+        'people_list': 'people/',
+        'peoples': 'people/me/people/visible?maxResults=100',
+    }
 
     def check_in_circle(self, url, token_id, loyalty_id):
         in_circle = False
@@ -30,14 +41,14 @@ class GoogleApi(SocnetBase):
         socToken = SocToken.query.get(token_id)
         username = self.parse_username(url)
         tagetUser = request_helper.make_request(
-            self.API_PATH + 'people/' + username + '?key=' + SocConfig.GOOGLE_KEY, True)
+            self.API_PATH + self.API_PARTS['people_list'] + username + '?key=' + SocConfig.GOOGLE_KEY, True)
 
         if 'id' in tagetUser and tagetUser['id']:
             userId = tagetUser['id']
             g = Grab()
             g.setup(headers={'Authorization': 'Bearer ' + socToken.user_token})
 
-            urlApi = self.API_PATH + 'people/me/people/visible?maxResults=100'
+            urlApi = self.API_PATH + self.API_PARTS['peoples']
 
             while not in_circle:
                 g.go(urlApi)
@@ -52,7 +63,7 @@ class GoogleApi(SocnetBase):
 
                 if 'nextPageToken' in circle and len(circle['nextPageToken']) > 0:
                     urlApi = self.API_PATH + \
-                        'people/me/people/visible?maxResults=100&pageToken=' + \
+                        self.API_PARTS['peoples'] + '&pageToken=' + \
                         circle['nextPageToken']
                 else:
                     break
@@ -68,8 +79,8 @@ class GoogleApi(SocnetBase):
         socToken = SocToken.query.get(token_id)
         g = Grab()
         # g.setup(headers={'Authorization':'Bearer ' + socToken.user_token})
-        urlApi = self.API_PATH + 'activities/' + \
-            target['id'] + '/people/plusoners?maxResults=100&key=' + \
+        urlApi = self.API_PATH + self.API_PARTS['activities'] + \
+            target['id'] + self.API_PARTS['plusoners'] + '&key=' + \
             SocConfig.GOOGLE_KEY
 
         while not plused:
@@ -85,8 +96,8 @@ class GoogleApi(SocnetBase):
                 break
 
             if 'nextPageToken' in plusoners and len(plusoners['nextPageToken']) > 0:
-                    urlApi = self.API_PATH + 'activities/' + \
-                        target['id'] + '/people/plusoners?maxResults=100&pageToken=' + plusoners[
+                    urlApi = self.API_PATH + self.API_PARTS['activities'] + \
+                        target['id'] + self.API_PARTS['plusoners'] + '&pageToken=' + plusoners[
                             'nextPageToken'] + '&key=' + SocConfig.GOOGLE_KEY
             else:
                 break
@@ -111,16 +122,16 @@ class GoogleApi(SocnetBase):
                     time.time()) + newToken['expires_in'] - 60
                 socToken.save()
 
-    def get_circle(self, token_id, pageToken):
-        socToken = SocToken.query.get(token_id)
-
     def parse_username(self, url):
         userId = url
-        if 'google.com/u/0/' in url:
-            userId = request_helper.parse_get_param(url, 'google.com/u/0/')
-        elif 'plus.google.com/' in url:
-            userId = request_helper.parse_get_param(url, 'plus.google.com/')
-        elif 'google.com/' in url:
-            userId = request_helper.parse_get_param(url, 'google.com/')
+        if self.URLS_PARTS['user'] in url:
+            userId = request_helper.parse_get_param(
+                url, self.URLS_PARTS['user'])
+        elif self.URLS_PARTS['plus'] in url:
+            userId = request_helper.parse_get_param(
+                url, self.URLS_PARTS['plus'])
+        elif self.URLS_PARTS['base'] in url:
+            userId = request_helper.parse_get_param(
+                url, self.URLS_PARTS['base'])
 
         return userId

@@ -22,6 +22,13 @@ class YouTubeApi(SocnetBase):
 
     API_PATH = 'https://www.googleapis.com/youtube/'
     TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
+    HISTORY_URL = 'https://gdata.youtube.com/feeds/api/users/default/watch_history?v=2'
+
+    API_PARTS = {
+        'subscriptions': 'v3/subscriptions?maxResults=50&part=snippet&mine=true',
+        'watch': 'watch?v=',
+    }
+    VIDEO_URLS = ['watch?v=', 'youtube.com/v/', '/videos/']
 
     def check_following(self, url, token_id, loyalty_id):
         follow = False
@@ -32,8 +39,7 @@ class YouTubeApi(SocnetBase):
 
         g = Grab()
         g.setup(headers={'Authorization': 'Bearer ' + socToken.user_token})
-        urlApi = self.API_PATH + \
-            'v3/subscriptions?maxResults=50&part=snippet&mine=true'
+        urlApi = self.API_PATH + self.API_PARTS['subscriptions']
 
         while not follow:
             g.go(urlApi)
@@ -48,7 +54,8 @@ class YouTubeApi(SocnetBase):
 
             if 'nextPageToken' in subscriptions and len(subscriptions['nextPageToken']) > 0:
                     urlApi = self.API_PATH + \
-                        'v3/subscriptions?maxResults=50&part=snippet&mine=true'
+                        self.API_PARTS['subscriptions'] + '&pageToken=' + subscriptions[
+                            'nextPageToken']
             else:
                 break
 
@@ -60,11 +67,11 @@ class YouTubeApi(SocnetBase):
         socToken = SocToken.query.get(token_id)
 
         watchHistory = request_helper.make_request(
-            'https://gdata.youtube.com/feeds/api/users/default/watch_history?v=2&access_token=' + socToken.user_token, False)
+            self.HISTORY_URL + '&access_token=' + socToken.user_token, False)
         targetId = self.parse_video_id(url)
 
         watchHistory = unicode(watchHistory, 'latin1')
-        if '/' + targetId in watchHistory or 'watch?v=' + targetId in watchHistory:
+        if '/' + targetId in watchHistory or self.API_PARTS['watch'] + targetId in watchHistory:
             viewed = True
 
         return viewed
@@ -90,11 +97,9 @@ class YouTubeApi(SocnetBase):
     def parse_video_id(self, url):
         videoId = url
 
-        if 'watch?v=' in url:
-            videoId = request_helper.parse_get_param(url, 'watch?v=')
-        elif 'youtube.com/v/' in url:
-            videoId = request_helper.parse_get_param(url, 'youtube.com/v/')
-        elif '/videos/' in url:
-            videoId = request_helper.parse_get_param(url, '/videos/')
+        for video_url in self.VIDEO_URLS:
+            if video_url in url:
+                videoId = request_helper.parse_get_param(url, video_url)
+                break
 
         return videoId

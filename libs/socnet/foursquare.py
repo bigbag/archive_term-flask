@@ -18,6 +18,12 @@ from helpers import request_helper
 class FoursquareApi(SocnetBase):
 
     API_PATH = 'https://api.foursquare.com/v2/'
+    VERSION = '&v=20140206'
+    API_PARTS = {
+        'badges': 'users/self/badges',
+        'mayorships': 'users/self/mayorships',
+        'venuehistory': 'users/self/venuehistory',
+    }
 
     def check_checkin(self, placeStr, token_id, loyalty_id):
         checkin = False
@@ -63,15 +69,15 @@ class FoursquareApi(SocnetBase):
 
     def get_badges(self, token_id):
         socToken = SocToken.query.get(token_id)
-        return self.make_api_request(self.API_PATH + 'users/self/badges?oauth_token=' + socToken.user_token + '&v=20140206', True)
+        return request_helper.make_request(self.API_PATH + self.API_PARTS['badges'] + '?oauth_token=' + socToken.user_token + self.VERSION, True)
 
     def get_mayorship(self, token_id):
         socToken = SocToken.query.get(token_id)
-        return self.make_api_request(self.API_PATH + 'users/self/mayorships?oauth_token=' + socToken.user_token + '&v=20140206', True)
+        return request_helper.make_request(self.API_PATH + self.API_PARTS['mayorships'] + '?oauth_token=' + socToken.user_token + self.VERSION, True)
 
     def get_history(self, token_id):
         socToken = SocToken.query.get(token_id)
-        return self.make_api_request(self.API_PATH + 'users/self/venuehistory?oauth_token=' + socToken.user_token + '&v=20140205', True)
+        return request_helper.make_request(self.API_PATH + self.API_PARTS['venuehistory'] + '?oauth_token=' + socToken.user_token + self.VERSION, True)
 
     def parse_place(self, placeStr):
         place = {}
@@ -90,13 +96,3 @@ class FoursquareApi(SocnetBase):
             place.pop('address')
 
         return place
-
-    @staticmethod
-    def make_api_request(url, parse_json):
-        g = Grab()
-        g.go(url)
-        answer = g.response.body
-        if parse_json:
-            answer = json.loads(answer)
-
-        return answer
