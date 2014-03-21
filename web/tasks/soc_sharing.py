@@ -27,7 +27,8 @@ def check_sharing(MessageClass, **kwargs):
 
         if len(url):
             socToken = SocToken.query.get(stackItem.token_id)
-            pageLiked = SocnetsApi.check_soc_sharing(
+            socApi = SocnetsApi()
+            pageLiked = socApi.check_soc_sharing(
                 action.sharing_type, url, socToken.id, stackItem.loyalty_id)
 
             if pageLiked:
