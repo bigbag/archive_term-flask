@@ -10,6 +10,7 @@ import json
 
 
 def clear_get_params(str):
+
     answer = str
     if "/" in answer:
         answer = answer[0:answer.find("/")]
