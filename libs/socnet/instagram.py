@@ -12,13 +12,21 @@ from grab import Grab
 import json
 import urllib
 import pprint
+from helpers import request_helper
 
 
 class InstagramApi(SocnetBase):
 
     API_PATH = 'https://api.instagram.com/v1/'
+    API_PARTS = {
+        'base': 'instagram.com/',
+        'oembed': 'http://api.instagram.com/oembed?url=',
+        'search_users': 'users/search?q=',
+        'relationship': 'users/%s/relationship',
+        'media_likes': 'media/%s/likes',
+    }
 
-    def check_like(self, url, token_id):
+    def check_like(self, url, token_id, loyalty_id):
         liked = False
 
         likesData = self.get_media_likes(url, token_id)
@@ -31,7 +39,7 @@ class InstagramApi(SocnetBase):
 
         return liked
 
-    def check_following(self, url, token_id):
+    def check_following(self, url, token_id, loyalty_id):
         follow = False
         relation = self.get_relation(url, token_id)
 
@@ -43,12 +51,12 @@ class InstagramApi(SocnetBase):
     def get_media_likes(self, url, token_id):
         likesData = {}
 
-        postMeta = self.make_request(
-            'http://api.instagram.com/oembed?url=' + url, True)
+        postMeta = request_helper.make_request(
+            self.API_PARTS['oembed'] + url, True)
         if 'media_id' in postMeta:
             socToken = SocToken.query.get(token_id)
-            likesData = self.make_request(self.API_PATH + 'media/' + postMeta[
-                                          'media_id'] + '/likes?access_token=' + socToken.user_token, True)
+            likesData = request_helper.make_request(self.API_PATH + self.API_PARTS['media_likes'] % (postMeta[
+                                                    'media_id']) + '?access_token=' + socToken.user_token, True)
 
         return likesData
 
@@ -56,10 +64,10 @@ class InstagramApi(SocnetBase):
         relation = {}
         socToken = SocToken.query.get(token_id)
 
-        user = self.make_request(self.API_PATH + 'users/search?q=' + self.parse_get_param(
-            url, 'instagram.com/') + '&access_token=' + socToken.user_token, True)
+        user = request_helper.make_request(self.API_PATH + self.API_PARTS['search_users'] + request_helper.parse_get_param(
+            url, self.API_PARTS['base']) + '&access_token=' + socToken.user_token, True)
         if 'data' in user and len(user['data']) > 0 and 'id' in user['data'][0]:
-            relation = self.make_request(self.API_PATH + 'users/' + user['data'][
-                                         0]['id'] + '/relationship?access_token=' + socToken.user_token, True)
+            relation = request_helper.make_request(self.API_PATH + self.API_PARTS[
+                                                   'relationship'] % (user['data'][0]['id']) + '?access_token=' + socToken.user_token, True)
 
         return relation
