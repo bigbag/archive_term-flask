@@ -37,7 +37,7 @@ class PersonEvent(db.Model):
     status = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
-        self.timeout = 300
+        self.timeout = 5
         self.status = self.STATUS_ACTIVE
 
     def __repr__(self):
