@@ -15,6 +15,7 @@
                 ng-model="user.email"
                 ng-keypress="($event.keyCode == 13)?login(user, signForm.$valid):''"
                 maxlength="300"
+                ng-class="{error: error.email}"
                 required >
             <input 
                 name="password"
@@ -23,6 +24,7 @@
                 ng-model="user.password"
                 ng-keypress="($event.keyCode == 13)?login(user, signForm.$valid):''"
                 maxlength="300"
+                ng-class="{error: error.password}"
                 required >
 
             <a href="javascript:;" class="f-spot-button" ng-click="login(user, signForm.$valid)">

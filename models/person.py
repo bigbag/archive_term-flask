@@ -39,7 +39,7 @@ class Person(db.Model):
         self.wallet_status = self.STATUS_VALID
         self.type = self.TYPE_TIMEOUT
         self.creation_date = date_helper.get_curent_date()
-        self.name = 'Anonim'
+        self.name = u'Пользователь'
 
     def select_person_list(self, firm_id, **kwargs):
         order = kwargs[
