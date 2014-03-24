@@ -811,8 +811,10 @@ table tr:nth-of-type(2n) .table-control a:hover{
 	margin: 0 !important;
 }
 .block-table .columns{
-	padding-right: 40px;
 	padding-left: 40px;
+}
+.block-table .large-10 {
+	padding-right: 40px;
 }
 .block-table_content{
 	padding: 14px 0 4px;
@@ -863,4 +865,8 @@ table tr:nth-of-type(2n) .table-control a:hover{
 }
 .block-table .pagination{
 	margin-bottom: 10px;
+}
+.report-date li{
+	text-align: center;
+	padding-right: 0;
 }

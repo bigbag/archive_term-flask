@@ -79,7 +79,7 @@ class FacebookApi(SocnetBase):
             username = username[
                 username.find(FacebookApi.URLS_PARTS['base']) + len(FacebookApi.URLS_PARTS['base']):]
 
-        username = request_helper.rmGetParams(username)
+        username = request_helper.clear_get_params(username)
 
         return username
 

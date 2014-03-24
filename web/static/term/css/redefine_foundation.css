@@ -155,7 +155,6 @@ form.custom .custom.dropdown ul{
 	-webkit-box-shadow: none;
 	-moz-box-shadow: none;
 	box-shadow: none;
-	overflow: hidden;
 }
 form.custom .custom.dropdown ul li{
 	cursor: pointer;
