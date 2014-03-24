@@ -3,22 +3,24 @@
 angular.module('term').controller('PersonController', 
     function($scope, $http, $compile, contentService) {
 
+  $scope.error = {};
+
   //Переадресация на страницу информации о человеке
   $scope.getPersonView = function(person_id) {
     $(location).attr('href','/person/' + person_id);
   };
 
-   //Тригер на изменение снятие ошибки при изменение полей, в форме добавления терминала
-  $scope.$watch('person.name', function(person) {
-    if ($scope.person) {
-      angular.element('input[name=user_name]').removeClass('error');
-    }
+   //Тригер на изменение снятие ошибки при изменение полей
+  $scope.$watch('person.card_code + person.name', function(user) {
+    $scope.error.name = false;
+    $scope.error.card_code = false;
   });
+
 
   //Добавляем или редактируем человека
   $scope.savePerson = function(person, valid) {
     if (!valid) {
-      angular.element('#add_person input[name=user_name]').addClass('error');
+      $scope.error.name = true;
       contentService.scrollPage('.m-page-name');
       return false;
     };
@@ -29,6 +31,7 @@ angular.module('term').controller('PersonController',
     $http.post(url, person).success(function(data) {
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
+        $scope.error.card_code = true;
         contentService.setModal(data.message, 'error');
       } else {
         contentService.setModal(data.message, 'success');
@@ -39,17 +42,10 @@ angular.module('term').controller('PersonController',
     });   
   };
 
-  //Тригер на изменение снятие ошибки при изменение полей, в форме добавления кода карты
-  $scope.$watch('person.card_code', function(person) {
-    if ($scope.person) {
-      angular.element('input[name=card_code]').removeClass('error');
-    }
-  });
-
   //Привязываем карту к человеку
   $scope.bindCard = function(person, valid) {
     if (!valid) {
-      angular.element('input[name=card_code]').addClass('error');
+      $scope.error.card_code = true;
       return false;
     };
     person.action = 'bind_card';

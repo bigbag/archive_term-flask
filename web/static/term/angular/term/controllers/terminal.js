@@ -3,24 +3,24 @@
 angular.module('term').controller('TerminalController', 
     function($scope, $http, $compile, contentService) {
 
+  $scope.error = {};
+
   //Переадресация на страницу информации о терминале
   $scope.getTerminalView = function(term_id) {
     $(location).attr('href','/terminal/' + term_id);
   };
 
   //Тригер на изменение снятие ошибки при изменение полей, в форме добавления терминала
-  $scope.$watch('term.name', function(term) {
-    if ($scope.term) {
-      angular.element('input[name=name]').removeClass('error');
-    }
+  $scope.$watch('term.name + term.hard_id', function(term) {
+    $scope.error.name = false;
+    $scope.error.hard_id = false;
   });
 
 
   //Добавляем новый или редактируем старый терминал
   $scope.saveTerminal = function(term, valid) {
-    console.log(valid);
     if (!valid) {
-      angular.element('#add_term input[name=name]').addClass('error');
+      $scope.error.name = true;
       contentService.scrollPage('.m-page-name');
       return false;
     };
@@ -32,6 +32,7 @@ angular.module('term').controller('TerminalController',
     $http.post(url, term).success(function(data) {
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
+        $scope.error.hard_id = true;
         contentService.setModal(data.message, 'error');
       } else {
         contentService.setModal(data.message, 'success');

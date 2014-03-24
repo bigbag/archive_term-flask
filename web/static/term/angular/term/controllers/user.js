@@ -3,15 +3,16 @@
 angular.module('term').controller('UserController', 
   function($scope, $http, $compile, $timeout, contentService) {
 
+  $scope.error = {};
+
   //Авторизация
   $scope.login = function(user, valid) {
     if (!valid) return false;
     $http.post('/login', user).success(function(data) {
       if (data.error === 'yes') {
+        $scope.error.email = true;
+        $scope.error.password = true;
         contentService.setModal(data.content, 'error');
-
-        angular.element('.f-login input[name=email]').addClass('error');
-        angular.element('.f-login input[name=password]').addClass('error');
       } else {
         $(location).attr('href','/');
       }
@@ -20,11 +21,8 @@ angular.module('term').controller('UserController',
 
   //Удаляем класс error при изменении поля
   $scope.$watch('user.email + user.password', function(user) {
-
-    if ($scope.user) {
-      angular.element('.f-login input[name=email]').removeClass('error');
-      angular.element('.f-login input[name=password]').removeClass('error');
-    }
+    $scope.error.email = false;
+    $scope.error.password = false;
   });
 
   // Восстановление пароля
@@ -33,6 +31,7 @@ angular.module('term').controller('UserController',
 
     $http.post('/forgot', user).success(function(data) {
       if (data.error === 'yes') {
+        $scope.error.email = true;
         contentService.setModal(data.content, 'error');
       } else {
         contentService.setModal(data.content, 'none');
