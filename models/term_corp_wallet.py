@@ -36,7 +36,7 @@ class TermCorpWallet(db.Model):
     def __init__(self):
         self.limit = 0
         self.balance = 0
-        self.interval = self.INTERVAL_ONCE
+        self.interval = self.INTERVAL_MONTH
         self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_ACTIVE
 
@@ -45,11 +45,19 @@ class TermCorpWallet(db.Model):
 
     def get_interval_list(self):
         return [
-            {'id': self.INTERVAL_ONCE, 'name': u"Нет"},
-            {'id': self.INTERVAL_DAY, 'name': u"Ежедневно"},
-            {'id': self.INTERVAL_WEEK, 'name': u"Еженедельно"},
-            {'id': self.INTERVAL_MONTH, 'name': u"Ежемесячно"}
+            {'id': self.INTERVAL_ONCE, 'name': u"Разовый"},
+            {'id': self.INTERVAL_DAY, 'name': u"Дневной"},
+            {'id': self.INTERVAL_WEEK, 'name': u"Недельный"},
+            {'id': self.INTERVAL_MONTH, 'name': u"Месячный"}
         ]
+
+    def get_max_limit_dict(self):
+        return {
+            self.INTERVAL_ONCE: 9999,
+            self.INTERVAL_DAY: 1000,
+            self.INTERVAL_WEEK: 2500,
+            self.INTERVAL_MONTH: 9999
+        }
 
     def to_json(self):
         corp_wallet_interval = self.get_interval_list()

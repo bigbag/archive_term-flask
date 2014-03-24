@@ -40,7 +40,7 @@ class TermEvent(db.Model):
         self.age = 0
         self.start = "00:01"
         self.stop = "23:59"
-        self.timeout = 300
+        self.timeout = 5
         self.min_item = self.DEFAULT_MIN_ITEM
         self.max_item = self.DEFAULT_MAX_ITEM
         self.event_id = 1

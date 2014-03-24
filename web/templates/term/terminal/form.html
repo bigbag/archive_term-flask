@@ -14,6 +14,7 @@
                 name="name"
                 ng-maxlength="300"
                 ng-model="term.name"
+                ng-class="{error: error.name}"
                 required>
         </div>
         <div class="content-row g-clearfix" 
@@ -23,6 +24,7 @@
                 type="number"
                 name="hard_id"
                 min="0"
+                ng-class="{error: error.hard_id}"
                 ng-model="term.hard_id">
         </div>
     </div>
