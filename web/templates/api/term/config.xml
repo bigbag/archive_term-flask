@@ -77,7 +77,7 @@
                 {% if person_event.status == 1 %}
                 {% if person_event.person.wallet_status == 1 %}
                 {% if payment_id %}
-                <card timeout="{{person_event.timeout}}">
+                <card timeout="{{person_event.timeout*60}}">
                 {{ payment_id }}</card>
                 {% endif %}
                 {% endif %}

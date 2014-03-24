@@ -8,7 +8,9 @@
 from grab import Grab
 import json
 
-def rmGetParams(str):
+
+def clear_get_params(str):
+
     answer = str
     if "/" in answer:
         answer = answer[0:answer.find("/")]
@@ -18,6 +20,7 @@ def rmGetParams(str):
         answer = answer[0:answer.find("&")]
 
     return answer
+
 
 def parse_get_param(url, param):
     value = url
@@ -32,6 +35,7 @@ def parse_get_param(url, param):
         value = value[0:value.find("&")]
 
     return value
+
 
 def make_request(url, parse_json):
     g = Grab()

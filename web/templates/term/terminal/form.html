@@ -26,49 +26,38 @@
                 ng-model="term.hard_id">
         </div>
     </div>
-
-    <div class="row">
-        <div class="large-6 columns">
-            <div class="content-row g-clear-b" 
-                ng-init="term.blacklist={{term.blacklist}}">
-                <label for="add-type">Вид</label>
-                <select id="add-type" 
-                    class="medium"
-                    name="type"
-                    ng-model="term.blacklist"
-                    ng-change="change()">
-                    {% for blacklist in term_blacklist %}
-                    <option {% if blacklist['id'] == term.blacklist %} selected {% endif %} 
-                        value="{{blacklist['id']}}">
-                            {{blacklist['name']}}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
+   <div class="content-row g-clear-b" 
+        ng-init="term.blacklist={{term.blacklist}}">
+        <label for="add-type">Средства платежа</label>
+        <select id="add-type" 
+            class="large"
+            name="type"
+            ng-model="term.blacklist"
+            ng-change="change()">
+            {% for blacklist in term_blacklist %}
+            <option {% if blacklist['id'] == term.blacklist %} selected {% endif %} 
+                value="{{blacklist['id']}}">
+                    {{blacklist['name']}}
+            </option>
+            {% endfor %}
+        </select>
     </div>
-
-    <div class="row">
-        <div class="large-6 columns">
-            <div class="content-row g-clear-b" 
-                ng-init="term.type={{term.type}}">
-                <label for="add-type">Тип</label>
-                <select id="add-type" 
-                    class="medium"
-                    name="type"
-                    ng-model="term.type"
-                    ng-change="change()">
-                    {% for type in term_types %}
-                    <option {% if type['id'] == term.type %} selected {% endif %} 
-                        value="{{type['id']}}">
-                            {{type['name']}}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
+    <div class="content-row g-clear-b" 
+        ng-init="term.type={{term.type}}">
+        <label for="add-type">Тип</label>
+        <select id="add-type" 
+            class="medium"
+            name="type"
+            ng-model="term.type"
+            ng-change="change()">
+            {% for type in term_types %}
+            <option {% if type['id'] == term.type %} selected {% endif %} 
+                value="{{type['id']}}">
+                    {{type['name']}}
+            </option>
+            {% endfor %}
+        </select>
     </div>
-
     <div class="content-row g-clearfix" 
         ng-init="term.upload_start='{{term.upload_start}}'">
         <label for="add-start-upload">Время первой отправки отчета (чч:мм)</label>

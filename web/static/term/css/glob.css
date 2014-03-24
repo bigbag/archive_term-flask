@@ -109,7 +109,6 @@ html[xmlns] .clearfix {
 }
 .g-clear-b{
 	clear: both;
-	overflow: hidden;
 }
 
 input::-webkit-outer-spin-button,

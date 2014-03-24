@@ -1,13 +1,28 @@
 <div class="m-block" ng-controller="PersonController">
-    <form name="eventForm">
+    <form name="eventForm" class="custom">
         <div class="row"
             ng-init="person_event.id={{person_event.id|replace("None", 0)}};person_event.person_id={{person.id}}">
-            <div class="large-5 columns">
+            <div class="large-8 columns">
                 <div class="content-row"
                     ng-init="person_event.term_event_id='{{term_event.id}}'">
+                    {% if person_event.id %}
+                    <p for="type-event">
+                        <label for="type-event">Событие*</label>
+                        <select id="type-event" 
+                            class="large"
+                            min="1"
+                            ng-model="person_event.term_event_id"
+                            required>
+                                <option selected 
+                                    value="{{term_event.id}}">
+                                    №{{term_event.term.hard_id}}, {{term_event.term.name}}, {{term_event.event.name}}
+                                </option>
+                        </select>
+                    </p>
+                    {% else%}
                     <label for="type-event">Событие*</label>
                     <select id="type-event" 
-                        class="medium"
+                        class="large"
                         min="1"
                         ng-model="person_event.term_event_id"
                         required>
@@ -21,13 +36,13 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                   
+                    {% endif %}                   
                 </div>
             </div>
         </div>
         <div class="content-row g-clearfix"
             ng-init="person_event.timeout={{person_event.timeout}}">
-            <label for="time-out">Тайм-аут (в секундах)*</label>
+            <label for="time-out">Тайм-аут (в минутах)*</label>
             <input id="time-out" 
                 class="f-input-small left"
                 minlength="1"
