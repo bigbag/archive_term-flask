@@ -92,6 +92,7 @@ def terminal_info(term_id):
         term_events=term_events,
         term_access=term_access,
         term_types=Term().get_type_list(),
+        term_factors=Term().get_factor_list(),
         term_blacklist=Term().get_blacklist_list(),
     )
 
