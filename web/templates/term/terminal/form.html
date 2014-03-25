@@ -45,17 +45,17 @@
         </select>
     </div>
     <div class="content-row g-clear-b" 
-        ng-init="term.type={{term.type}}">
-        <label for="add-type">Тип</label>
-        <select id="add-type" 
+        ng-init="term.factor={{term.factor}}">
+        <label for="add-factor">Формат отчета с терминала</label>
+        <select id="add-factor" 
             class="medium"
-            name="type"
-            ng-model="term.type"
+            name="factor"
+            ng-model="term.factor"
             ng-change="change()">
-            {% for type in term_types %}
-            <option {% if type['id'] == term.type %} selected {% endif %} 
-                value="{{type['id']}}">
-                    {{type['name']}}
+            {% for factor in term_factors %}
+            <option {% if factor['id'] == term.factor %} selected {% endif %} 
+                value="{{factor['id']}}">
+                    {{factor['name']}}
             </option>
             {% endfor %}
         </select>

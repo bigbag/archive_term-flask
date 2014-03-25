@@ -98,6 +98,12 @@ class Term(db.Model):
             {'id': self.TYPE_POS, 'name': u"POS-терминал"}
         ]
 
+    def get_factor_list(self):
+        return [
+            {'id': 1, 'name': u"Копейки"},
+            {'id': 100, 'name': u"Рубли"}
+        ]
+
     def get_blacklist_list(self):
         return [
             {'id': self.BLACKLIST_ON, 'name':
