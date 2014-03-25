@@ -50,8 +50,7 @@
         <select id="add-factor" 
             class="medium"
             name="factor"
-            ng-model="term.factor"
-            ng-change="change()">
+            ng-model="term.factor">
             {% for factor in term_factors %}
             <option {% if factor['id'] == term.factor %} selected {% endif %} 
                 value="{{factor['id']}}">

@@ -51,6 +51,7 @@ def terminal_view():
         'term/terminal/index.html',
         term=Term(),
         term_types=Term().get_type_list(),
+        term_factors=Term().get_factor_list(),
         term_blacklist=Term().get_blacklist_list()
     )
 
