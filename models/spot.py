@@ -36,6 +36,8 @@ class Spot(db.Model):
 
     CODE_SIZE = 10
 
+    MAX_GENERATE = 100
+
     discodes_id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(10), nullable=False)
     name = db.Column(db.String(300))
