@@ -5,10 +5,12 @@
 <h2 class="g-color-blue m-page-name" ng-controller="PersonController">
     {{person.name}}
     <div class="right">
+        {% if person.payment_id %}
         <a ng-click="unbindCard(person)" 
             class="f-spot-button bg-red small">
             Отвязать карту
         </a>
+        {% endif %}
         <a ng-click="removePerson(person)" 
             class="f-spot-button bg-red small">
             Удалить
@@ -29,6 +31,7 @@
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style=""  ng-controller="PersonController">
     <section class="section active">
         <p class="title"><a>События</a></p>
+        {% if person.payment_id %}
         <span ng-init="person.type={{person.type}}"></span>
         <div class="content">
             {% if term_events %}
@@ -77,7 +80,36 @@
             </div>
             {% endif %}
         </div>
-
+        {% else %}
+        <div class="content">
+            <div class="content-row">
+                <p class="m-hint">Для того что бы дать возможность человеку пользоваться терминальной сетью, вам необходимо ввести код активации карты, которую вы хотите к нему привязать. именно эта карта в дальнейшем будет идентифицировать человека.</p>
+            </div>
+            <form class="custom" id="add_card" name="cardForm">
+                <div class="content-row g-clearfix">
+                    <label for="add-card-code">
+                        Код активации карты (6 цифр и 4 буквы)
+                    </label>
+                    <input id="add-card-code" 
+                        name="card_code"
+                        maxlength="10"
+                        minlength="10"
+                        ng-minlength="10"
+                        ng-maxlength="10"
+                        type="text"
+                        ng-model="person.card_code"
+                        ng-class="{error: error.card_code}"
+                        required>
+                </div>
+                <div class="content-row g-clearfix">
+                    <a ng-click="bindCard(person, cardForm.$valid)"
+                        class="f-spot-button">
+                       Сохранить
+                    </a>
+                </div>
+            </form>
+        </div>
+        {% endif %}
     </section>
     <section class="section" ng-controller="GeneralController">
         <span ng-init="search.limit=1;search.person_id=person.id;search.period='month';search.action_type='get_grid_content';search.action='report'"></span>
