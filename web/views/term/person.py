@@ -73,8 +73,8 @@ def person_info(person_id):
         abort(403)
 
     template_patch = 'term/person/view.html'
-    if not person.payment_id:
-        template_patch = 'term/person/view_empty.html'
+    # if not person.payment_id:
+    #     template_patch = 'term/person/view_empty.html'
 
     term_events = TermEvent().get_by_firm_id(g.firm_info['id'])
     term_event = TermEvent()
