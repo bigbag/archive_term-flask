@@ -55,6 +55,7 @@ angular.module('term').controller('PersonController',
     $http.post(url, person).success(function(data) {
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
+        $scope.error.card_code = true;
         contentService.setModal(data.message, 'error');
       } else {
         contentService.setModal(data.message, 'success');
