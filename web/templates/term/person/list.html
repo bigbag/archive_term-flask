@@ -32,11 +32,11 @@
                 <td>{[{person.card}]}</td>
                 <td>
                     <span class="m-card-act g-round"
-                        ng-class="(person.hard_id==1)?'active':''"></span>
+                        ng-class="(person.hard_id==0)?'':'active'"></span>
                 </td>
                 <td>
                     <span class="m-card-act g-round"
-                        ng-class="(person.status==1)?'active':''"></span>
+                        ng-class="(person.wallet_status==1)?'active':''"></span>
                 </td>
             </tr>
             <tr class="m-table-bottom" ng-show="search.page_count">
