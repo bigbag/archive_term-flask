@@ -82,18 +82,18 @@ class WebApiAdminTestCase(unittest.TestCase):
         rv = self.app.post(self.GENERATE_URL, headers=headers, data=data)
         self.assertEqual(rv.status_code, 405)
 
-    # def test_spot_generate_max_count(self):
-    #     data = dict(
-    #         count=100,
-    #     )
-    #     sign = hash_helper.get_api_sign(self.ADMIN_SECRET, data)
-    #     headers = [
-    #         ('Key', self.ADMIN_KEY),
-    #         ('Sign', sign)
-    #     ]
-    #     rv = self.app.post(self.GENERATE_URL, headers=headers, data=data)
-    #     self.assertEqual(rv.status_code, 200)
-        # assert self.valid_xml(rv.data)
+    def test_spot_generate_max_count(self):
+        data = dict(
+            count=100,
+        )
+        sign = hash_helper.get_api_sign(self.ADMIN_SECRET, data)
+        headers = [
+            ('Key', self.ADMIN_KEY),
+            ('Sign', sign)
+        ]
+        rv = self.app.post(self.GENERATE_URL, headers=headers, data=data)
+        self.assertEqual(rv.status_code, 200)
+        assert self.valid_xml(rv.data)
 
     def test_spot_linking(self):
 
