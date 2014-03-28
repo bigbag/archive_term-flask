@@ -28,6 +28,13 @@ angular.module('term').controller('GeneralController',
     });
   }
 
+  //Обнуление результата
+  $scope.setEmptyResult = function() {
+    $scope.result = {};
+    $scope.pagination.total = 7;
+    $scope.search.page_count = 7;
+  }
+
   //Запрос на отображение табличных данных
   $scope.getGridContent = function(search) {
     if(typeof(search.page)==='undefined') search.page = 1;
@@ -46,7 +53,7 @@ angular.module('term').controller('GeneralController',
   };
 
   //Тригер на запрос табличных данных по параметрам
-  $scope.$watch('pagination.cur + search.period  + search.status + search.person_name', function() {
+  $scope.$watch('pagination.cur + search.period  + search.status + search.person_name + search.report_type', function() {
     if (!$scope.search) return false;
     var search = $scope.search;
     search.page = $scope.pagination.cur;
@@ -56,6 +63,7 @@ angular.module('term').controller('GeneralController',
     }
     
     if (search.action_type === 'get_grid_content') {
+      $scope.setEmptyResult();
       $scope.getGridContent(search);
     }
   });

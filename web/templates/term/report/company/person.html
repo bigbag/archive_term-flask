@@ -1,8 +1,3 @@
-{% extends "term/page.html" %}
-
-{% block content %}
-<h2 class="g-color-blue m-page-name">Люди</h2>
-<span ng-init="search.limit=1;search.period='day';search.action_type='get_grid_content'"></span>
 <div class="content" ng-controller="ReportController">
     <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
         <div class="m-content-page">
@@ -57,9 +52,3 @@
         </div>
     </div>
 </div>
-{% endblock %} 
-
-{% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/controllers/report.js"></script>
-{{ super() }}
-{% endblock %} 
