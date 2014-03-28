@@ -337,7 +337,7 @@ class Report(db.Model):
 
         return query.all()
 
-    @cache.cached(timeout=60, key_prefix='report_interval')
+    @cache.cached(timeout=120, key_prefix='report_interval')
     def get_term_report(self, **kwargs):
 
         self._get_search_params(**kwargs)
