@@ -271,7 +271,7 @@ def change_request():
 @mod.route('/report', methods=['GET'])
 def default():
     """Перенаправление на вид по умолчанию"""
-    return redirect('/report/summ')
+    return redirect('/report/company')
 
 
 from web.views.term import report, terminal, person
