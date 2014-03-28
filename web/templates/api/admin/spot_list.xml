@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="windows-1251"?>
-<info>
+<info count="{{count}}">
     {% for key in result %}<spot dis="{{key}}">{{result[key]}}</spot>{% endfor %}
 </info>
