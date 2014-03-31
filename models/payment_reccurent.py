@@ -3,16 +3,18 @@
     Модель для таблицы автоплатежей
 
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db, app
+from web import db
+
+from models.base_model import BaseModel
 from models.payment_wallet import PaymentWallet
 from models.payment_history import PaymentHistory
 from helpers import date_helper
 
 
-class PaymentReccurent(db.Model):
+class PaymentReccurent(db.Model, BaseModel):
 
     __bind_key__ = 'payment'
     __tablename__ = 'reccurent'
@@ -48,9 +50,6 @@ class PaymentReccurent(db.Model):
         self.status = self.STATUS_OFF
         self.count = 0
 
-    def __repr__(self):
-        return '<id %r>' % (self.wallet_id)
-
     def set_reccurent_on(self):
         from models.payment_wallet import PaymentWallet
         from models.payment_history import PaymentHistory
@@ -74,21 +73,3 @@ class PaymentReccurent(db.Model):
             if reccurent.save():
                 errors = False
         return errors
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True

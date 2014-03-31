@@ -3,14 +3,16 @@
     Модель для администраторов терминалов
 
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db, app, cache
+from web import db
+
+from models.base_model import BaseModel
 from helpers import date_helper, hash_helper
 
 
-class TermUser(db.Model):
+class TermUser(db.Model, BaseModel):
 
     __bind_key__ = 'term'
     __tablename__ = 'term_user'
@@ -50,9 +52,6 @@ class TermUser(db.Model):
     def get_id(self):
         return self.id
 
-    def __repr__(self):
-        return '<User %r>' % (self.email)
-
     def get_by_api_key(self, api_key):
         return self.query.filter_by(api_key=api_key).first()
 
@@ -76,15 +75,6 @@ class TermUser(db.Model):
         db.session.commit()
 
     def save(self):
-        try:
-            if not self.activkey:
-                self.password = hash_helper.get_password_hash(self.password)
-                self.activkey = hash_helper.get_activkey(self.password)
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True
+        self.password = hash_helper.get_password_hash(self.password)
+        self.activkey = hash_helper.get_activkey(self.password)
+        BaseModel.save(self)

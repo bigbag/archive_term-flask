@@ -2,15 +2,15 @@
 """
     Модель для очереди заявок на генерацию отчета
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import hashlib
+from web import db
 
-from web import db, app
+from models.base_model import BaseModel
 
 
-class ReportStack(db.Model):
+class ReportStack(db.Model, BaseModel):
 
     __bind_key__ = 'stack'
     __tablename__ = 'report_stack'
@@ -53,23 +53,3 @@ class ReportStack(db.Model):
             str(self.start),
             str(self.stop),
             str(self.type_id))).hexdigest()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            if not self.check_summ:
-                self.check_summ = self.get_check_summ()
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True

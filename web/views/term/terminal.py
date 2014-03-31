@@ -363,7 +363,6 @@ def terminal_event_save(term_id, term_event_id):
                                 удалите старое или измените тип нового"""
         return jsonify(answer)
 
-    term_event.cost = term_event.cost
     if term_event.save():
         answer['error'] = 'no'
         answer['message'] = u'Данные сохранены'

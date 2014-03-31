@@ -2,15 +2,17 @@
 """
     Модель для сотрудников фирм
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import app, db, cache
+from web import db, cache
+
+from models.base_model import BaseModel
 
 from helpers import date_helper
 
 
-class Person(db.Model):
+class Person(db.Model, BaseModel):
 
     __bind_key__ = 'term'
     __tablename__ = 'person'
@@ -76,31 +78,9 @@ class Person(db.Model):
         )
         return value
 
-    def __repr__(self):
-        return '<id %r>' % (self.id)
-
     def person_remove(self):
         from models.term_corp_wallet import TermCorpWallet
 
         TermCorpWallet.query.filter_by(person_id=self.id).delete()
-
         self.delete()
         return True
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True
