@@ -31,6 +31,7 @@ class ReportStack(db.Model, BaseModel):
     TYPE_MONEY = 2
 
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256))
     firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
     firm = db.relationship('Firm')
     email = db.Column(db.Text, nullable=False)
@@ -43,23 +44,29 @@ class ReportStack(db.Model, BaseModel):
 
     def __init__(self):
         self.excel = self.EXCEL_YES
-        self.type = TYPE_PERSON
-        self.interval = INTERVAL_ONCE
+        self.type = self.TYPE_PERSON
+        self.interval = self.INTERVAL_ONCE
         self.lock = self.LOCK_FREE
 
     def get_interval_list(self):
         return [
-            {'id': self.INTERVAL_ONCE, 'name': u"Разовый"},
-            {'id': self.INTERVAL_DAY, 'name': u"Дневной"},
-            {'id': self.INTERVAL_WEEK, 'name': u"Недельный"},
-            {'id': self.INTERVAL_MONTH, 'name': u"Месячный"}
+            {'id': self.INTERVAL_ONCE, 'name': u"Один раз"},
+            {'id': self.INTERVAL_DAY, 'name': u"Ежедневно"},
+            {'id': self.INTERVAL_WEEK, 'name': u"Еженедельно"},
+            {'id': self.INTERVAL_MONTH, 'name': u"Ежемесячно"}
         ]
 
     def get_type_list(self):
         return [
             {'id': self.TYPE_PERSON, 'name': u"По людям"},
             {'id': self.TYPE_TERM, 'name': u"По терминалам"},
-            {'id': self.TYPE_MONEY, 'name': u"Личные расходы"}
+            {'id': self.TYPE_MONEY, 'name': u"Личным расходам"}
+        ]
+
+    def get_excel_list(self):
+        return [
+            {'id': self.EXCEL_YES, 'name': u"Да"},
+            {'id': self.EXCEL_NO, 'name': u"Нет"},
         ]
 
     def get_json(self):
