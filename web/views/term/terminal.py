@@ -103,7 +103,7 @@ def terminal_info(term_id):
 def terminal_rent_info(term_id):
     """Информация о сдачи терминала в аренду"""
 
-    answer = dict(error='yes', message='Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка')
 
     term = Term().get_info_by_id(term_id)
     if not term:
@@ -131,7 +131,7 @@ def terminal_rent_info(term_id):
 def terminal_rent_add(term_id):
     """Сдаём терминал в аренду"""
 
-    answer = dict(error='yes', message='Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка')
     arg = get_post_arg(request, True)
     error = False
 
@@ -181,7 +181,7 @@ def terminal_rent_add(term_id):
 def terminal_rent_remove(term_id):
     """Удаляем аренду терминала"""
 
-    answer = dict(error='yes', message='Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка')
     arg = get_post_arg(request, True)
 
     if 'id' not in arg:
@@ -207,7 +207,7 @@ def terminal_rent_remove(term_id):
 def terminal_save(term_id, action):
     """Добавляем или редактируем терминал"""
 
-    answer = dict(error='yes', message='Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка')
     arg = get_post_arg(request, True)
     action_list = ('add', 'edit')
 
@@ -252,7 +252,7 @@ def terminal_save(term_id, action):
 def terminal_locking(term_id):
     """Блокировка и разблокировка терминал"""
 
-    answer = dict(error='yes', message='Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка')
     arg = get_post_arg(request, True)
 
     if 'status' not in arg or 'id' not in arg:
@@ -279,7 +279,7 @@ def terminal_locking(term_id):
 def terminal_remove(term_id):
     """Удаление терминала"""
 
-    answer = dict(error='yes', message='Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка')
     arg = get_post_arg(request, True)
 
     term = Term().get_info_by_id(term_id)
@@ -377,7 +377,7 @@ def terminal_event_save(term_id, term_event_id):
 def terminal_event_delete(term_id, term_event_id):
     """Удаляем событие привязаное к терминалу"""
 
-    answer = dict(error='yes', message='Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка')
     arg = get_post_arg(request, True)
 
     firm_term = FirmTerm().get_list_by_firm_id(g.firm_info['id'])

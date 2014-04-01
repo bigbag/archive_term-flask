@@ -5,6 +5,8 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import json
+
 from web import db
 
 from models.base_model import BaseModel
@@ -34,12 +36,13 @@ class ReportStack(db.Model, BaseModel):
     name = db.Column(db.String(256))
     firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
     firm = db.relationship('Firm')
-    email = db.Column(db.Text, nullable=False)
+    emails = db.Column(db.Text, nullable=False)
     excel = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Integer, index=True, nullable=False)
     interval = db.Column(db.Integer, nullable=False)
     details = db.Column(db.Text)
     launch_date = db.Column(db.DateTime)
+    check_summ = db.Column(db.Text, nullable=False)
     lock = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
@@ -73,3 +76,14 @@ class ReportStack(db.Model, BaseModel):
         self.email = json.loads(self.email)
         self.recipients = json.loads(self.recipients)
         return self
+
+    def save(self):
+        if not self.check_summ:
+            self.check_summ = hash(self)
+
+        if not isinstance(self.emails, str):
+            self.emails = str(json.dumps(self.emails))
+
+        if self.details and not isinstance(self.emails, str):
+            self.details = str(json.dumps(self.details))
+        return BaseModel.save(self)

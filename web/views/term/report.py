@@ -5,6 +5,7 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import json
 
 from web.views.term.general import *
 
@@ -63,8 +64,8 @@ def report_get_money_report():
 
 @mod.route('/report/new', methods=['GET'])
 @login_required
-def report_create_new():
-    """Создание нового отчета"""
+def report_create_page():
+    """Отображение формы нового отчета"""
 
     return render_template(
         'term/report/new.html',
@@ -73,6 +74,29 @@ def report_create_new():
         interval_list=ReportStack().get_interval_list(),
         excel_list=ReportStack().get_excel_list()
     )
+
+
+@mod.route('/report/new', methods=['POST'])
+@login_required
+def report_create_new():
+    """Создание нового отчета"""
+
+    answer = dict(error='yes', message=u'Произошла ошибка')
+
+    arg = get_post_arg(request, True)
+    arg['firm_id'] = g.firm_info['id']
+
+    print arg
+
+    report_stack = ReportStack()
+    for key in arg:
+        setattr(report_stack, key, arg[key])
+
+    if report_stack.save():
+        answer['error'] = 'no'
+        answer['message'] = u'Отчет добавлен'
+
+    return jsonify(answer)
 
 
 @mod.route('/report/list', methods=['GET'])
