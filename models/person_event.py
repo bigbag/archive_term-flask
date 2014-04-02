@@ -27,7 +27,7 @@ class PersonEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
     person = db.relationship('Person')
-    term_id = db.Column(db.Integer, db.ForeignKey('term.id'), index=True)
+    term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     event = db.relationship('Event')
@@ -37,7 +37,7 @@ class PersonEvent(db.Model):
     status = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
-        self.timeout = 300
+        self.timeout = 5
         self.status = self.STATUS_ACTIVE
 
     def __repr__(self):
@@ -56,24 +56,6 @@ class PersonEvent(db.Model):
             db.session.add(person_event)
 
         db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True
 
     @staticmethod
     def add_by_user_loyalty_id(user_id, loyalty_id):
@@ -112,3 +94,21 @@ class PersonEvent(db.Model):
                 event.save()
 
             return event.id
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def save(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(e)
+            return False
+        else:
+            return True

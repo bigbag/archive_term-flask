@@ -35,7 +35,7 @@ class Term(db.Model):
     DEFAULT_FACTOR = 100
 
     id = db.Column(db.Integer, primary_key=True)
-    hard_id = db.Column(db.Integer)
+    hard_id = db.Column(db.Integer, unique=True)
     type = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(300), nullable=False)
     tz = db.Column(db.String(300), nullable=False)
@@ -95,13 +95,20 @@ class Term(db.Model):
     def get_type_list(self):
         return [
             {'id': self.TYPE_VENDING, 'name': u"Вендинговый"},
-            {'id': self.TYPE_POS, 'name': u"Платежный"}
+            {'id': self.TYPE_POS, 'name': u"POS-терминал"}
+        ]
+
+    def get_factor_list(self):
+        return [
+            {'id': 1, 'name': u"Копейки"},
+            {'id': 100, 'name': u"Рубли"}
         ]
 
     def get_blacklist_list(self):
         return [
-            {'id': self.BLACKLIST_ON, 'name': u"Денежный"},
-            {'id': self.BLACKLIST_OFF, 'name': u"Корпоративный"}
+            {'id': self.BLACKLIST_ON, 'name':
+                u"Корпоративные и реальные деньги"},
+            {'id': self.BLACKLIST_OFF, 'name': u"Корпоративные деньги"}
         ]
 
     def get_valid_term(self, hard_id):

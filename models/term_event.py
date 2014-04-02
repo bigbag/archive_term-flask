@@ -32,16 +32,20 @@ class TermEvent(db.Model):
     term = db.relationship('Term')
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     event = db.relationship('Event')
+    credit_period = db.Column(db.Integer, nullable=False)
+    credit_amount = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
         self.cost = 0
         self.age = 0
         self.start = "00:01"
         self.stop = "23:59"
-        self.timeout = 300
+        self.timeout = 5
         self.min_item = self.DEFAULT_MIN_ITEM
         self.max_item = self.DEFAULT_MAX_ITEM
         self.event_id = 1
+        self.credit_period = 900
+        self.credit_amount = 50000
 
     def __repr__(self):
         return '<id %r>' % (self.id)

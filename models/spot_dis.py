@@ -34,6 +34,14 @@ class SpotDis(db.Model):
             premium=premium,
             status=self.STATUS_INIT).limit(count).all()
 
+    def set_generated(self):
+        self.status = SpotDis.STATUS_GENERATED
+        return self.save()
+
+    def set_init(self):
+        self.status = SpotDis.STATUS_INIT
+        return self.save()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

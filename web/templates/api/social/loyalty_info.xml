@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<info>
+    <loyalty>
+        <id>{{loyalty.id}}</id>
+        <start_date>{{loyalty.start_date}}</start_date>
+        <stop_date>{{loyalty.stop_date}}</stop_date>
+        <type>{{loyalty.rules_const()}}</type>
+        <soc_type>{{loyalty.sharing_type}}</soc_type>
+        <desc>{{loyalty.desc}}</desc>
+        <amount>{{loyalty.amount}}</amount>
+        <limit>{{loyalty.limit}}</limit>
+        <timeout>{{loyalty.timeout}}</timeout>
+        <spots>
+        {% for spot in spots %}
+            <spot>
+                <hard_id>{{spot['hard_id']}}</hard_id>
+                <barcode>{{spot['barcode']}}</barcode>
+            </spot>
+        {% endfor %}
+        </spots>
+    </loyalty>
+</info>

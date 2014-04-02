@@ -17,7 +17,6 @@ models_payment_test = loader.loadTestsFromModule(models_payment_test)
 web_api_test = loader.loadTestsFromModule(web_api_test)
 web_api_admin_test = loader.loadTestsFromModule(web_api_admin_test)
 web_term_test = loader.loadTestsFromModule(web_term_test)
-socnets_api_test = loader.loadTestsFromModule(socnets_api_test)
 
 tests = [
     models_test,
@@ -25,10 +24,9 @@ tests = [
     models_term_test,
     web_api_admin_test,
     web_api_test,
-    web_term_test,
-    socnets_api_test]
+    web_term_test]
 
-# tests = [web_term_test]
+# tests = [web_api_admin_test]
 
 alltests = unittest.TestSuite(tests)
 

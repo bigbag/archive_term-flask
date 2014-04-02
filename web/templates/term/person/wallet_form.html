@@ -21,7 +21,8 @@
     <div class="cover"></div>
     <div class="wallet-options animate-show" ng-hide="corp_wallet.id">
         <div class="content-row">
-            <p class="hint-txt">Для того что бы задействовать корпоративный кошелёк, введите лимит операций для данного человека, а так же укажите сбрасывать ли лимит. Минимальная сумма 100 рублей</p>
+            <p class="hint-txt">Для того что бы задействовать корпоративный кошелёк, введите лимит операций для данного человека, а так же укажите сбрасывать ли лимит.<br />
+            Минимальный лимит 100 рублей, максимальный месячный и разовый 9999, недельный 2500, дневной 1000.</p>
         </div>
         <span ng-init="corp_wallet.type={{corp_wallet.interval}};corp_wallet.person_id=person.id;corp_wallet.limit={{corp_wallet.limit/100}}"></span>
         <form name="myForm" class="custom">
@@ -39,12 +40,12 @@
                     required>
             </div>
             <div class="content-row left">
-                <label for="type-limit">Сбрасывать лимит</label>
+                <label for="type-limit">Лимит</label>
                 <select id="type-limit" class="medium" 
                     ng-model="corp_wallet.interval"
-                    ng-init="corp_wallet.interval=0">
+                    ng-init="corp_wallet.interval={{corp_wallet.interval}}">
                     {% for interval in corp_wallet_interval %}
-                    <option value="{{interval['id']}}">
+                    <option value="{{interval['id']}}" {% if interval['id'] == corp_wallet.interval %} selected {% endif %} >
                             {{interval['name']}}
                     </option>
                     {% endfor %}

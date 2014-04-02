@@ -51,6 +51,7 @@ def terminal_view():
         'term/terminal/index.html',
         term=Term(),
         term_types=Term().get_type_list(),
+        term_factors=Term().get_factor_list(),
         term_blacklist=Term().get_blacklist_list()
     )
 
@@ -92,6 +93,7 @@ def terminal_info(term_id):
         term_events=term_events,
         term_access=term_access,
         term_types=Term().get_type_list(),
+        term_factors=Term().get_factor_list(),
         term_blacklist=Term().get_blacklist_list(),
     )
 
@@ -185,7 +187,7 @@ def terminal_rent_remove(term_id):
     if 'id' not in arg:
         abort(405)
 
-    term = Term().get_info_by_id(term_id)
+    term = Term().get_by_id(term_id)
     if not term:
         abort(404)
 
@@ -214,17 +216,14 @@ def terminal_save(term_id, action):
 
     id = int(arg['id']) if 'id' in arg else None
 
-    if 'hard_id' in arg and arg['hard_id']:
-        term = Term().get_by_hard_id(arg['hard_id'])
-    elif 'edit' in action:
-        term = Term().get_by_id(id)
-
-    if not term:
-        term = Term()
-
+    term = Term().get_by_hard_id(arg['hard_id'])
     if term and term.id and term.id != id:
         answer['message'] = u'Терминал с таким SN уже есть в системе'
         return jsonify(answer)
+
+    term = Term().get_by_id(id)
+    if not term:
+        term = Term()
 
     form = TermAddForm.from_json(arg)
     if not form.validate():

@@ -16,6 +16,8 @@ class Loyalty(db.Model):
 
     RULE_FIXED = 0
     RULE_RATE = 1
+    RULE_DISCOUNT = 2
+    RULE_PRESENT = 3
 
     STATUS_NOT_ACTUAL = 0
     STATUS_ACTUAL = 1
@@ -38,6 +40,9 @@ class Loyalty(db.Model):
     YOUTUBE_FOLLOWING = 14
     YOUTUBE_VIEWS = 15
 
+    DEFAULT_COUNT = 20
+    MAX_COUNT = 100
+
     id = db.Column(db.Integer, primary_key=True)
     terms_id = db.Column(db.Integer)
     event_id = db.Column(db.Integer, db.ForeignKey('person_event.id'))
@@ -47,11 +52,16 @@ class Loyalty(db.Model):
     amount = db.Column(db.String(32))
     threshold = db.Column(db.String(32))
     desc = db.Column(db.String(1024))
+    name = db.Column(db.String(128))
     creation_date = db.Column(db.DateTime)
     start_date = db.Column(db.DateTime)
     stop_date = db.Column(db.DateTime)
     sharing_type = db.Column(db.Integer)
     data = db.Column(db.String(1024))
+    coupon_class = db.Column(db.String(64))
+    target_url = db.Column(db.String(1024))
+    limit = db.Column(db.Integer)
+    timeout = db.Column(db.Integer)
 
     def __init__(self):
         self.rules = self.RULE_FIXED
@@ -77,6 +87,19 @@ class Loyalty(db.Model):
             return False
         else:
             return True
+
+    def rules_const(self):
+        rules = '-1'
+        if self.rules == self.RULE_FIXED:
+            rules = 'RULE_FIXED'
+        elif self.rules == self.RULE_RATE:
+            rules = 'RULE_RATE'
+        elif self.rules == self.RULE_DISCOUNT:
+            rules = 'RULE_DISCOUNT'
+        elif self.rules == self.RULE_PRESENT:
+            rules = 'RULE_PRESENT'
+
+        return rules
 
     @staticmethod
     def get_action_link(action_id):

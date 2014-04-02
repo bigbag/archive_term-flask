@@ -14,7 +14,7 @@ from models.person_event import PersonEvent
 from models.likes_stack import LikesStack
 from models.soc_token import SocToken
 from console.configs.payment import UnitellerConfig
-from libs.socnets_api import SocnetsApi
+from libs.socnet.socnets_api import SocnetsApi
 
 
 class CheckLikes(Command):
@@ -28,7 +28,8 @@ class CheckLikes(Command):
 
             if len(url):
                 socToken = SocToken.query.get(stackItem.token_id)
-                pageLiked = SocnetsApi.check_soc_sharing(
+                socApi = SocnetsApi()
+                pageLiked = socApi.check_soc_sharing(
                     action.sharing_type, url, socToken.id, stackItem.loyalty_id)
 
                 if pageLiked:

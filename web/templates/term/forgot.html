@@ -16,6 +16,7 @@
                 ng-keypress="($event.keyCode == 13)?forgot(user, recoveryForm.$valid):''"
                 autocomplete="on"
                 maxlength="300"
+                ng-class="{error: error.email}"
                 required >
             <a href="javascript:;" class="f-spot-button" ng-click="forgot(user, recoveryForm.$valid)">
                 Отправить

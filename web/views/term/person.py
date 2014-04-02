@@ -72,10 +72,6 @@ def person_info(person_id):
     if person.firm_id != g.firm_info['id']:
         abort(403)
 
-    template_patch = 'term/person/view.html'
-    if not person.payment_id:
-        template_patch = 'term/person/view_empty.html'
-
     term_events = TermEvent().get_by_firm_id(g.firm_info['id'])
     term_event = TermEvent()
     if term_events:
@@ -87,7 +83,7 @@ def person_info(person_id):
         corp_wallet = TermCorpWallet()
 
     return render_template(
-        template_patch,
+        'term/person/view.html',
         person=person,
         person_event=PersonEvent(),
         person_events=PersonEvent().get_by_person_id(person.id),
@@ -105,7 +101,7 @@ def person_info(person_id):
 def person_save(person_id):
     """Добавляем или редактируем человека"""
 
-    answer = dict(error='yes', message='Произошла ошибка', person_id=0)
+    answer = dict(error='yes', message=u'Произошла ошибка', person_id=0)
     arg = json.loads(request.stream.read())
     form = PersonAddForm.from_json(arg)
 
@@ -148,7 +144,7 @@ def person_save(person_id):
 def person_bind_card(person_id):
     """Привязываем к человеку карту"""
 
-    answer = dict(error='yes', message='Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка')
     arg = json.loads(request.stream.read())
 
     code = arg['card_code'] if 'card_code' in arg else False
@@ -190,7 +186,6 @@ def set_person_card(code):
         answer['message'] = u'Привязываемая карта отсутсвует'
         return answer
 
-    firm_info = g.firm_info
     person = Person.query.filter_by(
         payment_id=wallet.payment_id).first()
 
@@ -208,7 +203,7 @@ def set_person_card(code):
 def person_unbind_card(person_id):
     """Отвязываем карту от человека"""
 
-    answer = dict(error='yes', message='Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка')
     arg = json.loads(request.stream.read())
 
     person = Person.query.get(person_id)
@@ -271,7 +266,7 @@ def person_lock(person_id):
 def person_remove(person_id):
     """Удаление сотрудника"""
 
-    answer = dict(error='yes', message='Произошла ошибка', status=False)
+    answer = dict(error='yes', message=u'Произошла ошибка', status=False)
     arg = get_post_arg(request, True)
 
     person = Person.query.get(person_id)
@@ -319,7 +314,7 @@ def person_event_info(person_id, person_event_id):
 def person_event_save(person_id, person_event_id):
     """Сохраняем событие привязаное к человеку"""
 
-    answer = dict(error='yes', message='Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка')
     arg = get_post_arg(request, True)
 
     if 'term_event_id' not in arg:
@@ -398,10 +393,12 @@ def person_event_delete(person_id, person_event_id):
 def person_save_corp_wallet(person_id):
     """Добавляем или редактируем корпоративный кошелёк"""
 
-    answer = dict(error='yes', message='Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка')
     arg = get_post_arg(request, True)
 
     person_limit = arg['limit'] if 'limit' in arg else False
+    if not person_limit:
+        abort(405)
 
     interval = arg[
         'interval'] if 'interval' in arg else TermCorpWallet.INTERVAL_ONCE
@@ -409,6 +406,13 @@ def person_save_corp_wallet(person_id):
     person = Person.query.get(person_id)
     if not person:
         abort(404)
+
+    interval = int(interval)
+    person_limit = int(person_limit)
+    max_limit = TermCorpWallet().get_max_limit_dict()
+    if person_limit > max_limit[interval]:
+        answer['message'] = u'Превышен лимит'
+        return jsonify(answer)
 
     corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id).first()
 

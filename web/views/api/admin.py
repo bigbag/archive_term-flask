@@ -19,6 +19,7 @@ from helpers import hash_helper
 from models.spot import Spot
 from models.spot_dis import SpotDis
 from models.payment_wallet import PaymentWallet
+from models.payment_history import PaymentHistory
 from models.term_user import TermUser
 
 
@@ -47,34 +48,42 @@ def api_admin_access(request):
 @xml_headers
 def api_admin_spot_generate():
     """Генерация спотов"""
-    api_admin_access(request)
 
+    api_admin_access(request)
     count = 10
     if 'count' in request.form:
-        count = int(request.form['count'])
-        count = 1 if count > 100 else count
+        try:
+            count = int(request.form['count'])
+        except Exception as e:
+            abort(405)
+
+        count = 1 if count > Spot.MAX_GENERATE else count
 
     dis = SpotDis().get_new_list(count)
+    if not dis:
+        abort(405)
 
     result = {}
     for row in dis:
-        row.status = SpotDis.STATUS_GENERATED
-        if not row.save():
+        if not row.set_generated():
             continue
 
+        spot = Spot.query.get(row.id)
+        if spot:
+            continue
         spot = Spot()
         spot.discodes_id = row.id
 
         if not spot.save():
-            row.status = SpotDis.STATUS_INIT
-            row.save()
-            continue
+            if not row.set_init():
+                continue
 
         result[spot.code] = spot.barcode
 
     spot_list = render_template(
         'api/admin/spot_list.xml',
         result=result,
+        count=len(result)
     ).encode('cp1251')
     response = make_response(spot_list)
 
@@ -85,6 +94,7 @@ def api_admin_spot_generate():
 @xml_headers
 def api_admin_linking_spot():
     """Добавляем спот и связанный с ним кошелёк"""
+
     api_admin_access(request)
     add_success = 0
 
@@ -95,20 +105,23 @@ def api_admin_linking_spot():
     if not hid or not ean or not pids:
         abort(400)
 
-    if not len(str(pids)) == 10 or not len(str(ean)) == 13:
+    if not len(str(ean)) == 13:
         abort(400)
 
-    hid = int(hid)
-    pids = int(pids)
+    try:
+        hid = int(hid)
+        pids = int(pids)
+    except Exception as e:
+        abort(405)
 
     spot = Spot.query.filter_by(
         barcode=ean).first()
-
     if not spot:
-        abort(400)
+        abort(404)
 
-    wallet = PaymentWallet.query.filter_by(
-        hard_id=hid).first()
+    wallet = PaymentWallet.query.filter(
+        (PaymentWallet.hard_id == hid) |
+        (PaymentWallet.discodes_id == spot.discodes_id)).first()
 
     if not wallet:
         wallet = PaymentWallet()
@@ -134,34 +147,39 @@ def api_admin_linking_spot():
     ).encode('cp1251')
 
     response = make_response(add_xml)
-
     return response
 
 
-@mod.route('/spot/hid/<int:hard_id>', methods=['GET'])
-@mod.route('/spot/ean/<barcode>', methods=['GET'])
+@mod.route('/spot/hid/<int:hid>', methods=['GET'])
+@mod.route('/spot/ean/<ean>', methods=['GET'])
 @xml_headers
-def api_admin_get_info(hard_id=False, barcode=False):
+def api_admin_get_info(hid=False, ean=False):
     """Возвращает информацию о споте по его HID или EAN"""
-    api_admin_access(request)
 
-    if not hard_id and not barcode:
+    api_admin_access(request)
+    if not hid and not ean:
+        abort(400)
+
+    try:
+        hid = int(hid)
+    except Exception as e:
         abort(405)
 
-    if hard_id:
+    if hid:
         wallet = PaymentWallet.query.filter_by(
-            hard_id=hard_id).first()
-
+            hard_id=hid).first()
         if not wallet:
             abort(404)
 
         spot = Spot.query.filter_by(
             discodes_id=wallet.discodes_id).first()
 
-    if barcode:
-        spot = Spot.query.filter_by(
-            barcode=barcode).first()
+    if ean:
+        if not len(str(ean)) == 13:
+            abort(400)
 
+        spot = Spot.query.filter_by(
+            barcode=ean).first()
         if not spot:
             abort(404)
 
@@ -173,7 +191,6 @@ def api_admin_get_info(hard_id=False, barcode=False):
         spot=spot,
         wallet=wallet,
     ).encode('cp1251')
-
     response = make_response(info_xml)
 
     return response
@@ -184,14 +201,16 @@ def api_admin_get_info(hard_id=False, barcode=False):
 def api_admin_get_free():
     """Возвращает информацию неактивированых спотах"""
 
+    api_admin_access(request)
     spot = Spot.query.filter_by(
         status=Spot.STATUS_GENERATED).all()
+    if not spot:
+        abort(404)
 
     info_xml = render_template(
         'api/admin/spot_free.xml',
         spot=spot,
     ).encode('cp1251')
-
     response = make_response(info_xml)
 
     return response
@@ -201,25 +220,26 @@ def api_admin_get_free():
 @xml_headers
 def api_admin_spot_delete():
     """Удаление спотов"""
-    api_admin_access(request)
 
+    api_admin_access(request)
     hid = request.form['hid']
     if not hid:
         abort(400)
 
     wallet = PaymentWallet.query.filter_by(
-        hard_id=hid).first()
-
+        hard_id=hid, user_id=0).first()
     if not wallet:
         abort(404)
 
-    wallet.delete()
-
     spot = Spot.query.filter_by(
         discodes_id=wallet.discodes_id).first()
+    if not spot:
+        abort(404)
 
     spot.status = Spot.STATUS_GENERATED
     if not spot.save():
         abort(500)
+
+    wallet.delete()
 
     return set_message('success', 'Success', 201)
