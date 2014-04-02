@@ -98,7 +98,7 @@ class Spot(db.Model):
         codes = []
         code128 = ''
 
-        i = 1
+        i = 0
         while i < Spot.CODE128_LEN:
             code128 = code128 + str(random.randint(1, 9))
             i = i + 1
