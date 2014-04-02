@@ -36,6 +36,9 @@ class Spot(db.Model):
 
     CODE_SIZE = 10
 
+    CODE128_LEN = 12
+    MAX_GEN_COUNT = 20
+
     discodes_id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(10), nullable=False)
     name = db.Column(db.String(300))
@@ -50,6 +53,7 @@ class Spot(db.Model):
     registered_date = db.Column(db.DateTime)
     removed_date = db.Column(db.DateTime)
     status = db.Column(db.Integer, nullable=False, index=True)
+    code128 = db.Column(db.String(128))
 
     def __init__(self):
         self.lang = 'en'
@@ -86,6 +90,33 @@ class Spot(db.Model):
             self.get_barcode
         else:
             return ean
+
+    @staticmethod
+    def gen_code128(count=1):
+        if count > Spot.MAX_GEN_COUNT:
+            count = Spot.MAX_GEN_COUNT
+        codes = []
+        code128 = ''
+
+        i = 1
+        while i < Spot.CODE128_LEN:
+            code128 = code128 + str(random.randint(1, 9))
+            i = i + 1
+
+        code128 = int(code128)
+        codes.append(code128)
+
+        i = 1
+        while i < count:
+            codes.append(code128 + i)
+            i = i + 1
+
+        spots = Spot.query.filter(Spot.code128.in_(codes)).count()
+
+        if spots:
+            Spot.gen_code128(count)
+        else:
+            return codes
 
     def get_url(self):
         if not self.barcode:
