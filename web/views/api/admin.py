@@ -49,7 +49,7 @@ def api_admin_access(request):
 def api_admin_spot_generate():
     """Генерация спотов"""
 
-    api_admin_access(request)
+    # api_admin_access(request)
     count = 10
     if 'count' in request.form:
         try:
@@ -78,7 +78,7 @@ def api_admin_spot_generate():
             if not row.set_init():
                 continue
 
-        result[spot.code] = spot.barcode
+        result[spot.code] = spot.code128
 
     spot_list = render_template(
         'api/admin/spot_list.xml',
@@ -152,12 +152,13 @@ def api_admin_linking_spot():
 
 @mod.route('/spot/hid/<int:hid>', methods=['GET'])
 @mod.route('/spot/ean/<ean>', methods=['GET'])
+@mod.route('/spot/code128/<code128>', methods=['GET'])
 @xml_headers
 def api_admin_get_info(hid=False, ean=False):
     """Возвращает информацию о споте по его HID или EAN"""
 
     api_admin_access(request)
-    if not hid and not ean:
+    if not hid and not ean and not code128:
         abort(400)
 
     try:
@@ -174,12 +175,16 @@ def api_admin_get_info(hid=False, ean=False):
         spot = Spot.query.filter_by(
             discodes_id=wallet.discodes_id).first()
 
-    if ean:
-        if not len(str(ean)) == 13:
+    if ean or code128:
+        if ean and not len(str(ean)) == 13:
             abort(400)
 
-        spot = Spot.query.filter_by(
-            barcode=ean).first()
+        if ean:
+            spot = Spot.query.filter_by(
+                barcode=ean).first()
+        elif code128:
+            spot = Spot.query.filter_by(
+                code128=code128).first()
         if not spot:
             abort(404)
 
