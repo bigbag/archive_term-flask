@@ -3,7 +3,7 @@
     Модель для платежных и вендинговых терминалов
 
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 from flask import g
@@ -11,12 +11,13 @@ from web import app, db, cache
 
 from helpers import date_helper
 
+from models.base_model import BaseModel
 from models.firm_term import FirmTerm
 from models.term_event import TermEvent
 from models.person_event import PersonEvent
 
 
-class Term(db.Model):
+class Term(db.Model, BaseModel):
 
     __bind_key__ = 'term'
     __tablename__ = 'term'
@@ -68,9 +69,6 @@ class Term(db.Model):
         self.settings_id = 1
         self.factor = 1
         self.status = self.STATUS_VALID
-
-    def __repr__(self):
-        return '<id %r>' % (self.id)
 
     def term_add(self, firm_id):
         result = False
@@ -170,6 +168,7 @@ class Term(db.Model):
 
         return result
 
+    @cache.cached(timeout=120, key_prefix='term_list')
     def select_term_list(self, firm_id, **kwargs):
         tz = app.config['TZ']
         date_pattern = '%H:%M %d.%m.%y'
@@ -216,21 +215,3 @@ class Term(db.Model):
         )
 
         return value
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True

@@ -2,13 +2,15 @@
 """
     Модель для ДИС
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db, app
+from web import db
+
+from models.base_model import BaseModel
 
 
-class SpotDis(db.Model):
+class SpotDis(db.Model, BaseModel):
 
     __bind_key__ = 'mobispot'
     __tablename__ = 'discodes'
@@ -26,9 +28,6 @@ class SpotDis(db.Model):
     def __init__(self):
         self.status = self.STATUS_GENERATED
 
-    def __repr__(self):
-        return '<id %r>' % (self.id)
-
     def get_new_list(self, count=10, premium=0):
         return self.query.filter_by(
             premium=premium,
@@ -41,21 +40,3 @@ class SpotDis(db.Model):
     def set_init(self):
         self.status = SpotDis.STATUS_INIT
         return self.save()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True

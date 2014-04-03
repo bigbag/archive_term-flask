@@ -3,16 +3,19 @@
     Модель для истории пополнений
 
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db, app
+from web import db
+
+
+from models.base_model import BaseModel
 from models.payment_wallet import PaymentWallet
 from models.payment_history import PaymentHistory
 from helpers import date_helper
 
 
-class PaymentLog(db.Model):
+class PaymentLog(db.Model, BaseModel):
 
     __bind_key__ = 'payment'
     __tablename__ = 'log'
@@ -29,26 +32,5 @@ class PaymentLog(db.Model):
     def __init__(self):
         self.creation_date = date_helper.get_curent_date()
 
-    def __repr__(self):
-        return '<id %r>' % (self.history_id)
-
     def get_by_history_id(self, history_id):
         return self.query.filter_by(history_id=history_id).first()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True

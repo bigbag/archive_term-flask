@@ -30,6 +30,10 @@ from web.emails.term.user_forgot_password import UserForgotPasswordMessage
 mod = Blueprint('term', __name__)
 
 
+def get_general_url():
+    return '/report/company'
+
+
 @lm.user_loader
 def load_user(id):
     key = 'term_user_%s' % str(id)
@@ -56,6 +60,8 @@ def get_post_arg(request, token=False):
     if token:
         if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
             abort(403)
+
+    del arg['csrf_token']
     return arg
 
 
@@ -112,7 +118,7 @@ def login_form():
     """Форма логина"""
 
     if g.user.is_authenticated():
-        return redirect('/report/person')
+        return redirect(get_general_url())
 
     firm_info = g.firm_info
     if not firm_info:
@@ -271,7 +277,7 @@ def change_request():
 @mod.route('/report', methods=['GET'])
 def default():
     """Перенаправление на вид по умолчанию"""
-    return redirect('/report/company')
+    return redirect(get_general_url())
 
 
 from web.views.term import report, terminal, person

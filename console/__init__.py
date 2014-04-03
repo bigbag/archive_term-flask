@@ -1,7 +1,7 @@
 from flask import Flask
 
 app = Flask(__name__)
-app.config.from_object('configs.general.Config')
+app.config.from_object('configs.general.DevelopmentConfig')
 
 from flask.ext.cache import Cache
 

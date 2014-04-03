@@ -2,14 +2,16 @@
 """
     Модель для настроек терминалов
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 
-from web import db, app
+from web import db
+
+from models.base_model import BaseModel
 
 
-class TermSettings(db.Model):
+class TermSettings(db.Model, BaseModel):
 
     __bind_key__ = 'term'
     __tablename__ = 'term_settings'
@@ -71,24 +73,3 @@ class TermSettings(db.Model):
         self.keyload_port = 9999
         self.keyload_proto = 'https'
         self.keyload_link_type = 2
-
-    def __repr__(self):
-        return '<id %r>' % (self.id)
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True

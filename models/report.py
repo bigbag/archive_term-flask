@@ -2,24 +2,25 @@
 """
     Модель отчетов поступающих с терминалов
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import hashlib
 import time
-from datetime import datetime, timedelta
+
 from web import db, app, cache
 from sqlalchemy.sql import func
 
 from helpers import date_helper
 
+from models.base_model import BaseModel
 from models.term import Term
 from models.person import Person
 from models.event import Event
 from models.firm_term import FirmTerm
 
 
-class Report(db.Model):
+class Report(db.Model, BaseModel):
 
     __bind_key__ = 'term'
     __tablename__ = 'report'
@@ -66,9 +67,6 @@ class Report(db.Model):
         self.payment_type = self.TYPE_WHITE
         self.firm_id = 0
         self.person_id = 0
-
-    def __repr__(self):
-        return '<id %r>' % (self.id)
 
     def get_db_view(self, data):
         date_pattern = '%Y-%m-%d %H:%M:%S'
@@ -396,22 +394,3 @@ class Report(db.Model):
         )
 
         return value
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            self.payment_id = str(self.payment_id).rjust(20, '0')
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True
