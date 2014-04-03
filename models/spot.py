@@ -91,8 +91,7 @@ class Spot(db.Model):
         else:
             return ean
 
-    @staticmethod
-    def gen_code128(count=1):
+    def gen_code128(self, count=1):
         if count > Spot.MAX_GEN_COUNT:
             count = Spot.MAX_GEN_COUNT
         codes = []
