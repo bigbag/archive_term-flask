@@ -120,3 +120,55 @@ def api_social_get_loyalty(loyalty_id):
     response = make_response(info_xml)
 
     return response
+
+
+@mod.route('/spot/loyalty/<ean>', methods=['GET'])
+@xml_headers
+def api_social_spot_loyalty(ean=False):
+    """Возвращает акции, в которых участвует спот по EAN"""
+
+    api_admin_access(request)
+    ean = str(ean)
+    if not ean or not len(ean) == 13 or not ean.isdigit():
+        abort(400)
+
+    spot = Spot.query.filter_by(
+        barcode=ean).first()
+    if not spot:
+        abort(404)
+
+    wallet = PaymentWallet.query.filter_by(
+        discodes_id=spot.discodes_id).first()
+
+    if not wallet:
+        abort(404)
+
+    wl = WalletLoyalty.query.filter_by(
+        wallet_id=wallet.id)
+
+    loyaltyList = []
+    for part in wl:
+        if part.loyalty_id not in loyaltyList:
+            loyaltyList.append(part.loyalty_id)
+
+    offset = 0
+    if 'offset' in request.args:
+        offset = int(request.args['offset'])
+
+    count = Loyalty.MAX_COUNT
+    if 'count' in request.args:
+        count = int(request.args['count'])
+
+    loyalties = Loyalty.query.filter(Loyalty.id.in_(loyaltyList)).order_by(
+    )[offset:(offset + count)]
+
+    info_xml = render_template(
+        'api/social/spot_loyalty.xml',
+        spot=spot,
+        loyalties=loyalties,
+        count=count,
+        offset=offset
+    ).encode('cp1251')
+    response = make_response(info_xml)
+
+    return response
