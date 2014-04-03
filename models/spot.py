@@ -99,9 +99,11 @@ class Spot(db.Model, BaseModel):
     def get_max_code128(self):
         if 'max_code128' not in g:
             spot = Spot.query.order_by('code128 DESC').first()
-            return spot.code128
+            if spot:
+                return spot.code128
         else:
             return g.max_code128
+        return False
 
     def gen_code128(self):
 
