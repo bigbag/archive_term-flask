@@ -9,6 +9,8 @@ import random
 import string
 import hashlib
 
+from flask import g
+
 from web import db
 from helpers import date_helper, hash_helper
 
@@ -39,13 +41,13 @@ class Spot(db.Model, BaseModel):
     CODE_SIZE = 10
     MAX_GENERATE = 101
     CODE128_LEN = 12
-    MAX_GEN_COUNT = 20
+    EAN_LEN = 12
 
     discodes_id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(10), nullable=False)
     name = db.Column(db.String(300))
     url = db.Column(db.String(150), nullable=False)
-    barcode = db.Column(db.String(32), nullable=False, unique=True)
+    barcode = db.Column(db.String(32), nullable=False)
     spot_type_id = db.Column(db.Integer)
     lang = db.Column(db.String(10), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -55,7 +57,7 @@ class Spot(db.Model, BaseModel):
     registered_date = db.Column(db.DateTime)
     removed_date = db.Column(db.DateTime)
     status = db.Column(db.Integer, nullable=False, index=True)
-    code128 = db.Column(db.String(128))
+    code128 = db.Column(db.String(128), nullable=False)
 
     def __init__(self):
         self.lang = 'en'
@@ -91,38 +93,29 @@ class Spot(db.Model, BaseModel):
         if spot:
             self.get_barcode
         else:
-            return ean
+            self.barcode = ean
+            return True
 
-    @staticmethod
-    def gen_code128(count=1):
-        if count > Spot.MAX_GEN_COUNT:
-            count = Spot.MAX_GEN_COUNT
-        codes = []
-        code128 = ''
-
-        i = 0
-        while i < Spot.CODE128_LEN:
-            code128 = code128 + str(random.randint(1, 9))
-            i = i + 1
-
-        code128 = int(code128)
-        codes.append(code128)
-
-        i = 1
-        while i < count:
-            codes.append(code128 + i)
-            i = i + 1
-
-        spots = Spot.query.filter(Spot.code128.in_(codes)).count()
-
-        if spots:
-            Spot.gen_code128(count)
+    def get_max_code128(self):
+        if 'max_code128' not in g:
+            spot = Spot.query.order_by('code128 DESC').first()
+            return spot.code128
         else:
-            return codes
+            return g.max_code128
+
+    def gen_code128(self):
+
+        max_code = self.get_max_code128()
+        self.code128 = 1
+        if max_code:
+            self.code128 = int(max_code) + 1
+
+        self.code128 = str(self.code128).rjust(self.CODE128_LEN, '0')
+        return True
 
     def get_url(self):
         if not self.barcode:
-            self.barcode = self.get_barcode()
+            self.get_barcode()
 
         random_part = random.randint(1000000000, 9999999999)
         data = "%s%s" % (str(self.barcode), str(random_part))
@@ -133,7 +126,8 @@ class Spot(db.Model, BaseModel):
         if spot:
             self.get_url
         else:
-            return url
+            self.url = url
+            return True
 
     def get_valid_by_code(self, code):
         valid_status = [
@@ -147,14 +141,18 @@ class Spot(db.Model, BaseModel):
 
     def save(self):
         if not self.registered_date and self.status == self.STATUS_REGISTERED:
-                self.registered_date = date_helper.get_curent_date()
+            self.registered_date = date_helper.get_curent_date()
 
         if not self.removed_date:
             if self.status == self.STATUS_REMOVED_USER or self.status == self.STATUS_REMOVED_SYS:
                 self.removed_date = date_helper.get_curent_date()
 
         if not self.url:
-            self.url = self.get_url()
+            self.get_url()
+
+        if not self.code128:
+            self.gen_code128()
+            g.max_code128 = self.code128
 
         if not self.code:
             self.code = self.get_code(self.discodes_id)
