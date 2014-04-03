@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <info>
-    {% for row in spot %}<spot dis="{{row.code}}">{{row.barcode}}</spot>{% endfor %}
+    {% for row in spot %}<spot dis="{{row.code}}">{{row.code128}}</spot>{% endfor %}
 </info>

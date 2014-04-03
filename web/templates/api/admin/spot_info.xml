@@ -8,6 +8,7 @@
     <name>{{spot.name}}</name>
     <url>{{spot.url}}</url>
     <barcode>{{spot.barcode}}</barcode>
+    <code128>{{spot.code128}}</code128>
     <user_id>{{spot.user_id}}</user_id>
     <user_email>{{spot.user.email}}</user_email>
     <generated_date>{{spot.generated_date}}</generated_date>
