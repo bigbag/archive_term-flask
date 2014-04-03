@@ -36,6 +36,7 @@ class Spot(db.Model):
 
     CODE_SIZE = 10
 
+    MAX_GENERATE = 101
     CODE128_LEN = 12
     MAX_GEN_COUNT = 20
 
