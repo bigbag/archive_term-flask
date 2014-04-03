@@ -168,6 +168,7 @@ class Term(db.Model, BaseModel):
 
         return result
 
+    @cache.cached(timeout=120, key_prefix='term_list')
     def select_term_list(self, firm_id, **kwargs):
         tz = app.config['TZ']
         date_pattern = '%H:%M %d.%m.%y'

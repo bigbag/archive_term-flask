@@ -44,6 +44,20 @@ class Person(db.Model, BaseModel):
         self.creation_date = date_helper.get_curent_date()
         self.name = u'Пользователь'
 
+    @cache.cached(timeout=120, key_prefix='person_dict')
+    def get_dict_by_firm_id(self, firm_id):
+        persons = Person.query.filter_by(firm_id=firm_id).all()
+
+        result = {}
+        for person in persons:
+            result[person.id] = dict(
+                name=person.name,
+                tabel_id=person.tabel_id,
+                card=person.card
+            )
+
+        return result
+
     def select_person_list(self, firm_id, **kwargs):
         order = kwargs[
             'order'] if 'order' in kwargs else 'name asc'

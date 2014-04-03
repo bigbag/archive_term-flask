@@ -6,9 +6,11 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db
+from web import db, cache
 
 from models.base_model import BaseModel
+from models.person import Person
+
 from helpers import date_helper
 
 
@@ -57,6 +59,26 @@ class TermCorpWallet(db.Model, BaseModel):
             self.INTERVAL_WEEK: 2500,
             self.INTERVAL_MONTH: 9999
         }
+
+    # @cache.cached(timeout=120, key_prefix='corp_wallet')
+    def get_dict_by_firm_id(self, firm_id):
+        corp_wallet_interval = self.get_interval_list()
+        persons = Person().get_dict_by_firm_id(firm_id)
+
+        result = {}
+        for key in persons:
+            wallet = self.query.filter_by(person_id=key).first()
+            if not wallet:
+                continue
+
+            result[key] = dict(
+                interval=corp_wallet_interval[
+                    wallet.interval][
+                        'name'],
+                limit=wallet.limit,
+                balance=wallet.balance
+            )
+        return result
 
     def to_json(self):
         corp_wallet_interval = self.get_interval_list()

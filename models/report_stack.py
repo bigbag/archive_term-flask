@@ -59,12 +59,39 @@ class ReportStack(db.Model, BaseModel):
             {'id': self.INTERVAL_MONTH, 'name': u"Ежемесячно"}
         ]
 
+    def interval_meta(self):
+        return {
+            self.INTERVAL_ONCE: 'once',
+            self.INTERVAL_DAY: 'day',
+            self.INTERVAL_WEEK: 'week',
+            self.INTERVAL_MONTH: 'month'
+        }
+
+    def get_interval_meta(self, interval):
+        interval_meta = self.interval_meta()
+        if interval in interval_meta:
+            return interval_meta[interval]
+        return False
+
     def get_type_list(self):
         return [
             {'id': self.TYPE_PERSON, 'name': u"По людям"},
             {'id': self.TYPE_TERM, 'name': u"По терминалам"},
             {'id': self.TYPE_MONEY, 'name': u"Личным расходам"}
         ]
+
+    def type_meta(self):
+        return {
+            self.TYPE_PERSON: 'person',
+            self.TYPE_TERM: 'term',
+            self.TYPE_MONEY: 'money',
+        }
+
+    def get_type_meta(self, type):
+        type_meta = self.type_meta()
+        if type in type_meta:
+            return type_meta[type]
+        return False
 
     def get_excel_list(self):
         return [
