@@ -6,10 +6,13 @@
     :license: BSD, see LICENSE for more details.
 """
 from web import db
+
+from models.base_model import BaseModel
+
 from helpers import date_helper
 
 
-class WalletLoyalty(db.Model):
+class WalletLoyalty(db.Model, BaseModel):
 
     __bind_key__ = 'payment'
     __tablename__ = 'wallet_loyalty'
@@ -21,24 +24,3 @@ class WalletLoyalty(db.Model):
     count = db.Column(db.Integer)
     part_count = db.Column(db.Integer)
     bonus_count = db.Column(db.Integer)
-
-    def __repr__(self):
-        return '<id %r>' % (self.id)
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True

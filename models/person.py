@@ -2,15 +2,17 @@
 """
     Модель для сотрудников фирм
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import app, db, cache
+from web import db, cache
+
+from models.base_model import BaseModel
 
 from helpers import date_helper
 
 
-class Person(db.Model):
+class Person(db.Model, BaseModel):
 
     __bind_key__ = 'term'
     __tablename__ = 'person'
@@ -25,7 +27,8 @@ class Person(db.Model):
     name = db.Column(db.Text, nullable=False)
     tabel_id = db.Column(db.String(150))
     birthday = db.Column(db.Date())
-    firm_id = db.Column(db.Integer, nullable=False, index=True)
+    firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
+    firm = db.relationship('Firm')
     card = db.Column(db.String(8))
     payment_id = db.Column(db.String(20), nullable=False, index=True)
     hard_id = db.Column(db.String(128), nullable=False)
@@ -40,6 +43,20 @@ class Person(db.Model):
         self.type = self.TYPE_TIMEOUT
         self.creation_date = date_helper.get_curent_date()
         self.name = u'Пользователь'
+
+    @cache.cached(timeout=120, key_prefix='person_dict')
+    def get_dict_by_firm_id(self, firm_id):
+        persons = Person.query.filter_by(firm_id=firm_id).all()
+
+        result = {}
+        for person in persons:
+            result[person.id] = dict(
+                name=person.name,
+                tabel_id=person.tabel_id,
+                card=person.card
+            )
+
+        return result
 
     def select_person_list(self, firm_id, **kwargs):
         order = kwargs[
@@ -76,31 +93,9 @@ class Person(db.Model):
         )
         return value
 
-    def __repr__(self):
-        return '<id %r>' % (self.id)
-
     def person_remove(self):
         from models.term_corp_wallet import TermCorpWallet
 
         TermCorpWallet.query.filter_by(person_id=self.id).delete()
-
         self.delete()
         return True
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True

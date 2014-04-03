@@ -13,19 +13,39 @@ from celery.schedules import crontab
 app.config.update(
     CELERY_TIMEZONE='Europe/Moscow',
     CELERYBEAT_SCHEDULE={
-        'every-day': {
+        'empty-recovery-limit-day': {
             'task': 'web.tasks.corp_wallet.recovery_limit',
             'schedule': crontab(hour=0, minute=11),
             'args': ('1',),
         },
-        'every-wheek': {
+        'empty-recovery-limit-wheek': {
             'task': 'web.tasks.corp_wallet.recovery_limit',
             'schedule': crontab(hour=0, minute=11, day_of_week=1),
             'args': ('2',),
         },
-        'every-month': {
+        'empty-recovery-limit-month': {
             'task': 'web.tasks.corp_wallet.recovery_limit',
             'schedule': crontab(hour=0, minute=22, day_of_month=1),
+            'args': ('3',),
+        },
+        'report-sender': {
+            'task': 'web.tasks.report.report_manager',
+            'schedule': crontab(minute='*/1'),
+            'args': ('3',),
+        },
+        'report-sender-day': {
+            'task': 'web.tasks.report.report_manager',
+            'schedule': crontab(hour=10, minute=1),
+            'args': ('1',),
+        },
+        'report-sender-wheek': {
+            'task': 'web.tasks.report.report_manager',
+            'schedule': crontab(hour=10, minute=10, day_of_week=1),
+            'args': ('2',),
+        },
+        'report-sender-month': {
+            'task': 'web.tasks.report.report_manager',
+            'schedule': crontab(hour=10, minute=25, day_of_month=1),
             'args': ('3',),
         },
     },

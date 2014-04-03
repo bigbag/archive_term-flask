@@ -2,14 +2,16 @@
 """
     Модель реализующая принадлежность терминалов к фирмам и мультиаренду
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db, app, cache
+from web import app, db, cache
 from helpers import date_helper
 
+from models.base_model import BaseModel
 
-class FirmTerm(db.Model):
+
+class FirmTerm(db.Model, BaseModel):
 
     __bind_key__ = 'term'
     __tablename__ = 'firm_term'
@@ -30,9 +32,6 @@ class FirmTerm(db.Model):
 
     def __init__(self):
         self.creation_date = date_helper.get_curent_date()
-
-    def __repr__(self):
-        return '<id %r>' % (self.id)
 
     def get_list_by_term_id(self, term_id):
         firm_terms = self.query.filter_by(
@@ -104,21 +103,3 @@ class FirmTerm(db.Model):
         self.delete()
 
         return True
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True

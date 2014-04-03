@@ -3,19 +3,21 @@
     Модель для платежной карты (кошелька)
 
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import hashlib
 import random
 
-from web import db, app
+from web import db
+
+from models.base_model import BaseModel
 from models.user import User
 
 from helpers import date_helper, hash_helper
 
 
-class PaymentWallet(db.Model):
+class PaymentWallet(db.Model, BaseModel):
 
     __bind_key__ = 'payment'
     __tablename__ = 'wallet'
@@ -49,9 +51,6 @@ class PaymentWallet(db.Model):
         self.user_id = 0
         self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_NOACTIVE
-
-    def __repr__(self):
-        return '<id %r>' % (self.id)
 
     def get_pid(self, pids):
         pids = str(pids).rjust(10, '0')
@@ -92,21 +91,6 @@ class PaymentWallet(db.Model):
     def get_by_payment_id(self, payment_id):
         return self.query.filter_by(payment_id=payment_id).first()
 
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
     def save(self):
-        try:
-            self.payment_id = str(self.payment_id).rjust(20, '0')
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True
+        self.payment_id = str(self.payment_id).rjust(20, '0')
+        return BaseModel.save(self)

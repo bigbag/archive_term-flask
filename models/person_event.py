@@ -4,17 +4,20 @@
     таймауты обслуживания для каждого пользователя
 
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import json
-from web import db, app
+
+from web import db
+
+from models.base_model import BaseModel
 from models.loyalty import Loyalty
 from models.payment_wallet import PaymentWallet
 from models.person import Person
 
 
-class PersonEvent(db.Model):
+class PersonEvent(db.Model, BaseModel):
 
     __bind_key__ = 'term'
     __tablename__ = 'person_event'
@@ -39,9 +42,6 @@ class PersonEvent(db.Model):
     def __init__(self):
         self.timeout = 5
         self.status = self.STATUS_ACTIVE
-
-    def __repr__(self):
-        return '<id %r>' % (self.id)
 
     def get_valid_by_term_id(self, term_id):
         return self.query.filter_by(term_id=term_id).all()
@@ -94,21 +94,3 @@ class PersonEvent(db.Model):
                 event.save()
 
             return event.id
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True
