@@ -2,21 +2,23 @@
 """
     Модель для спотов
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import random
 import string
 import hashlib
 
-from web import db, app
+from web import db
 from helpers import date_helper, hash_helper
+
+from models.base_model import BaseModel
 
 from models.user import User
 from models.spot_dis import SpotDis
 
 
-class Spot(db.Model):
+class Spot(db.Model, BaseModel):
 
     __bind_key__ = 'mobispot'
     __tablename__ = 'spot'
@@ -142,33 +144,18 @@ class Spot(db.Model):
             Spot.code == code).filter(
                 Spot.status.in_(valid_status)).first()
 
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
     def save(self):
-        try:
-            if not self.registered_date and self.status == self.STATUS_REGISTERED:
+        if not self.registered_date and self.status == self.STATUS_REGISTERED:
                 self.registered_date = date_helper.get_curent_date()
 
-            if not self.removed_date:
-                if self.status == self.STATUS_REMOVED_USER or self.status == self.STATUS_REMOVED_SYS:
-                    self.removed_date = date_helper.get_curent_date()
+        if not self.removed_date:
+            if self.status == self.STATUS_REMOVED_USER or self.status == self.STATUS_REMOVED_SYS:
+                self.removed_date = date_helper.get_curent_date()
 
-            if not self.url:
-                self.url = self.get_url()
+        if not self.url:
+            self.url = self.get_url()
 
-            if not self.code:
-                self.code = self.get_code(self.discodes_id)
+        if not self.code:
+            self.code = self.get_code(self.discodes_id)
 
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True
+        return BaseModel.save(self)

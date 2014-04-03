@@ -2,17 +2,18 @@
 """
     Модель событий привязанных к терминалу
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db, app
+from web import db
 
+from models.base_model import BaseModel
 from models.person_event import PersonEvent
 from models.firm_term import FirmTerm
 from models.person import Person
 
 
-class TermEvent(db.Model):
+class TermEvent(db.Model, BaseModel):
 
     __bind_key__ = 'term'
     __tablename__ = 'term_event'
@@ -46,9 +47,6 @@ class TermEvent(db.Model):
         self.event_id = 1
         self.credit_period = 900
         self.credit_amount = 50000
-
-    def __repr__(self):
-        return '<id %r>' % (self.id)
 
     def term_event_save(self, firm_id, term_id):
         result = False
@@ -91,24 +89,5 @@ class TermEvent(db.Model):
             TermEvent.term_id.in_(
                 firm_term)).all()
 
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
     def save(self):
-        try:
-            if not self.min_item:
-                self.max_item = self.DEFAULT_MIN_ITEM
-            if not self.min_item:
-                self.max_item = self.DEFAULT_MAX_ITEM
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True
+        return BaseModel.save(self)

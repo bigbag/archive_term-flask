@@ -22,8 +22,8 @@ class UserForgotPasswordMessage(Message):
 
         self.add_recipient(kwargs['to'])
         self.body = render_template(
-            'term/emails/user_forgot_password.txt',
+            'term/emails/user/forgot_password.txt',
             **kwargs)
         self.html = render_template(
-            'term/emails/user_forgot_password.html',
+            'term/emails/user/forgot_password.html',
             **kwargs)

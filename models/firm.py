@@ -2,13 +2,15 @@
 """
     Модель событий доступных для привязки
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db, app
+from web import db
+
+from models.base_model import BaseModel
 
 
-class Firm(db.Model):
+class Firm(db.Model, BaseModel):
 
     __bind_key__ = 'term'
     __tablename__ = 'firm'
@@ -38,24 +40,3 @@ class Firm(db.Model):
 
     def get_by_sub_domain(self, sub_domain):
         return self.query.filter_by(sub_domain=sub_domain).first()
-
-    def __repr__(self):
-        return '<id %r>' % (self.id)
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def save(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True

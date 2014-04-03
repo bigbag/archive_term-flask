@@ -96,47 +96,6 @@
   opacity:0;
 }
 
-
-/*.report-table {
-  margin: 0 40px;
+.f-email-case {
+  margin-top: 10px;
 }
-  .report-table .report-title {
-    font-size: 18px;
-    font-family: Mobispot, arial, sans-serif;
-    font-weight: 100;
-  }
-  .report-table .report-title li{
-    padding: 5px 40px 15px 0;
-  }
-
-  .report-table .report-content {
-    border-top: 1px solid #E9EDF2;
-    padding: 10px 0;
-    font-size: 0.875em;
-    color: #222;
-  }
-    .report-table .report-content:hover{
-      color: #FFF;
-      background-color: #0061FF;
-    }
-    
-    .report-table .report-content li {
-      padding: 5px 40px 14px 0;
-    }
-
-    .report-table .report-content .report-date {
-      text-align: center;
-    }
-
-  .report-table .report-date-amount, 
-  .report-table .report-date-count {
-    text-align: right;
-  }
-
-  .report-table .report-content .report-content-result{
-    font-weight: bold;
-  }
-
-  .m-spot-table th.active{
-  color: #0061FF;
-}*/

@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-    Модель для операций без кошельков
+    Модель для потерянных операций
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import hashlib
-from web import db, app
+
+from web import db
+
+from models.base_model import BaseModel
 from models.term import Term
 from models.event import Event
 
 
-class PaymentLost(db.Model):
+class PaymentLost(db.Model, BaseModel):
 
     __bind_key__ = 'payment'
     __tablename__ = 'lost'
@@ -33,9 +36,6 @@ class PaymentLost(db.Model):
         self.amount = 0
         self.type = self.TYPE_WHITE
 
-    def __repr__(self):
-        return '<id %r>' % (self.id)
-
     def add_lost_payment(self, report):
         self.term_id = report.term_id
         self.event_id = report.event_id
@@ -45,21 +45,6 @@ class PaymentLost(db.Model):
         self.creation_date = report.creation_date
         return self.save()
 
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
     def save(self):
-        try:
-            self.payment_id = str(self.payment_id).rjust(20, '0')
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(e)
-            return False
-        else:
-            return True
+        self.payment_id = str(self.payment_id).rjust(20, '0')
+        return BaseModel.save(self)
