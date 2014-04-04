@@ -50,17 +50,22 @@ def api_admin_access(request):
 def api_social_get_loyalties():
     """Возвращает список акций"""
 
+    api_admin_access(request)
     count = Loyalty.DEFAULT_COUNT
     if 'count' in request.args:
-        count = int(request.args['count'])
-        if count > Loyalty.MAX_COUNT:
-            count = Loyalty.MAX_COUNT
+        try:
+            count = int(request.args['count'])
+        except Exception as e:
+            abort(405)
+        count = Loyalty.MAX_COUNT if count > Loyalty.MAX_COUNT else count
 
     offset = 0
     if 'offset' in request.args:
-        offset = int(request.args['offset'])
+        try:
+            offset = int(request.args['offset'])
+        except Exception as e:
+            abort(405)
 
-    api_admin_access(request)
     loyalties = Loyalty.query.filter().order_by(
         Loyalty.id)[offset:(offset + count)]
 
@@ -81,7 +86,19 @@ def api_social_get_loyalties():
 def api_social_get_loyalty(loyalty_id):
     """Возвращает детализацию по акции"""
     api_admin_access(request)
+
+    if not loyalty_id:
+        abort(400)
+
+    try:
+        loyalty_id = int(loyalty_id)
+    except Exception as e:
+        abort(405)
+
     loyalty = Loyalty.query.get(loyalty_id)
+
+    if not loyalty:
+        abort(404)
 
     wl = WalletLoyalty.query.filter_by(
         loyalty_id=loyalty.id)
@@ -153,11 +170,17 @@ def api_social_spot_loyalty(ean=False):
 
     offset = 0
     if 'offset' in request.args:
-        offset = int(request.args['offset'])
+        try:
+            offset = int(request.args['offset'])
+        except Exception as e:
+            abort(405)
 
     count = Loyalty.MAX_COUNT
     if 'count' in request.args:
-        count = int(request.args['count'])
+        try:
+            count = int(request.args['count'])
+        except Exception as e:
+            abort(405)
 
     loyalties = Loyalty.query.filter(Loyalty.id.in_(loyaltyList)).order_by(
     )[offset:(offset + count)]

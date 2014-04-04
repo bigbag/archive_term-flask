@@ -49,7 +49,7 @@ def api_admin_access(request):
 def api_admin_spot_generate():
     """Генерация спотов"""
 
-    # api_admin_access(request)
+    api_admin_access(request)
     count = 10
     if 'count' in request.form:
         try:
