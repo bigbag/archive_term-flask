@@ -31,7 +31,7 @@ app.config.update(
         'report-sender': {
             'task': 'web.tasks.report.report_manager',
             'schedule': crontab(minute='*/1'),
-            'args': ('3',),
+            'args': ('0',),
         },
         'report-sender-day': {
             'task': 'web.tasks.report.report_manager',
