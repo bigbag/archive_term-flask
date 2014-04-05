@@ -4,9 +4,10 @@
 </div>
 <br /><br />
 <div>
-    {% set data = results['data']%}
+    {% set data = results['data'] %}
+     {% set persons = results['persons'] %}
     <h2 style="color: #0062ff;font-size:1em;">
-        {{results['firm_name']}}, Отчет {{ results['interval'] }}
+        {{results['firm_name']}}<br /> Отчет {{ results['interval'] }}
     </h2>
     <table  cellpadding="5" cellspacing="0" border="1" >
         <thead>
@@ -18,7 +19,7 @@
             <th>Итого, руб.</th>
         </thead>
         <tbody>
-            {% for key in  data %}
+            {% for key in  persons %}
             <tr>
                 <td>{{ data[key]['name'] }}</td>
                 <td>{{ data[key]['tabel_id'] }}</td>

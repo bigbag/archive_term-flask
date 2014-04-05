@@ -66,22 +66,6 @@ def report_generate(report_stack):
     return True
 
 
-def get_person_query(interval, firm_id):
-    query = db.session.query(
-        Report.person_id,
-        func.sum(Report.amount),
-        Report.term_id,)
-
-    query = query.filter(Report.corp_type == Report.CORP_TYPE_ON)
-    query = query.filter(Report.person_firm_id == firm_id)
-    query = query.filter(
-        Report.creation_date.between(interval[0], interval[1]))
-
-    query = query.group_by(Report.person_id, Report.term_id)
-    query = query.order_by(Report.name)
-    return query
-
-
 def get_person_interval(report_stack):
     firm = Firm.query.get(report_stack.firm_id)
     if not firm:
@@ -93,11 +77,15 @@ def get_person_interval(report_stack):
     corp_wallets = TermCorpWallet().get_dict_by_firm_id(
         report_stack.firm_id)
 
-    yesterday = datetime.now() - timedelta(1)
-    interval = date_helper.get_date_interval(yesterday, interval_meta)
+    report = Report()
+    report.firm_id = report_stack.firm_id
+    report.period = interval_meta
 
-    query = get_person_query(interval, report_stack.firm_id)
+    search_date = datetime.now() - timedelta(10)
+    interval = date_helper.get_date_interval(search_date, interval_meta)
+    query = report.person_corp_query(interval)
     reports = query.all()
+
     result = dict(
         data={},
         summ=0,
@@ -139,9 +127,7 @@ def get_person_interval(report_stack):
 
         result['data'][row[0]] = data
 
-    result['interval'] = '%s - %s' % (
-        interval[0].strftime('%d.%m.%Y'),
-        interval[1].strftime('%d.%m.%Y'))
+    result['interval'] = report.format_search_date(search_date)
 
     return result
 
@@ -172,14 +158,15 @@ def get_person_interval_xls(results, firm_id):
     cols = dict(
         name=u'ФИО',
         tabel_id=u'Таб. номер',
-        card=u'Номер карты',
+        card=u'Карта',
         wallet_interval=u'Статус кошелька',
         wallet_limit=u'Размер кошелька, руб',
         amount=u'Итого'
     )
     worksheet.set_column(0, len(keys) + len(terms), 13)
 
-    worksheet.write(1, 0, u'Отчет за период', bold)
+    worksheet.write(0, 0, results['firm_name'], bold)
+    worksheet.write(1, 0, u'Отчет ', bold)
     worksheet.write(1, 1, results['interval'], bold)
 
     row = 3

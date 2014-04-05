@@ -335,36 +335,43 @@ class Report(db.Model, BaseModel):
 
         return query.all()
 
+    def get_date_pattern(self):
+        date_pattern = False
+        if self.period == 'month':
+            date_pattern = '%m.%Y'
+        elif self.period == 'week':
+            date_pattern = '%x'
+        else:
+            date_pattern = '%d.%m.%Y'
+
+        return date_pattern
+
+    def format_search_date(self, search_date):
+        date_pattern = self.get_date_pattern()
+
+        if self.period == 'week':
+            interval = date_helper.get_date_interval(
+                search_date, self.period)
+            interval = (
+                interval[0].strftime('%d.%m.%Y'),
+                interval[1].strftime('%d.%m.%Y'))
+            creation_date = '%s - %s' % interval
+        else:
+            creation_date = search_date.strftime(date_pattern)
+
+        return creation_date
+
     @cache.cached(timeout=120, key_prefix='report_interval')
     def get_term_report(self, **kwargs):
 
         self._get_search_params(**kwargs)
-        if self.period == 'day':
-            date_pattern = '%d.%m.%Y'
-        elif self.period == 'month':
-            date_pattern = '%m.%Y'
-        elif self.period == 'week':
-            date_pattern = '%x'
-
         answer = self.term_general_query(**kwargs)
 
         result = []
         term_name_dict = Term().select_name_dict()
         for report in answer['reports']:
-
-            search_date = date_helper.from_utc(
-                report[0],
-                self.tz)
-
-            if self.period == 'week':
-                interval = date_helper.get_date_interval(
-                    search_date, self.period)
-                interval = (
-                    interval[0].strftime('%d.%m.%Y'),
-                    interval[1].strftime('%d.%m.%Y'))
-                creation_date = '%s - %s' % interval
-            else:
-                creation_date = search_date.strftime(date_pattern)
+            search_date = date_helper.from_utc(report[0], self.tz)
+            creation_date = self.format_search_date(search_date)
 
             data = dict(
                 creation_date=creation_date,
@@ -394,3 +401,18 @@ class Report(db.Model, BaseModel):
         )
 
         return value
+
+    def person_corp_query(self, interval):
+        query = db.session.query(
+            Report.person_id,
+            func.sum(Report.amount),
+            Report.term_id,)
+
+        query = query.filter(Report.corp_type == Report.CORP_TYPE_ON)
+        query = query.filter(Report.person_firm_id == self.firm_id)
+        query = query.filter(
+            Report.creation_date.between(interval[0], interval[1]))
+
+        query = query.group_by(Report.person_id, Report.term_id)
+        query = query.order_by(Report.name)
+        return query
