@@ -59,6 +59,13 @@ class ReportStack(db.Model, BaseModel):
             {'id': self.INTERVAL_MONTH, 'name': u"Ежемесячно"}
         ]
 
+    def get_sender_name_list(self):
+        return {self.INTERVAL_ONCE: u"Однократный",
+                self.INTERVAL_DAY: u"Ежедневный",
+                self.INTERVAL_WEEK: u"Еженедельный",
+                self.INTERVAL_MONTH: u"Ежемесячный"
+                }
+
     def interval_meta(self):
         return {
             self.INTERVAL_ONCE: 'once',
@@ -71,6 +78,12 @@ class ReportStack(db.Model, BaseModel):
         interval_meta = self.interval_meta()
         if interval in interval_meta:
             return interval_meta[interval]
+        return False
+
+    def get_interval_name(self, interval):
+        interval_name = self.get_sender_name_list()
+        if interval in interval_name:
+            return interval_name[interval]
         return False
 
     def get_type_list(self):

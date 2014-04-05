@@ -4,34 +4,30 @@
 </div>
 <br /><br />
 <div>
-    {% set data = results['data'] %}
-     {% set persons = results['persons'] %}
+    {% set data = result.data %}
+     {% set persons = result.persons %}
     <h2 style="color: #0062ff;font-size:1em;">
-        {{results['firm_name']}}<br /> Отчет {{ results['interval'] }}
+        {{result.firm_name}}<br /> {{result.interval_name}} отчет {{ result.interval }}
     </h2>
     <table  cellpadding="5" cellspacing="0" border="1" >
         <thead>
-            <th>ФИО</th>
-            <th>Таб номер</th>
-            <th>Карта</th>
-            <th>Статус кошелька</th>
-            <th>Размер кошелька, руб.</th>
-            <th>Итого, руб.</th>
+            <tr>
+                {% for key in result.col_name %}
+                <th>{{ result.col_name[key] }}</th>
+                {% endfor %}
+            </tr>
         </thead>
         <tbody>
             {% for key in  persons %}
             <tr>
-                <td>{{ data[key]['name'] }}</td>
-                <td>{{ data[key]['tabel_id'] }}</td>
-                <td>{{ data[key]['card'] }}</td>
-                <td>{{ data[key]['wallet_interval'] }}</td>
-                <td>{{ data[key]['wallet_limit'] }}</td>
-                <td>{{ data[key]['amount'] }}</td>
+                {% for col_key in result.col_keys %}
+                <td>{{ data[key][col_key] }}</td>
+                {% endfor %}
             </tr>
             {% endfor %}
             <tr>
                 <td colspan="5"><strong>Итого</strong></td>
-                <td><strong>{{ results['summ'] }}</strong></td>
+                <td><strong>{{ result.summ }}</strong></td>
             </tr>
         </tbody>
     </table>

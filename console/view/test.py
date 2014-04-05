@@ -185,7 +185,7 @@ class TestCommand(Command):
     def run(self):
         import time
         import xlsxwriter
-        from web.tasks import report as report_task
+        from web.tasks import report_send
 
         report_stack = ReportStack.query.get(53)
-        results = report_task.report_generate(report_stack)
+        results = report_send.report_generate(report_stack)

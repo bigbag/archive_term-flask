@@ -20,6 +20,7 @@ from models.person import Person
 from models.term import Term
 from models.firm import Firm
 from models.report_stack import ReportStack
+from models.report_sender import ReportSender
 from models.term_corp_wallet import TermCorpWallet
 
 from web.tasks import mail
@@ -40,19 +41,19 @@ def report_manager(interval):
 
 @celery.task
 def report_generate(report_stack):
-    results = False
+    result = False
     attach = False
 
     if report_stack.type == ReportStack.TYPE_PERSON:
         if report_stack.interval != ReportStack.INTERVAL_ONCE:
-            results = get_person_interval(report_stack)
+            result = get_person_interval(report_stack)
             if report_stack.excel == ReportStack.EXCEL_YES:
-                attach = get_person_interval_xls(results, report_stack.firm_id)
+                attach = get_person_interval_xls(result, report_stack.firm_id)
 
-    if not results:
+    if not result:
         return False
 
-    if results['summ'] == 0:
+    if result.summ == 0:
         return False
 
     emails = json.loads(report_stack.emails)
@@ -61,7 +62,8 @@ def report_generate(report_stack):
             ReportMessage,
             to=email,
             attach=attach,
-            results=results)
+            result=result,
+            template='person')
 
     return True
 
@@ -81,31 +83,31 @@ def get_person_interval(report_stack):
     report.firm_id = report_stack.firm_id
     report.period = interval_meta
 
-    search_date = datetime.now() - timedelta(10)
+    search_date = datetime.now() - timedelta(1)
     interval = date_helper.get_date_interval(search_date, interval_meta)
-    query = report.person_corp_query(interval)
-    reports = query.all()
+    reports = report.person_corp_query(interval).all()
 
-    result = dict(
-        data={},
-        summ=0,
-        persons=[],
-        terms={},
-        firm_name=firm.name
-    )
+    result = ReportSender()
+    result.firm_name = firm.name
+    result.interval = report.format_search_date(search_date)
+    result.interval_name = ReportStack().get_interval_name(
+        report_stack.interval)
+    result.col_keys = ReportSender.get_person_keys()
+    result.col_name = ReportSender.get_person_col_name()
+
     for row in reports:
-        if row.person_id not in result['persons']:
-            result['persons'].append(row.person_id)
+        if row.person_id not in result.persons:
+            result.persons.append(row.person_id)
 
-        if row[0] not in result['data']:
-            result['data'][row[0]] = {}
-            result['data'][row[0]]['amount'] = 0
+        if row[0] not in result.data:
+            result.data[row[0]] = {}
+            result.data[row[0]]['amount'] = 0
 
-        if row[2] not in result['terms']:
-            result['terms'][row[2]] = dict(name=terms[row[2]])
-            result['terms'][row[2]]['amount'] = 0
+        if row[2] not in result.terms:
+            result.terms[row[2]] = dict(name=terms[row[2]])
+            result.terms[row[2]]['amount'] = 0
 
-        data = result['data'][row[0]]
+        data = result.data[row[0]]
         data['name'] = persons[row[0]]['name']
         data['tabel_id'] = persons[row[0]]['tabel_id']
         data['card'] = persons[row[0]]['card']
@@ -117,26 +119,20 @@ def get_person_interval(report_stack):
         amount = row[1] / 100
         data['amount'] = data['amount'] + amount
 
-        result['summ'] = result['summ'] + amount
-        result['terms'][row[2]]['amount'] = result[
-            'terms'][row[2]]['amount'] + amount
+        result.summ = result.summ + amount
+        result.terms[row[2]]['amount'] = result.terms[
+            row[2]]['amount'] + amount
 
         if 'term' not in data:
             data['term'] = {}
         data['term'][row[2]] = row[1] / 100
 
-        result['data'][row[0]] = data
-
-    result['interval'] = report.format_search_date(search_date)
+        result.data[row[0]] = data
 
     return result
 
 
-def get_person_interval_xls(results, firm_id):
-    data = results['data']
-    persons = results['persons']
-    terms = results['terms']
-
+def get_person_interval_xls(result, firm_id):
     file_name = "./tmp/report_%s_%s.xlsx" % (
         firm_id, int(time.time()))
 
@@ -147,66 +143,52 @@ def get_person_interval_xls(results, firm_id):
     border = workbook.add_format({'border': 1})
     border_bold = workbook.add_format({'bold': 1, 'border': 1})
 
-    keys = (
-        'name',
-        'tabel_id',
-        'card',
-        'wallet_interval',
-        'wallet_limit',
-        'amount')
+    worksheet.set_column(0, 1, 20)
+    worksheet.set_column(1, len(result.col_keys) + len(result.terms), 13)
 
-    cols = dict(
-        name=u'ФИО',
-        tabel_id=u'Таб. номер',
-        card=u'Карта',
-        wallet_interval=u'Статус кошелька',
-        wallet_limit=u'Размер кошелька, руб',
-        amount=u'Итого'
-    )
-    worksheet.set_column(0, len(keys) + len(terms), 13)
-
-    worksheet.write(0, 0, results['firm_name'], bold)
-    worksheet.write(1, 0, u'Отчет ', bold)
-    worksheet.write(1, 1, results['interval'], bold)
+    worksheet.write(0, 0, result.firm_name, bold)
+    title = u'%s отчет' % result.interval_name
+    worksheet.write(1, 0, title, bold)
+    worksheet.write(1, 1, result.interval, bold)
 
     row = 3
     col = 0
-    for key in keys:
-        worksheet.write(row, col, cols[key], border_bold)
+    for key in result.col_keys:
+        worksheet.write(row, col, result.col_name[key], border_bold)
         col += 1
 
     row = 4
-    for person in persons:
-        if person not in data:
+    for person in result.persons:
+        if person not in result.data:
             continue
 
         col = 0
-        for key in keys:
-            worksheet.write(row, col, data[person][key], border)
+        for key in result.col_keys:
+            worksheet.write(row, col, result.data[person][key], border)
             col += 1
 
         row += 1
 
     worksheet.write(row, 0, u'Итого', bold)
-    worksheet.write(row, 5, results['summ'], bold)
+    worksheet.write(row, 5, result.summ, bold)
 
-    col = len(cols)
-    for key in terms:
-        worksheet.write(3, col, terms[key]['name'], border_bold)
-        worksheet.write(row, col, terms[key]['amount'], bold)
+    col = len(result.col_name)
+    for key in result.terms:
+        worksheet.write(3, col, result.terms[key]['name'], border_bold)
+        worksheet.write(row, col, result.terms[key]['amount'], bold)
 
         row = 4
-        for person in persons:
-            if person not in data:
+        for person in result.persons:
+            if person not in result.data:
                 continue
 
-            if key not in data[person]['term']:
+            if key not in result.data[person]['term']:
                 worksheet.write(row, col, 0, border)
             else:
                 worksheet.write(
                     row,
                     col,
-                    data[person]['term'][key],
+                    result.data[person]['term'][key],
                     border)
             row += 1
 
