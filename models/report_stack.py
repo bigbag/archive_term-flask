@@ -11,6 +11,8 @@ from web import db
 
 from models.base_model import BaseModel
 
+from helpers import hash_helper
+
 
 class ReportStack(db.Model, BaseModel):
 
@@ -59,13 +61,6 @@ class ReportStack(db.Model, BaseModel):
             {'id': self.INTERVAL_MONTH, 'name': u"Ежемесячно"}
         ]
 
-    def get_sender_name_list(self):
-        return {self.INTERVAL_ONCE: u"Однократный",
-                self.INTERVAL_DAY: u"Ежедневный",
-                self.INTERVAL_WEEK: u"Еженедельный",
-                self.INTERVAL_MONTH: u"Ежемесячный"
-                }
-
     def interval_meta(self):
         return {
             self.INTERVAL_ONCE: 'once',
@@ -80,8 +75,16 @@ class ReportStack(db.Model, BaseModel):
             return interval_meta[interval]
         return False
 
-    def get_interval_name(self, interval):
-        interval_name = self.get_sender_name_list()
+    def get_sender_interval_list(self):
+        return {
+            self.INTERVAL_ONCE: u"Однократный",
+            self.INTERVAL_DAY: u"Ежедневный",
+            self.INTERVAL_WEEK: u"Еженедельный",
+            self.INTERVAL_MONTH: u"Ежемесячный"
+        }
+
+    def get_sender_interval_name(self, interval):
+        interval_name = self.get_sender_interval_list()
         if interval in interval_name:
             return interval_name[interval]
         return False
@@ -93,6 +96,19 @@ class ReportStack(db.Model, BaseModel):
             {'id': self.TYPE_MONEY, 'name': u"Личным расходам"}
         ]
 
+    def get_sender_type_list(self):
+        return {
+            self.TYPE_PERSON: u"Корпоративные расходы, люди",
+            self.TYPE_TERM: u"Корпоративные расходы, терминалы",
+            self.TYPE_MONEY: u"Личные расходы",
+        }
+
+    def get_sender_type_name(self, type):
+        type_name = self.get_sender_type_list()
+        if type in type_name:
+            return type_name[type]
+        return False
+
     def type_meta(self):
         return {
             self.TYPE_PERSON: 'person',
@@ -100,10 +116,10 @@ class ReportStack(db.Model, BaseModel):
             self.TYPE_MONEY: 'money',
         }
 
-    def get_type_meta(self, type):
+    def get_type_meta(self):
         type_meta = self.type_meta()
-        if type in type_meta:
-            return type_meta[type]
+        if self.type in type_meta:
+            return type_meta[self.type]
         return False
 
     def get_excel_list(self):
@@ -117,11 +133,23 @@ class ReportStack(db.Model, BaseModel):
         self.recipients = json.loads(self.recipients)
         return self
 
+    def set_check_summ(self):
+        data = [
+            str(self.firm_id),
+            str(self.emails),
+            str(self.excel),
+            str(self.type),
+            str(self.interval)]
+
+        data = '&'.join(data)
+        self.check_summ = hash_helper.get_content_md5(data)
+        return True
+
     def save(self):
         if not self.check_summ:
-            self.check_summ = hash(self)
+            self.set_check_summ()
 
-        if not isinstance(self.emails, str):
+        if not self.id:
             self.emails = str(json.dumps(self.emails))
 
         if self.details and not isinstance(self.emails, str):

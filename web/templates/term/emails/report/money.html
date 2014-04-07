@@ -5,7 +5,7 @@
 <br /><br />
 <div>
     {% set data = result.data %}
-     {% set persons = result.persons %}
+     {% set terms = result.terms %}
     <h2 style="color: #0062ff;font-size:1em;">
         {{result.firm_name}}<br />
         {{result.type_name}}<br /> 
@@ -20,7 +20,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for key in  persons %}
+            {% for key in  terms %}
             <tr>
                 {% for col_key in result.col_keys %}
                 <td>{{ data[key][col_key] }}</td>
@@ -28,7 +28,8 @@
             </tr>
             {% endfor %}
             <tr>
-                <td colspan="5"><strong>Итого</strong></td>
+                <td><strong>Итого</strong></td>
+                <td><strong>{{ result.all_count }}</strong></td>
                 <td><strong>{{ result.all_summ }}</strong></td>
             </tr>
         </tbody>

@@ -416,3 +416,22 @@ class Report(db.Model, BaseModel):
         query = query.group_by(Report.person_id, Report.term_id)
         query = query.order_by(Report.name)
         return query
+
+    def person_money_query(self, interval):
+        query = db.session.query(
+            Report.term_id,
+            func.count(Report.id),
+            func.sum(Report.amount).label("summ1"))
+
+        query = query.filter(Report.type == Report.TYPE_PAYMENT)
+        query = query.filter(Report.term_firm_id == self.firm_id)
+        query = query.filter(
+            Report.creation_date.between(interval[0], interval[1]))
+
+        query = self._set_period_group(query, self.period)
+        query = query.group_by(
+            Report.person_id,
+            Report.term_id)
+        query = query.order_by('summ1 desc')
+
+        return query
