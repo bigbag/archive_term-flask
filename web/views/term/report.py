@@ -62,13 +62,47 @@ def report_get_money_report():
     return jsonify(answer)
 
 
-@mod.route('/report/new', methods=['GET'])
+@mod.route('/report/new', methods=['POST'])
 @login_required
-def report_create_page():
-    """Отображение формы нового отчета"""
+def report_create_new():
+    """Создание нового или редактирование отчета"""
+
+    answer = dict(error='yes', message=u'Произошла ошибка')
+
+    arg = get_post_arg(request, True)
+    if 'id' not in arg:
+        abort(405)
+    arg['firm_id'] = g.firm_info['id']
+
+    report_stack = ReportStack.query.get(arg['id'])
+    if not report_stack:
+        report_stack = ReportStack()
+
+    for key in arg:
+        setattr(report_stack, key, arg[key])
+
+    old_report_stack = ReportStack.query.filter_by(
+        check_summ=report_stack.set_check_summ()).first()
+
+    if old_report_stack and not report_stack.id:
+        answer['message'] = u'Такой отчет уже есть в списке активных'
+        return jsonify(answer)
+
+    report_stack.encode_emails()
+    if report_stack.save():
+        answer['error'] = 'no'
+        answer['message'] = u'Отчет сохранен'
+
+    return jsonify(answer)
+
+
+@mod.route('/report/list', methods=['GET'])
+@login_required
+def report_list_page():
+    """Страница отчетов"""
 
     return render_template(
-        'term/report/new.html',
+        'term/report/list.html',
         report_stack=ReportStack(),
         type_list=ReportStack().get_type_list(),
         interval_list=ReportStack().get_interval_list(),
@@ -76,33 +110,52 @@ def report_create_page():
     )
 
 
-@mod.route('/report/new', methods=['POST'])
+@mod.route('/report/list', methods=['POST'])
 @login_required
-def report_create_new():
-    """Создание нового отчета"""
+def report_list():
+    """Выборка списка активных отчетов"""
 
-    answer = dict(error='yes', message=u'Произошла ошибка')
-
-    arg = get_post_arg(request, True)
-    arg['firm_id'] = g.firm_info['id']
-
-    print arg
-
-    report_stack = ReportStack()
-    for key in arg:
-        setattr(report_stack, key, arg[key])
-
-    if report_stack.save():
-        answer['error'] = 'no'
-        answer['message'] = u'Отчет добавлен'
+    arg = json.loads(request.stream.read())
+    answer = ReportStack().select_list(g.firm_info['id'], **arg)
 
     return jsonify(answer)
 
 
-@mod.route('/report/list', methods=['GET'])
+@mod.route('/report/<int:report_id>', methods=['GET'])
 @login_required
-def report_list():
-    """Список активных отчетов"""
+def report_edit_page(report_id):
+    """Страница просмотра и редактирования отчета"""
 
-    template = 'term/report/list.html'
-    return render_template(template)
+    report_stack = ReportStack.query.get(report_id)
+    if not report_stack:
+        abort(404)
+
+    if report_stack.firm_id != g.firm_info['id']:
+        abort(403)
+
+    return render_template(
+        'term/report/view.html',
+        report_stack=report_stack,
+        type_list=ReportStack().get_type_list(),
+        interval_list=ReportStack().get_interval_list(),
+        excel_list=ReportStack().get_excel_list()
+    )
+
+
+@mod.route('/report/<int:report_id>/remove', methods=['POST'])
+@login_required
+def report_remove(report_id):
+    """Удаление отчета"""
+
+    answer = dict(error='yes', message=u'Произошла ошибка', status=False)
+    arg = get_post_arg(request, True)
+
+    report_stack = ReportStack.query.get(report_id)
+    if not report_stack:
+        abort(404)
+
+    report_stack.delete()
+    answer['error'] = 'no'
+    answer['message'] = u'Операция успешно выполнена'
+
+    return jsonify(answer)

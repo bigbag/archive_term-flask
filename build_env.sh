@@ -7,6 +7,7 @@ mkdir ./archiv
 mkdir ./pids
 mkdir ./db
 mkdir ./tmp
+mkdir ./excel
 cp gunicorn.conf.py_distr gunicorn.conf.py
 cp api/configs/general.py_distr api/configs/general.py
 

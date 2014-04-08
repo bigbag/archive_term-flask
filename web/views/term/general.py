@@ -61,7 +61,6 @@ def get_post_arg(request, token=False):
         if 'csrf_token' not in arg or arg['csrf_token'] != g.token:
             abort(403)
 
-    del arg['csrf_token']
     return arg
 
 

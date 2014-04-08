@@ -36,7 +36,12 @@ class ReportParser(Command):
             if not len(data) == 3:
                 continue
 
-            term_id = int(data[0])
+            try:
+                term_id = int(data[0])
+            except Exception as e:
+                app.logger.error(e)
+                return False
+
             report_date = data[1]
             report_time = data[2]
 

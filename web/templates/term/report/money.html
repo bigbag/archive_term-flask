@@ -27,8 +27,9 @@
                         </ul>
                     </div>
                     <div class="large-10 columns">
-                        <ul class="small-block-grid-2">
+                        <ul class="small-block-grid-3">
                             <li class="active">Терминал</li>
+                            <li class="text-right">Количество</li>
                             <li class="text-right">Сумма</li>
                         </ul>
                     </div>
@@ -40,15 +41,21 @@
                         </ul>
                     </div>
                     <div class="large-10 columns">
-                        <ul class="small-block-grid-2" 
+                        <ul class="small-block-grid-3" 
                             ng-repeat="row in report.detaled | orderBy:'amount'">
-                            <li class="ng-binding">{[{row.term}]}</li>
+                            <li>{[{row.term}]}</li>
+                            <li class="report-date-amount text-right">
+                                {[{row.count}]}
+                            </li>
                             <li class="report-date-amount text-right">
                                 {[{row.amount}]}
                             </li>
                         </ul>
-                        <ul class="small-block-grid-2 report-content-result">
+                        <ul class="small-block-grid-3 report-content-result">
                             <li><strong>Всего</strong></li>
+                            <li class="report-date-amount text-right">
+                                <strong>{[{report.count}]}</strong>
+                            </li>
                             <li class="report-date-amount text-right">
                                 <strong>{[{report.amount}]}</strong>
                             </li>

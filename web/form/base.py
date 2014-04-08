@@ -30,4 +30,4 @@ class TokenSecureForm(Form):
 
     def validate_csrf_token(self, field):
         if field.data != hash_helper.get_user_token(request):
-            raise ValueError('Invalid CSRF1')
+            raise ValueError('Invalid CSRF')
