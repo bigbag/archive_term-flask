@@ -62,20 +62,6 @@ def report_get_money_report():
     return jsonify(answer)
 
 
-@mod.route('/report/new', methods=['GET'])
-@login_required
-def report_create_page():
-    """Отображение формы нового отчета"""
-
-    return render_template(
-        'term/report/new.html',
-        report_stack=ReportStack(),
-        type_list=ReportStack().get_type_list(),
-        interval_list=ReportStack().get_interval_list(),
-        excel_list=ReportStack().get_excel_list()
-    )
-
-
 @mod.route('/report/new', methods=['POST'])
 @login_required
 def report_create_new():
@@ -86,11 +72,16 @@ def report_create_new():
     arg = get_post_arg(request, True)
     arg['firm_id'] = g.firm_info['id']
 
-    print arg
-
     report_stack = ReportStack()
     for key in arg:
         setattr(report_stack, key, arg[key])
+
+    old_report_stack = ReportStack.query.filter_by(
+        check_summ=report_stack.set_check_summ()).first()
+
+    if old_report_stack:
+        answer['message'] = u'Такой отчет уже есть в списке активных'
+        return jsonify(answer)
 
     if report_stack.save():
         answer['error'] = 'no'
@@ -101,8 +92,24 @@ def report_create_new():
 
 @mod.route('/report/list', methods=['GET'])
 @login_required
-def report_list():
-    """Список активных отчетов"""
+def report_list_page():
+    """Страница отчетов"""
 
-    template = 'term/report/list.html'
-    return render_template(template)
+    return render_template(
+        'term/report/list.html',
+        report_stack=ReportStack(),
+        type_list=ReportStack().get_type_list(),
+        interval_list=ReportStack().get_interval_list(),
+        excel_list=ReportStack().get_excel_list()
+    )
+
+
+@mod.route('/report/list', methods=['POST'])
+@login_required
+def report_list():
+    """Выборка списка активных отчетов"""
+
+    arg = json.loads(request.stream.read())
+    answer = ReportStack().select_list(g.firm_info['id'], **arg)
+
+    return jsonify(answer)

@@ -98,8 +98,8 @@ class ReportStack(db.Model, BaseModel):
 
     def get_sender_type_list(self):
         return {
-            self.TYPE_PERSON: u"Корпоративные расходы, люди",
-            self.TYPE_TERM: u"Корпоративные расходы, терминалы",
+            self.TYPE_PERSON: u"Корпоративный, люди",
+            self.TYPE_TERM: u"Корпоративный, терминалы",
             self.TYPE_MONEY: u"Личные расходы",
         }
 
@@ -133,6 +133,36 @@ class ReportStack(db.Model, BaseModel):
         self.recipients = json.loads(self.recipients)
         return self
 
+    def select_list(self, firm_id, **kwargs):
+        order = kwargs[
+            'order'] if 'order' in kwargs else 'name asc'
+        limit = kwargs['limit'] if 'limit' in kwargs else 10
+        page = kwargs['page'] if 'page' in kwargs else 1
+
+        query = ReportStack.query.filter(
+            ReportStack.firm_id == firm_id).filter(
+                ReportStack.interval != self.INTERVAL_ONCE)
+        query = query.order_by(order)
+        report_stacks = query.paginate(page, limit, False).items
+
+        result = []
+        for report_stack in report_stacks:
+            data = dict(
+                id=report_stack.id,
+                name=report_stack.name,
+                interval_name=self.get_sender_interval_name(
+                    report_stack.interval),
+                type_name=self.get_sender_type_name(report_stack.type),
+                excel=self.excel
+            )
+            result.append(data)
+
+        value = dict(
+            result=result,
+            count=query.count(),
+        )
+        return value
+
     def set_check_summ(self):
         data = [
             str(self.firm_id),
@@ -142,12 +172,11 @@ class ReportStack(db.Model, BaseModel):
             str(self.interval)]
 
         data = '&'.join(data)
-        self.check_summ = hash_helper.get_content_md5(data)
-        return True
+        return hash_helper.get_content_md5(data)
 
     def save(self):
         if not self.check_summ:
-            self.set_check_summ()
+            self.check_summ = self.set_check_summ()
 
         if not self.id:
             self.emails = str(json.dumps(self.emails))

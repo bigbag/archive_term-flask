@@ -143,6 +143,7 @@ def _get_money_interval_xls(result):
     worksheet.set_column(0, 1, 25)
     worksheet.set_column(1, len(result.col_keys), 13)
 
+    # Шапка таблицы
     worksheet.write(0, 0, result.firm_name, bold)
     worksheet.write(1, 0, result.type_name, bold)
     worksheet.write(2, 0, u'%s отчет' % result.interval_name, bold)
@@ -150,11 +151,13 @@ def _get_money_interval_xls(result):
 
     row = 3
     col = 0
+    # Заголовки столбцов
     for key in result.col_keys:
         worksheet.write(row, col, result.col_name[key], border_bold)
         col += 1
 
     row = 4
+    # Блок информации о оборотах с разбивкой по терминалам
     for term in result.terms:
         col = 0
         for key in result.col_keys:
@@ -245,6 +248,7 @@ def _get_person_interval_xls(result):
     worksheet.set_column(0, 1, 20)
     worksheet.set_column(1, len(result.col_keys) + len(result.terms), 13)
 
+    # Шапка таблицы
     worksheet.write(0, 0, result.firm_name, bold)
     worksheet.write(1, 0, result.type_name, bold)
     worksheet.write(2, 0, u'%s отчет' % result.interval_name, bold)
@@ -252,11 +256,13 @@ def _get_person_interval_xls(result):
 
     row = 3
     col = 0
+    # Заголовоки столбцов
     for key in result.col_keys:
         worksheet.write(row, col, result.col_name[key], border_bold)
         col += 1
 
     row = 4
+    # Блок суммарных расходов по сотрудникам
     for person in result.persons:
         if person not in result.data:
             continue
@@ -272,6 +278,7 @@ def _get_person_interval_xls(result):
     worksheet.write(row, 5, result.all_summ, bold)
 
     col = len(result.col_name)
+    # Блок с разбивкой расходов по терминалам
     for key in result.terms:
         worksheet.write(3, col, result.terms[key]['name'], border_bold)
         worksheet.write(row, col, result.terms[key]['amount'], bold)

@@ -54,8 +54,7 @@ def get_person_list():
     """Получаем список сотрудников фирмы"""
 
     arg = json.loads(request.stream.read())
-    answer = Person().select_person_list(
-        g.firm_info['id'], **arg)
+    answer = Person().select_list(g.firm_info['id'], **arg)
 
     return jsonify(answer)
 

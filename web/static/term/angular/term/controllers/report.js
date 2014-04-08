@@ -54,14 +54,14 @@ angular.module('term').controller('ReportController',
     if (report_stack.emails.length == 0) return false;
 
     report_stack.csrf_token = $scope.token;
-    var url = window.location.pathname;
+    var url = '/report/new';
     $http.post(url, report_stack).success(function(data) {
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
       } else {
         contentService.setModal(data.message, 'none');
         setTimeout(function(){
-          $(location).attr('href', '/report/new');
+          $(location).attr('href', '/report/list');
         }, 2000);
       }
     });  
