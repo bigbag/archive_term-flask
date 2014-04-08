@@ -25,6 +25,8 @@ class Config(object):
 
     UPLOAD_FOLDER = './archiv'
     UPLOAD_TMP = './tmp'
+    EXCEL_FOLDER = './excel'
+    UPLOAD_LOG = './logs'
     ALLOWED_EXTENSIONS = set(['xml'])
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 

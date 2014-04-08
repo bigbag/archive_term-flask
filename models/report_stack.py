@@ -11,6 +11,8 @@ from web import db
 
 from models.base_model import BaseModel
 
+from helpers import hash_helper
+
 
 class ReportStack(db.Model, BaseModel):
 
@@ -33,7 +35,7 @@ class ReportStack(db.Model, BaseModel):
     TYPE_MONEY = 2
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(256))
+    name = db.Column(db.String(256), nullable=False)
     firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
     firm = db.relationship('Firm')
     emails = db.Column(db.Text, nullable=False)
@@ -48,12 +50,12 @@ class ReportStack(db.Model, BaseModel):
     def __init__(self):
         self.excel = self.EXCEL_YES
         self.type = self.TYPE_PERSON
-        self.interval = self.INTERVAL_ONCE
+        self.interval = self.INTERVAL_MONTH
         self.lock = self.LOCK_FREE
 
     def get_interval_list(self):
         return [
-            {'id': self.INTERVAL_ONCE, 'name': u"Один раз"},
+            # {'id': self.INTERVAL_ONCE, 'name': u"Один раз"},
             {'id': self.INTERVAL_DAY, 'name': u"Ежедневно"},
             {'id': self.INTERVAL_WEEK, 'name': u"Еженедельно"},
             {'id': self.INTERVAL_MONTH, 'name': u"Ежемесячно"}
@@ -73,12 +75,39 @@ class ReportStack(db.Model, BaseModel):
             return interval_meta[interval]
         return False
 
+    def get_sender_interval_list(self):
+        return {
+            self.INTERVAL_ONCE: u"Однократный",
+            self.INTERVAL_DAY: u"Ежедневный",
+            self.INTERVAL_WEEK: u"Еженедельный",
+            self.INTERVAL_MONTH: u"Ежемесячный"
+        }
+
+    def get_sender_interval_name(self, interval):
+        interval_name = self.get_sender_interval_list()
+        if interval in interval_name:
+            return interval_name[interval]
+        return False
+
     def get_type_list(self):
         return [
             {'id': self.TYPE_PERSON, 'name': u"По людям"},
             {'id': self.TYPE_TERM, 'name': u"По терминалам"},
             {'id': self.TYPE_MONEY, 'name': u"Личным расходам"}
         ]
+
+    def get_sender_type_list(self):
+        return {
+            self.TYPE_PERSON: u"Корпоративный, люди",
+            self.TYPE_TERM: u"Корпоративный, терминалы",
+            self.TYPE_MONEY: u"Личные расходы",
+        }
+
+    def get_sender_type_name(self, type):
+        type_name = self.get_sender_type_list()
+        if type in type_name:
+            return type_name[type]
+        return False
 
     def type_meta(self):
         return {
@@ -87,10 +116,10 @@ class ReportStack(db.Model, BaseModel):
             self.TYPE_MONEY: 'money',
         }
 
-    def get_type_meta(self, type):
+    def get_type_meta(self):
         type_meta = self.type_meta()
-        if type in type_meta:
-            return type_meta[type]
+        if self.type in type_meta:
+            return type_meta[self.type]
         return False
 
     def get_excel_list(self):
@@ -104,11 +133,58 @@ class ReportStack(db.Model, BaseModel):
         self.recipients = json.loads(self.recipients)
         return self
 
+    def select_list(self, firm_id, **kwargs):
+        order = kwargs[
+            'order'] if 'order' in kwargs else 'name asc'
+        limit = kwargs['limit'] if 'limit' in kwargs else 10
+        page = kwargs['page'] if 'page' in kwargs else 1
+
+        query = ReportStack.query.filter(
+            ReportStack.firm_id == firm_id).filter(
+                ReportStack.interval != self.INTERVAL_ONCE)
+        query = query.order_by(order)
+        report_stacks = query.paginate(page, limit, False).items
+
+        result = []
+        for report_stack in report_stacks:
+            data = dict(
+                id=report_stack.id,
+                name=report_stack.name,
+                interval_name=self.get_sender_interval_name(
+                    report_stack.interval),
+                type_name=self.get_sender_type_name(report_stack.type),
+                excel=report_stack.excel
+            )
+            result.append(data)
+
+        value = dict(
+            result=result,
+            count=query.count(),
+        )
+        return value
+
+    def decode_emails(self):
+        self.emails = json.loads(self.emails)
+
+    def encode_emails(self):
+        self.emails = str(json.dumps(self.emails))
+
+    def set_check_summ(self):
+        data = [
+            str(self.firm_id),
+            str(self.emails),
+            str(self.excel),
+            str(self.type),
+            str(self.interval)]
+
+        data = '&'.join(data)
+        return hash_helper.get_content_md5(data)
+
     def save(self):
         if not self.check_summ:
-            self.check_summ = hash(self)
+            self.check_summ = self.set_check_summ()
 
-        if not isinstance(self.emails, str):
+        if not self.id:
             self.emails = str(json.dumps(self.emails))
 
         if self.details and not isinstance(self.emails, str):

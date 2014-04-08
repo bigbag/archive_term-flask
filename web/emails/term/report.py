@@ -12,24 +12,23 @@ from flask.ext.mail import Message
 class ReportMessage(Message):
 
     def __init__(self, **kwargs):
-        required = ['to', 'results']
+        required = ['to', 'result', 'template']
         for k in required:
             if not k in kwargs:
                 msg = "These values must be provided: %s" % ",".join(required)
                 app.logger.error(msg)
                 raise KeyError(msg)
         title = u"Отчет"
-        results = kwargs['results']
-        if 'interval' in results and 'firm_name' in results:
-            title = 'Отчет, %s' % (results['interval'])
+        result = kwargs['result']
+        if result.interval and result.firm_name:
+            title = 'Отчет, %s' % result.interval
         Message.__init__(self, title)
 
-        results = kwargs['results']
+        result = kwargs['result']
 
         self.add_recipient(kwargs['to'])
-        self.html = render_template(
-            'term/emails/report/general.html',
-            **kwargs)
+        template = 'term/emails/report/%s.html' % kwargs['template']
+        self.html = render_template(template, **kwargs)
 
         filename = False
         if 'attach' in kwargs:
@@ -37,7 +36,8 @@ class ReportMessage(Message):
 
         if filename:
             with open(filename, 'r') as fp:
+                attach_name = '%s.xlsx' % title
                 self.attach(
-                    title,
+                    attach_name,
                     "application/vnd.ms-excel",
                     fp.read())

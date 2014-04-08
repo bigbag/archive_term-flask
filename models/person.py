@@ -58,7 +58,7 @@ class Person(db.Model, BaseModel):
 
         return result
 
-    def select_person_list(self, firm_id, **kwargs):
+    def select_list(self, firm_id, **kwargs):
         order = kwargs[
             'order'] if 'order' in kwargs else 'name asc'
         limit = kwargs['limit'] if 'limit' in kwargs else 10
