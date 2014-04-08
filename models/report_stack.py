@@ -35,7 +35,7 @@ class ReportStack(db.Model, BaseModel):
     TYPE_MONEY = 2
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(256))
+    name = db.Column(db.String(256), nullable=False)
     firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
     firm = db.relationship('Firm')
     emails = db.Column(db.Text, nullable=False)
@@ -50,12 +50,12 @@ class ReportStack(db.Model, BaseModel):
     def __init__(self):
         self.excel = self.EXCEL_YES
         self.type = self.TYPE_PERSON
-        self.interval = self.INTERVAL_ONCE
+        self.interval = self.INTERVAL_MONTH
         self.lock = self.LOCK_FREE
 
     def get_interval_list(self):
         return [
-            {'id': self.INTERVAL_ONCE, 'name': u"Один раз"},
+            # {'id': self.INTERVAL_ONCE, 'name': u"Один раз"},
             {'id': self.INTERVAL_DAY, 'name': u"Ежедневно"},
             {'id': self.INTERVAL_WEEK, 'name': u"Еженедельно"},
             {'id': self.INTERVAL_MONTH, 'name': u"Ежемесячно"}
@@ -153,7 +153,7 @@ class ReportStack(db.Model, BaseModel):
                 interval_name=self.get_sender_interval_name(
                     report_stack.interval),
                 type_name=self.get_sender_type_name(report_stack.type),
-                excel=self.excel
+                excel=report_stack.excel
             )
             result.append(data)
 
@@ -162,6 +162,12 @@ class ReportStack(db.Model, BaseModel):
             count=query.count(),
         )
         return value
+
+    def decode_emails(self):
+        self.emails = json.loads(self.emails)
+
+    def encode_emails(self):
+        self.emails = str(json.dumps(self.emails))
 
     def set_check_summ(self):
         data = [

@@ -10,7 +10,7 @@ angular.module('term').controller('PersonController',
     $(location).attr('href','/person/' + person_id);
   };
 
-   //Тригер на изменение снятие ошибки при изменение полей
+  //Тригер на изменение снятие ошибки при изменение полей
   $scope.$watch('person.card_code + person.name', function(user) {
     $scope.error.name = false;
     $scope.error.card_code = false;
