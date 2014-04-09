@@ -1,3 +1,4 @@
+<br />
 <span ng-init="search.custom_filer=0"></span>
 <div ng-show="search.page_count!=0 || search.custom_filer!=0">
     <div ng-show="search.status==1" class="content-row">
@@ -7,7 +8,7 @@
         <br />
         <p class="m-hint">Кликните на строку с определенным сотрудником, чтобы восстановить учетную запись</p>
     </div>
-    <div class="m-grid-search">
+    <div class="m-grid-search" ng-hide="search.page_count==0 && search.custom_filer!=0">
         <input type="text"
             name="person_name"
             ng-init="search.person_name=''"

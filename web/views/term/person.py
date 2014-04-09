@@ -20,20 +20,6 @@ from models.payment_wallet import PaymentWallet
 from models.term_corp_wallet import TermCorpWallet
 
 
-@mod.route('/person/content/<path:action>', methods=['POST'])
-@login_required
-@json_headers
-def get_person_content(action):
-    """Получаем блок для динамической вставки"""
-
-    answer = dict(content='', error='yes')
-    patch = "term/person/%s.html" % action
-    answer['content'] = render_template(patch)
-    answer['error'] = 'no'
-
-    return jsonify(answer)
-
-
 @mod.route('/person/<path:action>', methods=['GET'])
 @mod.route('/person', methods=['GET'])
 @login_required
@@ -47,6 +33,7 @@ def person_view(action=None):
     )
 
 
+@mod.route('/person/content/<path:action>', methods=['POST'])
 @mod.route('/person', methods=['POST'])
 @login_required
 @json_headers
