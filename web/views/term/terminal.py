@@ -88,7 +88,7 @@ def terminal_info(term_id):
     return render_template(
         'term/terminal/view.html',
         term=term,
-        events=Event().get_events(),
+        events=Event().get_events(term.type),
         term_event=TermEvent(),
         term_events=term_events,
         term_access=term_access,
@@ -316,7 +316,7 @@ def terminal_event_info(term_id, term_event_id):
     if term_event.term_id != term.id:
         abort(400)
 
-    events = Event().get_events()
+    events = Event().get_events(term.type)
 
     return render_template(
         'term/terminal/event_view.html',
