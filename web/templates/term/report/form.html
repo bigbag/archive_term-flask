@@ -1,12 +1,13 @@
 <div class="m-block" ng-controller="ReportController">
     <form class="custom" name="reportForm">
+        <span ng-init="report_stack.id='{{report_stack.id |replace("None", 0)}}'"></span>
         <div class="content-row">
-            <label for="add-name">Название</label>
+            <label for="add-name">Название*</label>
             <input id="add-name" 
                 type="text"
                 name="name"
                 ng-maxlength="300"
-                ng-init="term.name='{{report_stack.name}}'"
+                ng-init="report_stack.name='{{report_stack.name |replace("None", "")}}'"
                 ng-model="report_stack.name"
                 ng-class="{error: error.name}"
                 required>
@@ -41,10 +42,15 @@
                 ng-click="addEmailInStack(report_stack)">
                 Добавить
             </a>
+            {% if report_stack.emails %}
+            <span ng-init="initEmails('{{report_stack.emails}}')"></span>
+            {% endif %}
             <div class="f-select-email">
-                
+                <span class="f-email-case g-radius-main"
+                    ng-repeat="email in report_stack.emails">{[{email}]}
+                    <i class="g-round" ng-click="removeEmailFromStack($index, $event)"></i>
+                </span>
             </div>
-        </div>
          <div class="content-row">
             <label for="type-report">Отчет по</label>
             <select id="type-report" 
@@ -79,9 +85,10 @@
         </div>
     </form>
     <div class="content-row g-clearfix">
-        <a ng-click="saveReportStack(report_stack)"
+        <a ng-click="saveReportStack(report_stack, reportForm.$valid)"
             class="f-spot-button">
-            Добавить отчет
+            <span ng-hide="report_stack.id">Добавить</span>
+            <span ng-show="report_stack.id">Сохранить</span>
         </a>
     </div>
 </div>

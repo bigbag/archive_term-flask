@@ -7,6 +7,7 @@ gunicorn.conf.py
 /venv/
 /env/
 /logs/
+/excel/
 /pids/
 /archiv/
 /tmp/

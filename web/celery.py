@@ -29,22 +29,22 @@ app.config.update(
             'args': ('3',),
         },
         'report-sender': {
-            'task': 'web.tasks.report.report_manager',
+            'task': 'web.tasks.report_send.report_manager',
             'schedule': crontab(minute='*/1'),
-            'args': ('3',),
+            'args': ('0',),
         },
         'report-sender-day': {
-            'task': 'web.tasks.report.report_manager',
+            'task': 'web.tasks.report_send.report_manager',
             'schedule': crontab(hour=10, minute=1),
             'args': ('1',),
         },
         'report-sender-wheek': {
-            'task': 'web.tasks.report.report_manager',
+            'task': 'web.tasks.report_send.report_manager',
             'schedule': crontab(hour=10, minute=10, day_of_week=1),
             'args': ('2',),
         },
         'report-sender-month': {
-            'task': 'web.tasks.report.report_manager',
+            'task': 'web.tasks.report_send.report_manager',
             'schedule': crontab(hour=10, minute=25, day_of_month=1),
             'args': ('3',),
         },

@@ -49,7 +49,7 @@ def api_admin_access(request):
 def api_admin_spot_generate():
     """Генерация спотов"""
 
-    # api_admin_access(request)
+    api_admin_access(request)
     count = 10
     if 'count' in request.form:
         try:
@@ -154,7 +154,7 @@ def api_admin_linking_spot():
 @mod.route('/spot/ean/<ean>', methods=['GET'])
 @mod.route('/spot/code128/<code128>', methods=['GET'])
 @xml_headers
-def api_admin_get_info(hid=False, ean=False):
+def api_admin_get_info(hid=False, ean=False, code128=False):
     """Возвращает информацию о споте по его HID или EAN"""
 
     api_admin_access(request)

@@ -135,8 +135,7 @@ def terminal_rent_add(term_id):
     arg = get_post_arg(request, True)
     error = False
 
-    term = Term().get_info_by_id(term_id)
-    if not term:
+    if not Term().get_by_id(term_id):
         abort(404)
 
     firm_terms = FirmTerm.query.filter_by(
@@ -165,7 +164,7 @@ def terminal_rent_add(term_id):
         return jsonify(answer)
 
     firm_term = FirmTerm()
-    firm_term.term_id = term.id
+    firm_term.term_id = term_id
     firm_term.firm_id = parent_firm_id
     firm_term.child_firm_id = child_firm.id
 
