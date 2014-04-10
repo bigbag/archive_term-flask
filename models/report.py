@@ -402,7 +402,7 @@ class Report(db.Model, BaseModel):
 
         return value
 
-    def person_corp_query(self, interval):
+    def person_query(self, interval):
         query = db.session.query(
             Report.person_id,
             func.sum(Report.amount),
@@ -417,7 +417,7 @@ class Report(db.Model, BaseModel):
         query = query.order_by(Report.name)
         return query
 
-    def person_money_query(self, interval):
+    def money_query(self, interval):
         query = db.session.query(
             Report.term_id,
             func.count(Report.id),

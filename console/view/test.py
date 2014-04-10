@@ -183,9 +183,8 @@ class TestCommand(Command):
                 wallet.save()
 
     def run(self):
-        from web.tasks import report_send
+        from web.tasks.report_send import ReportSenderTask
 
-        report_stack = ReportStack.query.get(53)
-        results = report_send.report_generate(report_stack)
+        results = ReportSenderTask.report_manager(2)
 
         print results
