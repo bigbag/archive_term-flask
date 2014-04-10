@@ -31,6 +31,9 @@ class Term(db.Model, BaseModel):
     TYPE_POS = 0
     TYPE_VENDING = 1
 
+    EVENTS_POS = ['breakfast', 'lunch', 'dinner']
+    EVENTS_VENDING = ['issuance']
+
     SEANS_ALARM = 86400
 
     DEFAULT_FACTOR = 100
