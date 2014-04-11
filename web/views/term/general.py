@@ -230,7 +230,7 @@ def change(user_id, recovery_token):
     term_user = TermUser.query.get(user_id)
 
     if term_user.activkey != recovery_token:
-        abort(404)
+        return redirect('/')
 
     return render_template(
         'term/change_password.html',

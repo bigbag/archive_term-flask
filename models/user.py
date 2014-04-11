@@ -51,4 +51,4 @@ class User(db.Model, BaseModel):
     def save(self):
         self.password = hash_helper.get_password_hash(self.password)
         self.activkey = hash_helper.get_activkey(self.password)
-        BaseModel.save(self)
+        return BaseModel.save(self)
