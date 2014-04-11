@@ -102,6 +102,12 @@ class ReportSenderTask (object):
 
         return True
 
+    def _init_xls_file(self):
+        if not self.firm:
+            return False
+        return "%s/excel%s_%s.xlsx" % (app.config['EXCEL_FOLDER'],
+                                       self.firm.id, int(time.time()))
+
     def _init_result(self):
         if not self.element or not self.firm or not self.type_meta:
             return False
@@ -161,8 +167,9 @@ class ReportSenderTask (object):
         return result
 
     def _get_money_xls(self, result):
-        file_name = "%s/excel%s_%s.xlsx" % (app.config['EXCEL_FOLDER'],
-                                            result.firm_id, int(time.time()))
+        file_name = self._init_xls_file()
+        if not file_name:
+            return False
 
         workbook = xlsxwriter.Workbook(file_name)
         worksheet = workbook.add_worksheet()
@@ -249,8 +256,9 @@ class ReportSenderTask (object):
         return result
 
     def _get_person_xls(self, result):
-        file_name = "%s/excel%s_%s.xlsx" % (app.config['EXCEL_FOLDER'],
-                                            result.firm_id, int(time.time()))
+        file_name = self._init_xls_file()
+        if not file_name:
+            return False
 
         workbook = xlsxwriter.Workbook(file_name)
         worksheet = workbook.add_worksheet()
