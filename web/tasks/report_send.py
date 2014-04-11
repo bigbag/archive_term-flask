@@ -73,6 +73,7 @@ class ReportSenderTask (object):
             return False
 
         if element.interval == ReportStack.INTERVAL_ONCE:
+        # and element.type == ReportStack.TYPE_PERSON:
             return False
 
         result = getattr(
@@ -101,6 +102,12 @@ class ReportSenderTask (object):
         element.save()
 
         return True
+
+    def _init_xls_file(self):
+        if not self.firm:
+            return False
+        return "%s/excel%s_%s.xlsx" % (app.config['EXCEL_FOLDER'],
+                                       self.firm.id, int(time.time()))
 
     def _init_result(self):
         if not self.element or not self.firm or not self.type_meta:
@@ -161,8 +168,9 @@ class ReportSenderTask (object):
         return result
 
     def _get_money_xls(self, result):
-        file_name = "%s/excel%s_%s.xlsx" % (app.config['EXCEL_FOLDER'],
-                                            result.firm_id, int(time.time()))
+        file_name = self._init_xls_file()
+        if not file_name:
+            return False
 
         workbook = xlsxwriter.Workbook(file_name)
         worksheet = workbook.add_worksheet()
@@ -249,8 +257,9 @@ class ReportSenderTask (object):
         return result
 
     def _get_person_xls(self, result):
-        file_name = "%s/excel%s_%s.xlsx" % (app.config['EXCEL_FOLDER'],
-                                            result.firm_id, int(time.time()))
+        file_name = self._init_xls_file()
+        if not file_name:
+            return False
 
         workbook = xlsxwriter.Workbook(file_name)
         worksheet = workbook.add_worksheet()
@@ -314,3 +323,10 @@ class ReportSenderTask (object):
 
             col += 1
         return file_name
+
+    def _get_term(self):
+        '''Формируем отчет за день, неделю, месяц по терминалам'''
+        return self._get_money()
+
+    def _get_term_xls(self, result):
+        return self._get_money_xls(result)
