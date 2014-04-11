@@ -185,6 +185,13 @@ class TestCommand(Command):
     def run(self):
         from web.tasks.report_send import ReportSenderTask
 
-        results = ReportSenderTask.report_manager(2)
+        report_stack = ReportStack.query.get(9)
+
+        sender_task = ReportSenderTask()
+        sender_task.element = report_stack
+
+        sender_task.firm = Firm.query.get(element.firm_id)
+
+        results = sender_task._get_term(2)
 
         print results

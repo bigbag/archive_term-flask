@@ -55,7 +55,7 @@ class ReportStack(db.Model, BaseModel):
 
     def get_interval_list(self):
         return [
-            # {'id': self.INTERVAL_ONCE, 'name': u"Один раз"},
+            {'id': self.INTERVAL_ONCE, 'name': u"Один раз"},
             {'id': self.INTERVAL_DAY, 'name': u"Ежедневно"},
             {'id': self.INTERVAL_WEEK, 'name': u"Еженедельно"},
             {'id': self.INTERVAL_MONTH, 'name': u"Ежемесячно"}
@@ -77,7 +77,7 @@ class ReportStack(db.Model, BaseModel):
 
     def get_sender_interval_list(self):
         return {
-            self.INTERVAL_ONCE: u"Однократный",
+            self.INTERVAL_ONCE: u"Разовый",
             self.INTERVAL_DAY: u"Ежедневный",
             self.INTERVAL_WEEK: u"Еженедельный",
             self.INTERVAL_MONTH: u"Ежемесячный"

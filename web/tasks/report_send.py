@@ -73,6 +73,7 @@ class ReportSenderTask (object):
             return False
 
         if element.interval == ReportStack.INTERVAL_ONCE:
+        # and element.type == ReportStack.TYPE_PERSON:
             return False
 
         result = getattr(
@@ -88,17 +89,17 @@ class ReportSenderTask (object):
         if element.excel == ReportStack.EXCEL_YES:
             attach = getattr(sender_task, excel_method_name)(result)
 
-        emails = json.loads(element.emails)
-        for email in emails:
-            mail.send.delay(
-                ReportMessage,
-                to=email,
-                attach=attach,
-                result=result,
-                template=element.get_type_meta())
+        # emails = json.loads(element.emails)
+        # for email in emails:
+        #     mail.send.delay(
+        #         ReportMessage,
+        #         to=email,
+        #         attach=attach,
+        #         result=result,
+        #         template=element.get_type_meta())
 
-        element.launch_date = date_helper.get_curent_date()
-        element.save()
+        # element.launch_date = date_helper.get_curent_date()
+        # element.save()
 
         return True
 
@@ -322,3 +323,11 @@ class ReportSenderTask (object):
 
             col += 1
         return file_name
+
+    def _get_term(self):
+        '''Формируем отчет за день, неделю, месяц по терминалам'''
+
+        self._init_result()
+        result = self.result
+
+        print result

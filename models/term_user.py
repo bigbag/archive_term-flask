@@ -75,6 +75,5 @@ class TermUser(db.Model, BaseModel):
         db.session.commit()
 
     def save(self):
-        self.password = hash_helper.get_password_hash(self.password)
         self.activkey = hash_helper.get_activkey(self.password)
         return BaseModel.save(self)
