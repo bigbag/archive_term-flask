@@ -408,7 +408,8 @@ class Report(db.Model, BaseModel):
             func.sum(Report.amount).label("summ1"))
 
         query = query.filter(Report.type == Report.TYPE_WHITE)
-        query = query.filter(Report.term_firm_id == self.firm_id)
+        query = query.filter(
+            (Report.term_firm_id == self.firm_id) | (Report.person_firm_id == self.firm_id))
         query = query.filter(
             Report.creation_date.between(interval[0], interval[1]))
 
