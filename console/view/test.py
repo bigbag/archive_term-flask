@@ -182,19 +182,6 @@ class TestCommand(Command):
                 wallet.discodes_id = spot.discodes_id
                 wallet.save()
 
-    def rules_const(self):
-        rules = '-1'
-        if self.rules == self.RULE_FIXED:
-            rules = 'RULE_FIXED'
-        elif self.rules == self.RULE_RATE:
-            rules = 'RULE_RATE'
-        elif self.rules == self.RULE_DISCOUNT:
-            rules = 'RULE_DISCOUNT'
-        elif self.rules == self.RULE_PRESENT:
-            rules = 'RULE_PRESENT'
-
-        return rules
-
     def run(self):
         from web.tasks.report_send import ReportSenderTask
 
