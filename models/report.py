@@ -115,7 +115,6 @@ class Report(db.Model, BaseModel):
         self = self.get_db_view(card_node)
 
         old_report = self.get_by_params()
-
         if old_report:
             return error
 
@@ -128,7 +127,7 @@ class Report(db.Model, BaseModel):
         person = Person.query.get(self.person_id)
 
         # Если человек имеет корпоративный кошелек, обновляем его баланс
-        if person and person.type == Person.TYPE_WALLET:
+        if person and person.wallet_status == Person.STATUS_VALID and person.type == Person.TYPE_WALLET:
             self.corp_type = self.CORP_TYPE_ON
             corp_wallet = TermCorpWallet.query.filter_by(
                 person_id=person.id).first()
