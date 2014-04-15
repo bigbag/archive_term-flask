@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('term').controller('PersonController', 
+angular.module('term').controller('PersonController',
     function($scope, $http, $compile, contentService) {
 
   $scope.error = {};
@@ -39,7 +39,7 @@ angular.module('term').controller('PersonController',
           $(location).attr('href','/person/' + data.person_id);
         }, 2000);
       }
-    });   
+    });
   };
 
   //Привязываем карту к человеку
@@ -49,7 +49,7 @@ angular.module('term').controller('PersonController',
       return false;
     };
     person.action = 'bind_card';
-    
+
     var url = '/person/' + person.id + '/' + person.action;
     person.csrf_token = $scope.token;
     $http.post(url, person).success(function(data) {
@@ -63,7 +63,7 @@ angular.module('term').controller('PersonController',
           $(location).attr('href', '/person/' + person.id);
         }, 2000);
       }
-    });  
+    });
   };
 
   //Отвязываем карту от человеку
@@ -79,7 +79,7 @@ angular.module('term').controller('PersonController',
           $(location).attr('href', '/person/' + person.id);
         }, 2000);
       }
-    });  
+    });
   };
 
   //Блокируем или разблокируем пользователя
@@ -94,7 +94,7 @@ angular.module('term').controller('PersonController',
         }
         contentService.setModal(data.message, 'success');
       }
-    }); 
+    });
   };
 
   //Удаляем пользователя
@@ -109,7 +109,7 @@ angular.module('term').controller('PersonController',
       } else {
         contentService.setModal(data.message, 'error');
       }
-    }); 
+    });
   };
 
 
@@ -129,7 +129,7 @@ angular.module('term').controller('PersonController',
           $(location).attr('href','/person/' + person_event.person_id);
         }, 2000);
       }
-    });  
+    });
   }
 
   //Переадресация на страницу редактирования привязанного события
@@ -151,7 +151,7 @@ angular.module('term').controller('PersonController',
           $(location).attr('href','/person/' + person_event.person_id);
         }, 2000);
       }
-    });  
+    });
   }
 
   $scope.$watch('corp_wallet.limit', function(term) {
@@ -177,7 +177,7 @@ angular.module('term').controller('PersonController',
         angular.element('#wallet-info').html($compile(data.content)($scope));
         $scope.corp_wallet = data.corp_wallet;
       }
-    });  
+    });
   }
 
   //Редактируем кошелёк
@@ -197,6 +197,6 @@ angular.module('term').controller('PersonController',
         $scope.person.type = 0;
         $scope.corp_wallet.id = 0;
       }
-    });  
+    });
   }
 });

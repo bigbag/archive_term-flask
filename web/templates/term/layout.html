@@ -14,7 +14,6 @@
     <link rel="icon" type="image/png" href="/static/term/img/favicon16.png">
     <link rel="icon" type="image/png" href="/static/term/img/favicon32.png">
     <link rel="icon" type="image/png" href="/static/term/img/favicon48.png">
-
     <link rel="stylesheet" href="/static/term/css/normalize.css" />
     <link rel="stylesheet" href="/static/term/css/foundation.min.css" />
     <link rel="stylesheet" href="/static/term/css/style.css" />
@@ -35,12 +34,11 @@
     {% block body %}{% endblock %}
     <div class="m-result">
         <p></p>
-    </div> 
+    </div>
     <script type="text/javascript" src="/static/term/js/date.js"></script>
-    <script type="text/javascript" src="/static/term/js/daterangepicker.js"></script>
     <script type="text/javascript" src="/static/term/js/script.js"></script>
-    <script type="text/javascript" src="/static/term/js/foundation.min.js"></script> 
-    <script type="text/javascript" src="/static/term/angular/modules/pagination/ui-pagination.js"></script>  
+    <script type="text/javascript" src="/static/term/js/foundation.min.js"></script>
+    <script type="text/javascript" src="/static/term/angular/modules/pagination/ui-pagination.js"></script>
     <script type="text/javascript" src="/static/term/angular/term/app.js"></script>
     <script type="text/javascript" src="/static/term/angular/term/services.js"></script>
     {% block footer_script %}
@@ -48,9 +46,6 @@
 
     <script>
         $(document).foundation();
-        $(document).ready(function() {
-            $('#datepicker').daterangepicker();
-        });
     </script>
 </body>
 </html>

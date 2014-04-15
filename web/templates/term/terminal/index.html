@@ -1,4 +1,4 @@
-{% extends "term/page.html" %}
+{% extends "term/terminal/page.html" %}
 
 {% block content %}
 <h2 class="g-color-blue m-page-name">Терминалы</h2>
@@ -24,8 +24,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-click="getTerminalView(term.id)" 
-                        ng-repeat="term in result" 
+                    <tr ng-click="getTerminalView(term.id)"
+                        ng-repeat="term in result"
                         class="m-t-cont-row">
                         <td>{[{term.id}]}</td>
                         <td>{[{term.hard_id}]}</td>
@@ -42,9 +42,9 @@
                     </tr>
                     <tr class="m-table-bottom" ng-show="search.page_count">
                         <td colspan="10">
-                            <ui-pagination 
-                                cur="pagination.cur" 
-                                total="pagination.total" 
+                            <ui-pagination
+                                cur="pagination.cur"
+                                total="pagination.total"
                                 display="{[{pagination.display}]}">
                             </ui-pagination>
                         </td>
@@ -58,12 +58,8 @@
             <a>Добавить терминал</a>
         </p>
         <div class="content">
-            {% include 'term/terminal/form.html' %}
+            {% include 'term/terminal/_form.html' %}
         </div>
     </section>
 </div>
 {% endblock %}
-{% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/controllers/terminal.js"></script> 
-{{ super() }}
-{% endblock %} 

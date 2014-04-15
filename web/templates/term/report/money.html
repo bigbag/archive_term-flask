@@ -1,4 +1,4 @@
-{% extends "term/page.html" %}
+{% extends "term/report/page.html" %}
 
 {% block content %}
 <h2 class="g-color-blue m-page-name">Личные расходы</h2>
@@ -41,7 +41,7 @@
                         </ul>
                     </div>
                     <div class="large-10 columns">
-                        <ul class="small-block-grid-3" 
+                        <ul class="small-block-grid-3"
                             ng-repeat="row in report.detaled | orderBy:'amount'">
                             <li>{[{row.term}]}</li>
                             <li class="report-date-amount text-right">
@@ -67,15 +67,15 @@
             <table class="m-spot-table">
                 <tr class="m-table-bottom">
                     <td colspan="10">
-                        <ui-pagination 
-                            cur="pagination.cur" 
-                            total="pagination.total" 
+                        <ui-pagination
+                            cur="pagination.cur"
+                            total="pagination.total"
                             display="{[{pagination.display}]}">
                         </ui-pagination>
                     </td>
                 </tr>
                 <tr class="m-t-cont-row" ng-hide="search.page_count">
-            
+
                     <td colspan="6" class="m-t-nothing">
                         У вас нет ни одного терминала по которому бы обслуживались платежные карты.
                     </td>
@@ -86,7 +86,3 @@
     </div>
 </div>
 {% endblock %}
-{% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/controllers/report.js"></script>
-{{ super() }}
-{% endblock %} 
