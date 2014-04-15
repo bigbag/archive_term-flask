@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('term').controller('ReportController', 
+angular.module('term').controller('ReportController',
   function($scope, $http, $compile, contentService) {
 
   //Список периодов для отчетов
@@ -9,6 +9,27 @@ angular.module('term').controller('ReportController',
     {name:'Неделя', value:'week'},
     {name:'Месяц', value:'month'},
   ];
+
+  moment.lang('ru');
+
+  $('#report_interval').daterangepicker({
+      format: 'DD.MM.YY',
+      // startDate:
+      maxDate: moment().endOf('day'),
+      locale: {
+          applyLabel: 'Применить',
+          cancelLabel: 'Отменить',
+          firstDay: 1
+      },
+    },
+    function(start, end, label) {
+      var pattern = 'YYYY-MM-DD'
+      var data = {start:moment(start).format(pattern), end:moment(end).format(pattern)};
+      $scope.$apply(function () {
+          $scope.report_stack.details = data;
+      });
+    }
+  );
 
   $scope.error = {};
   $scope.report_stack = {};
@@ -76,7 +97,7 @@ angular.module('term').controller('ReportController',
           $(location).attr('href', '/report/list');
         }, 2000);
       }
-    });  
+    });
   }
 
   //Переадресация на страницу информации об отчете
@@ -98,7 +119,7 @@ angular.module('term').controller('ReportController',
       } else {
         contentService.setModal(data.message, 'error');
       }
-    }); 
+    });
   };
 
 });

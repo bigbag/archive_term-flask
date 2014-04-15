@@ -11,7 +11,7 @@ from helpers import date_helper
 from models.base_model import BaseModel
 
 
-class Loyalty(db.Model, BaseModel):
+class PaymentLoyalty(db.Model, BaseModel):
 
     __bind_key__ = 'payment'
     __tablename__ = 'loyalty'
@@ -69,27 +69,33 @@ class Loyalty(db.Model, BaseModel):
         self.rules = self.RULE_FIXED
         self.creation_date = date_helper.get_curent_date()
 
+    def get_rules_dict(self):
+        return {
+            self.RULE_FIXED: 'RULE_FIXED',
+            self.RULE_RATE: 'RULE_RATE',
+            self.RULE_DISCOUNT: 'RULE_DISCOUNT',
+            self.RULE_RATE: 'RULE_PRESENT',
+        }
+
     def rules_const(self):
+        rules_dict = PaymentLoyalty().get_rules_dict()
         rules = '-1'
-        if self.rules == self.RULE_FIXED:
-            rules = 'RULE_FIXED'
-        elif self.rules == self.RULE_RATE:
-            rules = 'RULE_RATE'
-        elif self.rules == self.RULE_DISCOUNT:
-            rules = 'RULE_DISCOUNT'
-        elif self.rules == self.RULE_PRESENT:
-            rules = 'RULE_PRESENT'
+
+        if self.rules in rules_dict:
+            rules = rules_dict[self.rules]
 
         return rules
 
     @staticmethod
     def get_action_link(action_id):
         link = ''
-        userAction = Loyalty.query.filter_by(
-            id=action_id).first()
+
         actionTag = "<a ng-click=\"checkLike(" + str(
             action_id) + ")\">"
-        if actionTag in userAction.desc:
+
+        userAction = PaymentLoyalty.query.filter_by(
+            id=action_id).first()
+        if userAction and actionTag in userAction.desc:
             link = userAction.desc[
                 userAction.desc.find(actionTag) + len(actionTag):]
             if "</a>" in link:

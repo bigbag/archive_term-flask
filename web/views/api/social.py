@@ -15,7 +15,7 @@ from helpers.error_xml_helper import *
 from helpers import date_helper, hash_helper
 
 from models.term_user import TermUser
-from models.loyalty import Loyalty
+from models.payment_loyalty import PaymentLoyalty
 from models.person_event import PersonEvent
 from models.person import Person
 from models.payment_wallet import PaymentWallet
@@ -51,13 +51,13 @@ def api_social_get_loyalties():
     """Возвращает список акций"""
 
     api_admin_access(request)
-    count = Loyalty.DEFAULT_COUNT
+    count = PaymentLoyalty.DEFAULT_COUNT
     if 'count' in request.args:
         try:
             count = int(request.args['count'])
         except Exception as e:
             abort(405)
-        count = Loyalty.MAX_COUNT if count > Loyalty.MAX_COUNT else count
+        count = PaymentLoyalty.MAX_COUNT if count > PaymentLoyalty.MAX_COUNT else count
 
     offset = 0
     if 'offset' in request.args:
@@ -66,8 +66,8 @@ def api_social_get_loyalties():
         except Exception as e:
             abort(405)
 
-    loyalties = Loyalty.query.filter().order_by(
-        Loyalty.id)[offset:(offset + count)]
+    loyalties = PaymentLoyalty.query.filter().order_by(
+        PaymentLoyalty.id)[offset:(offset + count)]
 
     info_xml = render_template(
         'api/social/loyalties_list.xml',
@@ -95,7 +95,7 @@ def api_social_get_loyalty(loyalty_id):
     except Exception as e:
         abort(405)
 
-    loyalty = Loyalty.query.get(loyalty_id)
+    loyalty = PaymentLoyalty.query.get(loyalty_id)
 
     if not loyalty:
         abort(404)
@@ -175,14 +175,14 @@ def api_social_spot_loyalty(ean=False):
         except Exception as e:
             abort(405)
 
-    count = Loyalty.MAX_COUNT
+    count = PaymentLoyalty.MAX_COUNT
     if 'count' in request.args:
         try:
             count = int(request.args['count'])
         except Exception as e:
             abort(405)
 
-    loyalties = Loyalty.query.filter(Loyalty.id.in_(loyaltyList)).order_by(
+    loyalties = PaymentLoyalty.query.filter(PaymentLoyalty.id.in_(loyaltyList)).order_by(
     )[offset:(offset + count)]
 
     info_xml = render_template(

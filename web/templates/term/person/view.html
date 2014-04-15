@@ -1,4 +1,4 @@
-{% extends "term/page.html" %}
+{% extends "term/person/page.html" %}
 
 {% block content %}
 <span ng-init="person.id={{person.id}};person.status={{person.status}}"></span>
@@ -6,22 +6,22 @@
     {{person.name}}
     <div class="right">
         {% if person.payment_id %}
-        <a ng-click="unbindCard(person)" 
+        <a ng-click="unbindCard(person)"
             class="f-spot-button bg-red small">
             Отвязать карту
         </a>
         {% endif %}
-        <a ng-click="removePerson(person)" 
+        <a ng-click="removePerson(person)"
             class="f-spot-button bg-red small">
             Удалить
         </a>
         <a ng-show="person.status"
-            ng-click="lockPerson(person)" 
+            ng-click="lockPerson(person)"
             class="f-spot-button bg-red small">
             Заблокировать
         </a>
         <a ng-hide="person.status"
-            ng-click="lockPerson(person)" 
+            ng-click="lockPerson(person)"
             class="f-spot-button bg-red small">
             Разблокировать
         </a>
@@ -37,14 +37,14 @@
             {% if term_events %}
             <div>
                 <br />
-                {% include 'term/person/wallet_form.html' %}
+                {% include 'term/person/wallet/_form.html' %}
             </div>
             <div id="person-type"></div>
             <br/>
             <div class="content-row">
                 <p class="m-hint">Для изменения времени начала и конца события два раза кликните по нему. </p>
             </div>
-           
+
             <div class="content-row f-main-slide-link">
                 <div class="toggle-active">
                     <a id="event" class="loc-link f-spot-button small">
@@ -53,7 +53,7 @@
                 </div>
             </div>
             <div id="eventForm" class="slide-box slide-setting">
-                {% include 'term/person/event_form.html' %}
+                {% include 'term/person/_event_form.html' %}
             </div>
             <table class="m-spot-table">
                 <thead>
@@ -90,7 +90,7 @@
                     <label for="add-card-code">
                         Код активации карты (6 цифр и 4 буквы)
                     </label>
-                    <input id="add-card-code" 
+                    <input id="add-card-code"
                         name="card_code"
                         maxlength="10"
                         minlength="10"
@@ -148,9 +148,9 @@
                         </tr>
                         <tr class="m-table-bottom">
                             <td colspan="10">
-                                <ui-pagination 
-                                    cur="pagination.cur" 
-                                    total="pagination.total" 
+                                <ui-pagination
+                                    cur="pagination.cur"
+                                    total="pagination.total"
                                     display="{[{pagination.display}]}">
                                 </ui-pagination>
                             </td>
@@ -170,12 +170,8 @@
     <section class="section">
         <p class="title"><a>Редактировать</a></p>
         <div class="content">
-            {% include 'term/person/form.html' %}
+            {% include 'term/person/_form.html' %}
         </div>
     </section>
 </div>
 {% endblock %}
-{% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/controllers/person.js"></script>
-{{ super() }}
-{% endblock %} 

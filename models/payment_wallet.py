@@ -53,9 +53,9 @@ class PaymentWallet(db.Model, BaseModel):
         self.status = self.STATUS_NOACTIVE
 
     def get_pid(self, pids):
-        pids = str(pids).rjust(10, '0')
         pid = "%s%s" % (pids, random.randint(100000000, 999999999))
         pid = "%s%s" % (pid, hash_helper.get_isin_checksum(pid))
+        pid = str(pid).rjust(20, '0')[-20:]
 
         wallet = self.query.filter_by(payment_id=pid).first()
         if wallet:
