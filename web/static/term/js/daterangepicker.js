@@ -443,7 +443,7 @@
                     left: this.parentEl.offset().left - this.parentEl.scrollLeft()
                 };
             }
-            
+
             if (this.opens == 'left') {
                 this.container.css({
                     top: this.element.offset().top + this.element.outerHeight() - parentOffset.top,
@@ -498,7 +498,7 @@
             if (
                 target.closest(this.element).length ||
                 target.closest(this.container).length ||
-                target.closest('.calendar-date').length 
+                target.closest('.calendar-date').length
                 ) return;
             this.hide();
         },
@@ -663,6 +663,8 @@
             this.updateCalendars();
 
             endDate.endOf('day');
+
+            this.updateInputText();
 
             if (this.singleDatePicker)
                 this.clickApply();
