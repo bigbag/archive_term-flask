@@ -8,7 +8,7 @@
 from libs.socnet.socnet_base import SocnetBase
 from configs.soc_config import SocConfig
 from models.soc_token import SocToken
-from models.loyalty import Loyalty
+from models.payment_loyalty import PaymentLoyalty
 from grab import Grab
 import json
 import urllib
@@ -25,7 +25,8 @@ class YouTubeApi(SocnetBase):
     HISTORY_URL = 'https://gdata.youtube.com/feeds/api/users/default/watch_history?v=2'
 
     API_PARTS = {
-        'subscriptions': 'v3/subscriptions?maxResults=50&part=snippet&mine=true',
+        'subscriptions':
+        'v3/subscriptions?maxResults=50&part=snippet&mine=true',
         'watch': 'watch?v=',
     }
     VIDEO_URLS = ['watch?v=', 'youtube.com/v/', '/videos/']
@@ -34,7 +35,7 @@ class YouTubeApi(SocnetBase):
         follow = False
         self.refresh_token(token_id)
         socToken = SocToken.query.get(token_id)
-        action = Loyalty.query.get(loyalty_id)
+        action = PaymentLoyalty.query.get(loyalty_id)
         target = json.loads(action.data)
 
         g = Grab()

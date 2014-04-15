@@ -8,7 +8,7 @@
 from libs.socnet.socnet_base import SocnetBase
 from configs.soc_config import SocConfig
 from models.soc_token import SocToken
-from models.loyalty import Loyalty
+from models.payment_loyalty import PaymentLoyalty
 from grab import Grab
 import json
 import urllib
@@ -74,7 +74,7 @@ class GoogleApi(SocnetBase):
         plused = False
         self.refresh_token(token_id)
 
-        action = Loyalty.query.get(loyalty_id)
+        action = PaymentLoyalty.query.get(loyalty_id)
         target = json.loads(action.data)
         socToken = SocToken.query.get(token_id)
         g = Grab()

@@ -1,4 +1,4 @@
-{% extends "term/page.html" %}
+{% extends "term/terminal/page.html" %}
 
 {% block content %}
 <span ng-init="term.id={{term.id}};"></span>
@@ -14,12 +14,8 @@
     <section class="section active">
         <p class="title"><a>Редактировать</a></p>
         <div class="content">
-        {% include 'term/terminal/event_form.html' %}
+        {% include 'term/terminal/_event_form.html' %}
         </div>
     </section>
 </div>
-{% endblock %} 
-{% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/controllers/terminal.js"></script> 
-{{ super() }}
-{% endblock %} 
+{% endblock %}

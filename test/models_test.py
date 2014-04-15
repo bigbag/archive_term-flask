@@ -13,7 +13,7 @@ from models.card_stack import CardStack
 from models.mail_stack import MailStack
 from models.report_stack import ReportStack
 from models.user import User
-from models.loyalty import Loyalty
+from models.payment_loyalty import PaymentLoyalty
 from models.soc_token import SocToken
 from models.likes_stack import LikesStack
 
@@ -95,7 +95,7 @@ class ModelsCase(unittest.TestCase):
             img='defoult-store.png',
             part_limit=3,
         )
-        self.model_test(Loyalty, data)
+        self.model_test(PaymentLoyalty, data)
 
     def test_soc_token(self):
         data = dict(

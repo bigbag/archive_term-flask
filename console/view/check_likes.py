@@ -9,7 +9,7 @@ import json
 from flask import Flask
 from flask.ext.script import Command
 from grab import Grab
-from models.loyalty import Loyalty
+from models.payment_loyalty import PaymentLoyalty
 from models.person_event import PersonEvent
 from models.likes_stack import LikesStack
 from models.soc_token import SocToken
@@ -23,8 +23,8 @@ class CheckLikes(Command):
         lStack = LikesStack.query.filter().all()
 
         for stackItem in lStack:
-            url = Loyalty.get_action_link(stackItem.loyalty_id)
-            action = Loyalty.query.get(stackItem.loyalty_id)
+            url = PaymentLoyalty.get_action_link(stackItem.loyalty_id)
+            action = PaymentLoyalty.query.get(stackItem.loyalty_id)
 
             if len(url):
                 socToken = SocToken.query.get(stackItem.token_id)

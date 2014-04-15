@@ -1,11 +1,11 @@
-{% extends "term/page.html" %}
+{% extends "term/report/page.html" %}
 
 {% block content %}
 <span ng-init="report_stack.id={{report_stack.id}};"></span>
 <h2 class="g-color-blue m-page-name">{{report_stack.name}}
     <div ng-controller="ReportController">
         <div class="right">
-            <a ng-click="removeReport({{report_stack.id}})" 
+            <a ng-click="removeReport({{report_stack.id}})"
                 class="f-spot-button bg-red small">
                 Удалить
             </a>
@@ -20,12 +20,8 @@
     <section class="section active">
         <p class="title"><a>Редактировать</a></p>
         <div class="content">
-        {% include 'term/report/form.html' %} 
+        {% include 'term/report/_form.html' %}
         </div>
     </section>
 </div>
 {% endblock %}
-{% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/controllers/report.js"></script>
-{{ super() }}
-{% endblock %} 

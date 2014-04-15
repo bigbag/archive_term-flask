@@ -3,7 +3,7 @@
         <span ng-init="report_stack.id='{{report_stack.id |replace("None", 0)}}'"></span>
         <div class="content-row">
             <label for="add-name">Название*</label>
-            <input id="add-name" 
+            <input id="add-name"
                 type="text"
                 name="name"
                 ng-maxlength="300"
@@ -14,31 +14,39 @@
         </div>
         <div class="content-row">
             <label for="interval-report">Как часто отсылать отчет</label>
-            <select id="interval-report" 
+            <select id="interval-report"
                 class="medium"
                 ng-init="report_stack.interval={{report_stack.interval}}"
                 ng-model="report_stack.interval"
                 required>
                 {% for row in interval_list %}
-                <option 
-                    {% if row.id == report_stack.interval %} selected {% endif %} 
+                <option
+                    {% if row.id == report_stack.interval %} selected {% endif %}
                     value="{{row.id}}">
                     {{row.name}}
                 </option>
                 {% endfor %}
             </select>
         </div>
+        <div class="content-row g-clearfix" ng-hide="report_stack.interval">
+            <label for="add-name">Интервал</label>
+            <div class="f-datepicker">
+                <input type="text"
+                    name="reservation"
+                    id="report_interval">
+            </div>
+        </div>
         <div class="content-row">
             <label for="add-email">E-mail*</label>
-            <input id="add-email" 
-                type="email" 
-                placeholder="E-mail" 
+            <input id="add-email"
+                type="email"
+                placeholder="E-mail"
                 class="left"
                 ng-keypress="($event.keyCode == 13)?addEmailInStack(report_stack):''"
                 ng-model="report_stack.curent_email"
                 ng-class="{error: error.curent_email}"
                 >
-            <a class="f-spot-button" 
+            <a class="f-spot-button"
                 ng-click="addEmailInStack(report_stack)">
                 Добавить
             </a>
@@ -53,14 +61,14 @@
             </div>
          <div class="content-row">
             <label for="type-report">Отчет по</label>
-            <select id="type-report" 
+            <select id="type-report"
                 class="medium"
                 ng-init="report_stack.type={{report_stack.type}}"
                 ng-model="report_stack.type"
                 required>
                 {% for row in type_list %}
-                <option 
-                    {% if row.id == report_stack.type %} selected {% endif %} 
+                <option
+                    {% if row.id == report_stack.type %} selected {% endif %}
                     value="{{row.id}}">
                     {{row.name}}
                 </option>
@@ -69,14 +77,14 @@
         </div>
         <div class="content-row">
             <label for="excel-report">Добавить к письму файл с выгрузкой в Excel?</label>
-            <select id="excel-report" 
+            <select id="excel-report"
                 class="medium"
                 ng-init="report_stack.excel={{report_stack.excel}}"
                 ng-model="report_stack.excel"
                 required>
                 {% for row in excel_list %}
-                <option 
-                    {% if row.id == report_stack.excel %} selected {% endif %} 
+                <option
+                    {% if row.id == report_stack.excel %} selected {% endif %}
                     value="{{row.id}}">
                     {{row.name}}
                 </option>
