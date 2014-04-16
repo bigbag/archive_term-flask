@@ -70,20 +70,19 @@ class ReportSenderTask (object):
         if not result.data:
             return False
 
-        if result.all['summ'] == 0:
-            return False
+        if result.all['summ'] != 0:
 
-        if task.excel == ReportStack.EXCEL_YES:
-            attach = getattr(sender_task, "_get_%s_xls" % result.type['meta'])(result)
+            if task.excel == ReportStack.EXCEL_YES:
+                attach = getattr(sender_task, "_get_%s_xls" % result.type['meta'])(result)
 
-        emails = task.decode_field(task.emails)
-        for email in emails:
-            mail.send.delay(
-                ReportMessage,
-                to=email,
-                attach=attach,
-                result=result,
-                template=result.type['meta'])
+            emails = task.decode_field(task.emails)
+            for email in emails:
+                mail.send.delay(
+                    ReportMessage,
+                    to=email,
+                    attach=attach,
+                    result=result,
+                    template=result.type['meta'])
 
         task.launch_date = date_helper.get_curent_date()
         if task.interval == ReportStack.INTERVAL_ONCE:
