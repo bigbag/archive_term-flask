@@ -7,9 +7,9 @@
     {% set data = result.data %}
      {% set persons = result.persons %}
     <h2 style="color: #0062ff;font-size:1em;">
-        {{result.firm_name}}<br />
-        {{result.type_name}}<br /> 
-        {{result.interval_name}} отчет, {{ result.interval }}
+        {{result.firm.name}}<br />
+        {{result.type['templ_name']}}<br />
+        {{result.interval['templ_name']}} отчет, {{ result.interval['templ_interval'] }}
     </h2>
     <table  cellpadding="5" cellspacing="0" border="1" >
         <thead>
@@ -29,7 +29,7 @@
             {% endfor %}
             <tr>
                 <td colspan="5"><strong>Итого</strong></td>
-                <td><strong>{{ result.all_summ }}</strong></td>
+                <td><strong>{{ result.all['summ'] }}</strong></td>
             </tr>
         </tbody>
     </table>

@@ -128,12 +128,12 @@ class TestCommand(Command):
 
                 try_wallet.balance = int(
                     try_wallet.balance) - int(
-                        history.amount)
+                    history.amount)
                 try_wallet.save()
 
                 false_wallet.balance = int(
                     try_wallet.balance) + int(
-                        history.amount)
+                    history.amount)
 
                 false_wallet.save()
 
@@ -183,8 +183,4 @@ class TestCommand(Command):
                 wallet.save()
 
     def run(self):
-        from web.tasks.report_send import ReportSenderTask
-
-        results = ReportSenderTask.report_manager(2)
-
-        print results
+        return '1'
