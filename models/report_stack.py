@@ -116,10 +116,10 @@ class ReportStack(db.Model, BaseModel):
             self.TYPE_MONEY: 'money',
         }
 
-    def get_type_meta(self):
+    def get_type_meta(self, type):
         type_meta = self.type_meta()
-        if self.type in type_meta:
-            return type_meta[self.type]
+        if type in type_meta:
+            return type_meta[type]
         return False
 
     def get_excel_list(self):
@@ -141,7 +141,7 @@ class ReportStack(db.Model, BaseModel):
 
         query = ReportStack.query.filter(
             ReportStack.firm_id == firm_id).filter(
-                ReportStack.interval != self.INTERVAL_ONCE)
+            ReportStack.interval != self.INTERVAL_ONCE)
         query = query.order_by(order)
         report_stacks = query.paginate(page, limit, False).items
 
