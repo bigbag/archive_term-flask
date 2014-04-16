@@ -68,10 +68,10 @@ def get_timezone(tzname):
 def get_date_interval(search_date, period='day'):
 
     search_date = search_date.date()
-    if period == 'day':
-        start = search_date
-        stop = search_date + timedelta(days=1)
-    elif period == 'week':
+    start = search_date
+    stop = search_date + timedelta(days=1)
+
+    if period == 'week':
         day_of_week = search_date.weekday()
         start_delta = timedelta(days=day_of_week)
         start = search_date - start_delta

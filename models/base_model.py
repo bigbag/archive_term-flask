@@ -29,7 +29,7 @@ class BaseModel(object):
         return True
 
     def encode_field(self, data):
-        if not isinstance(data, str):
+        if not isinstance(data, (str, unicode)):
             data = str(json.dumps(data))
         return data
 
@@ -37,7 +37,7 @@ class BaseModel(object):
         if not self.is_json(data):
             return data
 
-        if isinstance(data, str):
+        if isinstance(data, (str, unicode)):
             data = json.loads(data)
         return data
 

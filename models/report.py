@@ -136,7 +136,7 @@ class Report(db.Model, BaseModel):
 
             corp_wallet.balance = int(
                 corp_wallet.balance) - int(
-                    self.amount)
+                self.amount)
             corp_wallet.save()
 
             # Блокируем возможность платежей через корпоративный кошелек
@@ -282,7 +282,7 @@ class Report(db.Model, BaseModel):
                     date=creation_date.strftime(date_pattern),
                     event=events[
                         row.event_id] if events[
-                            row.event_id] else 'Empty',
+                        row.event_id] else 'Empty',
                     amount=float(row.amount) / 100,
                     name=row.name,
                 )
@@ -347,6 +347,12 @@ class Report(db.Model, BaseModel):
 
     def format_search_date(self, search_date):
         date_pattern = self.get_date_pattern()
+
+        if isinstance(search_date, (tuple)):
+            interval = (
+                search_date[0].strftime('%d.%m.%Y'),
+                search_date[1].strftime('%d.%m.%Y'))
+            return '%s - %s' % interval
 
         if self.period == 'week':
             interval = date_helper.get_date_interval(
