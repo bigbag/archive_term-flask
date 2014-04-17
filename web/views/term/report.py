@@ -88,7 +88,6 @@ def report_create_new():
         answer['message'] = u'Такой отчет уже есть в списке активных'
         return jsonify(answer)
 
-    report_stack.encode_emails()
     if report_stack.save():
         answer['error'] = 'no'
         answer['message'] = u'Отчет сохранен'

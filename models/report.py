@@ -115,7 +115,6 @@ class Report(db.Model, BaseModel):
         self = self.get_db_view(card_node)
 
         old_report = self.get_by_params()
-
         if old_report:
             return error
 
@@ -128,7 +127,7 @@ class Report(db.Model, BaseModel):
         person = Person.query.get(self.person_id)
 
         # Если человек имеет корпоративный кошелек, обновляем его баланс
-        if person and person.type == Person.TYPE_WALLET:
+        if person and person.wallet_status == Person.STATUS_VALID and person.type == Person.TYPE_WALLET:
             self.corp_type = self.CORP_TYPE_ON
             corp_wallet = TermCorpWallet.query.filter_by(
                 person_id=person.id).first()
@@ -137,7 +136,7 @@ class Report(db.Model, BaseModel):
 
             corp_wallet.balance = int(
                 corp_wallet.balance) - int(
-                    self.amount)
+                self.amount)
             corp_wallet.save()
 
             # Блокируем возможность платежей через корпоративный кошелек
@@ -283,7 +282,7 @@ class Report(db.Model, BaseModel):
                     date=creation_date.strftime(date_pattern),
                     event=events[
                         row.event_id] if events[
-                            row.event_id] else 'Empty',
+                        row.event_id] else 'Empty',
                     amount=float(row.amount) / 100,
                     name=row.name,
                 )
@@ -349,6 +348,12 @@ class Report(db.Model, BaseModel):
     def format_search_date(self, search_date):
         date_pattern = self.get_date_pattern()
 
+        if isinstance(search_date, (tuple)):
+            interval = (
+                search_date[0].strftime('%d.%m.%Y'),
+                search_date[1].strftime('%d.%m.%Y'))
+            return '%s - %s' % interval
+
         if self.period == 'week':
             interval = date_helper.get_date_interval(
                 search_date, self.period)
@@ -402,11 +407,27 @@ class Report(db.Model, BaseModel):
 
         return value
 
+    def term_query(self, interval):
+        query = db.session.query(
+            Report.term_id,
+            func.count(Report.id),
+            func.sum(Report.amount).label("summ1"))
+
+        query = query.filter(Report.type == Report.TYPE_WHITE)
+        query = query.filter(
+            (Report.term_firm_id == self.firm_id) | (Report.person_firm_id == self.firm_id))
+        query = query.filter(
+            Report.creation_date.between(interval[0], interval[1]))
+
+        query = query.group_by(Report.term_id)
+        query = query.order_by('summ1 desc')
+        return query
+
     def person_query(self, interval):
         query = db.session.query(
             Report.person_id,
             func.sum(Report.amount),
-            Report.term_id,)
+            Report.term_id)
 
         query = query.filter(Report.corp_type == Report.CORP_TYPE_ON)
         query = query.filter(Report.person_firm_id == self.firm_id)

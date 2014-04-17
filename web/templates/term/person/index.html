@@ -1,33 +1,29 @@
-{% extends "term/page.html" %}
+{% extends "term/person/page.html" %}
 
 {% block content %}
 <h2 class="g-color-blue m-page-name">Люди</h2>
 <span ng-init="search.limit=20;search.action_type='get_grid_content';search.status=1"></span>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="" ng-controller="PersonController">
-    <section class="section active">    
+    <section class="section active">
         <p class="title">
             <a ng-click="search.status=1">Активные</a>
         </p>
-        <div class="content">{% include 'term/person/list.html' %}</div>
+        <div class="content">{% include 'term/person/_list.html' %}</div>
     </section>
     <section class="section">
         <p class="title">
             <a ng-click="search.status=0">Заблокированные</a>
         </p>
-        <div class="content">{% include 'term/person/list.html' %}</div>
+        <div class="content">{% include 'term/person/_list.html' %}</div>
     </section>
     <section class="section">
         <p class="title">
             <a>Добавить</a>
         </p>
         <div class="content">
-            {% include 'term/person/form.html' %}
+            {% include 'term/person/_form.html' %}
             {% include 'term/person/import.html' %}
         </div>
     </section>
 </div>
 {% endblock %}
-{% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/controllers/person.js"></script>   
-{{ super() }}
-{% endblock %} 

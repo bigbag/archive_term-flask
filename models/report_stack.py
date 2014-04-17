@@ -55,7 +55,7 @@ class ReportStack(db.Model, BaseModel):
 
     def get_interval_list(self):
         return [
-            # {'id': self.INTERVAL_ONCE, 'name': u"Один раз"},
+            {'id': self.INTERVAL_ONCE, 'name': u"Один раз"},
             {'id': self.INTERVAL_DAY, 'name': u"Ежедневно"},
             {'id': self.INTERVAL_WEEK, 'name': u"Еженедельно"},
             {'id': self.INTERVAL_MONTH, 'name': u"Ежемесячно"}
@@ -77,7 +77,7 @@ class ReportStack(db.Model, BaseModel):
 
     def get_sender_interval_list(self):
         return {
-            self.INTERVAL_ONCE: u"Однократный",
+            self.INTERVAL_ONCE: u"Разовый",
             self.INTERVAL_DAY: u"Ежедневный",
             self.INTERVAL_WEEK: u"Еженедельный",
             self.INTERVAL_MONTH: u"Ежемесячный"
@@ -116,10 +116,10 @@ class ReportStack(db.Model, BaseModel):
             self.TYPE_MONEY: 'money',
         }
 
-    def get_type_meta(self):
+    def get_type_meta(self, type):
         type_meta = self.type_meta()
-        if self.type in type_meta:
-            return type_meta[self.type]
+        if type in type_meta:
+            return type_meta[type]
         return False
 
     def get_excel_list(self):
@@ -141,7 +141,7 @@ class ReportStack(db.Model, BaseModel):
 
         query = ReportStack.query.filter(
             ReportStack.firm_id == firm_id).filter(
-                ReportStack.interval != self.INTERVAL_ONCE)
+            ReportStack.interval != self.INTERVAL_ONCE)
         query = query.order_by(order)
         report_stacks = query.paginate(page, limit, False).items
 
@@ -163,12 +163,6 @@ class ReportStack(db.Model, BaseModel):
         )
         return value
 
-    def decode_emails(self):
-        self.emails = json.loads(self.emails)
-
-    def encode_emails(self):
-        self.emails = str(json.dumps(self.emails))
-
     def set_check_summ(self):
         data = [
             str(self.firm_id),
@@ -184,9 +178,8 @@ class ReportStack(db.Model, BaseModel):
         if not self.check_summ:
             self.check_summ = self.set_check_summ()
 
-        if not self.id:
-            self.emails = str(json.dumps(self.emails))
+        self.emails = self.encode_field(self.emails)
 
-        if self.details and not isinstance(self.emails, str):
-            self.details = str(json.dumps(self.details))
+        if self.details:
+            self.details = self.encode_field(self.details)
         return BaseModel.save(self)

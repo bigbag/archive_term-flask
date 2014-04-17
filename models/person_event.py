@@ -12,7 +12,7 @@ import json
 from web import db
 
 from models.base_model import BaseModel
-from models.loyalty import Loyalty
+from models.payment_loyalty import PaymentLoyalty
 from models.payment_wallet import PaymentWallet
 from models.person import Person
 
@@ -59,7 +59,7 @@ class PersonEvent(db.Model, BaseModel):
 
     @staticmethod
     def add_by_user_loyalty_id(user_id, loyalty_id):
-        loyalty = Loyalty.query.filter_by(
+        loyalty = PaymentLoyalty.query.filter_by(
             id=loyalty_id).first()
         wallet = PaymentWallet.query.filter_by(
             user_id=user_id).first()

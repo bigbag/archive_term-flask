@@ -20,8 +20,8 @@ class ReportMessage(Message):
                 raise KeyError(msg)
         title = u"Отчет"
         result = kwargs['result']
-        if result.interval and result.firm_name:
-            title = 'Отчет, %s' % result.interval
+        if result.interval and result.firm.name:
+            title = 'Отчет, %s' % result.interval['templ_interval']
         Message.__init__(self, title)
 
         result = kwargs['result']

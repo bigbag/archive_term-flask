@@ -10,16 +10,16 @@
             </hgroup>
             <input
                 name="email"
-                type="email" 
+                type="email"
                 placeholder="Email"
                 ng-model="user.email"
                 ng-keypress="($event.keyCode == 13)?login(user, signForm.$valid):''"
                 maxlength="300"
                 ng-class="{error: error.email}"
                 required >
-            <input 
+            <input
                 name="password"
-                type="password" 
+                type="password"
                 placeholder="Пароль"
                 ng-model="user.password"
                 ng-keypress="($event.keyCode == 13)?login(user, signForm.$valid):''"
@@ -43,5 +43,5 @@
 {% endblock %}
 
 {% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/controllers/user.js"></script>  
+<script type="text/javascript" src="/static/term/angular/term/controllers/user.js"></script>
 {% endblock %}

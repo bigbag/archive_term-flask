@@ -1,4 +1,4 @@
-{% extends "term/page.html" %}
+{% extends "term/terminal/page.html" %}
 
 {% block content %}
 <span ng-init="term.id={{term.id}};term.status={{term.status}}"></span>
@@ -7,17 +7,17 @@
         {{term.name}}
         {% if term_access %}
         <div class="right">
-            <a ng-click="removeTerminal(term)" 
+            <a ng-click="removeTerminal(term)"
                 class="f-spot-button bg-red small">
                 Удалить
             </a>
-            <a ng-show="term.status" 
-                ng-click="lockingTerminal(term)" 
+            <a ng-show="term.status"
+                ng-click="lockingTerminal(term)"
                 class="f-spot-button small">
                 Заблокировать
             </a>
-            <a ng-hide="term.status" 
-                ng-click="lockingTerminal(term)" 
+            <a ng-hide="term.status"
+                ng-click="lockingTerminal(term)"
                 class="f-spot-button small">
                 Разблокировать
             </a>
@@ -33,7 +33,7 @@
     <section class="section active">
         <p class="title"><a>Информация</a></p>
         <div class="content">
-            {% include 'term/terminal/info.html' %}            
+            {% include 'term/terminal/_info.html' %}
         </div>
     </section>
     {% if term_access %}
@@ -42,7 +42,7 @@
             <a>Аренда</a>
         </p>
         <div class="content">
-            {% include 'term/terminal/rent.html' %}
+            {% include 'term/terminal/_rent.html' %}
         </div>
     </section>
     <section class="section">
@@ -50,13 +50,9 @@
             <a>Редактировать</a>
         </p>
         <div class="content">
-            {% include 'term/terminal/form.html' %}
+            {% include 'term/terminal/_form.html' %}
         </div>
     </section>
     {% endif %}
 </div>
 {% endblock %}
-{% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/controllers/terminal.js"></script> 
-{{ super() }}
-{% endblock %} 

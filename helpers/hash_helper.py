@@ -79,7 +79,11 @@ def get_isin_checksum(isin):
     # then add each single int in both odd and even
     odd_sum = sum([int(i) for i in odd])
     mod = (even_sum + odd_sum) % 10
-    return 10 - mod
+
+    result = 10 - mod
+    if result == 10:
+        result = 0
+    return result
 
 
 def get_api_sign(secret, data):

@@ -25,11 +25,11 @@
             <a id="event" class="loc-link f-spot-button small">
                 + Добавить событие
             </a>
-            
+
         </div>
     </div>
     <div id="eventForm" class="slide-box slide-setting">
-        {% include 'term/terminal/event_form.html' %}
+        {% include 'term/terminal/_event_form.html' %}
     </div>
     {% endif %}
     <table class="m-spot-table">
@@ -43,7 +43,7 @@
         </thead>
         <tbody>
             {% for term_event in term_events %}
-            <tr 
+            <tr
                 {% if term_access %}
                     ng-click="getTermEventEdit({{term_event.term_id}}, {{term_event.id}})"
                 {% endif %}

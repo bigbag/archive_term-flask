@@ -1,10 +1,10 @@
-{% extends "term/page.html" %}
+{% extends "term/report/page.html" %}
 
 {% block content %}
 <h2 class="g-color-blue m-page-name">Отчеты</h2>
 <span ng-init="search.limit=20;search.action_type='get_grid_content'"></span>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
-    <section class="section active">    
+    <section class="section active">
         <p class="title">
             <a>Активные</a>
         </p>
@@ -34,9 +34,9 @@
                     </tr>
                     <tr class="m-table-bottom" ng-show="search.page_count">
                         <td colspan="10">
-                            <ui-pagination 
-                                cur="pagination.cur" 
-                                total="pagination.total" 
+                            <ui-pagination
+                                cur="pagination.cur"
+                                total="pagination.total"
                                 display="{[{pagination.display}]}">
                             </ui-pagination>
                         </td>
@@ -45,7 +45,7 @@
             </table>
         </div>
     </section>
-    <section class="section active">    
+    <section class="section active">
         <p class="title">
             <a>Добавить</a>
         </p>
@@ -53,7 +53,7 @@
             <div class="content-row">
                 <p class="m-hint">Здесь вы можете создать новый отчет, который будет выслан вам в течении 5 минут. Или же создать отчет который будет вам высылаться периодически - раз в день, неделю или месяц.</p>
             </div>
-                {% include 'term/report/form.html' %} 
+                {% include 'term/report/_form.html' %}
             <div class="content-row">
                 <p class="m-hint">Вы не можете создать два одинаковых периодических отчета.</p>
             </div>
@@ -61,7 +61,3 @@
     </section>
 </div>
 {% endblock %}
-{% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/controllers/report.js"></script> 
-{{ super() }}
-{% endblock %} 

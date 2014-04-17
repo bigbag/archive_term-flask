@@ -7,7 +7,7 @@
 """
 from libs.socnet.socnet_base import SocnetBase
 from models.soc_token import SocToken
-from models.loyalty import Loyalty
+from models.payment_loyalty import PaymentLoyalty
 from grab import Grab
 import json
 import urllib
@@ -29,7 +29,7 @@ class FoursquareApi(SocnetBase):
         checkin = False
 
         history = self.get_history(token_id)
-        action = Loyalty.query.get(loyalty_id)
+        action = PaymentLoyalty.query.get(loyalty_id)
 
         if 'response' in history and 'venues' in history['response'] and 'items' in history['response']['venues'] and len(history['response']['venues']['items']) > 0 and len(action.data) > 0:
             target = json.loads(action.data)
@@ -43,7 +43,7 @@ class FoursquareApi(SocnetBase):
         is_mayor = False
 
         mayorship = self.get_mayorship(token_id)
-        action = Loyalty.query.get(loyalty_id)
+        action = PaymentLoyalty.query.get(loyalty_id)
 
         if 'response' in mayorship and 'mayorships' in mayorship['response'] and 'items' in mayorship['response']['mayorships'] and len(mayorship['response']['mayorships']['items']) > 0 and len(action.data) > 0:
             target = json.loads(action.data)
