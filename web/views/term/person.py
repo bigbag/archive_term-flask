@@ -5,6 +5,11 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import os
+import cgi
+import xlrd
+import pprint
+from datetime import datetime
 
 from web.views.term.general import *
 
@@ -18,6 +23,10 @@ from models.term_event import TermEvent
 from models.spot import Spot
 from models.payment_wallet import PaymentWallet
 from models.term_corp_wallet import TermCorpWallet
+from werkzeug.utils import secure_filename
+from helpers import request_helper
+
+ALLOWED_EXTENSIONS = set(['xls', 'xlsx'])  # допустимые разширения для импорта
 
 
 @mod.route('/person/<path:action>', methods=['GET'])
@@ -124,6 +133,106 @@ def person_save(person_id):
     return jsonify(answer)
 
 
+@mod.route('/person/parsexls', methods=['POST'])
+@login_required
+@json_headers
+def person_parse_xls():
+    """Получение списка сотрудников из *.xls для импорта"""
+    new_employers = []
+
+    file = request.files['ImportForm[file]']
+    if file and '.' in file.filename and file.filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS:
+        filepath = os.getcwd() + '/uploads/' + secure_filename(file.filename)
+        file.save(filepath)
+
+    book = xlrd.open_workbook(filepath)
+    sh = book.sheet_by_index(0)
+    for i in range(sh.nrows):
+        employer = {}
+        employer['second_name'] = sh.cell_value(rowx=i, colx=0)
+        employer['name'] = sh.cell_value(i, 1)
+        employer['patronymic'] = sh.cell_value(i, 2)
+        employer['card'] = sh.cell_value(i, 3)
+        employer['birthday'] = sh.cell_value(i, 4)
+        employer['tabel_id'] = sh.cell_value(i, 5)
+
+        if sh.cell(i, 4).ctype == 3:  # ctype: 3 => 'xldate' , 1 => 'text'
+            ms_date_number = sh.cell_value(i, 4)
+            year, month, day, hour, minute, second = xlrd.xldate_as_tuple(
+                ms_date_number, book.datemode)
+            py_date = datetime(year, month, day, hour, minute, second)
+            employer['birthday'] = py_date.strftime('%d.%m.%Y')
+
+        new_employers.append(employer)
+
+    if(os.path.exists(filepath)):
+        os.remove(filepath)
+
+    return jsonify(new_employers=new_employers)
+
+
+@mod.route('/person/import', methods=['POST'])
+@login_required
+@json_headers
+def person_import():
+    """Импорт списка сотрудников из json"""
+    answer = dict(error='yes')
+    wrongForms = []
+    wrongCards = []
+    addedForms = 0
+
+    data = json.loads(request.stream.read())
+    employers = data['employers']
+    for json_employer in employers:
+        employer = request_helper.name_together(json_employer)
+
+        if len(employer['birthday']):
+            try:
+                employer['birthday'] = datetime.strptime(
+                    employer['birthday'], '%d.%m.%Y')
+                employer['birthday'] = employer[
+                    'birthday'].strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                wrongForms.append(json_employer)
+                continue
+
+        employer['firm_id'] = g.firm_info['id']
+        employer['csrf_token'] = data['csrf_token']
+        person = Person()
+
+        form = PersonAddForm.from_json(employer)
+        if not form.validate():
+            wrongForms.append(json_employer)
+            continue
+
+        form.populate_obj(person)
+        card = employer['card'] if 'card' in employer else False
+
+        if card:
+            bind_card = set_person_card(card)
+            if not bind_card['wallet']:
+                wrongCards.append(json_employer)
+                person.card = None
+                person.wallet_status = person.STATUS_BANNED
+                person.status = Person.STATUS_BANNED
+            else:
+                wallet = bind_card['wallet']
+                person.payment_id = wallet.payment_id
+                person.hard_id = wallet.hard_id
+
+        if person.save():
+            addedForms = addedForms + 1
+        else:
+            wrongForms.append(json_employer)
+
+    answer['error'] = 'no'
+    answer['wrongForms'] = wrongForms
+    answer['wrongCards'] = wrongCards
+    answer['addedForms'] = addedForms
+
+    return jsonify(answer)
+
+
 @mod.route('/person/<int:person_id>/bind_card', methods=['POST'])
 @login_required
 @json_headers
@@ -158,7 +267,7 @@ def person_bind_card(person_id):
 
 
 def set_person_card(code):
-    answer = dict(error='yes', message='Произошла ошибка', wallet=False)
+    answer = dict(error='yes', message=u'Произошла ошибка', wallet=False)
 
     spot = Spot().get_valid_by_code(code)
     if not spot:
@@ -264,7 +373,6 @@ def person_remove(person_id):
     answer['message'] = u'Операция успешно выполнена'
 
     return jsonify(answer)
-
 
 
 @mod.route('/person/<int:person_id>/event/<int:person_event_id>', methods=['GET'])
