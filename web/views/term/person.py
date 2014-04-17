@@ -162,7 +162,10 @@ def person_parse_xls():
                 ms_date_number, book.datemode)
             py_date = datetime(year, month, day, hour, minute, second)
             employer['birthday'] = py_date.strftime('%d.%m.%Y')
-
+            
+        if sh.cell(i, 5).ctype == 2:
+            employer['tabel_id'] = str(employer['tabel_id']).replace('.0','')
+            
         new_employers.append(employer)
 
     if(os.path.exists(filepath)):
@@ -184,8 +187,13 @@ def person_import():
     data = json.loads(request.stream.read())
     employers = data['employers']
     for json_employer in employers:
+        
+        if not(len(json_employer['name']) and len(json_employer['second_name'])):
+            wrongForms.append(json_employer)
+            continue
+            
         employer = request_helper.name_together(json_employer)
-
+        
         if len(employer['birthday']):
             try:
                 employer['birthday'] = datetime.strptime(
@@ -195,7 +203,12 @@ def person_import():
             except ValueError:
                 wrongForms.append(json_employer)
                 continue
-
+        else:
+            del employer['birthday']
+        
+        if not len(employer['tabel_id']):
+            employer['tabel_id'] = None
+        
         employer['firm_id'] = g.firm_info['id']
         employer['csrf_token'] = data['csrf_token']
         person = Person()
@@ -219,7 +232,11 @@ def person_import():
                 wallet = bind_card['wallet']
                 person.payment_id = wallet.payment_id
                 person.hard_id = wallet.hard_id
-
+        else:
+            person.card = None
+            person.wallet_status = person.STATUS_BANNED
+            person.status = Person.STATUS_BANNED
+            
         if person.save():
             addedForms = addedForms + 1
         else:
