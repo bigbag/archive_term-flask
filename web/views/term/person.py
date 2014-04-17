@@ -149,12 +149,17 @@ def person_parse_xls():
     sh = book.sheet_by_index(0)
     for i in range(sh.nrows):
         employer = {}
-        employer['second_name'] = sh.cell_value(rowx=i, colx=0)
-        employer['name'] = sh.cell_value(i, 1)
-        employer['patronymic'] = sh.cell_value(i, 2)
-        employer['card'] = sh.cell_value(i, 3)
+        employer['second_name'] = sh.cell_value(i, 0) if sh.cell(
+            i, 0).ctype == 1 else str(sh.cell_value(i, 0))
+        employer['name'] = sh.cell_value(i, 1) if sh.cell(
+            i, 1).ctype == 1 else str(sh.cell_value(i, 1))
+        employer['patronymic'] = sh.cell_value(i, 2) if sh.cell(
+            i, 2).ctype == 1 else str(sh.cell_value(i, 2))
+        employer['card'] = sh.cell_value(i, 3) if sh.cell(
+            i, 3).ctype == 1 else str(sh.cell_value(i, 3))
         employer['birthday'] = sh.cell_value(i, 4)
-        employer['tabel_id'] = sh.cell_value(i, 5)
+        employer['tabel_id'] = sh.cell_value(i, 5) if sh.cell(
+            i, 5).ctype == 1 else str(sh.cell_value(i, 5))
 
         if sh.cell(i, 4).ctype == 3:  # ctype: 3 => 'xldate' , 1 => 'text'
             ms_date_number = sh.cell_value(i, 4)
@@ -162,10 +167,10 @@ def person_parse_xls():
                 ms_date_number, book.datemode)
             py_date = datetime(year, month, day, hour, minute, second)
             employer['birthday'] = py_date.strftime('%d.%m.%Y')
-            
+
         if sh.cell(i, 5).ctype == 2:
-            employer['tabel_id'] = str(employer['tabel_id']).replace('.0','')
-            
+            employer['tabel_id'] = str(employer['tabel_id']).replace('.0', '')
+
         new_employers.append(employer)
 
     if(os.path.exists(filepath)):
@@ -187,13 +192,13 @@ def person_import():
     data = json.loads(request.stream.read())
     employers = data['employers']
     for json_employer in employers:
-        
+
         if not(len(json_employer['name']) and len(json_employer['second_name'])):
             wrongForms.append(json_employer)
             continue
-            
+
         employer = request_helper.name_together(json_employer)
-        
+
         if len(employer['birthday']):
             try:
                 employer['birthday'] = datetime.strptime(
@@ -205,10 +210,10 @@ def person_import():
                 continue
         else:
             del employer['birthday']
-        
+
         if not len(employer['tabel_id']):
             employer['tabel_id'] = None
-        
+
         employer['firm_id'] = g.firm_info['id']
         employer['csrf_token'] = data['csrf_token']
         person = Person()
@@ -236,7 +241,7 @@ def person_import():
             person.card = None
             person.wallet_status = person.STATUS_BANNED
             person.status = Person.STATUS_BANNED
-            
+
         if person.save():
             addedForms = addedForms + 1
         else:
