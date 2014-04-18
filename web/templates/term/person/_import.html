@@ -29,14 +29,93 @@
         </table>
     </div>
     <div class="content-row g-clearfix">
+    <form enctype="multipart/form-data" action="/person/parsexls">
         <label class="f-spot-button medium" for="ImportForm_file">Загрузить файл</label>
 
-
         <input id="ytImportForm_file" type="hidden" name="ImportForm[file]" value="">
-        <input id="ImportForm_file" class="hide" type="file" name="ImportForm[file]">
-
+        <input id="ImportForm_file" class="hide" type="file" name="ImportForm[file]" onchange="angular.element(this).scope().sendFile(this)">
+    </form>
     </div>
-    <div class="content-row g-clearfix">
-        <a href="#" class="f-spot-button">Сохранить</a>
+    <div class="content-row g-clearfix" ng-show="new_employers.length > 0">
+        <div class="m-table-wrapper">
+            <table>
+                <thead>
+                <tr>
+                    <th class="g-color-red">Фамилия</th>
+                    <th class="g-color-red">Имя</th>
+                    <th>Отчество</th>
+                    <th>Номер&nbsp;карты <br>(8 цифр)</th>
+                    <th>День рождения (дд.мм.гггг)</th>
+                    <th>Табельный номер</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="employer in new_employers">
+                    <td>{[{employer.second_name}]}</td>
+                    <td>{[{employer.name}]}</td>
+                    <td>{[{employer.patronymic}]}</td>
+                    <td>{[{employer.card}]}</td>
+                    <td>{[{employer.birthday}]}</td>
+                    <td>{[{employer.tabel_id}]}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <a ng-click="saveNewEmployers()" class="f-spot-button">Сохранить</a>
+    </div>
+    <h5 class="g-color-blue" ng-show="added_forms > 0">Импортировано строк: {[{added_forms}]}</h5>
+    <div class="content-row g-clearfix" ng-show="wrong_forms.length > 0">
+        <div class="m-table-wrapper">
+            <p class="m-hint g-color-red">Ошибки в формате данных (эти строки не были импортированы):</p>
+            <table>
+                <thead>
+                <tr>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Номер&nbsp;карты <br>(8 цифр)</th>
+                    <th>День рождения (дд.мм.гггг)</th>
+                    <th>Табельный номер</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="employer in wrong_forms">
+                    <td>{[{employer.second_name}]}</td>
+                    <td>{[{employer.name}]}</td>
+                    <td>{[{employer.patronymic}]}</td>
+                    <td>{[{employer.card}]}</td>
+                    <td>{[{employer.birthday}]}</td>
+                    <td>{[{employer.tabel_id}]}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="content-row g-clearfix" ng-show="wrong_cards.length > 0">
+        <div class="m-table-wrapper">
+            <p class="m-hint g-color-red">Ошибки в номере карты (эти строки были импортированы без привязки карты):</p>
+            <table>
+                <thead>
+                <tr>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Номер&nbsp;карты <br>(8 цифр)</th>
+                    <th>День рождения (дд.мм.гггг)</th>
+                    <th>Табельный номер</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="employer in wrong_cards">
+                    <td>{[{employer.second_name}]}</td>
+                    <td>{[{employer.name}]}</td>
+                    <td>{[{employer.patronymic}]}</td>
+                    <td>{[{employer.card}]}</td>
+                    <td>{[{employer.birthday}]}</td>
+                    <td>{[{employer.tabel_id}]}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

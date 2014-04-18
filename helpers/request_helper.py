@@ -45,3 +45,29 @@ def make_request(url, parse_json):
         answer = json.loads(answer)
 
     return answer
+
+
+def name_together(person):
+    new_person = person.copy()
+    if 'name' in new_person and 'second_name' in new_person and 'patronymic' in new_person:
+        fullName = new_person['second_name'] if len(
+            new_person['second_name']) else u''
+
+        if len(fullName):
+            fullName = fullName + u' ' + \
+                new_person['name'] if len(new_person['name']) else fullName
+        elif len(new_person['name']):
+            fullName = new_person['name']
+
+        if len(fullName):
+            fullName = fullName + u' ' + \
+                new_person['patronymic'] if len(
+                    new_person['patronymic']) else fullName
+        elif len(new_person['patronymic']):
+            fullName = new_person['patronymic']
+
+        new_person['name'] = fullName
+        del new_person['second_name']
+        del new_person['patronymic']
+
+    return new_person
