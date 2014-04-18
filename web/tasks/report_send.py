@@ -67,10 +67,7 @@ class ReportSenderTask (object):
             return False
 
         result = getattr(sender_task, "_get_%s" % result.type['meta'])(result)
-        if not result.data:
-            return False
-
-        if result.all['summ'] != 0:
+        if result.data and result.all['summ'] != 0:
 
             if task.excel == ReportStack.EXCEL_YES:
                 attach = getattr(sender_task, "_get_%s_xls" % result.type['meta'])(result)
@@ -84,10 +81,10 @@ class ReportSenderTask (object):
                     result=result,
                     template=result.type['meta'])
 
-        task.launch_date = date_helper.get_curent_date()
         if task.interval == ReportStack.INTERVAL_ONCE:
             task.delete()
         else:
+            task.launch_date = date_helper.get_curent_date()
             task.save()
 
         return True
