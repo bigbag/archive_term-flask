@@ -81,11 +81,11 @@ class ReportSenderTask (object):
                     result=result,
                     template=result.type['meta'])
 
-        # if task.interval == ReportStack.INTERVAL_ONCE:
-        #     task.delete()
-        # else:
-        #     task.launch_date = date_helper.get_curent_date()
-        #     task.save()
+        if task.interval == ReportStack.INTERVAL_ONCE:
+            task.delete()
+        else:
+            task.launch_date = date_helper.get_curent_date()
+            task.save()
 
         return True
 
