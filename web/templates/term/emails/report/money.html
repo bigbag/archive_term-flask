@@ -1,47 +1,26 @@
-<div bgcolor="#ffffff" style="padding:30px 0;margin:0; font-family:Arial, sans-serif;font-size:12pt;">
-<div style="padding-left:30px">
-    <img src="http://mobispot.com/themes/mobispot/images/mail/mobispot.png"/>
-</div>
-<br /><br />
-<div>
-    {% set data = result.data %}
-    {% set terms = result.terms %}
-    <h2 style="color: #0062ff;font-size:1em;">
-        {{result.firm.name}}<br />
-        {{result.type['templ_name']}}<br />
-        {{result.interval['templ_name']}} отчет, {{ result.interval['templ_interval'] }}
-    </h2>
-    <table  cellpadding="5" cellspacing="0" border="1" >
-        <thead>
-            <tr>
-                {% for key in result.col_keys %}
-                <th>{{ result.col_name[key] }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for key in  terms %}
-            <tr>
-                {% for col_key in result.col_keys %}
-                <td>{{ data[key][col_key] }}</td>
-                {% endfor %}
-            </tr>
+{% extends "term/emails/report/base.html" %}
+{% block body %}
+<table  cellpadding="5" cellspacing="0" border="1" >
+    <thead>
+        <tr>
+            {% for key in result.col_keys %}
+            <th>{{ result.col_name[key] }}</th>
             {% endfor %}
-            <tr>
-                <td><strong>Итого</strong></td>
-                <td><strong>{{ result.all['count'] }}</strong></td>
-                <td><strong>{{ result.all['summ'] }}</strong></td>
-            </tr>
-        </tbody>
-    </table>
-
-
-</div>
-<table style="margin-top:40px; width:660px; padding:0 30px" >
-    <tr>
-        <td rowspan="2" style="text-align:left;align:left;">&copy; Mobispot. Ltd. All rights reserved<br>
-            sales@mobispot.com<br>
-        </td>
-    </tr>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key in  terms %}
+        <tr>
+            {% for col_key in result.col_keys %}
+            <td>{{ data[key][col_key] }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        <tr>
+            <td><strong>Итого</strong></td>
+            <td><strong>{{ result.all['count'] }}</strong></td>
+            <td><strong>{{ result.all['summ'] }}</strong></td>
+        </tr>
+    </tbody>
 </table>
-</div>
+{% endblock %}
