@@ -81,11 +81,11 @@ class ReportSenderTask (object):
                     result=result,
                     template=result.type['meta'])
 
-        if task.interval == ReportStack.INTERVAL_ONCE:
-            task.delete()
-        else:
-            task.launch_date = date_helper.get_curent_date()
-            task.save()
+        # if task.interval == ReportStack.INTERVAL_ONCE:
+        #     task.delete()
+        # else:
+        #     task.launch_date = date_helper.get_curent_date()
+        #     task.save()
 
         return True
 
@@ -158,11 +158,11 @@ class ReportSenderTask (object):
 
         return file_name
 
-    def _get_person(self, result):
-        '''Формируем отчет за день, неделю, месяц по пользователям с корпоративными кошельками'''
+    def _get_corp(self, result):
+        '''Формируем отчет по пользователям с корпоративными кошельками'''
 
-        result.col_keys = ReportResult.get_person_keys()
-        result.col_name = ReportResult.get_person_col_name()
+        result.col_keys = ReportResult.get_corp_keys()
+        result.col_name = ReportResult.get_corp_col_name()
 
         persons = Person().get_dict_by_firm_id(result.firm.id)
         corp_wallets = TermCorpWallet().get_dict_by_firm_id(
@@ -201,7 +201,7 @@ class ReportSenderTask (object):
 
         return result
 
-    def _get_person_xls(self, result):
+    def _get_corp_xls(self, result):
         file_name = result.get_report_file()
         if not file_name:
             return False
@@ -245,8 +245,9 @@ class ReportSenderTask (object):
 
             row += 1
 
+        print result.all['summ']
         worksheet.write(row, 0, u'Итого', bold)
-        worksheet.write(row, 5, result.all['summ'], bold)
+        worksheet.write(row, len(result.col_keys)-1, result.all['summ'], bold)
 
         col = len(result.col_name)
         # Блок с разбивкой расходов по терминалам
@@ -268,8 +269,57 @@ class ReportSenderTask (object):
             col += 1
         return file_name
 
+    def _get_person(self, result):
+        '''Формируем отчет по всем пользователям из белого списка'''
+
+        result.col_keys = ReportResult.get_person_keys()
+        result.col_name = ReportResult.get_person_col_name()
+
+        persons = Person().get_dict_by_firm_id(result.firm.id)
+
+        for row in result.report:
+            result.set_terms(row[2])
+            if row.person_id not in result.persons:
+                result.persons.append(row.person_id)
+
+            if row[0] not in result.data:
+                if row[0] in persons:
+                    result.data[row[0]] = dict(
+                        amount=0,
+                        name=persons[row[0]]['name'],
+                        tabel_id=persons[row[0]]['tabel_id'],
+                        card=persons[row[0]]['card']
+                    )
+                else:
+                    result.data[row[0]] = dict(
+                        amount=0,
+                        name=row[3],
+                        tabel_id=0,
+                        card=0
+                    )
+
+            data = result.data[row[0]]
+
+            amount = row[1] / 100
+            data['amount'] = data['amount'] + amount
+
+            result.all['summ'] += amount
+            result.terms[row[2]]['amount'] = result.terms[
+                row[2]]['amount'] + amount
+
+            if 'term' not in data:
+                data['term'] = {}
+            data['term'][row[2]] = row[1] / 100
+
+            result.data[row[0]] = data
+
+        return result
+
+    def _get_person_xls(self, result):
+        return self._get_corp_xls(result)
+
     def _get_term(self, result):
-        '''Формируем отчет за день, неделю, месяц по терминалам'''
+        '''Формируем отчет по терминалам'''
         return self._get_money(result)
 
     def _get_term_xls(self, result):
