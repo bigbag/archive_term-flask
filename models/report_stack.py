@@ -30,9 +30,10 @@ class ReportStack(db.Model, BaseModel):
     INTERVAL_WEEK = 2
     INTERVAL_MONTH = 3
 
-    TYPE_PERSON = 0
+    TYPE_CORP = 0
     TYPE_TERM = 1
     TYPE_MONEY = 2
+    TYPE_PERSON = 3
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), nullable=False)
@@ -91,16 +92,18 @@ class ReportStack(db.Model, BaseModel):
 
     def get_type_list(self):
         return [
-            {'id': self.TYPE_PERSON, 'name': u"По людям"},
+            {'id': self.TYPE_CORP, 'name': u"По корп. кошелькам"},
             {'id': self.TYPE_TERM, 'name': u"По терминалам"},
-            {'id': self.TYPE_MONEY, 'name': u"Личным расходам"}
+            {'id': self.TYPE_MONEY, 'name': u"Личным расходам"},
+            {'id': self.TYPE_PERSON, 'name': u"По людям"},
         ]
 
     def get_sender_type_list(self):
         return {
-            self.TYPE_PERSON: u"Корпоративный, люди",
+            self.TYPE_CORP: u"Корпоративный, кошельки",
             self.TYPE_TERM: u"Корпоративный, терминалы",
             self.TYPE_MONEY: u"Личные расходы",
+            self.TYPE_PERSON: u"Корпоративный, люди",
         }
 
     def get_sender_type_name(self, type):
@@ -111,9 +114,10 @@ class ReportStack(db.Model, BaseModel):
 
     def type_meta(self):
         return {
-            self.TYPE_PERSON: 'person',
+            self.TYPE_CORP: 'corp',
             self.TYPE_TERM: 'term',
             self.TYPE_MONEY: 'money',
+            self.TYPE_PERSON: 'person',
         }
 
     def get_type_meta(self, type):

@@ -94,7 +94,7 @@ class ReportResult(object):
         return getattr(report, report_query_name)(self.interval['search']).all()
 
     @staticmethod
-    def get_person_keys():
+    def get_corp_keys():
         return (
             'name',
             'tabel_id',
@@ -105,6 +105,23 @@ class ReportResult(object):
 
     @staticmethod
     def get_person_col_name():
+        return dict(
+            name=u'ФИО',
+            tabel_id=u'Таб. номер',
+            card=u'Карта',
+            amount=u'Итого, руб.'
+        )
+
+    @staticmethod
+    def get_person_keys():
+        return (
+            'name',
+            'tabel_id',
+            'card',
+            'amount')
+
+    @staticmethod
+    def get_corp_col_name():
         return dict(
             name=u'ФИО',
             tabel_id=u'Таб. номер',
