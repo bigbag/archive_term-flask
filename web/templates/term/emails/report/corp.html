@@ -9,7 +9,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for key in  result.terms %}
+        {% for key in  result.persons %}
         <tr>
             {% for col_key in result.col_keys %}
             <td>{{ data[key][col_key] }}</td>
@@ -17,8 +17,7 @@
         </tr>
         {% endfor %}
         <tr>
-            <td><strong>Итого</strong></td>
-            <td><strong>{{ result.all['count'] }}</strong></td>
+            <td colspan="{{ result.col_keys|length - 1 }}"><strong>Итого</strong></td>
             <td><strong>{{ result.all['summ'] }}</strong></td>
         </tr>
     </tbody>
