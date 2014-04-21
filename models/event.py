@@ -8,7 +8,7 @@
 from web import db, cache
 
 from models.base_model import BaseModel
-from models.term import Term
+from models.event_type import EventType
 
 
 class Event(db.Model, BaseModel):
@@ -23,17 +23,9 @@ class Event(db.Model, BaseModel):
     def get_by_key(self, key):
         return self.query.filter_by(key=key).first()
 
-    def get_events(self, type=-1):
-        if Term.TYPE_POS == type:
-            return Event.query.filter(Event.key.in_(Term.EVENTS_POS))
-        elif Term.TYPE_VENDING == type:
-            return Event.query.filter(Event.key.in_(Term.EVENTS_VENDING))
-        else:
-            return Event.query.all()
-
-    @cache.cached(timeout=600, key_prefix='all_events_list')
-    def get_events_list(self):
-        events = Event().get_events()
+    @cache.cached(timeout=600, key_prefix='all_events_dict')
+    def get_dict(self):
+        events = Event.query.all()
         result = {}
         for event in events:
             result[event.id] = event.name

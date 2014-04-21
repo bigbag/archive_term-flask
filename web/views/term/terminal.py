@@ -13,6 +13,7 @@ from web.form.term.event import TermEventAddForm
 from models.term import Term
 from models.report import Report
 from models.event import Event
+from models.event_type import EventType
 from models.firm import Firm
 from models.firm_term import FirmTerm
 from models.term_event import TermEvent
@@ -88,7 +89,7 @@ def terminal_info(term_id):
     return render_template(
         'term/terminal/view.html',
         term=term,
-        events=Event().get_events(term.type),
+        events=EventType().get_dict(term.type),
         term_event=TermEvent(),
         term_events=term_events,
         term_access=term_access,
@@ -111,10 +112,10 @@ def terminal_rent_info(term_id):
 
     firm_terms = FirmTerm.query.filter(
         FirmTerm.term_id == term.id).filter(
-            FirmTerm.firm_id == g.firm_info[
-                'id']).filter(
-                    FirmTerm.firm_id != FirmTerm.child_firm_id).all(
-                    )
+        FirmTerm.firm_id == g.firm_info[
+            'id']).filter(
+        FirmTerm.firm_id != FirmTerm.child_firm_id).all(
+    )
 
     rents = []
     for row in firm_terms:
@@ -215,10 +216,11 @@ def terminal_save(term_id, action):
 
     id = int(arg['id']) if 'id' in arg else None
 
-    term = Term().get_by_hard_id(arg['hard_id'])
-    if term and term.id and term.id != id:
-        answer['message'] = u'Терминал с таким SN уже есть в системе'
-        return jsonify(answer)
+    if 'hard_id' in arg:
+        term = Term().get_by_hard_id(arg['hard_id'])
+        if term and term.id and term.id != id:
+            answer['message'] = u'Терминал с таким SN уже есть в системе'
+            return jsonify(answer)
 
     term = Term().get_by_id(id)
     if not term:

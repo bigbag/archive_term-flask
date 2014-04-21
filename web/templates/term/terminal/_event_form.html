@@ -1,20 +1,20 @@
 <div class="m-block" ng-controller="TerminalController">
     <form class="custom" name="eventForm">
-        <div class="row" 
+        <div class="row"
             ng-init="term_event.id={{term_event.id|replace("None", 0)}};term_event.term_id={{term.id}}">
             <div class="large-5 columns">
                 <div class="content-row" ng-init="term_event.event_id={{term_event.event_id}}">
                     <label for="type-event">Событие*</label>
-                    <select id="type-event" 
+                    <select id="type-event"
                         class="medium"
                         min="1"
                         ng-model="term_event.event_id"
                         required>
-                        {% for row in events %}
-                        <option 
-                            {% if row.id == term_event.event_id %} selected {% endif %} 
-                            value="{{row.id}}">
-                            {{row.name}}
+                        {% for key in events %}
+                        <option
+                            {% if key == term_event.event_id %} selected {% endif %}
+                            value="{{row}}">
+                            {{events[key]}}
                         </option>
                         {% endfor %}
                     </select>
@@ -24,8 +24,8 @@
         <div class="content-row left g-clearfix"
             ng-init="term_event.start='{{term_event.start}}'">
             <label for="start-time">Начало события (чч:мм)*</label>
-            <input id="start-time" 
-                class="f-input-small" 
+            <input id="start-time"
+                class="f-input-small"
                 type="text"
                 minlength="5"
                 maxlength="5"
@@ -35,8 +35,8 @@
         <div class="content-row g-clearfix"
             ng-init="term_event.stop='{{term_event.stop}}'">
             <label for="stop-time">Конец события (чч:мм)*</label>
-            <input id="stop-time" 
-                class="f-input-small" 
+            <input id="stop-time"
+                class="f-input-small"
                 type="text"
                 minlength="5"
                 maxlength="5"
@@ -47,8 +47,8 @@
         <div class="content-row left g-clearfix"
             ng-init="term_event.min_item={{term_event.min_item}}">
             <label for="min-item">Минимальное значение ячейки*</label>
-            <input id="min-item" 
-                class="f-input-small" 
+            <input id="min-item"
+                class="f-input-small"
                 type="text"
                 minlength="5"
                 maxlength="5"
@@ -58,8 +58,8 @@
         <div class="content-row g-clearfix"
             ng-init="term_event.max_item={{term_event.max_item}}">
             <label for="max-item">Максимальное значение ячейки*</label>
-            <input id="max-item" 
-                class="f-input-small" 
+            <input id="max-item"
+                class="f-input-small"
                 type="text"
                 minlength="6"
                 maxlength="6"
@@ -70,7 +70,7 @@
         <div class="content-row"
             ng-init="term_event.cost='{{term_event.cost / 100}}'">
             <label for="price">Стоимость события руб</label>
-            <input id="price" 
+            <input id="price"
                 type="text"
                 minlength="1"
                 maxlength="7"
@@ -79,10 +79,10 @@
         <div class="content-row g-clearfix"
             ng-init="term_event.timeout={{term_event.timeout}}">
             <label for="time-out">Тайм-аут по умолчанию (в минутах)*</label>
-            <input id="time-out" 
+            <input id="time-out"
                 class="f-input-small left"
                 minlength="1"
-                maxlength="5" 
+                maxlength="5"
                 type="text"
                 ng-model="term_event.timeout"
                 required>
@@ -95,7 +95,7 @@
             <span ng-hide="term_event.id">Добавить</span>
             <span ng-show="term_event.id">Сохранить</span>
         </a>
-        <a ng-show="term_event.id" 
+        <a ng-show="term_event.id"
             ng-click="deleteEventTerminal(term_event)"
             class="f-spot-button bg-red">
             Удалить событие
