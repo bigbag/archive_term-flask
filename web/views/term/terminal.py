@@ -112,10 +112,10 @@ def terminal_rent_info(term_id):
 
     firm_terms = FirmTerm.query.filter(
         FirmTerm.term_id == term.id).filter(
-        FirmTerm.firm_id == g.firm_info[
-            'id']).filter(
-        FirmTerm.firm_id != FirmTerm.child_firm_id).all(
-    )
+            FirmTerm.firm_id == g.firm_info[
+                'id']).filter(
+                    FirmTerm.firm_id != FirmTerm.child_firm_id).all(
+                    )
 
     rents = []
     for row in firm_terms:
@@ -318,12 +318,10 @@ def terminal_event_info(term_id, term_event_id):
     if term_event.term_id != term.id:
         abort(400)
 
-    events = Event().get_events(term.type)
-
     return render_template(
         'term/terminal/event_view.html',
         term=term,
-        events=events,
+        events=EventType().get_dict(term.type),
         term_event=term_event,
         factor=term_event.term.factor
     )
