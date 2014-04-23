@@ -13,6 +13,7 @@ from web.form.term.event import TermEventAddForm
 from models.term import Term
 from models.report import Report
 from models.event import Event
+from models.event_type import EventType
 from models.firm import Firm
 from models.firm_term import FirmTerm
 from models.term_event import TermEvent
@@ -88,7 +89,7 @@ def terminal_info(term_id):
     return render_template(
         'term/terminal/view.html',
         term=term,
-        events=Event().get_events(term.type),
+        events=EventType().get_dict(term.type),
         term_event=TermEvent(),
         term_events=term_events,
         term_access=term_access,
@@ -215,10 +216,11 @@ def terminal_save(term_id, action):
 
     id = int(arg['id']) if 'id' in arg else None
 
-    term = Term().get_by_hard_id(arg['hard_id'])
-    if term and term.id and term.id != id:
-        answer['message'] = u'Терминал с таким SN уже есть в системе'
-        return jsonify(answer)
+    if 'hard_id' in arg:
+        term = Term().get_by_hard_id(arg['hard_id'])
+        if term and term.id and term.id != id:
+            answer['message'] = u'Терминал с таким SN уже есть в системе'
+            return jsonify(answer)
 
     term = Term().get_by_id(id)
     if not term:
@@ -316,12 +318,10 @@ def terminal_event_info(term_id, term_event_id):
     if term_event.term_id != term.id:
         abort(400)
 
-    events = Event().get_events(term.type)
-
     return render_template(
         'term/terminal/event_view.html',
         term=term,
-        events=events,
+        events=EventType().get_dict(term.type),
         term_event=term_event,
         factor=term_event.term.factor
     )

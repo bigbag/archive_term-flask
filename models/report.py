@@ -249,7 +249,7 @@ class Report(db.Model, BaseModel):
         answer = self.person_general_query(**kwargs)
 
         result = []
-        events = Event().get_events_list()
+        events = Event().get_dict()
         term_name_dict = Term().select_name_dict()
         for report in answer['reports']:
             search_date = date_helper.from_utc(

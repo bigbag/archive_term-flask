@@ -5,7 +5,12 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db, cache
+import os
+import xlrd
+from datetime import datetime
+from werkzeug.utils import secure_filename
+
+from web import app, db, cache
 
 from models.base_model import BaseModel
 
@@ -99,3 +104,43 @@ class Person(db.Model, BaseModel):
         TermCorpWallet.query.filter_by(person_id=self.id).delete()
         self.delete()
         return True
+
+    @staticmethod
+    def save_import_file(request):
+        filepath = False
+        file = request.files['ImportForm[file]']
+
+        if not file or '.' not in file.filename:
+            return filepath
+
+        if file.filename.rsplit('.', 1)[1] in app.config['IMPORT_EXTENSIONS']:
+            filepath = "%s/%s/%s" % (os.getcwd(), app.config['EXCEL_FOLDER'],
+                                     secure_filename(file.filename))
+            file.save(filepath)
+
+        return filepath
+
+    @staticmethod
+    def excel_to_json_import(filepath):
+        new_employers = []
+
+        book = xlrd.open_workbook(filepath)
+        sh = book.sheet_by_index(0)
+        for i in range(sh.nrows):
+            employer = dict(
+                name=str(sh.cell_value(i, 0)),
+                card=str(sh.cell_value(i, 1)).replace('.0', ''),
+                birthday=str(sh.cell_value(i, 2)),
+                tabel_id=str(sh.cell_value(i, 3)).replace('.0', ''),
+                code=str(sh.cell_value(i, 4)),
+            )
+
+            if len(employer['birthday']):
+                check = date_helper.validate_date(
+                    employer['birthday'], '%d.%m.%Y')
+                if not check:
+                    employer['birthday'] = None
+
+            new_employers.append(employer)
+
+        return new_employers

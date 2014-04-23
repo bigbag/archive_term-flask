@@ -2,37 +2,28 @@
 """
     Хелпер для работы с url и запросами к внешним ресурсам
 
-    :copyright: (c) 2014 by Denis Amelin.
+    :copyright: (c) 2014 by Denis Amelin,  Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 from grab import Grab
 import json
 
 
-def clear_get_params(str):
-
-    answer = str
-    if "/" in answer:
-        answer = answer[0:answer.find("/")]
-    if "?" in answer:
-        answer = answer[0:answer.find("?")]
-    if "&" in answer:
-        answer = answer[0:answer.find("&")]
+def clear_get_params(answer):
+    keys = ("/", "?", "&")
+    for key in keys:
+        if key in answer:
+            answer = answer[0:answer.find(key)]
+            break
 
     return answer
 
 
-def parse_get_param(url, param):
-    value = url
+def parse_get_param(value, param):
     if param in value:
         value = value[value.find(param) + len(param):]
 
-    if "/" in value:
-        value = value[0:value.find("/")]
-    if "?" in value:
-        value = value[0:value.find("?")]
-    if "&" in value:
-        value = value[0:value.find("&")]
+    value = clear_get_params(value)
 
     return value
 
