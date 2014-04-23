@@ -24,5 +24,11 @@
             {% include 'term/person/_form.html' %}
         </div>
     </section>
+    <section class="section">
+        <p class="title" ng-click="search.status=-1"><a>Импорт</a></p>
+        <div class="content">
+            {% include 'term/person/_import.html' %}
+        </div>
+    </section>
 </div>
 {% endblock %}

@@ -5,6 +5,8 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import os
+from datetime import datetime
 
 from web.views.term.general import *
 
@@ -18,6 +20,8 @@ from models.term_event import TermEvent
 from models.spot import Spot
 from models.payment_wallet import PaymentWallet
 from models.term_corp_wallet import TermCorpWallet
+
+from helpers import request_helper
 
 
 @mod.route('/person/<path:action>', methods=['GET'])
@@ -124,6 +128,90 @@ def person_save(person_id):
     return jsonify(answer)
 
 
+@mod.route('/person/parsexls', methods=['POST'])
+@login_required
+@json_headers
+def person_parse_xls():
+    """Получение списка сотрудников из *.xls для импорта"""
+
+    filepath = Person.save_import_file(request)
+    if not filepath:
+        abort(405)
+
+    employers = Person.excel_to_json_import(filepath)
+
+    if(os.path.exists(filepath)):
+        os.remove(filepath)
+
+    return jsonify(new_employers=employers)
+
+
+@mod.route('/person/import', methods=['POST'])
+@login_required
+@json_headers
+def person_import():
+    """Импорт списка сотрудников из json"""
+    answer = dict(
+        error='yes',
+        wrongForms=[],
+        wrongCards=[],
+        addedForms=0
+    )
+
+    data = json.loads(request.stream.read())
+    employers = data['employers']
+    for json_employer in employers:
+
+        if not len(json_employer['name']):
+            answer['wrongForms'].append(json_employer)
+            continue
+
+        employer = request_helper.name_together(json_employer)
+        if employer['birthday'] and len(employer['birthday']):
+            try:
+                employer['birthday'] = datetime.strptime(
+                    employer['birthday'], '%d.%m.%Y')
+                employer['birthday'] = employer[
+                    'birthday'].strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                answer['wrongForms'].append(json_employer)
+                continue
+
+        if not len(employer['tabel_id']):
+            employer['tabel_id'] = None
+
+        employer['firm_id'] = g.firm_info['id']
+        employer['csrf_token'] = data['csrf_token']
+        person = Person()
+
+        form = PersonAddForm.from_json(employer)
+        if not form.validate():
+            answer['wrongForms'].append(json_employer)
+            continue
+
+        form.populate_obj(person)
+        code = employer['code'] if 'code' in employer else False
+        if code and len(code) == 10:
+            bind_card = set_person_card(code)
+            if bind_card['wallet']:
+                wallet = bind_card['wallet']
+                person.payment_id = wallet.payment_id
+                person.hard_id = wallet.hard_id
+            else:
+                answer['wrongCards'].append(json_employer)
+        else:
+            answer['wrongCards'].append(json_employer)
+
+        if person.save():
+            answer['addedForms'] = answer['addedForms'] + 1
+        else:
+            answer['wrongForms'].append(json_employer)
+
+    answer['error'] = 'no'
+
+    return jsonify(answer)
+
+
 @mod.route('/person/<int:person_id>/bind_card', methods=['POST'])
 @login_required
 @json_headers
@@ -158,7 +246,7 @@ def person_bind_card(person_id):
 
 
 def set_person_card(code):
-    answer = dict(error='yes', message='Произошла ошибка', wallet=False)
+    answer = dict(error='yes', message=u'Произошла ошибка', wallet=False)
 
     spot = Spot().get_valid_by_code(code)
     if not spot:
@@ -264,7 +352,6 @@ def person_remove(person_id):
     answer['message'] = u'Операция успешно выполнена'
 
     return jsonify(answer)
-
 
 
 @mod.route('/person/<int:person_id>/event/<int:person_event_id>', methods=['GET'])
@@ -424,7 +511,7 @@ def person_save_corp_wallet(person_id):
         answer['message'] = u'Операция выполнена'
         answer['corp_wallet'] = corp_wallet.to_json()
         answer['content'] = render_template(
-            'term/person/wallet_view.html',
+            'term/person/wallet/_view.html',
             corp_wallet=corp_wallet,
             corp_wallet_interval=TermCorpWallet().get_interval_list())
 

@@ -9,6 +9,7 @@ import hashlib
 import string
 import csv
 from console import app
+
 from grab import Grab
 from lxml import etree
 

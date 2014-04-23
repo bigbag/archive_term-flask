@@ -68,6 +68,7 @@ class Term(db.Model, BaseModel):
         self.blacklist = self.BLACKLIST_OFF
         self.settings_id = 1
         self.factor = 1
+        self.update_qid = 1
         self.status = self.STATUS_VALID
 
     def term_add(self, firm_id):

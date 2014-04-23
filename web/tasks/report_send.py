@@ -70,7 +70,9 @@ class ReportSenderTask (object):
         if result.data and result.all['summ'] != 0:
 
             if task.excel == ReportStack.EXCEL_YES:
-                attach = getattr(sender_task, "_get_%s_xls" % result.type['meta'])(result)
+                attach = getattr(
+                    sender_task, "_get_%s_xls" %
+                    result.type['meta'])(result)
 
             emails = task.decode_field(task.emails)
             for email in emails:
@@ -132,7 +134,9 @@ class ReportSenderTask (object):
         # Шапка таблицы
         worksheet.write(0, 0, result.firm.name, bold)
         worksheet.write(1, 0, result.type['templ_name'], bold)
-        worksheet.write(2, 0, u'%s отчет' % result.interval['templ_name'], bold)
+        worksheet.write(
+            2, 0, u'%s отчет' %
+            result.interval['templ_name'], bold)
         worksheet.write(2, 1, result.interval['templ_interval'], bold)
 
         row = 3
@@ -219,7 +223,9 @@ class ReportSenderTask (object):
         # Шапка таблицы
         worksheet.write(0, 0, result.firm.name, bold)
         worksheet.write(1, 0, result.type['templ_name'], bold)
-        worksheet.write(2, 0, u'%s отчет' % result.interval['templ_name'], bold)
+        worksheet.write(
+            2, 0, u'%s отчет' %
+            result.interval['templ_name'], bold)
         worksheet.write(2, 1, result.interval['templ_interval'], bold)
 
         row = 3
@@ -245,9 +251,13 @@ class ReportSenderTask (object):
 
             row += 1
 
-        print result.all['summ']
+        result.all['summ']
         worksheet.write(row, 0, u'Итого', bold)
-        worksheet.write(row, len(result.col_keys)-1, result.all['summ'], bold)
+        worksheet.write(
+            row,
+            len(result.col_keys) - 1,
+            result.all['summ'],
+            bold)
 
         col = len(result.col_name)
         # Блок с разбивкой расходов по терминалам

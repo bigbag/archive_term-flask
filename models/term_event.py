@@ -90,4 +90,8 @@ class TermEvent(db.Model, BaseModel):
                 firm_term)).all()
 
     def save(self):
+        if not self.min_item:
+            self.min_item = self.DEFAULT_MIN_ITEM
+        if not self.max_item:
+            self.max_item = self.DEFAULT_MAX_ITEM
         return BaseModel.save(self)
