@@ -2,7 +2,7 @@
 """
     Хелпер для работы с url и запросами к внешним ресурсам
 
-    :copyright: (c) 2014 by Denis Amelin.
+    :copyright: (c) 2014 by Denis Amelin,  Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 from grab import Grab

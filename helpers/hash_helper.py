@@ -2,7 +2,7 @@
 """
     Хелпер для работы с сигнатурами
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import hashlib
