@@ -554,7 +554,7 @@ def person_save_corp_wallet(person_id):
         answer['message'] = u'Операция выполнена'
         answer['corp_wallet'] = corp_wallet.to_json()
         answer['content'] = render_template(
-            'term/person/wallet_view.html',
+            'term/person/wallet/_view.html',
             corp_wallet=corp_wallet,
             corp_wallet_interval=TermCorpWallet().get_interval_list())
 
