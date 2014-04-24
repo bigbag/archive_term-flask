@@ -84,7 +84,7 @@ def terminal_info(term_id):
         abort(404)
 
     term_access = FirmTerm().get_access_by_firm_id(g.firm_info['id'], term_id)
-    term_events = TermEvent.query.filter(TermEvent.term_id == term_id).all()
+    term_events = TermEvent().get_by_term_id(term_id)
 
     return render_template(
         'term/terminal/view.html',
