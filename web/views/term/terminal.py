@@ -5,6 +5,8 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+
+import json
 from web.views.term.general import *
 
 from web.form.term.term import TermAddForm
@@ -16,6 +18,7 @@ from models.event import Event
 from models.firm import Firm
 from models.firm_term import FirmTerm
 from models.term_event import TermEvent
+from models.alarm_stack import AlarmStack
 
 
 @mod.route('/terminal/content/<path:action>', methods=['POST'])
@@ -95,6 +98,7 @@ def terminal_info(term_id):
         term_types=Term().get_type_list(),
         term_factors=Term().get_factor_list(),
         term_blacklist=Term().get_blacklist_list(),
+        term_alarm=AlarmStack().get_term_alarm(term_id, g.firm_info['id'])
     )
 
 
@@ -392,5 +396,77 @@ def terminal_event_delete(term_id, term_event_id):
     if term_event.term_event_remove(g.firm_info['id']):
         answer['error'] = 'no'
         answer['message'] = u'Событие удалено'
+
+    return jsonify(answer)
+
+
+@mod.route('/alarm/new', methods=['POST'])
+@login_required
+def alarm_save():
+    """Создание нового или редактирование оповещения"""
+
+    answer = dict(error='yes', message=u'Произошла ошибка')
+
+    arg = get_post_arg(request, True)
+    arg['firm_id'] = int(g.firm_info['id'])
+    arg['interval'] = int(arg['interval'][0:2]) * \
+        60 * 60 + int(arg['interval'][3:5]) * 60
+    arg['emails'] = json.dumps(arg['emails'])
+
+    if not 'term_id' in arg or not Term().get_by_id(arg['term_id']):
+        abort(404)
+
+    term_access = FirmTerm().get_access_by_firm_id(
+        g.firm_info['id'], arg['term_id'])
+    if not term_access:
+        term_rent = FirmTerm.query.filter_by(
+            term_id=arg['term_id'], child_firm_id=g.firm_info['id']).all()
+        if not term_rent:
+            abort(403)
+
+    alarm_stack = AlarmStack.query.filter_by(
+        term_id=arg['term_id'], firm_id=arg['firm_id']).first()
+    if not alarm_stack:
+        alarm_stack = AlarmStack()
+
+    for key in arg:
+        setattr(alarm_stack, key, arg[key])
+
+    if alarm_stack.save():
+        answer['error'] = 'no'
+        answer['message'] = u'Оповещение сохранено'
+
+    return jsonify(answer)
+
+
+@mod.route('/alarm/remove', methods=['POST'])
+@login_required
+def alarm_remove():
+    """Удаление оповещения"""
+
+    answer = dict(error='yes', message=u'Произошла ошибка')
+
+    arg = get_post_arg(request, True)
+    arg['firm_id'] = int(g.firm_info['id'])
+
+    if not 'term_id' in arg or not Term().get_by_id(arg['term_id']):
+        abort(404)
+
+    term_access = FirmTerm().get_access_by_firm_id(
+        g.firm_info['id'], arg['term_id'])
+    if not term_access:
+        term_rent = FirmTerm.query.filter_by(
+            term_id=arg['term_id'], child_firm_id=g.firm_info['id']).all()
+        if not term_rent:
+            abort(403)
+
+    alarm_stack = AlarmStack.query.filter_by(
+        term_id=arg['term_id'], firm_id=arg['firm_id']).first()
+    if not alarm_stack:
+        abort(404)
+
+    alarm_stack.delete()
+    answer['error'] = 'no'
+    answer['message'] = u'Оповещение удалено'
 
     return jsonify(answer)

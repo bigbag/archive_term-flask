@@ -32,6 +32,20 @@
         {% include 'term/terminal/_event_form.html' %}
     </div>
     {% endif %}
+    <div class="content-row f-main-slide-link">
+        <div class="toggle-active">
+            <a id="alarm" class="loc-link f-spot-button small">
+            {% if term_alarm['emails'] != None and term_alarm['interval'] != None %}
+                Оповещение о сбое
+            {% else %}
+                + Добавить оповещение о сбое
+            {% endif %}
+            </a>
+        </div>
+    </div>
+    <div id="alarmForm" class="slide-box slide-setting">
+        {% include 'term/terminal/_alarm_form.html' %}
+    </div>
     <table class="m-spot-table">
         <thead>
         <tr>

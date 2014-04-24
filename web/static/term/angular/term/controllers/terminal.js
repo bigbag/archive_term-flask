@@ -157,5 +157,96 @@ angular.module('term').controller('TerminalController',
       }
     });  
   } 
+  
+    $scope.alarm_stack = {};
 
+    $scope.initEmails = function(json) {
+        $scope.alarm_stack.emails = angular.fromJson(json);
+    };
+
+    //Тригер на изменение снятие ошибки при изменение полей
+    $scope.$watch('alarm_stack.curent_email + alarm_stack.interval', function(user) {
+        $scope.error.curent_email = false;
+        $scope.error.interval = false;
+    });
+    
+    //Добавляем email в список рассылки оповещений
+    $scope.addEmailInStack = function(alarm_stack) {
+        if (angular.isUndefined(alarm_stack.curent_email)) 
+            return false;
+        $scope.alarm_stack.emails = $scope.setEmail(alarm_stack.curent_email);
+
+        delete $scope.alarm_stack.curent_email;
+    };
+
+    //Удаляем email из списока рассылки оповещений
+    $scope.removeEmailFromStack = function(key, e) {
+        var emails = $scope.getEmails();
+        emails.splice(key,1);
+        $scope.alarm_stack.emails = emails;
+
+        angular.element(e.currentTarget).parent().remove();
+    }
+
+    //Сохранение оповещения
+    $scope.saveAlarmStack = function(alarm_stack, valid) {
+        $scope.addEmailInStack(alarm_stack);
+    
+        if (angular.isUndefined(alarm_stack.emails)) {
+          contentService.scrollPage('#alarmForm');
+          $scope.error.curent_email = true;
+          return false;
+        }
+        if (!valid) {
+          contentService.scrollPage('#alarmForm');
+          $scope.error.interval = true;
+          return false;
+        }
+        
+        if (alarm_stack.emails.length == 0) return false;
+
+        alarm_stack.csrf_token = $scope.token;
+        alarm_stack.term_id = $scope.term.id;
+        
+        $http.post('/alarm/new', alarm_stack).success(function(data) {
+            if (data.error === 'yes') {
+                contentService.setModal(data.message, 'error');
+            } else {
+                contentService.setModal(data.message, 'none');
+                angular.element('#removeAlarm').show();
+            }
+        }); 
+    }
+    
+    //Удаление оповещения
+    $scope.removeAlarmStack = function(alarm_stack) {
+        alarm_stack.csrf_token = $scope.token;
+        alarm_stack.term_id = $scope.term.id;
+        
+        $http.post('/alarm/remove', alarm_stack).success(function(data) {
+            if (data.error === 'yes') {
+                contentService.setModal(data.message, 'error');
+            } else {
+                contentService.setModal(data.message, 'none');
+                $scope.alarm_stack = {interval:'24:00'};
+                angular.element('#removeAlarm').hide();
+            }
+        }); 
+    }
+    
+    $scope.setEmail = function(email) {
+        var emails = $scope.getEmails();
+        for(var i=0; i<emails.length; i++) {
+            if (emails[i] == email)
+                return emails;
+        }
+        emails[emails.length] = email;
+        
+        return emails;
+    };
+    
+    $scope.getEmails = function() {
+        if (!$scope.alarm_stack.emails) return [];
+        else return $scope.alarm_stack.emails;
+    };
 });
