@@ -1,0 +1,62 @@
+<div class="m-block" ng-controller="TerminalController">
+    <form class="custom" name="alarmForm">
+        <!--
+        <div class="row">
+            <div class="large-5 columns">
+                <div class="content-row">
+                    <label for="type-event">Оповещение о сбое</label>
+                </div>
+            </div>
+        </div>
+        -->
+        <div class="content-row">
+            <label for="add-email">E-mail*</label>
+            <input id="add-email"
+                type="email"
+                placeholder="E-mail"
+                class="left"
+                ng-keypress="($event.keyCode == 13)?addEmailInStack(alarm_stack):''"
+                ng-model="alarm_stack.curent_email"
+                ng-class="{error: error.curent_email}"
+                >
+            <a class="f-spot-button"
+                ng-click="addEmailInStack(alarm_stack)">
+                Добавить
+            </a>
+             
+            <span ng-init="initEmails('{{term_alarm['emails']}}')"></span>
+            
+            <div class="f-select-email">
+                <span class="f-email-case g-radius-main"
+                    ng-repeat="email in alarm_stack.emails">{[{email}]}
+                    <i class="g-round" ng-click="removeEmailFromStack($index, $event)"></i>
+                </span>
+            </div>
+        </div>
+        <div class="content-row g-clearfix">
+            <label for="stop-time">Критичное время (чч:мм)*</label>
+            <input id="stop-time" 
+                class="f-input-small" 
+                type="text"
+                minlength="5"
+                maxlength="5"
+                ng-model="alarm_stack.interval"
+                ng-init="alarm_stack.interval='{{term_alarm['interval'] | replace('None', '24:00')}}'"
+                ng-class="{error: error.interval }"
+                required>
+        </div>
+        <div class="content-row g-clearfix">
+            <a ng-click="saveAlarmStack(alarm_stack, alarmForm.$valid)"
+                class="f-spot-button">
+                <span>Сохранить</span>
+            </a>
+            <a id="removeAlarm" ng-click="removeAlarmStack(alarm_stack)"
+                class="f-spot-button"
+                {% if term_alarm['emails'] == None and term_alarm['interval'] == None %}
+                    style="display:none">
+                {% endif %}
+                <span>Удалить</span>
+            </a>
+        </div>
+    </form>
+</div>
