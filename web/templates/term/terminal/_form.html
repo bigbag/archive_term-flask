@@ -6,10 +6,10 @@
         <span ng-init="term.action='edit'"></span>
     {% endif %}
     <div class="g-clear-b g-clearfix">
-        <div class="content-row left g-clearfix" 
+        <div class="content-row left g-clearfix"
             ng-init="term.name='{{term.name|replace('None', '')}}'">
             <label for="add-name">Название*</label>
-            <input id="add-name" 
+            <input id="add-name"
                 type="text"
                 name="name"
                 ng-maxlength="300"
@@ -17,10 +17,10 @@
                 ng-class="{error: error.name}"
                 required>
         </div>
-        <div class="content-row g-clearfix" 
+        <div class="content-row g-clearfix"
             ng-init="term.hard_id={{term.hard_id}}">
             <label for="add-hard_id">SN (только числа)</label>
-            <input id="add-hard_id" 
+            <input id="add-hard_id"
                 type="number"
                 name="hard_id"
                 min="0"
@@ -28,59 +28,59 @@
                 ng-model="term.hard_id">
         </div>
     </div>
-   <div class="content-row g-clear-b" 
+   <div class="content-row g-clear-b"
         ng-init="term.blacklist={{term.blacklist}}">
         <label for="add-type">Средства платежа</label>
-        <select id="add-type" 
+        <select id="add-type"
             class="large"
             name="type"
             ng-model="term.blacklist"
             ng-change="change()">
             {% for blacklist in term_blacklist %}
-            <option {% if blacklist['id'] == term.blacklist %} selected {% endif %} 
+            <option {% if blacklist['id'] == term.blacklist %} selected {% endif %}
                 value="{{blacklist['id']}}">
                     {{blacklist['name']}}
             </option>
             {% endfor %}
         </select>
     </div>
-    <div class="content-row g-clear-b" 
+    <div class="content-row g-clear-b"
         ng-init="term.factor={{term.factor}}">
         <label for="add-factor">Формат отчета с терминала</label>
-        <select id="add-factor" 
+        <select id="add-factor"
             class="medium"
             name="factor"
             ng-model="term.factor">
             {% for factor in term_factors %}
-            <option {% if factor['id'] == term.factor %} selected {% endif %} 
+            <option {% if factor['id'] == term.factor %} selected {% endif %}
                 value="{{factor['id']}}">
                     {{factor['name']}}
             </option>
             {% endfor %}
         </select>
     </div>
-    <div class="content-row g-clearfix" 
+    <div class="content-row g-clearfix"
         ng-init="term.upload_start='{{term.upload_start}}'">
         <label for="add-start-upload">Время первой отправки отчета (чч:мм)</label>
-        <input id="add-start-upload" 
+        <input id="add-start-upload"
             type="text"
             minlength="5"
             maxlength="5"
             ng-model="term.upload_start">
     </div>
-    <div class="content-row g-clearfix" 
+    <div class="content-row g-clearfix"
         ng-init="term.upload_period='{{term.upload_period}}'">
         <label for="add-upload-period">Период между отправками (мин)</label>
-        <input id="add-start-upload" 
+        <input id="add-start-upload"
             type="text"
             minlength="1"
             maxlength="4"
             ng-model="term.upload_period">
     </div>
-    <div class="content-row g-clearfix" 
+    <div class="content-row g-clearfix"
         ng-init="term.download_start='{{term.download_start}}'">
         <label for="add-download-period">Время первой загрузки конфигурации (чч:мм)</label>
-        <input id="add-download-period" 
+        <input id="add-download-period"
             type="text"
             minlength="5"
             maxlength="5"
@@ -89,7 +89,7 @@
     <div class="content-row g-clearfix"
         ng-init="term.download_period='{{term.download_period}}'">
         <label for="add-cardnumber">Период между загрузками (мин)</label>
-        <input id="add-start-download" 
+        <input id="add-start-download"
             type="text"
             minlength="1"
             maxlength="4"

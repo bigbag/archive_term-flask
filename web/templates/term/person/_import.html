@@ -1,91 +1,92 @@
-<div class="content-row m-row-h">
-    <h4 class="g-color-blue">Импорт</h4>
-</div>
 <div class="content-row g-clearfix">
-    <p class="m-hint">Вы можете загрузить таблицу Excel (xls, xlsx), данные должны быть только на первом листе. Расположение колонок в таблице:</p>
+    <div ng-hide="import_stage">
+        <p class="m-hint" >Вы можете загрузить таблицу Excel (xls, xlsx), данные должны быть только на первом листе. Расположение колонок в таблице:</p>
 
-    <div class="m-table-wrapper">
-        <table>
-            <thead>
-            <tr>
-                <th class="g-color-red">Фамилия</th>
-                <th class="g-color-red">Имя</th>
-                <th>Отчество</th>
-                <th>Номер&nbsp;карты <br>(8 цифр)</th>
-                <th>День рождения (дд.мм.гггг)</th>
-                <th>Табельный номер</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Иванов</td>
-                <td>Иван</td>
-                <td>Иванович</td>
-                <td>12345678</td>
-                <td>29.12.1970</td>
-                <td>11</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="content-row g-clearfix">
-    <form enctype="multipart/form-data" action="/person/parsexls">
-        <label class="f-spot-button medium" for="ImportForm_file">Загрузить файл</label>
-
-        <input id="ytImportForm_file" type="hidden" name="ImportForm[file]" value="">
-        <input id="ImportForm_file" class="hide" type="file" name="ImportForm[file]" onchange="angular.element(this).scope().sendFile(this)">
-    </form>
-    </div>
-    <div class="content-row g-clearfix" ng-show="new_employers.length > 0">
-        <div class="m-table-wrapper">
+        <div class="m-table-wrapper" ng-hide="import_stage">
             <table>
                 <thead>
                 <tr>
-                    <th class="g-color-red">Фамилия</th>
                     <th class="g-color-red">Имя</th>
-                    <th>Отчество</th>
-                    <th>Номер&nbsp;карты <br>(8 цифр)</th>
-                    <th>День рождения (дд.мм.гггг)</th>
+                    <th>Номер карты</th>
                     <th>Табельный номер</th>
+                    <th>Код активации карты (10 знаков)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Иванов Иван Иваныч</td>
+                    <td>1234</td>
+                    <td>11</td>
+                    <td>h3U7l23le8</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="content-row g-clearfix">
+            <form enctype="multipart/form-data" action="/person/parsexls">
+                <label class="f-spot-button medium"
+                    for="ImportForm_file">
+                    Загрузить файл
+                </label>
+
+                <input id="ytImportForm_file"
+                    type="hidden"
+                    name="ImportForm[file]"
+                    value="">
+                <input id="ImportForm_file"
+                    class="hide"
+                    type="file"
+                    name="ImportForm[file]"
+                    onchange="angular.element(this).scope().sendFile(this)">
+            </form>
+        </div>
+    </div>
+    <div class="content-row g-clearfix" ng-show="import_stage == 1">
+        <div class="m-table-wrapper">
+            <table>
+                <thead>
+                    <th>Имя</th>
+                    <th>Номер карты</th>
+                    <th>Табельный номер</th>
+                    <th>Код активации карты</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="employer in new_employers">
-                    <td>{[{employer.second_name}]}</td>
                     <td>{[{employer.name}]}</td>
-                    <td>{[{employer.patronymic}]}</td>
                     <td>{[{employer.card}]}</td>
-                    <td>{[{employer.birthday}]}</td>
                     <td>{[{employer.tabel_id}]}</td>
+                    <td>{[{employer.code}]}</td>
                 </tr>
                 </tbody>
             </table>
         </div>
         <a ng-click="saveNewEmployers()" class="f-spot-button">Сохранить</a>
     </div>
-    <h5 class="g-color-blue" ng-show="added_forms > 0">Импортировано строк: {[{added_forms}]}</h5>
+    <div class="content-row g-clearfix">
+        <h5 class="g-color-blue"
+            ng-show="added_forms > 0">
+            Импортировано строк: {[{added_forms}]}
+        </h5>
+    </div>
     <div class="content-row g-clearfix" ng-show="wrong_forms.length > 0">
         <div class="m-table-wrapper">
             <p class="m-hint g-color-red">Ошибки в формате данных (эти строки не были импортированы):</p>
             <table>
                 <thead>
                 <tr>
-                    <th>Фамилия</th>
                     <th>Имя</th>
-                    <th>Отчество</th>
-                    <th>Номер&nbsp;карты <br>(8 цифр)</th>
-                    <th>День рождения (дд.мм.гггг)</th>
+                    <th>Номер карты</th>
                     <th>Табельный номер</th>
+                    <th>Код активации карты</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="employer in wrong_forms">
-                    <td>{[{employer.second_name}]}</td>
                     <td>{[{employer.name}]}</td>
-                    <td>{[{employer.patronymic}]}</td>
                     <td>{[{employer.card}]}</td>
-                    <td>{[{employer.birthday}]}</td>
                     <td>{[{employer.tabel_id}]}</td>
+                    <td>{[{employer.code}]}</td>
                 </tr>
                 </tbody>
             </table>
@@ -97,22 +98,18 @@
             <table>
                 <thead>
                 <tr>
-                    <th>Фамилия</th>
                     <th>Имя</th>
-                    <th>Отчество</th>
-                    <th>Номер&nbsp;карты <br>(8 цифр)</th>
-                    <th>День рождения (дд.мм.гггг)</th>
+                    <th>Номер карты</th>
                     <th>Табельный номер</th>
+                    <th>Код активации карты</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="employer in wrong_cards">
-                    <td>{[{employer.second_name}]}</td>
                     <td>{[{employer.name}]}</td>
-                    <td>{[{employer.patronymic}]}</td>
                     <td>{[{employer.card}]}</td>
-                    <td>{[{employer.birthday}]}</td>
                     <td>{[{employer.tabel_id}]}</td>
+                    <td>{[{employer.code}]}</td>
                 </tr>
                 </tbody>
             </table>

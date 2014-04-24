@@ -200,57 +200,62 @@ angular.module('term').controller('PersonController',
     });
   }
 
-    $scope.new_employers = []; //список импортируемых сотрудников
-    $scope.added_forms = 0;
-    $scope.wrong_forms = [];
-    $scope.wrong_cards = [];
-  
-    $scope.sendFile = function(el) {
-    //импорт сотрудников - парсинг xls
-        var $form = $(el).parents('form');
+  $scope.import_stage = 0;
+  $scope.new_employers = []; //список импортируемых сотрудников
+  $scope.added_forms = 0;
+  $scope.wrong_forms = [];
+  $scope.wrong_cards = [];
 
-        if ($(el).val() == '') {
-            return false;
-        }
+  $scope.sendFile = function(el) {
+  //импорт сотрудников - парсинг xls
+    var $form = $(el).parents('form');
 
-        $scope.$apply(function() {
-            $scope.progress = 0;
-        });                
-        
-        $form.ajaxSubmit({
-            type: 'POST',
-            uploadProgress: function(event, position, total, percentComplete) {
-                /*$scope.$apply(function() {
-                    //progress bar
-                    $scope.progress = percentComplete;
-                });*/
-            },
-            success: function(responseText, statusText, xhr, form) { 
-                $scope.$apply(function() {
-                    $scope.new_employers = responseText.new_employers;
-                    $scope.added_forms = 0;
-                    $scope.wrong_forms = [];
-                    $scope.wrong_cards = [];
-                });
-            },
-        });
+    if ($(el).val() == '') {
+        return false;
     }
+
+    $scope.$apply(function() {
+        $scope.progress = 0;
+    });                
     
-    $scope.saveNewEmployers = function(){
-    //подтверждение импорта - сохранение новых сотрудников
-        if ($scope.new_employers.length > 0)
-        {
-            var data = {csrf_token:$scope.token, employers:$scope.new_employers}
-
-            $http.post('/person/import', data).success(function(data) {
-                if (data.error = 'no') {
-                    $scope.new_employers = [];
-                    $scope.added_forms = data.addedForms;
-                    $scope.wrong_forms = data.wrongForms;
-                    $scope.wrong_cards = data.wrongCards;                
-                }
+    $form.ajaxSubmit({
+        type: 'POST',
+        uploadProgress: function(event, position, total, percentComplete) {
+            /*$scope.$apply(function() {
+                //progress bar
+                $scope.progress = percentComplete;
+            });*/
+        },
+        success: function(responseText, statusText, xhr, form) { 
+            $scope.$apply(function() {
+                $scope.import_stage = 1;
+                $scope.new_employers = responseText.new_employers;
+                $scope.added_forms = 0;
+                $scope.wrong_forms = [];
+                $scope.wrong_cards = [];
             });
-        }
-    }
+        },
+    });
+  }
+  
+  $scope.saveNewEmployers = function(){
+  //подтверждение импорта - сохранение новых сотрудников
+    if ($scope.new_employers.length > 0)
+    {
+      $scope.import_stage = 2;
+      var data = {csrf_token:$scope.token, employers:$scope.new_employers}
 
+      $http.post('/person/import', data).success(function(data) {
+          if (data.error = 'no') {
+              $scope.new_employers = [];
+              $scope.added_forms = data.addedForms;
+              $scope.wrong_forms = data.wrongForms;
+              $scope.wrong_cards = data.wrongCards;                
+          }
+      });
+      setTimeout(function(){
+          $(location).attr('href','/person');
+        }, 2000);
+    }
+  }
 });

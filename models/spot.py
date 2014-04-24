@@ -43,6 +43,8 @@ class Spot(db.Model, BaseModel):
     CODE128_LEN = 12
     EAN_LEN = 12
 
+    CODE_CHAR = 'abcdefghjkmnopqrstuvwxyzABCDEFGHJKMNOPQRSTUVWXYZ'
+
     discodes_id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(10), nullable=False)
     name = db.Column(db.String(300))
@@ -75,7 +77,7 @@ class Spot(db.Model, BaseModel):
 
     def get_code(self, discodes_id):
         discodes_id = str(discodes_id)
-        rnd_letters = list(self.get_random_string())
+        rnd_letters = list(self.get_random_string(char=self.CODE_CHAR))
         rnd_order = range(10)
         random.shuffle(rnd_order)
         rnd_order = sorted(rnd_order[:6])
@@ -139,7 +141,7 @@ class Spot(db.Model, BaseModel):
         ]
         return Spot.query.filter(
             Spot.code == code).filter(
-                Spot.status.in_(valid_status)).first()
+            Spot.status.in_(valid_status)).first()
 
     def save(self):
         if not self.registered_date and self.status == self.STATUS_REGISTERED:

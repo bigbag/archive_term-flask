@@ -6,9 +6,6 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
-import cgi
-import xlrd
-import pprint
 from datetime import datetime
 
 from web.views.term.general import *
@@ -23,10 +20,8 @@ from models.term_event import TermEvent
 from models.spot import Spot
 from models.payment_wallet import PaymentWallet
 from models.term_corp_wallet import TermCorpWallet
-from werkzeug.utils import secure_filename
-from helpers import request_helper
 
-ALLOWED_EXTENSIONS = set(['xls', 'xlsx'])  # допустимые разширения для импорта
+from helpers import request_helper
 
 
 @mod.route('/person/<path:action>', methods=['GET'])
@@ -138,45 +133,17 @@ def person_save(person_id):
 @json_headers
 def person_parse_xls():
     """Получение списка сотрудников из *.xls для импорта"""
-    new_employers = []
 
-    file = request.files['ImportForm[file]']
-    if file and '.' in file.filename and file.filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS:
-        filepath = os.getcwd() + '/uploads/' + secure_filename(file.filename)
-        file.save(filepath)
+    filepath = Person.save_import_file(request)
+    if not filepath:
+        abort(405)
 
-    book = xlrd.open_workbook(filepath)
-    sh = book.sheet_by_index(0)
-    for i in range(sh.nrows):
-        employer = {}
-        employer['second_name'] = sh.cell_value(i, 0) if sh.cell(
-            i, 0).ctype == 1 else str(sh.cell_value(i, 0))
-        employer['name'] = sh.cell_value(i, 1) if sh.cell(
-            i, 1).ctype == 1 else str(sh.cell_value(i, 1))
-        employer['patronymic'] = sh.cell_value(i, 2) if sh.cell(
-            i, 2).ctype == 1 else str(sh.cell_value(i, 2))
-        employer['card'] = sh.cell_value(i, 3) if sh.cell(
-            i, 3).ctype == 1 else str(sh.cell_value(i, 3))
-        employer['birthday'] = sh.cell_value(i, 4)
-        employer['tabel_id'] = sh.cell_value(i, 5) if sh.cell(
-            i, 5).ctype == 1 else str(sh.cell_value(i, 5))
-
-        if sh.cell(i, 4).ctype == 3:  # ctype: 3 => 'xldate' , 1 => 'text'
-            ms_date_number = sh.cell_value(i, 4)
-            year, month, day, hour, minute, second = xlrd.xldate_as_tuple(
-                ms_date_number, book.datemode)
-            py_date = datetime(year, month, day, hour, minute, second)
-            employer['birthday'] = py_date.strftime('%d.%m.%Y')
-
-        if sh.cell(i, 5).ctype == 2:
-            employer['tabel_id'] = str(employer['tabel_id']).replace('.0', '')
-
-        new_employers.append(employer)
+    employers = Person.excel_to_json_import(filepath)
 
     if(os.path.exists(filepath)):
         os.remove(filepath)
 
-    return jsonify(new_employers=new_employers)
+    return jsonify(new_employers=employers)
 
 
 @mod.route('/person/import', methods=['POST'])
@@ -184,32 +151,31 @@ def person_parse_xls():
 @json_headers
 def person_import():
     """Импорт списка сотрудников из json"""
-    answer = dict(error='yes')
-    wrongForms = []
-    wrongCards = []
-    addedForms = 0
+    answer = dict(
+        error='yes',
+        wrongForms=[],
+        wrongCards=[],
+        addedForms=0
+    )
 
     data = json.loads(request.stream.read())
     employers = data['employers']
     for json_employer in employers:
 
-        if not(len(json_employer['name']) and len(json_employer['second_name'])):
-            wrongForms.append(json_employer)
+        if not len(json_employer['name']):
+            answer['wrongForms'].append(json_employer)
             continue
 
         employer = request_helper.name_together(json_employer)
-
-        if len(employer['birthday']):
+        if employer['birthday'] and len(employer['birthday']):
             try:
                 employer['birthday'] = datetime.strptime(
                     employer['birthday'], '%d.%m.%Y')
                 employer['birthday'] = employer[
                     'birthday'].strftime('%Y-%m-%d %H:%M:%S')
             except ValueError:
-                wrongForms.append(json_employer)
+                answer['wrongForms'].append(json_employer)
                 continue
-        else:
-            del employer['birthday']
 
         if not len(employer['tabel_id']):
             employer['tabel_id'] = None
@@ -220,37 +186,28 @@ def person_import():
 
         form = PersonAddForm.from_json(employer)
         if not form.validate():
-            wrongForms.append(json_employer)
+            answer['wrongForms'].append(json_employer)
             continue
 
         form.populate_obj(person)
-        card = employer['card'] if 'card' in employer else False
-
-        if card:
-            bind_card = set_person_card(card)
-            if not bind_card['wallet']:
-                wrongCards.append(json_employer)
-                person.card = None
-                person.wallet_status = person.STATUS_BANNED
-                person.status = Person.STATUS_BANNED
-            else:
+        code = employer['code'] if 'code' in employer else False
+        if code and len(code) == 10:
+            bind_card = set_person_card(code)
+            if bind_card['wallet']:
                 wallet = bind_card['wallet']
                 person.payment_id = wallet.payment_id
                 person.hard_id = wallet.hard_id
+            else:
+                answer['wrongCards'].append(json_employer)
         else:
-            person.card = None
-            person.wallet_status = person.STATUS_BANNED
-            person.status = Person.STATUS_BANNED
+            answer['wrongCards'].append(json_employer)
 
         if person.save():
-            addedForms = addedForms + 1
+            answer['addedForms'] = answer['addedForms'] + 1
         else:
-            wrongForms.append(json_employer)
+            answer['wrongForms'].append(json_employer)
 
     answer['error'] = 'no'
-    answer['wrongForms'] = wrongForms
-    answer['wrongCards'] = wrongCards
-    answer['addedForms'] = addedForms
 
     return jsonify(answer)
 
@@ -554,7 +511,7 @@ def person_save_corp_wallet(person_id):
         answer['message'] = u'Операция выполнена'
         answer['corp_wallet'] = corp_wallet.to_json()
         answer['content'] = render_template(
-            'term/person/wallet_view.html',
+            'term/person/wallet/_view.html',
             corp_wallet=corp_wallet,
             corp_wallet_interval=TermCorpWallet().get_interval_list())
 

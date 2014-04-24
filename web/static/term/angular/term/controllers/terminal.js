@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('term').controller('TerminalController', 
+angular.module('term').controller('TerminalController',
     function($scope, $http, $compile, contentService) {
 
   $scope.error = {};
@@ -37,10 +37,10 @@ angular.module('term').controller('TerminalController',
       } else {
         contentService.setModal(data.message, 'success');
         setTimeout(function(){
-          $(location).attr('href','/terminal');
+          $(location).attr('href','/terminal/' + term.id );
         }, 2000);
       }
-    });   
+    });
   };
 
   //Блокируем и разблокируем терминал
@@ -55,7 +55,7 @@ angular.module('term').controller('TerminalController',
         }
         contentService.setModal(data.message, 'success');
       }
-    });  
+    });
   }
 
   $scope.removeTerminal = function(term) {
@@ -69,7 +69,7 @@ angular.module('term').controller('TerminalController',
       } else {
         contentService.setModal(data.message, 'error');
       }
-    });  
+    });
   }
 
   //Переадресация на страницу редактирования привязанного события
@@ -95,7 +95,7 @@ angular.module('term').controller('TerminalController',
           $(location).attr('href','/terminal/' + term_event.term_id);
         }, 2000);
       }
-    });  
+    });
   }
 
   //Удаляем привязанное событие
@@ -112,7 +112,7 @@ angular.module('term').controller('TerminalController',
           $(location).attr('href','/terminal/' + term_event.term_id);
         }, 2000);
       }
-    });  
+    });
   }
 
   //Запрос на информацию об сдаче в аренду терминала
@@ -124,7 +124,7 @@ angular.module('term').controller('TerminalController',
       } else {
         $scope.rents = data.rents;
       }
-    });  
+    });
   }
 
   //Сохраняем аренду терминала
@@ -141,8 +141,8 @@ angular.module('term').controller('TerminalController',
           $(location).attr('href', window.location.pathname);
         }, 2000);
       }
-    });  
-  } 
+    });
+  }
 
   //Удаляем аренду терминала
   $scope.removeRentTerminal = function(id) {
@@ -155,10 +155,10 @@ angular.module('term').controller('TerminalController',
         contentService.setModal(data.message, 'success');
         $scope.getRentTerminal();
       }
-    });  
-  } 
-  
-    $scope.alarm_stack = {};
+    });
+  }
+
+   $scope.alarm_stack = {};
 
     $scope.initEmails = function(json) {
         $scope.alarm_stack.emails = angular.fromJson(json);
@@ -249,4 +249,5 @@ angular.module('term').controller('TerminalController',
         if (!$scope.alarm_stack.emails) return [];
         else return $scope.alarm_stack.emails;
     };
+  
 });

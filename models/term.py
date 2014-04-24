@@ -31,9 +31,6 @@ class Term(db.Model, BaseModel):
     TYPE_POS = 0
     TYPE_VENDING = 1
 
-    EVENTS_POS = ['breakfast', 'lunch', 'dinner']
-    EVENTS_VENDING = ['issuance']
-
     SEANS_ALARM = 86400
 
     DEFAULT_FACTOR = 100
@@ -71,6 +68,7 @@ class Term(db.Model, BaseModel):
         self.blacklist = self.BLACKLIST_OFF
         self.settings_id = 1
         self.factor = 1
+        self.update_qid = 1
         self.status = self.STATUS_VALID
 
     def term_add(self, firm_id):

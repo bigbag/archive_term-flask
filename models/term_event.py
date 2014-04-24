@@ -81,7 +81,7 @@ class TermEvent(db.Model, BaseModel):
         return True
 
     def get_by_term_id(self, term_id):
-        return self.query.filter_by(term_id=term_id).all()
+        return self.query.filter_by(term_id=term_id).order_by('start').all()
 
     def get_by_firm_id(self, firm_id):
         firm_term = FirmTerm().get_list_by_firm_id(firm_id)
@@ -90,4 +90,8 @@ class TermEvent(db.Model, BaseModel):
                 firm_term)).all()
 
     def save(self):
+        if not self.min_item:
+            self.min_item = self.DEFAULT_MIN_ITEM
+        if not self.max_item:
+            self.max_item = self.DEFAULT_MAX_ITEM
         return BaseModel.save(self)
