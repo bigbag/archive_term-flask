@@ -130,17 +130,16 @@ class Person(db.Model, BaseModel):
             employer = dict(
                 name=str(sh.cell_value(i, 0)),
                 card=str(sh.cell_value(i, 1)).replace('.0', ''),
-                birthday=str(sh.cell_value(i, 2)),
-                tabel_id=str(sh.cell_value(i, 3)).replace('.0', ''),
-                code=str(sh.cell_value(i, 4)),
+                tabel_id=str(sh.cell_value(i, 2)).replace('.0', ''),
+                code=str(sh.cell_value(i, 3)),
             )
 
-            if len(employer['birthday']):
-                check = date_helper.validate_date(
-                    employer['birthday'], '%d.%m.%Y')
-                if not check:
-                    employer['birthday'] = None
-
+            # if len(employer['birthday']):
+            #     check = date_helper.validate_date(
+            #         employer['birthday'], '%d.%m.%Y')
+            #     if not check:
+            #         employer['birthday'] = None
+            employer['birthday'] = None
             new_employers.append(employer)
 
         return new_employers
