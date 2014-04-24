@@ -48,6 +48,11 @@ app.config.update(
             'schedule': crontab(hour=10, minute=25, day_of_month=1),
             'args': ('3',),
         },
+        'alarm-sender': {
+            'task': 'web.tasks.alarms_send.check_alarms',
+            'schedule': crontab(minute='*/10'),
+            'args': (),
+        },
     },
 )
 
