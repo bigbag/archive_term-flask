@@ -8,6 +8,7 @@
 import os
 from datetime import datetime
 
+from web import db
 from web.views.term.general import *
 
 from web.form.term.person import PersonAddForm
@@ -133,17 +134,26 @@ def person_save(person_id):
 @json_headers
 def person_parse_xls():
     """Получение списка сотрудников из *.xls для импорта"""
+    answer = dict(
+        error='yes',
+        message=u'Неверный формат файла',
+        employers=[]
+    )
 
     filepath = Person.save_import_file(request)
     if not filepath:
         abort(405)
 
-    employers = Person.excel_to_json_import(filepath)
+    answer['employers'] = Person.excel_to_json_import(filepath)
 
     if(os.path.exists(filepath)):
         os.remove(filepath)
 
-    return jsonify(new_employers=employers)
+    if len(answer['employers']) > 0:
+        answer['error'] = 'no'
+        answer['message'] = 'Файл успешно загружен'
+
+    return jsonify(answer)
 
 
 @mod.route('/person/import', methods=['POST'])
@@ -202,12 +212,11 @@ def person_import():
         else:
             answer['wrongCards'].append(json_employer)
 
-        if person.save():
-            answer['addedForms'] = answer['addedForms'] + 1
-        else:
-            answer['wrongForms'].append(json_employer)
+        answer['addedForms'] = answer['addedForms'] + 1
+        db.session.add(person)
 
-    answer['error'] = 'no'
+    if db.session.commit():
+        answer['error'] = 'no'
 
     return jsonify(answer)
 
