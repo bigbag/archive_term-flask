@@ -13,7 +13,7 @@ import xlsxwriter
 from datetime import datetime, timedelta
 from sqlalchemy.sql import func
 
-from web import app, db
+from web import app
 from web.celery import celery
 
 from models.report import Report

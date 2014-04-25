@@ -45,16 +45,13 @@ class FirmTerm(db.Model, BaseModel):
 
     @cache.cached(timeout=30, key_prefix='list_by_firm_id')
     def get_list_by_firm_id(self, firm_id, child=True):
-        query = self.query
-
         if child:
-            query = query.filter_by(child_firm_id=firm_id)
+            query = self.query.filter_by(child_firm_id=firm_id)
         else:
-            query = query.filter_by(firm_id=firm_id)
-
-        firm_terms = query.all()
+            query = self.query.filter_by(firm_id=firm_id)
 
         firm_id_list = []
+        firm_terms = query.all()
         for firm_term in firm_terms:
             firm_id_list.append(firm_term.term_id)
 
@@ -64,7 +61,7 @@ class FirmTerm(db.Model, BaseModel):
         result = False
         access = self.query.filter_by(
             firm_id=firm_id).filter_by(
-                term_id=term_id).first()
+            term_id=term_id).first()
 
         if access:
             result = True
@@ -99,7 +96,7 @@ class FirmTerm(db.Model, BaseModel):
                 term_id=self.term_id,
                 firm_id=self.child_firm_id,
                 event_id=term_event.event_id).delete(
-                )
+            )
         self.delete()
 
         return True
