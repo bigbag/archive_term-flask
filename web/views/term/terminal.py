@@ -9,7 +9,7 @@
 import json
 from web.views.term.general import *
 
-from web.form.term.term import TermAddForm
+from web.form.term.term import TermAddForm, TermAlarmForm
 from web.form.term.event import TermEventAddForm
 
 from models.term import Term
@@ -64,7 +64,9 @@ def terminal_info(term_id):
 
     term_access = FirmTerm().get_access_by_firm_id(g.firm_info['id'], term_id)
     term_events = TermEvent().get_by_term_id(term_id)
-    alarm = AlarmStack(firm_id=g.firm_info['id'], term_id=term_id).get_term_alarm()
+    alarm = AlarmStack(
+        firm_id=g.firm_info['id'],
+        term_id=term_id).get_term_alarm()
     print alarm
 
     return render_template(
@@ -94,10 +96,10 @@ def terminal_rent_info(term_id):
 
     firm_terms = FirmTerm.query.filter(
         FirmTerm.term_id == term.id).filter(
-        FirmTerm.firm_id == g.firm_info[
-            'id']).filter(
-        FirmTerm.firm_id != FirmTerm.child_firm_id).all(
-    )
+            FirmTerm.firm_id == g.firm_info[
+                'id']).filter(
+                    FirmTerm.firm_id != FirmTerm.child_firm_id).all(
+                    )
 
     rents = []
     for row in firm_terms:
@@ -386,7 +388,6 @@ def alarm_save():
     answer = dict(error='yes', message=u'Произошла ошибка')
 
     arg = get_post_arg(request, True)
-    arg['firm_id'] = int(g.firm_info['id'])
     arg['interval'] = int(arg['interval'][0:2]) * \
         60 * 60 + int(arg['interval'][3:5]) * 60
 
@@ -402,20 +403,21 @@ def alarm_save():
         abort(403)
 
     alarm_stack = AlarmStack.query.filter_by(
-        term_id=arg['term_id'], firm_id=arg['firm_id']).first()
+        term_id=arg['term_id'], firm_id=g.firm_info['id']).first()
     if not alarm_stack:
         alarm_stack = AlarmStack()
 
-    for key in arg:
-        setattr(alarm_stack, key, arg[key])
+    arg['emails'] = AlarmStack().encode_field(arg['emails'])
+    form = TermAlarmForm.from_json(arg)
+    if not form.validate():
+        answer['message'] = u'Форма заполнена неверно, проверьте формат полей'
+        return jsonify(answer)
 
-    print alarm_stack.__dict__
-
+    form.populate_obj(alarm_stack)
+    alarm_stack.firm_id = g.firm_info['id']
     if alarm_stack.save():
         answer['error'] = 'no'
         answer['message'] = u'Оповещение сохранено'
-
-    print alarm_stack.__dict__
 
     return jsonify(answer)
 

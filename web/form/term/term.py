@@ -29,3 +29,10 @@ class TermAddForm(TokenSecureForm):
     upload_period = IntegerField(default=5)
     download_start = TextField(validators=[Optional(), base.time_check])
     download_period = IntegerField(default=5)
+
+
+class TermAlarmForm(TokenSecureForm):
+    id = IntegerField()
+    term_id = IntegerField(validators=[InputRequired()])
+    emails = TextField(validators=[InputRequired()])
+    interval = IntegerField(validators=[InputRequired()])

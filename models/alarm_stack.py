@@ -17,7 +17,7 @@ class AlarmStack(db.Model, BaseModel):
     __bind_key__ = 'stack'
     __tablename__ = 'alarm_stack'
 
-    DEFAULT_COUNT = 5
+    DEFAULT_COUNT = 1
     DEFAULT_INTERVAL = 86400
 
     id = db.Column(db.Integer, primary_key=True)
@@ -47,6 +47,18 @@ class AlarmStack(db.Model, BaseModel):
         alarm.interval = "%d:%02d" % (h, m)
 
         return alarm
+
+    def reset_count(self, term_id):
+        result = False
+        alarm = self.query.filter_by(term_id=term_id)
+        if not alarm:
+            return result
+
+        alarm.count = DEFAULT_COUNT
+        if alarm.save():
+            result = True
+
+        return result
 
     def save(self):
         self.emails = self.encode_field(self.emails)

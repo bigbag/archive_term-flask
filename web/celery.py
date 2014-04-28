@@ -50,7 +50,7 @@ app.config.update(
         },
         'alarm-sender': {
             'task': 'web.tasks.alarms_send.alarm_manager',
-            'schedule': crontab(minute='*/10'),
+            'schedule': crontab(minute='*/1'),
             'args': (),
         },
     },

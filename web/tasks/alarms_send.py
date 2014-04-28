@@ -20,20 +20,21 @@ from web.emails.term.term_alarm import TermAlarmMessage
 
 @celery.task
 def alarm_manager():
-    alarm_stack = AlarmStack.query.filter().all()
+    alarm_stack = AlarmStack.query.filter(AlarmStack.count != 0).all()
     for alarm in alarm_stack:
         term = Term().get_by_id(alarm.term_id)
         if not term:
             continue
 
-        seans_alarm = 0
         if not term.config_date:
-            return False
+            continue
 
         delta = date_helper.get_curent_date(format=False) - term.config_date
-
         if delta.total_seconds() <= alarm.interval:
-            return False
+            continue
+
+        alarm.count -= 1
+        alarm.save()
 
         emails = alarm.decode_field(alarm.emails)
         term_info = Term().get_info_by_id(alarm.term_id)
@@ -42,3 +43,5 @@ def alarm_manager():
                 TermAlarmMessage,
                 to=email,
                 term=term_info)
+        return True
+    return False
