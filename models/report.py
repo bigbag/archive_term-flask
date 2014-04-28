@@ -136,7 +136,7 @@ class Report(db.Model, BaseModel):
 
             corp_wallet.balance = int(
                 corp_wallet.balance) - int(
-                self.amount)
+                    self.amount)
             corp_wallet.save()
 
             # Блокируем возможность платежей через корпоративный кошелек
@@ -282,7 +282,7 @@ class Report(db.Model, BaseModel):
                     date=creation_date.strftime(date_pattern),
                     event=events[
                         row.event_id] if events[
-                        row.event_id] else 'Empty',
+                            row.event_id] else 'Empty',
                     amount=float(row.amount) / 100,
                     name=row.name,
                 )
@@ -467,7 +467,7 @@ class Report(db.Model, BaseModel):
 
         query = self._set_period_group(query, self.period)
         query = query.group_by(
-            Report.person_id,
+
             Report.term_id)
         query = query.order_by('summ1 desc')
 
