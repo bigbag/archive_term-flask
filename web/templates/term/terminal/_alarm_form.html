@@ -1,14 +1,6 @@
 <div class="m-block" ng-controller="TerminalController">
     <form class="custom" name="alarmForm">
-        <!--
-        <div class="row">
-            <div class="large-5 columns">
-                <div class="content-row">
-                    <label for="type-event">Оповещение о сбое</label>
-                </div>
-            </div>
-        </div>
-        -->
+        <span ng-init="alarm_stack.id='{{alarm_stack.id |replace("None", 0)}}'"></span>
         <div class="content-row">
             <label for="add-email">E-mail*</label>
             <input id="add-email"
@@ -23,9 +15,10 @@
                 ng-click="addEmailInStack(alarm_stack)">
                 Добавить
             </a>
-             
-            <span ng-init="initEmails('{{term_alarm['emails']}}')"></span>
-            
+
+            {% if alarm_stack.emails %}
+            <span ng-init="initEmails('{{alarm_stack.emails}}')"></span>
+            {% endif %}
             <div class="f-select-email">
                 <span class="f-email-case g-radius-main"
                     ng-repeat="email in alarm_stack.emails">{[{email}]}
@@ -34,29 +27,32 @@
             </div>
         </div>
         <div class="content-row g-clearfix">
-            <label for="stop-time">Критичное время (чч:мм)*</label>
-            <input id="stop-time" 
-                class="f-input-small" 
+            <label for="stop-time">Время простоя (чч:мм)*</label>
+            <input id="stop-time"
+                class="f-input-small"
                 type="text"
                 minlength="5"
                 maxlength="5"
                 ng-model="alarm_stack.interval"
-                ng-init="alarm_stack.interval='{{term_alarm['interval'] | replace('None', '24:00')}}'"
+                ng-init="alarm_stack.interval='{{alarm_stack.interval}}'"
                 ng-class="{error: error.interval }"
                 required>
         </div>
         <div class="content-row g-clearfix">
             <a ng-click="saveAlarmStack(alarm_stack, alarmForm.$valid)"
                 class="f-spot-button">
-                <span>Сохранить</span>
+                <span ng-hide="alarm_stack.id">Добавить</span>
+                <span ng-show="alarm_stack.id">Сохранить</span>
             </a>
-            <a id="removeAlarm" ng-click="removeAlarmStack(alarm_stack)"
+            <a id="removeAlarm"
+                ng-click="removeAlarmStack(alarm_stack)"
+                ng-show="alarm_stack.id"
                 class="f-spot-button"
-                {% if term_alarm['emails'] == None and term_alarm['interval'] == None %}
-                    style="display:none">
-                {% endif %}
                 <span>Удалить</span>
             </a>
         </div>
     </form>
+    <p class="m-hint">
+      Если терминал не будет скачивать настройки в течении заданного промежутка времени вы получите оповещение о сбое.  
+    </p>
 </div>

@@ -127,18 +127,28 @@ class Person(db.Model, BaseModel):
         book = xlrd.open_workbook(filepath)
         sh = book.sheet_by_index(0)
         for i in range(sh.nrows):
-            employer = dict(
-                name=str(sh.cell_value(i, 0)),
-                card=str(sh.cell_value(i, 1)).replace('.0', ''),
-                tabel_id=str(sh.cell_value(i, 2)).replace('.0', ''),
-                code=str(sh.cell_value(i, 3)),
-            )
+            employer = {}
 
-            # if len(employer['birthday']):
-            #     check = date_helper.validate_date(
-            #         employer['birthday'], '%d.%m.%Y')
-            #     if not check:
-            #         employer['birthday'] = None
+            if sh.cell(i, 0).ctype == 2:
+                employer['name'] = sh.cell_value(i, 0)
+            elif sh.cell(i, 0).ctype == 1:
+                employer['name'] = unicode(sh.cell_value(i, 0))
+            else:
+                continue
+
+            try:
+                employer['card'] = unicode(sh.cell_value(i, 1)).replace('.0', '')
+            except Exception:
+                pass
+            try:
+                employer['tabel_id'] = str(sh.cell_value(i, 2)).replace('.0', '')
+            except Exception:
+                pass
+            try:
+                employer['code'] = str(sh.cell_value(i, 3))
+            except Exception:
+                pass
+
             employer['birthday'] = None
             new_employers.append(employer)
 

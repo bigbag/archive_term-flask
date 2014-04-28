@@ -26,6 +26,7 @@ from models.payment_wallet import PaymentWallet
 from models.payment_reccurent import PaymentReccurent
 from models.payment_lost import PaymentLost
 from models.term_settings import TermSettings
+from models.alarm_stack import AlarmStack
 
 mod = Blueprint('api_term', __name__)
 
@@ -194,7 +195,7 @@ def api_upload_log(filename):
 @mod.route('/configs/callback/<int:term_id>_<action>', methods=['POST'])
 @mod.route('/configs/callback/<int:term_id>_<action>_<version>', methods=['POST'])
 def api_set_callback(term_id, action, version=None):
-    """Сообщение об удачной загрузки отчета"""
+    """Сообщение об удачной загрузки настроек или черного списка"""
 
     VALID_ACTITON = (
         'config',
@@ -210,6 +211,7 @@ def api_set_callback(term_id, action, version=None):
 
     if action == 'config':
         term.config_date = date_helper.get_curent_date()
+        AlarmStack().reset_count(term.id)
     elif action == 'blacklist':
         term.blacklist_date = date_helper.get_curent_date()
 

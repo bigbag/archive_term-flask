@@ -29,10 +29,6 @@
                     Загрузить файл
                 </label>
 
-                <input id="ytImportForm_file"
-                    type="hidden"
-                    name="ImportForm[file]"
-                    value="">
                 <input id="ImportForm_file"
                     class="hide"
                     type="file"
@@ -63,9 +59,8 @@
         </div>
         <a ng-click="saveNewEmployers()" class="f-spot-button">Сохранить</a>
     </div>
-    <div class="content-row g-clearfix">
-        <h5 class="g-color-blue"
-            ng-show="added_forms > 0">
+    <div class="content-row g-clearfix" ng-show="added_forms > 0">
+        <h5 class="g-color-blue">
             Импортировано строк: {[{added_forms}]}
         </h5>
     </div>
