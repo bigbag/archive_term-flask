@@ -50,7 +50,7 @@ class AlarmStack(db.Model, BaseModel):
 
     def reset_count(self, term_id):
         result = False
-        alarm = self.query.filter_by(term_id=term_id)
+        alarm = self.query.filter_by(term_id=term_id).first()
         if not alarm:
             return result
 
