@@ -209,27 +209,25 @@ angular.module('term').controller('PersonController',
   $scope.sendFile = function(el) {
   //импорт сотрудников - парсинг xls
     var $form = $(el).parents('form');
-
     if ($(el).val() == '') {
         return false;
     }
 
     $scope.$apply(function() {
         $scope.progress = 0;
-    });                
-    
+    });
+
     $form.ajaxSubmit({
         type: 'POST',
-        uploadProgress: function(event, position, total, percentComplete) {
-            /*$scope.$apply(function() {
-                //progress bar
-                $scope.progress = percentComplete;
-            });*/
-        },
-        success: function(responseText, statusText, xhr, form) { 
+        success: function(data, statusText, xhr, form) {
             $scope.$apply(function() {
+                if (data.error == 'yes'){
+                  contentService.setModal(data.message, 'error');
+                  return false;
+                }
+
+                $scope.new_employers = data.employers;
                 $scope.import_stage = 1;
-                $scope.new_employers = responseText.new_employers;
                 $scope.added_forms = 0;
                 $scope.wrong_forms = [];
                 $scope.wrong_cards = [];
@@ -237,25 +235,22 @@ angular.module('term').controller('PersonController',
         },
     });
   }
-  
+
   $scope.saveNewEmployers = function(){
   //подтверждение импорта - сохранение новых сотрудников
     if ($scope.new_employers.length > 0)
     {
-      $scope.import_stage = 2;
       var data = {csrf_token:$scope.token, employers:$scope.new_employers}
-
+      contentService.scrollPage('.m-page-name');
       $http.post('/person/import', data).success(function(data) {
           if (data.error = 'no') {
+              $scope.import_stage = 2;
               $scope.new_employers = [];
               $scope.added_forms = data.addedForms;
               $scope.wrong_forms = data.wrongForms;
-              $scope.wrong_cards = data.wrongCards;                
+              $scope.wrong_cards = data.wrongCards;
           }
       });
-      setTimeout(function(){
-          $(location).attr('href','/person');
-        }, 2000);
     }
   }
 });

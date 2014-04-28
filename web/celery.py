@@ -48,6 +48,11 @@ app.config.update(
             'schedule': crontab(hour=10, minute=25, day_of_month=1),
             'args': ('3',),
         },
+        'alarm-sender': {
+            'task': 'web.tasks.alarms_send.alarm_manager',
+            'schedule': crontab(minute='*/1'),
+            'args': (),
+        },
     },
 )
 
@@ -68,5 +73,4 @@ def make_celery(app):
 
 celery = make_celery(app)
 
-from web.tasks.soc_sharing import check_sharing
 from web.tasks import *

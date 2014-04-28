@@ -128,12 +128,12 @@ class TestCommand(Command):
 
                 try_wallet.balance = int(
                     try_wallet.balance) - int(
-                    history.amount)
+                        history.amount)
                 try_wallet.save()
 
                 false_wallet.balance = int(
                     try_wallet.balance) + int(
-                    history.amount)
+                        history.amount)
 
                 false_wallet.save()
 

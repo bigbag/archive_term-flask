@@ -16,3 +16,5 @@ def send(MessageClass, **kwargs):
     with app.test_request_context() as request:
         mailer = Mail(app)
         mailer.send(MessageClass(**kwargs))
+
+    return True
