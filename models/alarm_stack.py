@@ -54,7 +54,7 @@ class AlarmStack(db.Model, BaseModel):
         if not alarm:
             return result
 
-        alarm.count = DEFAULT_COUNT
+        alarm.count = self.DEFAULT_COUNT
         if alarm.save():
             result = True
 
