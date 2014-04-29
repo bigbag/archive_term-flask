@@ -12,7 +12,8 @@ from flask.ext.mail import Message
 class TermAlarmMessage(Message):
 
     def __init__(self, **kwargs):
-        Message.__init__(self, "Оповещение о сбое")
+        title = 'Оповещение о сбое, %s' % term.name
+        Message.__init__(self, title)
 
         required = ['to', 'term']
         for k in required:
