@@ -19,20 +19,22 @@ from libs.socnet.socnets_api import SocnetsApi
 
 @celery.task
 def check_sharing(MessageClass, **kwargs):
-    lStack = LikesStack.query.filter().all()
+    likes_stack = LikesStack.query.filter().all()
 
-    for stackItem in lStack:
-        url = PaymentLoyalty.get_action_link(stackItem.loyalty_id)
-        action = PaymentLoyalty.query.get(stackItem.loyalty_id)
+    for stack_item in likes_stack:
+        url = PaymentLoyalty.get_action_link(stack_item.loyalty_id)
+        action = PaymentLoyalty.query.get(stack_item.loyalty_id)
 
-        if len(url):
-            socToken = SocToken.query.get(stackItem.token_id)
-            socApi = SocnetsApi()
-            pageLiked = socApi.check_soc_sharing(
-                action.sharing_type, url, socToken.id, stackItem.loyalty_id)
+        if not len(url):
+            continue
 
-            if pageLiked:
-                PersonEvent.add_by_user_loyalty_id(
-                    socToken.user_id, stackItem.loyalty_id)
+        soc_token = SocToken.query.get(stack_item.token_id)
+        soc_api = SocnetsApi()
+        page_liked = soc_api.check_soc_sharing(
+            action.sharing_type, url, soc_token.id, stack_item.loyalty_id)
 
-                stackItem.delete()
+        if not page_liked:
+            continue
+
+        PersonEvent.add_by_user_loyalty_id(soc_token.user_id, stack_item.loyalty_id)
+        stack_item.delete()
