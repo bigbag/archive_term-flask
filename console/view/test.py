@@ -28,7 +28,7 @@ from models.report_stack import ReportStack
 
 from web.tasks import report as ReportTask
 
-from configs.payment import UnitellerConfig
+from configs.uniteller import UnitellerConfig
 from libs.uniteller_api import UnitellerApi
 
 
@@ -183,4 +183,10 @@ class TestCommand(Command):
                 wallet.save()
 
     def run(self):
-        return '1'
+        from configs.yandex import YandexMoneyConfig
+        from libs.ya_money import YaMoneyApi
+
+        ym = YaMoneyApi(YandexMoneyConfig)
+
+        result = ym.get_instance_id()
+        print result

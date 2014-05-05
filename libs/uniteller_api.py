@@ -8,10 +8,11 @@
 import hashlib
 import string
 import csv
-from console import app
 
 from grab import Grab
 from lxml import etree
+
+from flask import current_app
 
 
 class UnitellerApi(object):
@@ -38,6 +39,7 @@ class UnitellerApi(object):
     )
 
     def __init__(self, const):
+        self.app = current_app._get_current_object()
         self.const = const
         self.grab = None
         self.order_id = None
@@ -89,8 +91,6 @@ class UnitellerApi(object):
         return self.get_sing(data)
 
     def set_request(self, url, data=None):
-        return_data = False
-
         if not self.grab:
             self.grab = Grab()
 
@@ -100,11 +100,11 @@ class UnitellerApi(object):
         try:
             self.grab.go(url)
         except Exception as e:
-            app.logger.error(e)
+            self.app.logger.error(e)
         else:
-            return_data = self.grab
+            return self.grab
+        return False
 
-        return return_data
 
     def get_payment_info(self, order_id=None):
         return_data = False
@@ -138,8 +138,8 @@ class UnitellerApi(object):
             try:
                 tree = etree.fromstring(result.response.body)
             except Exception as e:
-                app.logger.error(e)
-                app.logger.error(result.response.body)
+                self.app.logger.error(e)
+                self.app.logger.error(result.response.body)
             else:
                 event_nodes = tree.xpath(
                     '/unitellerresult/orders/order')
