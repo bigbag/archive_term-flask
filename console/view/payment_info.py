@@ -11,7 +11,7 @@ from datetime import timedelta
 
 from flask.ext.script import Command
 from console import app
-from console.configs.payment import UnitellerConfig
+from configs.payment import UnitellerConfig
 
 from libs.uniteller_api import UnitellerApi
 from models.payment_history import PaymentHistory
@@ -108,7 +108,7 @@ class PaymentInfo(Command):
                     wallet = PaymentWallet.query.get(history.wallet_id)
                     wallet.balance = int(
                         wallet.balance) + int(
-                            history.amount)
+                        history.amount)
 
                     if not wallet.save():
                         continue
@@ -123,7 +123,7 @@ class PaymentInfo(Command):
                     wallet = PaymentWallet.query.get(history.wallet_id)
                     wallet.balance = int(
                         wallet.balance) - int(
-                            history.amount)
+                        history.amount)
 
                     if not wallet.save():
                         continue

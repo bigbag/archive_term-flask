@@ -28,7 +28,7 @@ from models.report_stack import ReportStack
 
 from web.tasks import report as ReportTask
 
-from console.configs.payment import UnitellerConfig
+from configs.payment import UnitellerConfig
 from libs.uniteller_api import UnitellerApi
 
 
@@ -128,12 +128,12 @@ class TestCommand(Command):
 
                 try_wallet.balance = int(
                     try_wallet.balance) - int(
-                        history.amount)
+                    history.amount)
                 try_wallet.save()
 
                 false_wallet.balance = int(
                     try_wallet.balance) + int(
-                        history.amount)
+                    history.amount)
 
                 false_wallet.save()
 

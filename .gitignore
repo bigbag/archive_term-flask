@@ -1,8 +1,9 @@
 *.sublime*
-/configs/general.py
-/console/configs/payment.py
-/console/configs/smsru.py
 *.pyc
+/configs/general.py
+/configs/payment.py
+/configs/smsru.py
+/configs/soc_config.py
 gunicorn.conf.py
 /venv/
 /env/
@@ -12,4 +13,4 @@ gunicorn.conf.py
 /archiv/
 /tmp/
 celerybeat-schedule
-/configs/soc_config.py
+
