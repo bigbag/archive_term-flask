@@ -8,9 +8,12 @@ mkdir ./pids
 mkdir ./db
 mkdir ./tmp
 mkdir ./excel
+
 cp gunicorn.conf.py_distr gunicorn.conf.py
 cp api/configs/general.py_distr api/configs/general.py
-
+cp api/configs/payment.py_distr api/configs/payment.py
+cp api/configs/smsru.py_distr api/configs/smsru.py
+cp api/configs/soc_config.py_distr api/configs/soc_config.py
 
 echo $0: Installing dependencies
 source ./env/bin/activate
