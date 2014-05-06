@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-    Тест веб интерфейса
+    Тест апи администрирования спотов
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import unittest
@@ -16,7 +16,7 @@ from models.payment_wallet import PaymentWallet
 from models.spot import Spot
 
 
-class WebApiAdminTestCase(unittest.TestCase):
+class ApiAdminTestCase(unittest.TestCase):
 
     GENERATE_URL = '/api/admin/spot/generate'
     LINKING_URL = '/api/admin/spot/linking'

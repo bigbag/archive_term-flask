@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-    Тест веб интерфейса api
+    Тест терминального апи
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import unittest
@@ -10,7 +10,7 @@ import unittest
 import web
 
 
-class WebApiTestCase(unittest.TestCase):
+class ApiTestCase(unittest.TestCase):
 
     API_URL = '/term/v1.0'
     GARBAGE_URL = '/123456'
