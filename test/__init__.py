@@ -14,3 +14,5 @@ from web_term_test import *
 from models_payment_test import *
 from models_term_test import *
 from models_general_test import *
+
+from libs_yandex_test import *

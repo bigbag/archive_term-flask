@@ -188,5 +188,5 @@ class TestCommand(Command):
 
         ym = YaMoneyApi(YandexMoneyConfig)
 
-        result = ym.get_instance_id()
+        result = ym.get_external_payment('200.00')
         print result

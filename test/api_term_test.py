@@ -10,7 +10,7 @@ import unittest
 import web
 
 
-class ApiTestCase(unittest.TestCase):
+class ApiTermTestCase(unittest.TestCase):
 
     API_URL = '/term/v1.0'
     GARBAGE_URL = '/123456'
