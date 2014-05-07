@@ -10,6 +10,7 @@ import hashlib
 import json
 import string
 import csv
+import pycurl
 
 from grab import Grab
 
@@ -27,6 +28,11 @@ class YaMoneyApi(object):
     def set_request(self, url, data=None):
         if not self.grab:
             self.grab = Grab()
+            self.grab.transport.curl.setopt(pycurl.SSL_VERIFYPEER, 1)
+            self.grab.transport.curl.setopt(pycurl.SSL_VERIFYHOST, 2)
+            self.grab.transport.curl.setopt(
+                pycurl.CAINFO,
+                self.const.CERTIFICATE_PATH)
 
         if data:
             self.grab.setup(post=data)
@@ -57,8 +63,26 @@ class YaMoneyApi(object):
 
         return result
 
+    def _request_external_payment(self, method, data):
+        instance_id = self.get_instance_id()
+        if not instance_id:
+            return False
+
+        data['instance_id'] = instance_id
+        result = self.set_request(self.get_url(method), data)
+        result = self._parse_result(result)
+        print result
+
+        if result['status'] != 'success':
+            return False
+
+        return result
+
     def get_instance_id(self):
         """Регистрация экземпляра приложения"""
+
+        if self.const.INSTANCE_ID:
+            return self.const.INSTANCE_ID
 
         if self.instance_id:
             return self.instance_id
@@ -73,20 +97,6 @@ class YaMoneyApi(object):
 
         return self.instance_id
 
-    def _request_external_payment(self, data):
-        instance_id = self.get_instance_id()
-        if not instance_id:
-            return False
-
-        data['instance_id'] = instance_id
-        result = self.set_request(self.get_url('request-external-payment'), data)
-        result = self._parse_result(result)
-
-        if result['status'] != 'success':
-            return False
-
-        return result
-
     def get_request_payment_to_shop(self, amount, pattern_id, message=None):
         """Создание платежа в магазин"""
 
@@ -97,7 +107,7 @@ class YaMoneyApi(object):
             message=message
         )
 
-        return self._request_external_payment(data)
+        return self._request_external_payment('request-external-payment', data)
 
     def get_request_payment_p2p(self, amount, recipient, message=None):
         """Создание перевода на кошелек"""
@@ -109,4 +119,19 @@ class YaMoneyApi(object):
             message=message
         )
 
-        return self._request_external_payment(data)
+        return self._request_external_payment('request-external-payment', data)
+
+    def get_process_external_payment(self, request_id):
+        """Проведение платежа"""
+
+        data = dict(
+            request_id=request_id,
+            request_token=True,
+            ext_auth_success_uri='http://mobispot.com',
+            ext_auth_fail_uri='http://mobispot.com'
+        )
+
+        result = self._request_external_payment(
+            'process-external-payment', data)
+        print result
+        return result

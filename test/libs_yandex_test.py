@@ -29,25 +29,31 @@ class LibsYandexTestCase(unittest.TestCase):
         self.CLIENT_ID = self.ym.const.CLIENT_ID
         self.ym.const.TEST = True
 
-    def test_url_generator(self):
-        ym = self.ym
-        assert ym.get_url('test')
+    # def test_url_generator(self):
+    #     ym = self.ym
+    #     assert ym.get_url('test')
 
-    def test_instance_id_getter(self):
-        assert self.ym.get_instance_id()
+    # def test_instance_id_getter(self):
+    #     assert self.ym.get_instance_id()
 
-    def test_faled_instance_id_getter(self):
-        self.ym.const.CLIENT_ID = self.FALED_CLIENT_ID
-        assert not self.ym.get_instance_id()
-        self.ym.const.CLIENT_ID = self.CLIENT_ID
+    # def test_faled_instance_id_getter(self):
+    #     self.ym.const.CLIENT_ID = self.FALED_CLIENT_ID
+    #     assert not self.ym.get_instance_id()
+    #     self.ym.const.CLIENT_ID = self.CLIENT_ID
 
-    def test_faled_request_payment_to_shop(self):
-        assert not self.ym.get_request_payment_to_shop(self.PAYMENT_AMOUNT,
-                                                       self.FALED_PATTERN_ID)
+    # def test_faled_request_payment_to_shop(self):
+    #     assert not self.ym.get_request_payment_to_shop(self.PAYMENT_AMOUNT,
+    #                                                    self.FALED_PATTERN_ID)
 
-    def test_request_payment_p2p(self):
-        assert self.ym.get_request_payment_p2p(self.PAYMENT_AMOUNT, self.RECIPIENT_ID)
+    # def test_request_payment_p2p(self):
+    # assert self.ym.get_request_payment_p2p(self.PAYMENT_AMOUNT,
+    # self.RECIPIENT_ID)
 
-    def test_faled_request_payment_p2p(self):
-        assert not self.ym.get_request_payment_p2p(self.PAYMENT_AMOUNT,
-                                                   self.FALED_RECIPIENT_ID)
+    # def test_faled_request_payment_p2p(self):
+    #     assert not self.ym.get_request_payment_p2p(self.PAYMENT_AMOUNT,
+    #                                                self.FALED_RECIPIENT_ID)
+
+    def test_process_payment(self):
+        payment = self.ym.get_request_payment_p2p(
+            self.PAYMENT_AMOUNT, self.RECIPIENT_ID)
+        assert self.ym.get_process_external_payment(payment['request_id'])
