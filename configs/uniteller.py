@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-    Настройки платежных систем
+    Настройки платежных параметров uniteller.ru
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 
@@ -25,6 +25,6 @@ class UnitellerConfig(object):
     TIME_PAID_CHANGE = 14
     CODE_SUCCES = 'AS000'
 
-    SHOP_ID = ''
-    PASSWORD = ''
-    LOGIN =
+    SHOP_ID = '00001623'
+    PASSWORD = 'kl9Gu1PJyE0yKfNdhCOiTtQnBPFlNNnirGhaw1qY8cm4zVbZXKg79QAvUPnrZqydvcOBua6t1En1Fl3E'
+    LOGIN = 813

@@ -28,7 +28,7 @@ from models.report_stack import ReportStack
 
 from web.tasks import report as ReportTask
 
-from console.configs.payment import UnitellerConfig
+from configs.uniteller import UnitellerConfig
 from libs.uniteller_api import UnitellerApi
 
 

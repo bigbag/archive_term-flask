@@ -33,6 +33,7 @@ class Spot(db.Model, BaseModel):
     STATUS_REMOVED_SYS = 5
     STATUS_INVISIBLE = 6
 
+    TYPE_DEMO = 0
     TYPE_PERSONAL = 3
     TYPE_COUPON = 4
     TYPE_CARD = 8
@@ -141,7 +142,7 @@ class Spot(db.Model, BaseModel):
         ]
         return Spot.query.filter(
             Spot.code == code).filter(
-            Spot.status.in_(valid_status)).first()
+                Spot.status.in_(valid_status)).first()
 
     def save(self):
         if not self.registered_date and self.status == self.STATUS_REGISTERED:

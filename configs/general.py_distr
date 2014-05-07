@@ -23,14 +23,15 @@ class Config(object):
 
     TZ = 'Europe/Moscow'
 
-    UPLOAD_FOLDER = './archiv'
-    UPLOAD_TMP = './tmp'
-    EXCEL_FOLDER = './excel'
+    ARCHIV_PATH = './archiv'
+    TMP_PACH = './tmp'
+    REPORT_TMP_PACH = './%s/tmp' % TMP_PACH
+    EXCEL_FOLDER = './%s/excel' % TMP_PACH
     UPLOAD_LOG = './logs'
     IMPORT_EXTENSIONS = set(['xls', 'xlsx'])
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
-    LOG_FOLDER = './logs'
+    LOG_PATH = './logs'
 
     MAIL_DEFAULT_SENDER = "no-reply@mobispot.com"
     MAIL_SERVER = '127.0.0.1'

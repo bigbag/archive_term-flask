@@ -31,7 +31,7 @@ if app.debug is not True:
     from logging import Formatter
     from logging.handlers import RotatingFileHandler
 
-    log_name = '%s/%s' % (app.config['LOG_FOLDER'], 'web_error.log')
+    log_name = '%s/%s' % (app.config['LOG_PATH'], 'web_error.log')
     file_handler = RotatingFileHandler(
         log_name,
         maxBytes=1024 * 1024 * 100,
