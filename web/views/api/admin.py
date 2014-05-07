@@ -102,6 +102,10 @@ def api_admin_linking_spot():
     pids = request.form['pids']
     ean = request.form['ean']
 
+    status = 1
+    if 'status' in request.form:
+        status = request.form['status']
+
     if not hid or not ean or not pids:
         abort(400)
 
@@ -119,22 +123,27 @@ def api_admin_linking_spot():
     if not spot:
         abort(404)
 
-    wallet = PaymentWallet.query.filter(
-        (PaymentWallet.hard_id == hid) |
-        (PaymentWallet.discodes_id == spot.discodes_id)).first()
+    if status == 1:
+        wallet = PaymentWallet.query.filter(
+            (PaymentWallet.hard_id == hid) |
+            (PaymentWallet.discodes_id == spot.discodes_id)).first()
 
-    if not wallet:
-        wallet = PaymentWallet()
-        wallet.payment_id = wallet.get_pid(pids)
-        wallet.hard_id = hid
-        wallet.discodes_id = spot.discodes_id
+        if not wallet:
+            wallet = PaymentWallet()
+            wallet.payment_id = wallet.get_pid(pids)
+            wallet.hard_id = hid
+            wallet.discodes_id = spot.discodes_id
 
-        if wallet.save():
-            spot.status = Spot.STATUS_ACTIVATED
-            if not spot.save():
-                abort(400)
+            if wallet.save():
+                add_success = 1
+    else:
+        spot.type = Spot.TYPE_DEMO
+        add_success = 1
 
-            add_success = 1
+    if add_success == 1:
+        spot.status = Spot.STATUS_ACTIVATED
+        if not spot.save():
+            abort(400)
 
     if wallet.discodes_id != spot.discodes_id:
         abort(400)
