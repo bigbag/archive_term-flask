@@ -9,7 +9,7 @@ from web import app
 from web.celery import celery
 
 from libs.smsru_api import SmsruApi
-from console.configs.smsru import SmsruConfig
+from configs.smsru import SmsruConfig
 
 
 @celery.task

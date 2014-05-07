@@ -28,7 +28,7 @@ class ReportParser(Command):
     "Report parser"
 
     def get_files(self):
-        files_all = os.listdir(app.config['UPLOAD_TMP'])
+        files_all = os.listdir(app.config['TMP_PACH'])
         report_files = []
 
         for report_file in files_all:
@@ -70,12 +70,12 @@ class ReportParser(Command):
         report_date = report_file['report_date']
 
         file_name = "%s/%s_%s_%s" % (
-            app.config['UPLOAD_TMP'],
+            app.config['TMP_PACH'],
             term_id,
             report_date,
             report_time)
         new_file_patch = "%s/%s" % (
-            app.config['UPLOAD_FOLDER'],
+            app.config['ARCHIV_PATH'],
             report_date)
         new_file_name = "%s/%s_%s" % (
             new_file_patch,

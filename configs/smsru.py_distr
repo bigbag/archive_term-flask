@@ -1,0 +1,28 @@
+# -*- coding: utf-8 -*-
+"""
+    Настройки отправки смс через сервис sms.ru
+
+    :copyright: (c) 2013 by Pavel Lyashkov.
+    :license: BSD, see LICENSE for more details.
+"""
+
+
+class SmsruConfig(object):
+    GENERAL_URL = 'http://sms.ru/'
+
+    METHODS = dict(
+        get_token='auth/get_token',
+        sms_send='sms/send',
+        sms_status='sms/status',
+        sms_cost='sms/cost',
+        get_balance='my/balance',
+        get_limit='my/limit',
+        auth_check='auth/check',
+    )
+
+    API_ID = ''
+    LOGIN = ''
+    PASSWORD = ''
+
+    PARTNER_ID = 99999
+    SENDER_NAME = False
