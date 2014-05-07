@@ -154,7 +154,7 @@ def api_upload_report(term_id, report_datetime):
 
     file = request.stream.read()
     filename = "%s/%s_%s" % (
-        app.config['UPLOAD_TMP'],
+        app.config['TMP_PACH'],
         str(term_id),
         str(report_datetime))
 

@@ -5,15 +5,18 @@
     :copyright: (c) 2014 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
-from web import app
-from web.celery import celery
 import json
 from grab import Grab
+
+from web import app
+from web.celery import celery
+
 from models.payment_loyalty import PaymentLoyalty
 from models.person_event import PersonEvent
 from models.likes_stack import LikesStack
 from models.soc_token import SocToken
-from console.configs.payment import UnitellerConfig
+
+from configs.uniteller import UnitellerConfig
 from libs.socnet.socnets_api import SocnetsApi
 
 
