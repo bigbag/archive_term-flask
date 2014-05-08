@@ -8,7 +8,7 @@
         <br />
         <p class="m-hint">Кликните на строку с определенным сотрудником, чтобы восстановить учетную запись</p>
     </div>
-    <div class="m-grid-search" ng-hide="search.page_count==0 && search.custom_filer!=0">
+    <div class="m-grid-search">
         <input type="text"
             name="person_name"
             ng-init="search.person_name=''"
@@ -27,7 +27,7 @@
         </thead>
         <tbody>
             <tr ng-click="getPersonView(person.id)"
-                ng-repeat="person in result" 
+                ng-repeat="person in result"
                 class="m-t-cont-row">
                 <td>{[{person.name}]}</td>
                 <td>{[{person.card}]}</td>
@@ -42,9 +42,9 @@
             </tr>
             <tr class="m-table-bottom" ng-show="search.page_count">
                 <td colspan="10">
-                    <ui-pagination 
-                        cur="pagination.cur" 
-                        total="pagination.total" 
+                    <ui-pagination
+                        cur="pagination.cur"
+                        total="pagination.total"
                         display="{[{pagination.display}]}">
                     </ui-pagination>
                 </td>
