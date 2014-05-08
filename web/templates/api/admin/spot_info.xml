@@ -13,4 +13,5 @@
     <user_email>{{spot.user.email}}</user_email>
     <generated_date>{{spot.generated_date}}</generated_date>
     <spot_status>{{spot.status}}</spot_status>
+    <spot_type>{{spot.spot_type_id}}</spot_type>
 </info>
