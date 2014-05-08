@@ -29,6 +29,9 @@ class PaymentWallet(db.Model, BaseModel):
     BLACKLIST_ON = 1
     BLACKLIST_OFF = 0
 
+    TYPE_DEMO = 0
+    TYPE_FULL = 1
+
     BALANCE_MIN = 4000
 
     id = db.Column(db.Integer, primary_key=True)
@@ -41,12 +44,12 @@ class PaymentWallet(db.Model, BaseModel):
     creation_date = db.Column(db.DateTime, nullable=False)
     balance = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Integer, nullable=False)
-    blacklist = db.Column(db.Integer(), index=True)
+    type = db.Column(db.Integer(), index=True)
 
     def __init__(self):
         self.discodes_id = 0
         self.name = 'My spot'
-        self.blacklist = self.BLACKLIST_ON
+        self.type = self.TYPE_FULL
         self.balance = 0
         self.user_id = 0
         self.creation_date = date_helper.get_curent_date()
@@ -78,7 +81,7 @@ class PaymentWallet(db.Model, BaseModel):
 
         wallet.balance = int(
             wallet.balance) - int(
-                report.amount)
+            report.amount)
 
         if not wallet.save():
             error = True

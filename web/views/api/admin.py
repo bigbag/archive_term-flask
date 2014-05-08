@@ -32,7 +32,7 @@ def api_admin_access(request):
     if 'Key' not in headers or 'Sign' not in headers:
         abort(400)
 
-    term_user = TermUser().get_by_api_key(headers['Key']);
+    term_user = TermUser().get_by_api_key(headers['Key'])
     if not term_user:
         abort(403)
 
@@ -49,7 +49,8 @@ def api_admin_access(request):
 def api_admin_spot_generate():
     """Генерация спотов"""
 
-    api_admin_access(request)
+    api_admin_access
+(request)
     count = 10
     if 'count' in request.form:
         try:
@@ -100,7 +101,9 @@ def api_admin_linking_spot():
 
     hid = request.form['hid']
     pids = request.form['pids']
+
     ean = request.form['ean']
+    code128 = request.form['code128']
 
     status = 1
     if 'status' in request.form:
@@ -123,27 +126,24 @@ def api_admin_linking_spot():
     if not spot:
         abort(404)
 
-    if status == 1:
-        wallet = PaymentWallet.query.filter(
-            (PaymentWallet.hard_id == hid) |
-            (PaymentWallet.discodes_id == spot.discodes_id)).first()
+    wallet = PaymentWallet.query.filter(
+        (PaymentWallet.hard_id == hid) |
+        (PaymentWallet.discodes_id == spot.discodes_id)).first()
 
-        if not wallet:
-            wallet = PaymentWallet()
-            wallet.payment_id = wallet.get_pid(pids)
-            wallet.hard_id = hid
-            wallet.discodes_id = spot.discodes_id
+    if not wallet:
+        wallet = PaymentWallet()
+        wallet.payment_id = wallet.get_pid(pids)
+        wallet.hard_id = hid
+        wallet.discodes_id = spot.discodes_id
 
-            if wallet.save():
-                add_success = 1
-    else:
-        spot.type = Spot.TYPE_DEMO
-        add_success = 1
+        if status == 0:
+            wallet.type = PaymentWallet.TYPE_DEMO
+            spot.spot_type_id = Spot.TYPE_DEMO
 
-    if add_success == 1:
-        spot.status = Spot.STATUS_ACTIVATED
-        if not spot.save():
-            abort(400)
+        if wallet.save():
+            spot.status = Spot.STATUS_ACTIVATED
+            if not spot.save():
+                abort(400)
 
     if wallet.discodes_id != spot.discodes_id:
         abort(400)
@@ -254,6 +254,8 @@ def api_admin_spot_delete():
     if not spot.save():
         abort(500)
 
-    wallet.delete()
+    if wallet:
+        wallet.delete()
 
     return set_message('success', 'Success', 201)
+

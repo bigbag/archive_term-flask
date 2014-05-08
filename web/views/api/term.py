@@ -2,7 +2,7 @@
 """
     Контролер реализующий апи для терминального проекта
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import re
@@ -99,7 +99,9 @@ def api_get_gzip_blacklist():
 
 def api_get_blacklist():
     """Возвращает черный список карт"""
-    wallets = PaymentWallet.query.group_by(PaymentWallet.payment_id).all()
+    query = PaymentWallet.query
+    query = query.filter(PaymentWallet.type == PaymentWallet.TYPE_FULL)
+    wallets = query.group_by(PaymentWallet.payment_id).all()
 
     valid_payment_id = []
     invalid_payment_id = []
@@ -135,6 +137,7 @@ def api_get_blacklist():
     response = make_response(config_xml)
 
     return response
+
 
 @mod.route('/reports/report_<int:term_id>_<report_datetime>.xml.gz', methods=['PUT'])
 @mod.route('/reports/report_<int:term_id>_<report_datetime>.xml', methods=['PUT'])
