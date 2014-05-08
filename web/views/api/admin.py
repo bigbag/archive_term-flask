@@ -104,7 +104,7 @@ def api_admin_linking_spot():
 
     status = 1
     if 'status' in request.form:
-        status = request.form['status']
+        status = int(request.form['status'])
 
     if not hid or not ean or not pids:
         abort(400)
@@ -141,6 +141,8 @@ def api_admin_linking_spot():
             spot.status = Spot.STATUS_ACTIVATED
             if not spot.save():
                 abort(400)
+
+            add_success = 1
 
     if wallet.discodes_id != spot.discodes_id:
         abort(400)
