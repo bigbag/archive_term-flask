@@ -163,7 +163,7 @@ def api_admin_linking_spot():
 def api_admin_get_info(hid=False, ean=False, code128=False):
     """Возвращает информацию о споте по его HID или EAN"""
 
-    # api_admin_access(request)
+    api_admin_access(request)
     if not hid and not ean and not code128:
         abort(400)
 
