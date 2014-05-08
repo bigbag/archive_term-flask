@@ -97,14 +97,14 @@ class YaMoneyApi(object):
 
         return self.instance_id
 
-    def get_request_payment_to_shop(self, amount, pattern_id, message=None):
+    def get_request_payment_to_shop(self, amount, pattern_id, order_id):
         """Создание платежа в магазин"""
 
         data = dict(
             instance_id=self.get_instance_id(),
             pattern_id=pattern_id,
-            amount=amount,
-            message=message
+            sum=amount,
+            customerNumber=order_id
         )
 
         return self._request_external_payment('request-external-payment', data)
