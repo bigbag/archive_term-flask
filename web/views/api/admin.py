@@ -49,8 +49,7 @@ def api_admin_access(request):
 def api_admin_spot_generate():
     """Генерация спотов"""
 
-    api_admin_access
-(request)
+    api_admin_access(request)
     count = 10
     if 'count' in request.form:
         try:
@@ -101,9 +100,7 @@ def api_admin_linking_spot():
 
     hid = request.form['hid']
     pids = request.form['pids']
-
     ean = request.form['ean']
-    code128 = request.form['code128']
 
     status = 1
     if 'status' in request.form:
@@ -258,4 +255,3 @@ def api_admin_spot_delete():
         wallet.delete()
 
     return set_message('success', 'Success', 201)
-
