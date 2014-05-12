@@ -11,39 +11,23 @@ import json
 import string
 import csv
 import pycurl
-
-from grab import Grab
-
-from flask import current_app
+import urllib
+import logging
+import cStringIO
 
 
 class YaMoneyApi(object):
 
-    def __init__(self, const, app=False):
-        self.app = app and app or current_app._get_current_object()
+    CONNECT_TIMEOUT = 10
+    TIMEOUT = 15
+
+    def __init__(self, const):
         self.const = const
-        self.grab = None
+        self.curl = None
         self.instance_id = None
 
-    def set_request(self, url, data=None):
-        if not self.grab:
-            self.grab = Grab()
-            self.grab.transport.curl.setopt(pycurl.SSL_VERIFYPEER, 1)
-            self.grab.transport.curl.setopt(pycurl.SSL_VERIFYHOST, 2)
-            self.grab.transport.curl.setopt(
-                pycurl.CAINFO,
-                self.const.CERTIFICATE_PATH)
-
-        if data:
-            self.grab.setup(post=data)
-
-        try:
-            self.grab.go(url)
-        except Exception as e:
-            self.app.logger.error(e)
-        else:
-            return self.grab
-        return False
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
 
     def __repr__(self):
         return "%s" % self.const
@@ -55,26 +39,57 @@ class YaMoneyApi(object):
 
         return "%s/%s" % (general_url, method)
 
+    def init_request(self):
+        if self.curl:
+            return True
+
+        self.curl = pycurl.Curl()
+        self.curl .setopt(pycurl.HTTPHEADER, ["Accept:"])
+        self.curl.setopt(pycurl.CONNECTTIMEOUT, self.CONNECT_TIMEOUT)
+        self.curl.setopt(pycurl.TIMEOUT, self.TIMEOUT)
+        self.curl.setopt(pycurl.NOSIGNAL, 1)
+
+        if self.const.DEBUG:
+            self.curl.setopt(pycurl.VERBOSE, 1)
+
+        if self.const.CERTIFICATE_SECURITY:
+            self.curl.setopt(pycurl.SSL_VERIFYPEER, 1)
+            self.curl.setopt(pycurl.SSL_VERIFYHOST, 2)
+            self.curl.setopt(
+                pycurl.CAINFO,
+                self.const.CERTIFICATE_PATH)
+        else:
+            self.curl.setopt(pycurl.SSL_VERIFYPEER, 0)
+            self.curl.setopt(pycurl.SSL_VERIFYHOST, 0)
+
+        return True
+
+    def set_request(self, url, data=None):
+        if not self.init_request():
+            return False
+
+        buf = cStringIO.StringIO()
+        self.curl.setopt(pycurl.URL, url)
+        self.curl.setopt(pycurl.WRITEFUNCTION, buf.write)
+
+        if data:
+            if isinstance(data, dict):
+                data = urllib.urlencode(data)
+            self.curl.setopt(pycurl.POSTFIELDS, data)
+
+        try:
+            self.curl.perform()
+        except Exception as e:
+            self.logger.error(e)
+            return False
+        else:
+            return buf.getvalue()
+
     def _parse_result(self, result):
         try:
-            result = json.loads(result.response.body)
+            result = json.loads(result)
         except Exception as e:
-            self.app.logger.error(e)
-
-        return result
-
-    def _request_external_payment(self, method, data):
-        instance_id = self.get_instance_id()
-        if not instance_id:
-            return False
-
-        data['instance_id'] = instance_id
-        result = self.set_request(self.get_url(method), data)
-        result = self._parse_result(result)
-        print result
-
-        if result['status'] != 'success':
-            return False
+            self.logger.error(e)
 
         return result
 
@@ -89,25 +104,29 @@ class YaMoneyApi(object):
 
         data = dict(client_id=self.const.CLIENT_ID)
         result = self.set_request(self.get_url('instance-id'), data)
+        if not result:
+            return False
+
         result = self._parse_result(result)
         if result['status'] != 'success':
             return False
 
         self.instance_id = result['instance_id']
-
         return self.instance_id
 
-    def get_request_payment_to_shop(self, amount, pattern_id, order_id):
-        """Создание платежа в магазин"""
+    def _request_external_payment(self, method, data):
+        instance_id = self.get_instance_id()
+        if not instance_id:
+            return False
 
-        data = dict(
-            instance_id=self.get_instance_id(),
-            pattern_id=pattern_id,
-            sum=amount,
-            customerNumber=order_id
-        )
+        data['instance_id'] = instance_id
+        result = self.set_request(self.get_url(method), data)
+        if not result:
+            return False
 
-        return self._request_external_payment('request-external-payment', data)
+        result = self._parse_result(result)
+
+        return result
 
     def get_request_payment_p2p(self, amount, recipient, message=None):
         """Создание перевода на кошелек"""
@@ -119,7 +138,28 @@ class YaMoneyApi(object):
             message=message
         )
 
-        return self._request_external_payment('request-external-payment', data)
+        result = self._request_external_payment(
+            'request-external-payment', data)
+        if result['status'] != 'success':
+            return False
+
+        return result
+
+    def get_request_payment_to_shop(self, amount, pattern_id, order_id=0):
+        """Создание платежа в магазин"""
+
+        data = dict(
+            pattern_id=pattern_id,
+            sum=amount,
+            customerNumber=order_id
+        )
+
+        result = self._request_external_payment(
+            'request-external-payment', data)
+        if result['status'] != 'success':
+            return False
+
+        return result
 
     def get_process_external_payment(self, request_id):
         """Проведение платежа"""
@@ -133,5 +173,4 @@ class YaMoneyApi(object):
 
         result = self._request_external_payment(
             'process-external-payment', data)
-        print result
         return result
