@@ -64,6 +64,7 @@ class PaymentLoyalty(db.Model, BaseModel):
     target_url = db.Column(db.String(1024))
     limit = db.Column(db.Integer)
     timeout = db.Column(db.Integer)
+    bonus_limit = db.Column(db.Integer)
 
     def __init__(self):
         self.rules = self.RULE_FIXED
