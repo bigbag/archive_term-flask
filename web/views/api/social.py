@@ -159,31 +159,51 @@ def api_social_spot_loyalty(ean=False):
 
     if not wallet:
         abort(404)
-
-    wl = WalletLoyalty.query.filter_by(
-        wallet_id=wallet.id)
-
-    loyaltyList = []
-    for part in wl:
-        if part.loyalty_id not in loyaltyList:
-            loyaltyList.append(part.loyalty_id)
-
-    offset = 0
-    if 'offset' in request.args:
-        try:
-            offset = int(request.args['offset'])
-        except Exception as e:
-            abort(405)
-
     count = PaymentLoyalty.MAX_COUNT
-    if 'count' in request.args:
+    offset = 0
+
+    if 'idaction' in request.args:
+        # данные только по требуемой акции
         try:
-            count = int(request.args['count'])
+            loyalty_id = int(request.args['idaction'])
         except Exception as e:
             abort(405)
 
-    loyalties = PaymentLoyalty.query.filter(PaymentLoyalty.id.in_(loyaltyList)).order_by(
-    )[offset:(offset + count)]
+        loyalty = PaymentLoyalty.query.get(loyalty_id)
+        if not loyalty:
+            abort(404)
+
+        wl = WalletLoyalty.query.filter_by(
+            loyalty_id=loyalty.id, wallet_id=wallet.id)
+        if wl[0].checked:
+            loyalties = [loyalty]
+        else:
+            abort(404)
+    else:
+        # по всем акциям спота
+        wl = WalletLoyalty.query.filter_by(
+            wallet_id=wallet.id).filter_by(checked=1)
+
+        loyaltyList = []
+        for part in wl:
+            if part.loyalty_id not in loyaltyList:
+                loyaltyList.append(part.loyalty_id)
+
+        offset = 0
+        if 'offset' in request.args:
+            try:
+                offset = int(request.args['offset'])
+            except Exception as e:
+                abort(405)
+
+        if 'count' in request.args:
+            try:
+                count = int(request.args['count'])
+            except Exception as e:
+                abort(405)
+
+        loyalties = PaymentLoyalty.query.filter(PaymentLoyalty.id.in_(loyaltyList)).order_by(
+        )[offset:(offset + count)]
 
     info_xml = render_template(
         'api/social/spot_loyalty.xml',

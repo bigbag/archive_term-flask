@@ -75,22 +75,25 @@ class PersonEvent(db.Model, BaseModel):
                 person.payment_id = wallet.payment_id
                 person.save()
 
-            terms = json.loads(loyalty.terms_id)
-            for term in terms:
-                event = PersonEvent.query.filter_by(
-                    person_id=person.id, term_id=term, event_id=loyalty.event_id, firm_id=loyalty.firm_id).first()
+            answer = -1
+            if loyalty.terms_id:
+                terms = json.loads(loyalty.terms_id)
+                for term in terms:
+                    event = PersonEvent.query.filter_by(
+                        person_id=person.id, term_id=term, event_id=loyalty.event_id, firm_id=loyalty.firm_id).first()
 
-            if event:
-                if event.timeout > PersonEvent.LIKE_TIMEOUT:
-                    event.status = PersonEvent.STATUS_BANNED
+                if event:
+                    if event.timeout > PersonEvent.LIKE_TIMEOUT:
+                        event.status = PersonEvent.STATUS_BANNED
+                        event.save()
+                else:
+                    event = PersonEvent()
+                    event.person_id = person.id
+                    event.term_id = term
+                    event.event_id = loyalty.event_id
+                    event.firm_id = loyalty.firm_id
+                    event.timeout = PersonEvent.LIKE_TIMEOUT
                     event.save()
-            else:
-                event = PersonEvent()
-                event.person_id = person.id
-                event.term_id = term
-                event.event_id = loyalty.event_id
-                event.firm_id = loyalty.firm_id
-                event.timeout = PersonEvent.LIKE_TIMEOUT
-                event.save()
+                    answer = event.id
 
-            return event.id
+            return answer
