@@ -55,7 +55,7 @@ app.config.update(
         },
         'soc_sharing_checker': {
             'task': 'web.tasks.soc_sharing.check_sharing',
-            'schedule': crontab(minute=0, hour='*/1'),
+            'schedule': crontab(minute='*/5'),
             'args': (),
         },
     },
