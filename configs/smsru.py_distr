@@ -20,8 +20,9 @@ class SmsruConfig(object):
         auth_check='auth/check',
     )
 
-    API_ID = '0'
-    LOGIN = '7000000000'
+    API_ID = ''
+    LOGIN = ''
     PASSWORD = ''
-    PARTNER_ID = 0
-    SENDER_NAME = 'Mobispot'
+
+    PARTNER_ID = 99999
+    SENDER_NAME = False

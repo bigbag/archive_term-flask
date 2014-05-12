@@ -31,7 +31,7 @@ class Config(object):
     IMPORT_EXTENSIONS = set(['xls', 'xlsx'])
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
-    LOG_FOLDER = './logs'
+    LOG_PATH = './logs'
 
     MAIL_DEFAULT_SENDER = "no-reply@mobispot.com"
     MAIL_SERVER = '127.0.0.1'

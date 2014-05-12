@@ -27,4 +27,4 @@ class UnitellerConfig(object):
 
     SHOP_ID = ''
     PASSWORD = ''
-    LOGIN =
+    LOGIN = 999

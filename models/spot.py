@@ -33,10 +33,8 @@ class Spot(db.Model, BaseModel):
     STATUS_REMOVED_SYS = 5
     STATUS_INVISIBLE = 6
 
-    TYPE_PERSONAL = 3
-    TYPE_COUPON = 4
-    TYPE_CARD = 8
-    TYPE_FEEDBACK = 9
+    TYPE_DEMO = 0
+    TYPE_FULL = 3
 
     CODE_SIZE = 10
     MAX_GENERATE = 101
@@ -66,7 +64,7 @@ class Spot(db.Model, BaseModel):
         self.name = 'No name'
         self.premium = 0
         self.status = self.STATUS_GENERATED
-        self.spot_type_id = self.TYPE_PERSONAL
+        self.spot_type_id = self.TYPE_FULL
         self.generated_date = date_helper.get_curent_date()
 
     def __repr__(self):
