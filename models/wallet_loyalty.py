@@ -23,4 +23,5 @@ class WalletLoyalty(db.Model, BaseModel):
     summ = db.Column(db.String(50))
     count = db.Column(db.Integer)
     part_count = db.Column(db.Integer)
-    bonus_count = db.Column(db.Integer)
+    bonus_limit = db.Column(db.Integer)
+    checked = db.Column(db.Integer)
