@@ -174,3 +174,29 @@ class YaMoneyApi(object):
         result = self._request_external_payment(
             'process-external-payment', data)
         return result
+
+    def linking_card(self):
+        """Привязка платежной карты"""
+
+        payment = self.get_request_payment_to_shop(1, self.const.CARD_PATTERN_ID)
+        if not payment:
+            return False
+
+        status = self.get_process_external_payment(payment['request_id'])
+        if status['status'] != 'ext_auth_required':
+            error = ''
+            if 'error' in status:
+                error = status['error']
+            info = "%s: %s" % (status['status'], error)
+            self.logger.info(info)
+            return False
+
+        if not 'acs_uri' in status or not 'acs_params' in status:
+            return False
+
+        result = dict(
+            url=status['acs_uri'],
+            params=status['acs_params']
+        )
+
+        return result

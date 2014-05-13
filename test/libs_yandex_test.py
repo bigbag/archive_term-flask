@@ -71,6 +71,9 @@ class LibsYandexTestCase(unittest.TestCase):
     def test_process_payment_to_p2p(self):
         payment = self.ym.get_request_payment_p2p(
             self.PAYMENT_AMOUNT, self.RECIPIENT_ID)
-
         assert payment
         assert self.ym.get_process_external_payment(payment['request_id'])
+
+    def test_linking_card(self):
+        assert self.ym.linking_card()
+
