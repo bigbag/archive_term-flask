@@ -2,7 +2,7 @@
 """
     Контролер реализующий апи администрирования
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import re
@@ -14,34 +14,15 @@ from web import app, cache
 from decorators.header import *
 from helpers.error_xml_helper import *
 
-from helpers import hash_helper
-
 from models.spot import Spot
 from models.spot_dis import SpotDis
 from models.payment_wallet import PaymentWallet
 from models.payment_history import PaymentHistory
-from models.term_user import TermUser
+
+from web.views.api import base
 
 
 mod = Blueprint('api_admin', __name__)
-
-
-def api_admin_access(request):
-    headers = request.headers
-
-    if 'Key' not in headers or 'Sign' not in headers:
-        abort(400)
-
-    term_user = TermUser().get_by_api_key(headers['Key'])
-    if not term_user:
-        abort(403)
-
-    true_sign = hash_helper.get_api_sign(
-        str(term_user.api_secret),
-        request.form)
-
-    if not true_sign == headers['Sign']:
-        abort(403)
 
 
 @mod.route('/spot/generate', methods=['POST'])
@@ -49,16 +30,9 @@ def api_admin_access(request):
 def api_admin_spot_generate():
     """Генерация спотов"""
 
-    api_admin_access(request)
-    count = 10
-    if 'count' in request.form:
-        try:
-            count = int(request.form['count'])
-        except Exception as e:
-            abort(405)
+    base._api_access(request)
 
-        count = 1 if count > Spot.MAX_GENERATE else count
-
+    count = base._get_request_count(request, 10)
     dis = SpotDis().get_new_list(count)
     if not dis:
         abort(405)
@@ -95,7 +69,7 @@ def api_admin_spot_generate():
 def api_admin_linking_spot():
     """Добавляем спот и связанный с ним кошелёк"""
 
-    api_admin_access(request)
+    base._api_access(request)
     add_success = 0
 
     hid = request.form['hid']
@@ -165,7 +139,7 @@ def api_admin_linking_spot():
 def api_admin_get_info(hid=False, ean=False, code128=False):
     """Возвращает информацию о споте по его HID или EAN"""
 
-    api_admin_access(request)
+    base._api_access(request)
     if not hid and not ean and not code128:
         abort(400)
 
@@ -214,7 +188,7 @@ def api_admin_get_info(hid=False, ean=False, code128=False):
 def api_admin_get_free():
     """Возвращает информацию неактивированых спотах"""
 
-    api_admin_access(request)
+    base._api_access(request)
     spot = Spot.query.filter_by(
         status=Spot.STATUS_GENERATED).all()
     if not spot:
@@ -234,7 +208,7 @@ def api_admin_get_free():
 def api_admin_spot_delete():
     """Удаление спотов"""
 
-    api_admin_access(request)
+    base._api_access(request)
     hid = request.form['hid']
     if not hid:
         abort(400)
