@@ -32,7 +32,15 @@ def api_admin_spot_generate():
 
     base._api_access(request)
 
-    count = base._get_request_count(request, 10)
+    count = 10
+    if 'count' in request.form:
+        try:
+            count = int(request.form['count'])
+        except Exception as e:
+            abort(405)
+
+        count = 1 if count > Spot.MAX_GENERATE else count
+
     dis = SpotDis().get_new_list(count)
     if not dis:
         abort(405)
