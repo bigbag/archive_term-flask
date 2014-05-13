@@ -12,9 +12,8 @@ from web import app, cache
 
 from decorators.header import *
 from helpers.error_xml_helper import *
-from helpers import date_helper, hash_helper
+from helpers import date_helper
 
-from models.term_user import TermUser
 from models.payment_loyalty import PaymentLoyalty
 from models.person_event import PersonEvent
 from models.person import Person
@@ -24,25 +23,10 @@ from models.soc_token import SocToken
 from models.likes_stack import LikesStack
 from models.spot import Spot
 
+from web.views.api import base
+
+
 mod = Blueprint('api_social', __name__)
-
-
-def api_admin_access(request):
-    headers = request.headers
-
-    if 'Key' not in headers or 'Sign' not in headers:
-        abort(400)
-
-    term_user = TermUser().get_by_api_key(headers['Key'])
-    if not term_user:
-        abort(403)
-
-    true_sign = hash_helper.get_api_sign(
-        str(term_user.api_secret),
-        request.form)
-
-    if not true_sign == headers['Sign']:
-        abort(403)
 
 
 @mod.route('/loyalty', methods=['GET'])
@@ -50,122 +34,96 @@ def api_admin_access(request):
 def api_social_get_loyalties():
     """Возвращает список акций"""
 
-    api_admin_access(request)
-    count = PaymentLoyalty.DEFAULT_COUNT
-    if 'count' in request.args:
-        try:
-            count = int(request.args['count'])
-        except Exception as e:
-            abort(405)
-        count = PaymentLoyalty.MAX_COUNT if count > PaymentLoyalty.MAX_COUNT else count
+    base._api_access(request)
 
-    offset = 0
-    if 'offset' in request.args:
-        try:
-            offset = int(request.args['offset'])
-        except Exception as e:
-            abort(405)
+    count = base._get_request_count(request, PaymentLoyalty.DEFAULT_COUNT)
+    offset = base._get_request_offset(request)
 
-    loyalties = PaymentLoyalty.query.filter().order_by(
-        PaymentLoyalty.id)[offset:(offset + count)]
+    query = PaymentLoyalty.query.order_by(PaymentLoyalty.id)
+    loyalties = query.limit(count).offset(offset).all()
 
     info_xml = render_template(
         'api/social/loyalties_list.xml',
         loyalties=loyalties,
         count=count,
         offset=offset
-    ).encode('cp1251')
+    ).encode('utf8')
 
-    response = make_response(info_xml)
-
-    return response
+    return make_response(info_xml)
 
 
 @mod.route('/loyalty/<int:loyalty_id>', methods=['GET'])
 @xml_headers
 def api_social_get_loyalty(loyalty_id):
     """Возвращает детализацию по акции"""
-    api_admin_access(request)
 
-    if not loyalty_id:
-        abort(400)
-
-    try:
-        loyalty_id = int(loyalty_id)
-    except Exception as e:
-        abort(405)
+    base._api_access(request)
 
     loyalty = PaymentLoyalty.query.get(loyalty_id)
-
     if not loyalty:
         abort(404)
 
-    wl = WalletLoyalty.query.filter_by(
-        loyalty_id=loyalty.id)
+    wallet_list = []
+    wallet_loyalty = WalletLoyalty.query.filter_by(loyalty_id=loyalty.id).all()
 
-    walletList = []
-    for part in wl:
-        if part.wallet_id not in walletList:
-            walletList.append(part.wallet_id)
+    for part in wallet_loyalty:
+        if part.wallet_id in wallet_list:
+            continue
+        wallet_list.append(part.wallet_id)
 
-    partWallets = PaymentWallet.query.filter(
-        PaymentWallet.id.in_(walletList))
+    spot_ist = []
+    part_wallets = PaymentWallet.query.filter(PaymentWallet.id.in_(wallet_list)).all()
 
-    spotList = []
-    for partWallet in partWallets:
-        if partWallet.discodes_id not in spotList:
-            spotList.append(partWallet.discodes_id)
+    for part_wallet in part_wallets:
+        if part_wallet.discodes_id in spot_ist:
+            continue
+        spot_ist.append(part_wallet.discodes_id)
 
-    spots = Spot.query.filter(Spot.discodes_id.in_(spotList))
+    spots = Spot.query.filter(Spot.discodes_id.in_(spot_ist)).all()
 
-    spotWallets = []
+    spot_wallets = []
     for spot in spots:
-        for partWallet in partWallets:
-            if partWallet.discodes_id == spot.discodes_id:
-                wallet = {}
-                wallet['discodes_id'] = spot.discodes_id
-                wallet['barcode'] = spot.barcode
-                wallet['hard_id'] = partWallet.hard_id
-                spotWallets.append(wallet)
+        for part_wallet in part_wallets:
+            if part_wallet.discodes_id != spot.discodes_id:
+                continue
+            spot_wallets.append(dict(
+                discodes_id=spot.discodes_id,
+                barcode=spot.barcode,
+                hard_id=part_wallet.hard_id
+            ))
 
     info_xml = render_template(
         'api/social/loyalty_info.xml',
         loyalty=loyalty,
-        spots=spotWallets
-    ).encode('cp1251')
+        spots=spot_wallets
+    ).encode('utf8')
 
-    response = make_response(info_xml)
-
-    return response
+    return make_response(info_xml)
 
 
-@mod.route('/spot/loyalty/<ean>', methods=['GET'])
+@mod.route('/loyalty/ean/<ean>', methods=['GET'])
 @xml_headers
-def api_social_spot_loyalty(ean=False):
+def api_social_spot_loyalty(ean):
     """Возвращает акции, в которых участвует спот по EAN"""
 
-    api_admin_access(request)
+    base._api_access(request)
+
     ean = str(ean)
-    if not ean or not len(ean) == 13 or not ean.isdigit():
+    if not len(ean) == 13 or not ean.isdigit():
         abort(400)
 
-    spot = Spot.query.filter_by(
-        barcode=ean).first()
+    spot = Spot.query.filter_by(barcode=ean).first()
     if not spot:
         abort(404)
 
-    wallet = PaymentWallet.query.filter_by(
-        discodes_id=spot.discodes_id).first()
-
+    wallet = PaymentWallet.query.filter_by(discodes_id=spot.discodes_id).first()
     if not wallet:
         abort(404)
-    count = PaymentLoyalty.MAX_COUNT
-    offset = 0
 
-    if 'idaction' in request.args:
+    if 'id' in request.args:
         # данные только по требуемой акции
         try:
-            loyalty_id = int(request.args['idaction'])
+            loyalty_id = int(request.args['id'])
         except Exception as e:
             abort(405)
 
@@ -173,37 +131,33 @@ def api_social_spot_loyalty(ean=False):
         if not loyalty:
             abort(404)
 
-        wl = WalletLoyalty.query.filter_by(
-            loyalty_id=loyalty.id, wallet_id=wallet.id)
-        if wl[0].checked:
-            loyalties = [loyalty]
-        else:
+        wallet_loyalty = WalletLoyalty.query.filter_by(
+            loyalty_id=loyalty.id, wallet_id=wallet.id).all()
+        if not wallet_loyalty:
             abort(404)
+
+        if wallet_loyalty[0].checked:
+            loyalties = [loyalty]
+
+        abort(404)
     else:
         # по всем акциям спота
-        wl = WalletLoyalty.query.filter_by(
-            wallet_id=wallet.id).filter_by(checked=1)
+        wallet_loyalty = WalletLoyalty.query.filter_by(
+            wallet_id=wallet.id).filter_by(checked=1).all()
+        if not wallet_loyalty:
+            abort(404)
 
         loyaltyList = []
-        for part in wl:
-            if part.loyalty_id not in loyaltyList:
-                loyaltyList.append(part.loyalty_id)
+        for part in wallet_loyalty:
+            if part.loyalty_id in loyaltyList:
+                continue
+            loyaltyList.append(part.loyalty_id)
 
-        offset = 0
-        if 'offset' in request.args:
-            try:
-                offset = int(request.args['offset'])
-            except Exception as e:
-                abort(405)
+        count = base._get_request_count(request, PaymentLoyalty.DEFAULT_COUNT)
+        offset = base._get_request_offset(request)
 
-        if 'count' in request.args:
-            try:
-                count = int(request.args['count'])
-            except Exception as e:
-                abort(405)
-
-        loyalties = PaymentLoyalty.query.filter(PaymentLoyalty.id.in_(loyaltyList)).order_by(
-        )[offset:(offset + count)]
+        query = query.PaymentLoyalty.query.filter(PaymentLoyalty.id.in_(loyaltyList))
+        loyalties = query.limit(count).offset(offset).all()
 
     info_xml = render_template(
         'api/social/spot_loyalty.xml',
@@ -211,7 +165,6 @@ def api_social_spot_loyalty(ean=False):
         loyalties=loyalties,
         count=count,
         offset=offset
-    ).encode('cp1251')
-    response = make_response(info_xml)
+    ).encode('utf8')
 
-    return response
+    return make_response(info_xml)
