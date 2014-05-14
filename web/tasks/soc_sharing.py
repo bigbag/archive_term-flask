@@ -15,36 +15,46 @@ from models.payment_loyalty import PaymentLoyalty
 from models.person_event import PersonEvent
 from models.likes_stack import LikesStack
 from models.soc_token import SocToken
+from models.wallet_loyalty import WalletLoyalty
 
 from models.payment_wallet import PaymentWallet
 from libs.socnet.socnets_api import SocnetsApi
 
 
-@celery.task
-def check_sharing():
-    likes_stack = LikesStack.query.filter().all()
+class SocSharingTask (object):
 
-    if not len(likes_stack):
-        return False
+    @staticmethod
+    @celery.task
+    def sharing_manager():
+        element_keys = LikesStack.query.filter().all()
+        if not element_keys:
+            return False
 
-    for stack_item in likes_stack:
-        url = PaymentLoyalty.get_action_link(stack_item.loyalty_id)
+        for key in element_keys:
+            SocSharingTask.check_sharing.delay(key)
+
+        return True
+
+    @staticmethod
+    @celery.task
+    def check_sharing(task):
+        url = PaymentLoyalty.get_action_link(task.loyalty_id)
         if not len(url):
-            continue
+            return False
 
-        action = PaymentLoyalty.query.get(stack_item.loyalty_id)
+        action = PaymentLoyalty.query.get(task.loyalty_id)
         if not action:
-            continue
+            return False
 
-        soc_token = SocToken.query.get(stack_item.token_id)
+        soc_token = SocToken.query.get(task.token_id)
         if not soc_token:
-            continue
+            return False
 
         page_liked = SocnetsApi().check_soc_sharing(
-            action.sharing_type, url, soc_token.id, stack_item.loyalty_id)
+            action.sharing_type, url, soc_token.id, task.loyalty_id)
 
         if not page_liked:
-            continue
+            return False
 
         user_wallets = PaymentWallet.query.filter_by(user_id=soc_token.user_id)
         wallet_list = []
@@ -60,7 +70,7 @@ def check_sharing():
             wl.save()
 
         PersonEvent.add_by_user_loyalty_id(
-            soc_token.user_id, stack_item.loyalty_id)
+            soc_token.user_id, task.loyalty_id)
 
-        stack_item.delete()
-    return True
+        task.delete()
+        return True

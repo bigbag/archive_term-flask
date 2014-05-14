@@ -13,13 +13,12 @@ from grab import Grab
 from twython import Twython
 from helpers import request_helper
 
-URLS_PARTS = {
-    'base': 'twitter.com/',
-    'status': '/status/',
-}
-
 
 class TwitterApi(SocnetBase):
+    URLS_PARTS = {
+        'base': 'twitter.com/',
+        'status': '/status/',
+    }
 
     def checkSharing(self, url, token_id, loyalty_id):
         # пока решено отказаться от акций такого типа, это заготовка
