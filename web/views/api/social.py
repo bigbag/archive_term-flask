@@ -72,7 +72,8 @@ def api_social_get_loyalty(loyalty_id):
         wallet_list.append(part.wallet_id)
 
     spot_ist = []
-    part_wallets = PaymentWallet.query.filter(PaymentWallet.id.in_(wallet_list)).all()
+    part_wallets = PaymentWallet.query.filter(
+        PaymentWallet.id.in_(wallet_list)).all()
 
     for part_wallet in part_wallets:
         if part_wallet.discodes_id in spot_ist:
@@ -116,9 +117,13 @@ def api_social_spot_loyalty(ean):
     if not spot:
         abort(404)
 
-    wallet = PaymentWallet.query.filter_by(discodes_id=spot.discodes_id).first()
+    wallet = PaymentWallet.query.filter_by(
+        discodes_id=spot.discodes_id).first()
     if not wallet:
         abort(404)
+
+    count = base._get_request_count(request, PaymentLoyalty.DEFAULT_COUNT)
+    offset = base._get_request_offset(request)
 
     if 'id' in request.args:
         # данные только по требуемой акции
@@ -139,7 +144,6 @@ def api_social_spot_loyalty(ean):
         if wallet_loyalty[0].checked:
             loyalties = [loyalty]
 
-        abort(404)
     else:
         # по всем акциям спота
         wallet_loyalty = WalletLoyalty.query.filter_by(
@@ -153,10 +157,7 @@ def api_social_spot_loyalty(ean):
                 continue
             loyaltyList.append(part.loyalty_id)
 
-        count = base._get_request_count(request, PaymentLoyalty.DEFAULT_COUNT)
-        offset = base._get_request_offset(request)
-
-        query = query.PaymentLoyalty.query.filter(PaymentLoyalty.id.in_(loyaltyList))
+        query = PaymentLoyalty.query.filter(PaymentLoyalty.id.in_(loyaltyList))
         loyalties = query.limit(count).offset(offset).all()
 
     info_xml = render_template(
