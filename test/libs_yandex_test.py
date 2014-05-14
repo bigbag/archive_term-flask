@@ -76,4 +76,3 @@ class LibsYandexTestCase(unittest.TestCase):
 
     def test_linking_card(self):
         assert self.ym.linking_card()
-

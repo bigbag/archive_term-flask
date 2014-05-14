@@ -140,6 +140,8 @@ class YaMoneyApi(object):
 
         result = self._request_external_payment(
             'request-external-payment', data)
+        if not result:
+            return False
         if result['status'] != 'success':
             return False
 
@@ -156,6 +158,8 @@ class YaMoneyApi(object):
 
         result = self._request_external_payment(
             'request-external-payment', data)
+        if not result:
+            return False
         if result['status'] != 'success':
             return False
 
