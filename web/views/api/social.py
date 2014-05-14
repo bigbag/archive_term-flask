@@ -156,7 +156,7 @@ def api_social_spot_loyalty(ean):
         count = base._get_request_count(request, PaymentLoyalty.DEFAULT_COUNT)
         offset = base._get_request_offset(request)
 
-        query = query.PaymentLoyalty.query.filter(PaymentLoyalty.id.in_(loyaltyList))
+        query = PaymentLoyalty.query.filter(PaymentLoyalty.id.in_(loyaltyList))
         loyalties = query.limit(count).offset(offset).all()
 
     info_xml = render_template(
