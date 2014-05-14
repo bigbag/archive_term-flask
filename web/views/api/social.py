@@ -141,8 +141,10 @@ def api_social_spot_loyalty(ean):
         if not wallet_loyalty:
             abort(404)
 
-        if wallet_loyalty[0].checked:
-            loyalties = [loyalty]
+        if not wallet_loyalty[0].checked:
+            abort(404)
+        
+        loyalties = [loyalty]
 
     else:
         # по всем акциям спота
