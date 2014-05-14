@@ -95,7 +95,6 @@ def get_api_sign(secret, data):
 
     H = hmac.new(secret, digestmod=hashlib.sha512)
     H.update('&'.join(post))
-
     return H.hexdigest()
 
 

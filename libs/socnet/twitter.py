@@ -24,14 +24,14 @@ class TwitterApi(SocnetBase):
     def checkSharing(self, url, token_id, loyalty_id):
         # пока решено отказаться от акций такого типа, это заготовка
         shared = False
-        socToken = SocToken.query.get(token_id)
+        soc_token = SocToken.query.get(token_id)
         twitter = Twython(
-            SocConfig.TWITTER_KEY, SocConfig.TWITTER_SECRET, socToken.user_token, socToken.token_secret)
-        # params = {'q': urllib.quote_plus(url), 'count': 1, 'from': socToken.soc_username}
+            SocConfig.TWITTER_KEY, SocConfig.TWITTER_SECRET, soc_token.user_token, soc_token.token_secret)
+        # params = {'q': urllib.quote_plus(url), 'count': 1, 'from': soc_token.soc_username}
         # searchResult = twitter.get('search/tweets', params=params)
 
         searchResult = twitter.get_user_timeline(
-            user_id=socToken.soc_id, count=1)
+            user_id=soc_token.soc_id, count=1)
 
         return shared
 
@@ -56,7 +56,6 @@ class TwitterApi(SocnetBase):
 
     def checkHashtag(self, url, token_id, loyalty_id):
         posted = False
-
         searchHashtag = self.search_hashtag(token_id, url)
 
         if 'statuses' in searchHashtag and len(searchHashtag['statuses']):
@@ -66,9 +65,9 @@ class TwitterApi(SocnetBase):
 
     @staticmethod
     def get_tweet(token_id, url):
-        socToken = SocToken.query.get(token_id)
+        soc_token = SocToken.query.get(token_id)
         twitter = Twython(
-            SocConfig.TWITTER_KEY, SocConfig.TWITTER_SECRET, socToken.user_token, socToken.token_secret)
+            SocConfig.TWITTER_KEY, SocConfig.TWITTER_SECRET, soc_token.user_token, soc_token.token_secret)
         status_id = TwitterApi.parse_status_id(url)
         tweet = twitter.show_status(
             id=status_id, include_my_retweet='true', include_entities='false')
@@ -77,23 +76,26 @@ class TwitterApi(SocnetBase):
 
     @staticmethod
     def get_friendship(token_id, url):
-        socToken = SocToken.query.get(token_id)
+        soc_token = SocToken.query.get(token_id)
         twitter = Twython(
-            SocConfig.TWITTER_KEY, SocConfig.TWITTER_SECRET, socToken.user_token, socToken.token_secret)
+            SocConfig.TWITTER_KEY, SocConfig.TWITTER_SECRET, soc_token.user_token, soc_token.token_secret)
         reading_name = TwitterApi.parse_screen_name(url)
         friendship = twitter.show_friendship(
-            source_screen_name=socToken.soc_username, target_screen_name=reading_name)
+            source_screen_name=soc_token.soc_username, target_screen_name=reading_name)
 
         return friendship
 
     @staticmethod
     def search_hashtag(token_id, url):
         hashtag = '#' + request_helper.parse_get_param(url, '#')
-        socToken = SocToken.query.get(token_id)
+        soc_token = SocToken.query.get(token_id)
         twitter = Twython(
-            SocConfig.TWITTER_KEY, SocConfig.TWITTER_SECRET, socToken.user_token, socToken.token_secret)
+            SocConfig.TWITTER_KEY, SocConfig.TWITTER_SECRET, soc_token.user_token, soc_token.token_secret)
 
-        params = {'q': hashtag, 'count': 1, 'from': socToken.soc_username}
+        params = {
+            'q': hashtag,
+            'count': 1,
+            'from': soc_token.soc_username}
         searchHashtag = twitter.get('search/tweets', params=params)
 
         return searchHashtag

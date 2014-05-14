@@ -1,10 +1,10 @@
 *.sublime*
+*.pyc
 /configs/general.py
 /configs/soc_config.py
 /configs/yandex.py
 /configs/uniteller.py
 /configs/smsru.py
-*.pyc
 gunicorn.conf.py
 /venv/
 /env/

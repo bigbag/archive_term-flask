@@ -108,7 +108,7 @@ class PaymentInfo(Command):
                     wallet = PaymentWallet.query.get(history.wallet_id)
                     wallet.balance = int(
                         wallet.balance) + int(
-                            history.amount)
+                        history.amount)
 
                     if not wallet.save():
                         continue
@@ -123,7 +123,7 @@ class PaymentInfo(Command):
                     wallet = PaymentWallet.query.get(history.wallet_id)
                     wallet.balance = int(
                         wallet.balance) - int(
-                            history.amount)
+                        history.amount)
 
                     if not wallet.save():
                         continue

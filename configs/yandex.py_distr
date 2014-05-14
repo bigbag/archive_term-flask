@@ -13,6 +13,7 @@ class YandexMoneyConfig(object):
     TEST_GENERAL_URL = 'https://demomoney.yandex.ru/api'
 
     TEST = True
+    DEBUG = True
 
     INSTANCE_ID = None
 
@@ -25,4 +26,5 @@ class YandexMoneyConfig(object):
     CARD_PATTERN_ID = 99999
     CARD_SHOP_ID = 99999
 
+    CERTIFICATE_SECURITY = False
     CERTIFICATE_PATH = './data/ca-certificate.crt'

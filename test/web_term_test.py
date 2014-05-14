@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-    Тест веб интерфейса админского api
+    Тест веб интерфейса
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import unittest

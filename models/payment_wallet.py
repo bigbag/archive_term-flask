@@ -26,13 +26,11 @@ class PaymentWallet(db.Model, BaseModel):
     STATUS_ACTIVE = 1
     STATUS_BANNED = -1
 
-    BLACKLIST_ON = 1
-    BLACKLIST_OFF = 0
+    ACTIVE_ON = 1
+    ACTIVE_OFF = 0
 
     TYPE_DEMO = 0
     TYPE_FULL = 1
-
-    BALANCE_MIN = 4000
 
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.String(20), index=True)
@@ -42,15 +40,15 @@ class PaymentWallet(db.Model, BaseModel):
     user = db.relationship('User')
     discodes_id = db.Column(db.Integer(), index=True)
     creation_date = db.Column(db.DateTime, nullable=False)
-    balance = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Integer, nullable=False)
+    blacklist = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Integer(), index=True)
 
     def __init__(self):
         self.discodes_id = 0
         self.name = 'My spot'
         self.type = self.TYPE_FULL
-        self.balance = 0
+        self.blacklist = self.ACTIVE_OFF
         self.user_id = 0
         self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_NOACTIVE

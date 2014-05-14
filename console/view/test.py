@@ -128,12 +128,12 @@ class TestCommand(Command):
 
                 try_wallet.balance = int(
                     try_wallet.balance) - int(
-                        history.amount)
+                    history.amount)
                 try_wallet.save()
 
                 false_wallet.balance = int(
                     try_wallet.balance) + int(
-                        history.amount)
+                    history.amount)
 
                 false_wallet.save()
 
@@ -183,4 +183,10 @@ class TestCommand(Command):
                 wallet.save()
 
     def run(self):
-        return '1'
+        from configs.yandex import YandexMoneyConfig
+        from libs.ya_money import YaMoneyApi
+
+        ym = YaMoneyApi(YandexMoneyConfig)
+
+        result = ym.get_external_payment('200.00')
+        print result

@@ -67,17 +67,23 @@ class FoursquareApi(SocnetBase):
 
         return has_badge
 
+    def _get_oauth_request(self, token_id, method):
+        soc_token = SocToken.query.get(token_id)
+        url_api = "%s%s?oauth_token=%s%s" % (
+            self.API_PATH,
+            self.API_PARTS[method],
+            soc_token.user_token,
+            self.VERSION)
+        return request_helper.make_request(url_api, True)
+
     def get_badges(self, token_id):
-        socToken = SocToken.query.get(token_id)
-        return request_helper.make_request(self.API_PATH + self.API_PARTS['badges'] + '?oauth_token=' + socToken.user_token + self.VERSION, True)
+        return self._get_oauth_request(token_id, 'badges')
 
     def get_mayorship(self, token_id):
-        socToken = SocToken.query.get(token_id)
-        return request_helper.make_request(self.API_PATH + self.API_PARTS['mayorships'] + '?oauth_token=' + socToken.user_token + self.VERSION, True)
+        return self._get_oauth_request(token_id, 'mayorships')
 
     def get_history(self, token_id):
-        socToken = SocToken.query.get(token_id)
-        return request_helper.make_request(self.API_PATH + self.API_PARTS['venuehistory'] + '?oauth_token=' + socToken.user_token + self.VERSION, True)
+        return self._get_oauth_request(token_id, 'venuehistory')
 
     def parse_place(self, placeStr):
         place = {}
@@ -86,11 +92,9 @@ class FoursquareApi(SocnetBase):
             place['address'] = place['name'][place['name'].find('"') + 1:]
             place['name'] = place['name'][0:place['name'].find('"')]
 
-            place['address'] = request_helper.parse_get_param(
-                place['address'], '"')
+            place['address'] = request_helper.parse_get_param(place['address'], '"')
             if '"' in place['address']:
-                place['address'] = place['address'][
-                    0:place['address'].find('"')]
+                place['address'] = place['address'][0:place['address'].find('"')]
 
         if 'address' in place and 0 == len(place['address']):
             place.pop('address')
