@@ -26,7 +26,7 @@ def api_internal_yandex_linking():
     ym = YaMoneyApi(YandexMoneyConfig)
     result = {'error': '1'}
 
-    status = ym.linking_card()
+    status = ym.get_linking_card_params()
     print status
     if status:
         result = status

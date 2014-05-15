@@ -23,6 +23,8 @@ class LibsYandexTestCase(unittest.TestCase):
 
     PAYMENT_AMOUNT = 100
 
+    SUCCESS_REQUEST_ID = '3535393131395f63643332316436666634653437633539376331396663393231623862366637663533626465656461'
+
     def setUp(self):
         self.app = web.app.test_client()
 
@@ -74,5 +76,14 @@ class LibsYandexTestCase(unittest.TestCase):
         assert payment
         assert self.ym.get_process_external_payment(payment['request_id'])
 
-    def test_linking_card(self):
-        assert self.ym.linking_card()
+    def test_linking_card_params(self):
+        assert self.ym.get_linking_card_params()
+
+    def test_payment_token(self):
+        assert self.ym.get_payment_info(self.SUCCESS_REQUEST_ID
+                                        )
+
+    def test_background_payment(self):
+        payment_info = self.ym.get_payment_info(self.SUCCESS_REQUEST_ID)
+        assert payment_info
+        self.ym.background_payment(self.PAYMENT_AMOUNT, payment_info['token'])
