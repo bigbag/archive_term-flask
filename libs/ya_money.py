@@ -15,6 +15,8 @@ import urllib
 import logging
 import cStringIO
 
+from random import randint
+
 
 class YaMoneyApi(object):
 
@@ -32,6 +34,20 @@ class YaMoneyApi(object):
     def __repr__(self):
         return "%s" % self.const
 
+    def get_random_headers(self):
+        """
+        Copyright: 2011, Grigoriy Petukhov
+        Build headers which sends typical browser.
+        """
+
+        return {
+            'Accept': 'text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.%d' % randint(2, 5),
+            'Accept-Language': 'en-us,en;q=0.%d' % (randint(5, 9)),
+            'Accept-Charset': 'utf-8,windows-1251;q=0.7,*;q=0.%d' % randint(5, 7),
+            'Keep-Alive': '300',
+            'Expect': '',
+        }
+
     def get_url(self, method):
         general_url = self.const.GENERAL_URL
         if self.const.TEST:
@@ -43,8 +59,12 @@ class YaMoneyApi(object):
         if self.curl:
             return True
 
+        headers = self.get_random_headers()
+        header_tuples = [str('%s: %s' % x) for x
+                         in headers.items()]
+
         self.curl = pycurl.Curl()
-        self.curl .setopt(pycurl.HTTPHEADER, ["Accept:"])
+        self.curl.setopt(pycurl.HTTPHEADER, header_tuples)
         self.curl.setopt(pycurl.CONNECTTIMEOUT, self.CONNECT_TIMEOUT)
         self.curl.setopt(pycurl.TIMEOUT, self.TIMEOUT)
         self.curl.setopt(pycurl.NOSIGNAL, 1)
