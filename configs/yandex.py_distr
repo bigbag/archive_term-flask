@@ -12,6 +12,9 @@ class YandexMoneyConfig(object):
     GENERAL_URL = 'https://money.yandex.ru/api'
     TEST_GENERAL_URL = 'https://demomoney.yandex.ru/api'
 
+    FAIL_URI = ''
+    SUCCESS_URI = ''
+
     TEST = True
     DEBUG = True
 

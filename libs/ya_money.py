@@ -15,8 +15,6 @@ import urllib
 import logging
 import cStringIO
 
-from random import randint
-
 
 class YaMoneyApi(object):
 
@@ -27,6 +25,8 @@ class YaMoneyApi(object):
         self.const = const
         self.curl = None
         self.instance_id = None
+        self.success_uri = const.SUCCESS_URI
+        self.fail_uri = const.FAIL_URI
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
@@ -41,9 +41,9 @@ class YaMoneyApi(object):
         """
 
         return {
-            'Accept': 'text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.%d' % randint(2, 5),
-            'Accept-Language': 'en-us,en;q=0.%d' % (randint(5, 9)),
-            'Accept-Charset': 'utf-8,windows-1251;q=0.7,*;q=0.%d' % randint(5, 7),
+            'Accept': 'text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
+            'Accept-Language': 'en-us,en;q=0.5',
+            'Accept-Charset': 'utf-8,windows-1251;q=0.7,*;q=0.5',
             'Keep-Alive': '300',
             'Expect': '',
         }
@@ -186,13 +186,13 @@ class YaMoneyApi(object):
         return result
 
     def get_process_external_payment(self, request_id):
-        """Проведение платежа"""
+        """Проведение платежа получение информации о статусе платежа"""
 
         data = dict(
             request_id=request_id,
             request_token=True,
-            ext_auth_success_uri='http://mobispot.com',
-            ext_auth_fail_uri='http://mobispot.com'
+            ext_auth_success_uri=self.success_uri,
+            ext_auth_fail_uri=self.fail_uri
         )
 
         result = self._request_external_payment(
