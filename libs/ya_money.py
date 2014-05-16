@@ -28,7 +28,10 @@ class YaMoneyApi(object):
         self.success_uri = const.SUCCESS_URI
         self.fail_uri = const.FAIL_URI
 
-        logging.basicConfig(format=u'# %(levelname)s, file:%(filename)s, line:%(lineno)d, time:%(asctime)s], error: %(message)s', level=logging.INFO)
+        # logging.basicConfig(format=u'# %(levelname)s, file:%(filename)s,
+        # line:%(lineno)d, time:%(asctime)s], error: %(message)s',
+        # level=logging.INFO)
+        logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
     def __repr__(self):
@@ -50,7 +53,8 @@ class YaMoneyApi(object):
         """
 
         return {
-            'Accept': 'text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
+            'Accept':
+            'text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
             'Accept-Language': 'en-us,en;q=0.5',
             'Accept-Charset': 'utf-8,windows-1251;q=0.7,*;q=0.5',
             'Keep-Alive': '300',
@@ -225,10 +229,11 @@ class YaMoneyApi(object):
             'process-external-payment', data)
         return result
 
-    def get_linking_card_params(self):
+    def get_linking_card_params(self, order_id=0):
         """Запрос параметров для привязки карты"""
 
-        payment = self.get_request_payment_to_shop(1, self.const.CARD_PATTERN_ID)
+        payment = self.get_request_payment_to_shop(
+            1, self.const.CARD_PATTERN_ID, order_id)
         if not payment:
             return False
 
@@ -275,11 +280,13 @@ class YaMoneyApi(object):
     def background_payment(self, amount, token):
         """Фоновый платеж по карте"""
 
-        payment = self.get_request_payment_to_shop(amount, self.const.CARD_PATTERN_ID)
+        payment = self.get_request_payment_to_shop(
+            amount, self.const.CARD_PATTERN_ID)
         if not payment:
             return False
 
-        status = self.get_process_external_payment(payment['request_id'], token)
+        status = self.get_process_external_payment(
+            payment['request_id'], token)
         if status['status'] not in ('success', 'in_progress'):
             self.logging_status(status)
             return False

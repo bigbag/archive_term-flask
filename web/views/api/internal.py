@@ -13,23 +13,19 @@ from web import app, cache
 from decorators.header import *
 from helpers.error_json_helper import *
 
-from configs.yandex import YandexMoneyConfig
-from libs.ya_money import YaMoneyApi
+from models.payment_card import PaymentCard
 
 mod = Blueprint('api_internal', __name__)
 
 
-@mod.route('/yandex/linking', methods=['GET'])
+@mod.route('/yandex/linking/<int:discodes_id>', methods=['GET'])
 @json_headers
-def api_internal_yandex_linking():
+def api_internal_yandex_linking(discodes_id):
 
-    ym = YaMoneyApi(YandexMoneyConfig)
     result = {'error': '1'}
-
-    status = ym.get_linking_card_params()
-    print status
-    if status:
-        result = status
+    params = PaymentCard().linking_card_init(discodes_id)
+    if params:
+        result = params
         result['error'] = 0
 
     return make_response(jsonify(result))

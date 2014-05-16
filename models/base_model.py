@@ -24,7 +24,7 @@ class BaseModel(object):
     def is_json(self, data_json):
         try:
             json_object = json.loads(data_json)
-        except ValueError, e:
+        except ValueError as e:
             return False
         return True
 
