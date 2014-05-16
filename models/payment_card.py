@@ -26,17 +26,14 @@ class PaymentCard(db.Model, BaseModel):
     STATUS_PAYMENT = 1
     STATUS_ARCHIV = 0
 
-    TYPE_VISA = 1
-    TYPE_MC = 2
-
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     user = db.relationship('User')
     wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'), index=True)
     wallet = db.relationship('PaymentWallet')
     pan = db.Column(db.String(128), nullable=False)
-    text = db.Column(db.Text(), nullable=False)
-    type = db.Column(db.Integer(), nullable=False, index=True)
+    token = db.Column(db.Text(), nullable=False)
+    type = db.Column(db.String(128), nullable=False, index=True)
     status = db.Column(db.Integer(), nullable=False, index=True)
 
     def linking_card_init(self, discodes_id):
@@ -50,27 +47,62 @@ class PaymentCard(db.Model, BaseModel):
             return False
 
         history = PaymentHistory()
-        history.type = PaymentHistory.TYPE_SYSTEM
-        history.amount = PaymentHistory.SYSTEM_PAYMENT
-        history.user_id = wallet.user_id
-        history.wallet_id = wallet.id
-
+        history.add_linking_record(self, wallet.user_id, wallet.id)
         if not history.save():
             return False
 
         ym = YaMoneyApi(YandexMoneyConfig)
         status = ym.get_linking_card_params(history.id)
-        if status:
-            history.request_id = status['params']['cps_context_id']
-            if not history.save():
-                return False
+        if not status:
+            return False
 
-            old_history = PaymentHistory().query.filter(PaymentHistory.id != history.id).filter(
-                PaymentHistory.wallet_id == history.wallet_id).filter(
-                    PaymentHistory.type == PaymentHistory.TYPE_SYSTEM).filter(
-                        PaymentHistory.status == PaymentHistory.STATUS_NEW).all()
+        history.request_id = status['params']['cps_context_id']
+        if not history.save():
+            return False
 
-            for row in old_history:
-                db.session.delete(row)
-            db.session.commit()
+        fail_history = PaymentHistory().get_fail_linking_record(
+            history.id, history.wallet_id)
+        for row in fail_history:
+            db.session.delete(row)
+        db.session.commit()
+        return status
+
+    def linkig_card(self, request_id):
+        """Привязываем карту, получаем платежный токен"""
+
+        history = PaymentHistory.query.filter_by(request_id=request_id).first()
+        if not history:
+            return False
+
+        if history.status == PaymentHistory.STATUS_COMPLETE:
+            return False
+
+        ym = YaMoneyApi(YandexMoneyConfig)
+        status = ym.get_payment_info(request_id)
+        if not status:
+            return False
+
+        history.invoice_id = status['invoice_id']
+        history.status = PaymentHistory.STATUS_COMPLETE
+        if not history.save():
+            return False
+
+        old_cards = PaymentCard.query.filter_by(
+            wallet_id=history.wallet_id,
+            status=PaymentCard.STATUS_PAYMENT).all()
+        for row in old_cards:
+            row.status = PaymentCard.STATUS_ARCHIV
+            db.session.add(row)
+        db.session.commit()
+
+        card = PaymentCard()
+        card.user_id = history.user_id
+        card.wallet_id = history.wallet_id
+        card.token = status['token']
+        card.pan = status['card_pan']
+        card.type = status['card_type']
+        card.status = PaymentCard.STATUS_PAYMENT
+        if not card.save():
+            return False
+
         return status

@@ -217,11 +217,11 @@ class YaMoneyApi(object):
 
         data = dict(
             request_id=request_id,
-            request_token=True,
             ext_auth_success_uri=self.success_uri,
             ext_auth_fail_uri=self.fail_uri
         )
-
+        if not token:
+            data['request_token'] = True
         if token:
             data['money_source_token'] = token
 
