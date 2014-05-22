@@ -67,10 +67,9 @@ class TestCommand(Command):
                 wallet.save()
 
     def run(self):
-        from configs.yandex import YandexMoneyConfig
-        from libs.ya_money import YaMoneyApi
+        from web.tasks.payment import PaymentTask
 
-        ym = YaMoneyApi(YandexMoneyConfig)
+        history = PaymentHistory.query.get(17)
+        PaymentTask.check_linking(history)
 
-        result = ym.get_external_payment('200.00')
-        print result
+        # print result

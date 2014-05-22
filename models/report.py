@@ -111,6 +111,8 @@ class Report(db.Model, BaseModel):
         from models.payment_wallet import PaymentWallet
         from models.term_corp_wallet import TermCorpWallet
 
+        from web.tasks.payment import PaymentTask
+
         error = False
         self = self.get_db_view(card_node)
 
@@ -121,7 +123,8 @@ class Report(db.Model, BaseModel):
         # Если операция платежная, создаем задачу на списание с карты
         if int(self.type) == self.TYPE_PAYMENT:
             pass
-        # TODO добавить создание задачи для списания с карты
+        # Создание задачи для списания с карты
+        PaymentTask.background_payment(self.term.id, self.amount, self.payment_id)
 
         # Если операция по белому списку
         person = Person.query.get(self.person_id)
@@ -136,7 +139,7 @@ class Report(db.Model, BaseModel):
 
             corp_wallet.balance = int(
                 corp_wallet.balance) - int(
-                    self.amount)
+                self.amount)
             corp_wallet.save()
 
             # Блокируем возможность платежей через корпоративный кошелек
@@ -282,7 +285,7 @@ class Report(db.Model, BaseModel):
                     date=creation_date.strftime(date_pattern),
                     event=events[
                         row.event_id] if events[
-                            row.event_id] else 'Empty',
+                        row.event_id] else 'Empty',
                     amount=float(row.amount) / 100,
                     name=row.name,
                 )

@@ -58,6 +58,13 @@ app.config.update(
             'schedule': crontab(minute='*/1'),
             'args': (),
         },
+
+        'payment_check_linking': {
+            'task': 'web.tasks.payment.check_linking_manager',
+            'schedule': crontab(minute='*/1'),
+            'args': (),
+        },
+
     },
 )
 
