@@ -26,6 +26,8 @@ class PaymentCard(db.Model, BaseModel):
     STATUS_PAYMENT = 1
     STATUS_ARCHIV = 0
 
+    MAX_LINKING_CARD_TIMEOUT = 60 * 60
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     user = db.relationship('User')

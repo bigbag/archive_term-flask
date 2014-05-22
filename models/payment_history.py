@@ -57,8 +57,8 @@ class PaymentHistory(db.Model, BaseModel):
     def get_fail_linking_record(self, history_id, wallet_id):
         return PaymentHistory().query.filter(PaymentHistory.id != history_id).filter(
             PaymentHistory.wallet_id == wallet_id).filter(
-                PaymentHistory.type == PaymentHistory.TYPE_SYSTEM).filter(
-                    PaymentHistory.status == PaymentHistory.STATUS_NEW).all()
+            PaymentHistory.type == PaymentHistory.TYPE_SYSTEM).filter(
+            PaymentHistory.status == PaymentHistory.STATUS_NEW).all()
 
     def add_linking_record(self, user_id, wallet_id):
         self.type = PaymentHistory.TYPE_SYSTEM
