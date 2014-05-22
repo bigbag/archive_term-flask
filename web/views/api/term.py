@@ -99,7 +99,7 @@ def api_get_blacklist():
     """Возвращает черный список карт"""
     query = PaymentWallet.query
     query = query.filter(PaymentWallet.type == PaymentWallet.TYPE_FULL)
-    query = query.filter(PaymentWallet.blacklist == PaymentWallet.ACTIVE_OFF)
+    query = query.filter((PaymentWallet.blacklist == PaymentWallet.ACTIVE_OFF) | (PaymentWallet.status == PaymentWallet.STATUS_BANNED))
     wallets = query.group_by(PaymentWallet.payment_id).all()
 
     blacklist = []

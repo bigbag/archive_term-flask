@@ -41,8 +41,8 @@ class PaymentCard(db.Model, BaseModel):
 
         wallet = PaymentWallet.query.filter(
             PaymentWallet.discodes_id == discodes_id).filter(
-                PaymentWallet.user_id != 0).first(
-                )
+            PaymentWallet.user_id != 0).first(
+        )
         if not wallet:
             return False
 
@@ -77,6 +77,10 @@ class PaymentCard(db.Model, BaseModel):
         if history.status == PaymentHistory.STATUS_COMPLETE:
             return False
 
+        wallet = PaymentWallet.query.get(history.wallet_id)
+        if not wallet:
+            return False
+
         ym = YaMoneyApi(YandexMoneyConfig)
         status = ym.get_payment_info(request_id)
         if not status:
@@ -104,5 +108,8 @@ class PaymentCard(db.Model, BaseModel):
         card.status = PaymentCard.STATUS_PAYMENT
         if not card.save():
             return False
+
+        wallet.blacklist = PaymentWallet.ACTIVE_ON
+        wallet.save()
 
         return status
