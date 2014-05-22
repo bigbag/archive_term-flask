@@ -21,11 +21,7 @@ from models.payment_wallet import PaymentWallet
 
 class PaymentTask (object):
 
-    @staticmethod
-    @celery.task
-    def linking_card():
-        return True
-
+    # TODO добавить отлов потеряных операций
     @staticmethod
     @celery.task
     def background_payment(term_id, amount, payment_id):
