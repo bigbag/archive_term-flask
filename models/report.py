@@ -118,10 +118,10 @@ class Report(db.Model, BaseModel):
         if old_report:
             return error
 
-        # Если операция платежная, обновляем баланс личного кошелька
-        # и пишем информацию в историю, сохраняем отчет
-        if int(self.type) == self.TYPE_PAYMENT or int(self.type) == self.TYPE_MPS:
-            error = PaymentWallet().update_balance(self)
+        # Если операция платежная, создаем задачу на списание с карты
+        if int(self.type) == self.TYPE_PAYMENT:
+            pass
+        # TODO добавить создание задачи для списания с карты
 
         # Если операция по белому списку
         person = Person.query.get(self.person_id)

@@ -131,6 +131,5 @@ class ReportParser(Command):
                 pool.close()
                 pool.join()
 
-            PaymentReccurent().set_reccurent_on()
         except Exception as e:
             app.logger.error(e)

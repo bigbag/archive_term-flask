@@ -25,12 +25,41 @@ class YaMoneyApi(object):
         self.const = const
         self.curl = None
         self.instance_id = None
+        self.success_uri = const.SUCCESS_URI
+        self.fail_uri = const.FAIL_URI
 
+        # logging.basicConfig(format=u'# %(levelname)s, file:%(filename)s,
+        # line:%(lineno)d, time:%(asctime)s], error: %(message)s',
+        # level=logging.INFO)
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
     def __repr__(self):
         return "%s" % self.const
+
+    def logging_status(self, status):
+        error = ''
+        if 'error' in status:
+            error = status['error']
+        info = "%s: %s" % (status['status'], error)
+
+        self.logger.error(info)
+        return True
+
+    def get_random_headers(self):
+        """
+        Copyright: 2011, Grigoriy Petukhov
+        Build headers which sends typical browser.
+        """
+
+        return {
+            'Accept':
+            'text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
+            'Accept-Language': 'en-us,en;q=0.5',
+            'Accept-Charset': 'utf-8,windows-1251;q=0.7,*;q=0.5',
+            'Keep-Alive': '300',
+            'Expect': '',
+        }
 
     def get_url(self, method):
         general_url = self.const.GENERAL_URL
@@ -43,8 +72,12 @@ class YaMoneyApi(object):
         if self.curl:
             return True
 
+        headers = self.get_random_headers()
+        header_tuples = [str('%s: %s' % x) for x
+                         in headers.items()]
+
         self.curl = pycurl.Curl()
-        self.curl .setopt(pycurl.HTTPHEADER, ["Accept:"])
+        self.curl.setopt(pycurl.HTTPHEADER, header_tuples)
         self.curl.setopt(pycurl.CONNECTTIMEOUT, self.CONNECT_TIMEOUT)
         self.curl.setopt(pycurl.TIMEOUT, self.TIMEOUT)
         self.curl.setopt(pycurl.NOSIGNAL, 1)
@@ -108,6 +141,10 @@ class YaMoneyApi(object):
             return False
 
         result = self._parse_result(result)
+        if not 'status' in result:
+            self.logger.error('Not found field status')
+            return False
+
         if result['status'] != 'success':
             return False
 
@@ -142,6 +179,11 @@ class YaMoneyApi(object):
             'request-external-payment', data)
         if not result:
             return False
+
+        if not 'status' in result:
+            self.logger.error('Not found field status')
+            return False
+
         if result['status'] != 'success':
             return False
 
@@ -160,42 +202,52 @@ class YaMoneyApi(object):
             'request-external-payment', data)
         if not result:
             return False
+
+        if not 'status' in result:
+            self.logger.error('Not found field status')
+            return False
+
         if result['status'] != 'success':
             return False
 
         return result
 
-    def get_process_external_payment(self, request_id):
-        """Проведение платежа"""
+    def get_process_external_payment(self, request_id, token=False):
+        """Проведение платежа получение информации о статусе платежа"""
 
         data = dict(
             request_id=request_id,
-            request_token=True,
-            ext_auth_success_uri='http://mobispot.com',
-            ext_auth_fail_uri='http://mobispot.com'
+            ext_auth_success_uri=self.success_uri,
+            ext_auth_fail_uri=self.fail_uri
         )
+        if not token:
+            data['request_token'] = True
+        if token:
+            data['money_source_token'] = token
 
         result = self._request_external_payment(
             'process-external-payment', data)
         return result
 
-    def linking_card(self):
-        """Привязка платежной карты"""
+    def get_linking_card_params(self, order_id=0):
+        """Запрос параметров для привязки карты"""
 
-        payment = self.get_request_payment_to_shop(1, self.const.CARD_PATTERN_ID)
+        payment = self.get_request_payment_to_shop(
+            1, self.const.CARD_PATTERN_ID, order_id)
         if not payment:
             return False
 
         status = self.get_process_external_payment(payment['request_id'])
+        if not 'status' in status:
+            self.logger.error('Not found field status')
+            return False
+
         if status['status'] != 'ext_auth_required':
-            error = ''
-            if 'error' in status:
-                error = status['error']
-            info = "%s: %s" % (status['status'], error)
-            self.logger.info(info)
+            self.logging_status(status)
             return False
 
         if not 'acs_uri' in status or not 'acs_params' in status:
+            self.logger.error('Not found fields acs_uri or acs_params')
             return False
 
         result = dict(
@@ -204,3 +256,39 @@ class YaMoneyApi(object):
         )
 
         return result
+
+    def get_payment_info(self, request_id):
+        """
+            Получаем платежный информацию для фоновых платежей и отображения привязанной карты
+            в интерфейсе
+        """
+
+        status = self.get_process_external_payment(request_id)
+        if status['status'] != 'success':
+            self.logging_status(status)
+            return False
+
+        result = dict(
+            token=status['money_source']['money_source_token'],
+            card_pan=status['money_source']['pan_fragment'],
+            card_type=status['money_source']['payment_card_type'],
+            invoice_id=status['invoice_id'],
+            request_id=request_id
+        )
+        return result
+
+    def background_payment(self, amount, token):
+        """Фоновый платеж по карте"""
+
+        payment = self.get_request_payment_to_shop(
+            amount, self.const.CARD_PATTERN_ID)
+        if not payment:
+            return False
+
+        status = self.get_process_external_payment(
+            payment['request_id'], token)
+        if status['status'] not in ('success', 'in_progress'):
+            self.logging_status(status)
+            return False
+
+        return status
