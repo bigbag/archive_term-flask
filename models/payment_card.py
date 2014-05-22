@@ -47,7 +47,7 @@ class PaymentCard(db.Model, BaseModel):
             return False
 
         history = PaymentHistory()
-        history.add_linking_record(self, wallet.user_id, wallet.id)
+        history.add_linking_record(wallet.user_id, wallet.id)
         if not history.save():
             return False
 
@@ -67,7 +67,7 @@ class PaymentCard(db.Model, BaseModel):
         db.session.commit()
         return status
 
-    def linkig_card(self, request_id):
+    def linking_card(self, request_id):
         """Привязываем карту, получаем платежный токен"""
 
         history = PaymentHistory.query.filter_by(request_id=request_id).first()

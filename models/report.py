@@ -118,9 +118,8 @@ class Report(db.Model, BaseModel):
         if old_report:
             return error
 
-        # Если операция платежная, обновляем баланс личного кошелька
-        # и пишем информацию в историю, сохраняем отчет
-        if int(self.type) == self.TYPE_PAYMENT or int(self.type) == self.TYPE_MPS:
+        # Если операция платежная, создаем задачу на списание с карты
+        if int(self.type) == self.TYPE_PAYMENT:
             pass
         # TODO добавить создание задачи для списания с карты
 
@@ -137,7 +136,7 @@ class Report(db.Model, BaseModel):
 
             corp_wallet.balance = int(
                 corp_wallet.balance) - int(
-                self.amount)
+                    self.amount)
             corp_wallet.save()
 
             # Блокируем возможность платежей через корпоративный кошелек
@@ -283,7 +282,7 @@ class Report(db.Model, BaseModel):
                     date=creation_date.strftime(date_pattern),
                     event=events[
                         row.event_id] if events[
-                        row.event_id] else 'Empty',
+                            row.event_id] else 'Empty',
                     amount=float(row.amount) / 100,
                     name=row.name,
                 )

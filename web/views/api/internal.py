@@ -36,7 +36,21 @@ def api_internal_yandex_linking(discodes_id):
 def api_internal_get_info(request_id):
 
     result = {'error': '1'}
-    info = PaymentCard().linkig_card(request_id)
+    info = PaymentCard().linking_card(request_id)
+    if info:
+        result = {'error': '0'}
+
+    print result
+    return make_response(jsonify(result))
+
+
+@mod.route('/yandex/test/<payment_id>', methods=['GET'])
+@json_headers
+def api_internal_test(payment_id):
+    from web.tasks.payment import PaymentTask
+    result = {'error': '1'}
+
+    info = PaymentTask.background_payment(1, 100, payment_id)
     if info:
         result = {'error': '0'}
 
