@@ -26,6 +26,8 @@ from models.payment_wallet import PaymentWallet
 from models.term_settings import TermSettings
 from models.alarm_stack import AlarmStack
 
+from web.tasks.report_parser import ReportParserTask
+
 mod = Blueprint('api_term', __name__)
 
 
@@ -132,7 +134,7 @@ def api_upload_report(term_id, report_datetime):
 
     file = request.stream.read()
     filename = "%s/%s_%s" % (
-        app.config['TMP_PACH'],
+        app.config['REPORT_TMP_PACH'],
         str(term_id),
         str(report_datetime))
 
@@ -150,6 +152,8 @@ def api_upload_report(term_id, report_datetime):
 
     term.report_date = date_helper.get_curent_date()
     term.save()
+
+    ReportParserTask.delay.parser(filename)
 
     return set_message('success', hash_helper.get_content_md5(file), 201)
 

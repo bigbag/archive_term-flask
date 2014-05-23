@@ -18,7 +18,6 @@ from models.report import Report
 from models.event import Event
 from models.term import Term
 
-from models.payment_reccurent import PaymentReccurent
 
 from helpers import date_helper
 
