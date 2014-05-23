@@ -119,6 +119,7 @@ class ReportSenderTask (object):
     def _get_money_xls(self, result):
         file_name = result.get_report_file()
         if not file_name:
+            app.logger.error('Not found excel file %s' % file_name)
             return False
 
         workbook = xlsxwriter.Workbook(file_name)
@@ -208,6 +209,7 @@ class ReportSenderTask (object):
     def _get_corp_xls(self, result):
         file_name = result.get_report_file()
         if not file_name:
+            app.logger.error('Not found excel file %s' % file_name)
             return False
 
         workbook = xlsxwriter.Workbook(file_name)

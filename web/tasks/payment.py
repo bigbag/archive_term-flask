@@ -27,15 +27,18 @@ class PaymentTask (object):
     def background_payment(term_id, amount, payment_id):
         """Проводим фоновый платеж"""
 
+        status = False
         wallet = PaymentWallet.query.filter_by(payment_id=payment_id).first()
         if not wallet:
+            app.logger.error('Not found wallet with pid %s' % payment_id)
+
             return False
 
         history = PaymentHistory()
         history.type = PaymentHistory.TYPE_PAYMENT
         history.amount = amount
-        history.user_id = user_id
-        history.wallet_id = wallet_id
+        history.user_id = wallet.user_id
+        history.wallet_id = wallet.id
         history.term_id = term_id
         history.save()
 
@@ -51,6 +54,7 @@ class PaymentTask (object):
         ym = YaMoneyApi(YandexMoneyConfig)
         status = ym.background_payment(amount, card.token)
         if not status:
+            app.logger.error('Fail in background payment, wallet %s' % wallet.id)
             return False
 
         return status

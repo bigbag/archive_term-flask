@@ -28,6 +28,8 @@ class TermCorpWallet(db.Model, BaseModel):
     INTERVAL_WEEK = 2
     INTERVAL_MONTH = 3
 
+    BALANCE_MIN = 40
+
     id = db.Column(db.Integer, primary_key=True)
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
     person = db.relationship('Person')
@@ -74,7 +76,7 @@ class TermCorpWallet(db.Model, BaseModel):
             result[key] = dict(
                 interval=corp_wallet_interval[
                     wallet.interval][
-                        'name'],
+                    'name'],
                 limit=wallet.limit,
                 balance=wallet.balance
             )

@@ -153,7 +153,7 @@ def api_upload_report(term_id, report_datetime):
     term.report_date = date_helper.get_curent_date()
     term.save()
 
-    ReportParserTask.delay.parser(filename)
+    ReportParserTask.delay.report_manager(filename)
 
     return set_message('success', hash_helper.get_content_md5(file), 201)
 
