@@ -67,9 +67,4 @@ class TestCommand(Command):
                 wallet.save()
 
     def run(self):
-        from web.tasks.payment import PaymentTask
-
-        history = PaymentHistory.query.get(17)
-        PaymentTask.check_linking(history)
-
-        # print result
+        pass
