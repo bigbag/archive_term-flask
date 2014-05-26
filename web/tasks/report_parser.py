@@ -44,6 +44,7 @@ class ReportParserTask (object):
 
         error = False
         result = ReportParserTask.parse_xml(file_path)
+
         for row in result:
             error = ReportParserTask.generate_report(params, row)
 
@@ -55,10 +56,8 @@ class ReportParserTask (object):
                 new_file_patch,
                 params['term_id'],
                 params['time'])
-
             if not os.path.exists(new_file_patch):
                 os.makedirs(new_file_patch)
-
             os.rename(file_path, new_file_name)
             return True
 
@@ -164,7 +163,7 @@ class ReportParserTask (object):
             report.type = payment['type']
             report.term_firm_id = firm_term.firm_id
             report.payment_id = payment['card']
-            report.amount = report.amount * int(term.factor)
+            report.amount = payment['amount'] * int(term.factor)
 
             person = None
             firm_list = FirmTerm().get_list_by_term_id(term.id)
