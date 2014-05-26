@@ -56,6 +56,7 @@ class PaymentCard(db.Model, BaseModel):
         ym = YaMoneyApi(YandexMoneyConfig)
         status = ym.get_linking_card_params(history.id)
         if not status:
+            history.delete()
             return False
 
         history.request_id = status['params']['cps_context_id']

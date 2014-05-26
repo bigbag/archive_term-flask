@@ -22,15 +22,15 @@ web_term_test = loader.loadTestsFromModule(web_term_test)
 
 libs_yandex_test = loader.loadTestsFromModule(libs_yandex_test)
 
-# tests = [
-#     models_general_test,
-#     models_payment_test,
-#     models_term_test,
-#     api_admin_test,
-#     api_term_test,
-#     web_term_test]
+tests = [
+    models_general_test,
+    models_payment_test,
+    models_term_test,
+    api_admin_test,
+    api_term_test,
+    web_term_test]
 
-tests = [libs_yandex_test]
+#tests = [libs_yandex_test]
 
 alltests = unittest.TestSuite(tests)
 
