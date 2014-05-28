@@ -27,9 +27,12 @@ class Config(object):
     TMP_PACH = './tmp'
     REPORT_TMP_PACH = './%s/tmp' % TMP_PACH
     EXCEL_FOLDER = './%s/excel' % TMP_PACH
+    IMG_FOLDER = './%s/img' % TMP_PACH
     UPLOAD_LOG = './logs'
     IMPORT_EXTENSIONS = set(['xls', 'xlsx'])
+    IMG_EXTENSIONS = set(['jpg', 'png'])
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+    MAX_IMG_LENGTH = 16 * 1024 * 1024
 
     LOG_PATH = './logs'
 
