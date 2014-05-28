@@ -101,7 +101,8 @@ def api_get_blacklist():
     """Возвращает черный список карт"""
     query = PaymentWallet.query
     query = query.filter(PaymentWallet.type == PaymentWallet.TYPE_FULL)
-    query = query.filter((PaymentWallet.blacklist == PaymentWallet.ACTIVE_OFF) | (PaymentWallet.status == PaymentWallet.STATUS_BANNED))
+    query = query.filter((PaymentWallet.blacklist == PaymentWallet.ACTIVE_OFF) | (
+        PaymentWallet.status == PaymentWallet.STATUS_BANNED))
     wallets = query.group_by(PaymentWallet.payment_id).all()
 
     blacklist = []
@@ -153,7 +154,7 @@ def api_upload_report(term_id, report_datetime):
     term.report_date = date_helper.get_curent_date()
     term.save()
 
-    ReportParserTask.delay.report_manager(filename)
+    ReportParserTask.report_manager.delay(filename)
 
     return set_message('success', hash_helper.get_content_md5(file), 201)
 

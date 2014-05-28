@@ -203,6 +203,8 @@ class YaMoneyApi(object):
 
         result = self._request_external_payment(
             'request-external-payment', data)
+
+        print result
         if not result:
             return False
 
@@ -221,7 +223,7 @@ class YaMoneyApi(object):
         data = dict(
             request_id=request_id,
             ext_auth_success_uri=self.success_uri,
-            ext_auth_fail_uri=self.fail_uri
+            ext_auth_fail_uri=self.fail_uri,
         )
         if not token:
             data['request_token'] = True
@@ -272,24 +274,28 @@ class YaMoneyApi(object):
             return False
 
         result = dict(
-            token=status['money_source']['money_source_token'],
-            card_pan=status['money_source']['pan_fragment'],
-            card_type=status['money_source']['payment_card_type'],
             invoice_id=status['invoice_id'],
             request_id=request_id
         )
+        if 'money_source' in status:
+            result['token'] = status['money_source']['money_source_token']
+            result['card_pan'] = status['money_source']['pan_fragment']
+            result['card_type'] = status['money_source']['payment_card_type']
+
         return result
 
     def background_payment(self, amount, token):
         """Фоновый платеж по карте"""
 
         payment = self.get_request_payment_to_shop(
-            amount, self.const.CARD_PATTERN_ID)
+            amount, self.const.PAYMENT_PATTERN_ID)
+
         if not payment:
             return False
 
         status = self.get_process_external_payment(
             payment['request_id'], token)
+
         if status['status'] not in ('success', 'in_progress'):
             self.logging_status(status)
             return False

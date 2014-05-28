@@ -17,6 +17,7 @@ from helpers import date_helper
 from models.payment_history import PaymentHistory
 from models.payment_card import PaymentCard
 from models.payment_wallet import PaymentWallet
+from models.term import Term
 
 
 class PaymentTask (object):
@@ -51,7 +52,13 @@ class PaymentTask (object):
             wallet.save()
             return False
 
+        term = Term.query.get(term_id)
+        if not term:
+            app.logger.error('Not found term %s' % term_id)
+            return False
+
         ym = YaMoneyApi(YandexMoneyConfig)
+        amount = amount / Term.DEFAULT_FACTOR * Term.factor
         status = ym.background_payment(amount, card.token)
         if not status:
             app.logger.error(
@@ -59,7 +66,35 @@ class PaymentTask (object):
                 wallet.id)
             return False
 
-        return status
+        history.request_id = status['request_id']
+        if history.save():
+            PaymentTask.check_status.delay(history.request_id, history)
+
+        return True
+
+    @staticmethod
+    @celery.task
+    def check_status(request_id, history=False):
+
+        ym = YaMoneyApi(YandexMoneyConfig)
+        status = ym.get_payment_info(request_id)
+        if not status:
+            app.logger.error('Fail in payment request_id=%s' % request_id)
+            return False
+
+        if not history:
+            history = PaymentHistory.query.filter_by(
+                request_id=request_id).first()
+
+        if not history:
+            app.logger.error('Not found history request_id=%s' % request_id)
+            return False
+
+        history.invoice_id = status['invoice_id']
+        history.status = PaymentHistory.STATUS_COMPLETE
+        history.save()
+
+        return True
 
     @staticmethod
     @celery.task
