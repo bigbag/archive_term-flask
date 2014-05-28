@@ -45,7 +45,7 @@ class PaymentTask (object):
         card = PaymentCard.query.filter_by(
             wallet_id=wallet.id,
             status=PaymentCard.STATUS_PAYMENT).first(
-        )
+            )
         if not card:
             wallet.blacklist = PaymentWallet.ACTIVE_OFF
             wallet.save()
@@ -54,7 +54,9 @@ class PaymentTask (object):
         ym = YaMoneyApi(YandexMoneyConfig)
         status = ym.background_payment(amount, card.token)
         if not status:
-            app.logger.error('Fail in background payment, wallet %s' % wallet.id)
+            app.logger.error(
+                'Fail in background payment, wallet %s' %
+                wallet.id)
             return False
 
         return status
@@ -74,6 +76,9 @@ class PaymentTask (object):
     @staticmethod
     @celery.task
     def check_linking(history):
+        history.status = PaymentHistory.STATUS_FAILURE
+        history.save()
+
         result = PaymentCard().linking_card(history.request_id)
         if not result:
             delta = date_helper.get_curent_date(
@@ -81,5 +86,9 @@ class PaymentTask (object):
 
             if delta.total_seconds() > PaymentCard.MAX_LINKING_CARD_TIMEOUT:
                 history.delete()
+                return True
+
+            history.status = PaymentHistory.STATUS_NEW
+            history.save()
 
         return True
