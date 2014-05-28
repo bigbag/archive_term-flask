@@ -99,6 +99,7 @@ class YaMoneyApi(object):
 
     def set_request(self, url, data=None):
         if not self.init_request():
+            self.logger.error('Fail in init pycurl')
             return False
 
         buf = cStringIO.StringIO()
@@ -138,6 +139,7 @@ class YaMoneyApi(object):
         data = dict(client_id=self.const.CLIENT_ID)
         result = self.set_request(self.get_url('instance-id'), data)
         if not result:
+            self.logger.error('Fail in instance-id request')
             return False
 
         result = self._parse_result(result)
@@ -146,6 +148,7 @@ class YaMoneyApi(object):
             return False
 
         if result['status'] != 'success':
+            self.logging_status(status)
             return False
 
         self.instance_id = result['instance_id']
