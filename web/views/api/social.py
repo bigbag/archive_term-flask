@@ -5,14 +5,17 @@
     :copyright: (c) 2014 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
+import os
 import json
 from flask import Blueprint, abort, request, make_response, url_for, render_template
+from werkzeug.utils import secure_filename
 
 from web import app, cache
 
 from decorators.header import *
 from helpers.error_xml_helper import *
 from helpers import date_helper
+from helpers import hash_helper
 
 from models.payment_loyalty import PaymentLoyalty
 from models.person_event import PersonEvent
@@ -143,7 +146,7 @@ def api_social_spot_loyalty(ean):
 
         if not wallet_loyalty[0].checked:
             abort(404)
-        
+
         loyalties = [loyalty]
 
     else:
@@ -168,6 +171,71 @@ def api_social_spot_loyalty(ean):
         loyalties=loyalties,
         count=count,
         offset=offset
+    ).encode('utf8')
+
+    return make_response(info_xml)
+
+
+@mod.route('/socnet/post/<ean>', methods=['POST'])
+@xml_headers
+def api_social_post(ean):
+    """Публикует пост с картинкой в заданной в soc_id соцсети"""
+    """В данный момент просто сохраняет картинку и отдаёт ссылку на неё"""
+    base._api_access(request)
+
+    ean = str(ean)
+    if not len(ean) == 13 or not ean.isdigit():
+        abort(400)
+
+    spot = Spot.query.filter_by(barcode=ean).first()
+    if not spot:
+        abort(404)
+
+    error = 'Unknown error'
+    img = ''
+
+    filepath = False
+    file = request.files['img']
+    filesize = 0
+
+    if file:
+        file.seek(0, os.SEEK_END)
+        filesize = file.tell()
+        file.seek(0, os.SEEK_SET)
+
+    if not file or '.' not in file.filename:
+        error = 'Incorrect file'
+    elif file.filename.rsplit('.', 1)[1] not in app.config['IMG_EXTENSIONS']:
+        error = 'usupported file extension'
+    elif filesize > app.config['MAX_IMG_LENGTH']:
+        error = 'img too large'
+    else:
+        baseName = secure_filename(file.filename)
+        imgName = baseName
+
+        filepath = "%s/%s/%s" % (os.getcwd(), app.config['IMG_FOLDER'],
+                                 imgName)
+
+        i = 0
+        while (os.path.exists(filepath)):
+            i += 1
+            imgName = "%s_%s" % (str(i), baseName)
+            filepath = "%s/%s/%s" % (os.getcwd(), app.config['IMG_FOLDER'],
+                                     imgName)
+
+        file.save(filepath)
+
+        img = "http://%s/%s/%s" % (
+            request.host, app.config['IMG_FOLDER'], imgName)
+        img = img.replace('/././', '/')
+
+        error = 'no write rights fo this social account'  # заглушка
+
+    info_xml = render_template(
+        'api/social/spot_post.xml',
+        spot=spot,
+        error=error,
+        img=img
     ).encode('utf8')
 
     return make_response(info_xml)

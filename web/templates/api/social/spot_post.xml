@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<info>
+    <spot>
+        <barcode>{{spot.barcode}}</barcode>
+        <success>0</success>
+        <error>{{error}}</error>
+        <img>{{img}}</img>
+    </spot>
+</info>
