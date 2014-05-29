@@ -124,6 +124,7 @@ class YaMoneyApi(object):
             result = json.loads(result)
         except Exception as e:
             self.logger.error(e)
+        print result
         return result
 
     def get_instance_id(self):

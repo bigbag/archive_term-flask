@@ -29,7 +29,6 @@ class PaymentTask (object):
     @celery.task
     def background_payment(report):
         """Проводим фоновый платеж"""
-
         status = False
         wallet = PaymentWallet.query.filter_by(
             payment_id=report.payment_id).first()
@@ -44,7 +43,6 @@ class PaymentTask (object):
             return False
 
         history = PaymentHistory().from_report(report, wallet)
-
         if not history:
             app.logger.error('Fail in history add, report_id=%s' % report.id)
             return False
@@ -54,6 +52,7 @@ class PaymentTask (object):
             status=PaymentCard.STATUS_PAYMENT).first(
             )
         if not card:
+            history.delete()
             wallet.add_to_blacklist()
             return False
 
