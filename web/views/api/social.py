@@ -176,6 +176,32 @@ def api_social_spot_loyalty(ean):
     return make_response(info_xml)
 
 
+@mod.route('/socnet/<ean>', methods=['GET'])
+@xml_headers
+def api_socnet_list(ean):
+    """Список соцсетей, подключенных к споту с правами записи"""
+    base._api_access(request)
+
+    ean = str(ean)
+    if not len(ean) == 13 or not ean.isdigit():
+        abort(400)
+
+    spot = Spot.query.filter_by(barcode=ean).first()
+    if not spot:
+        abort(404)
+
+    list = spot.getBindedNets()
+
+    info_xml = render_template(
+        'api/social/socnet_list.xml',
+        spot=spot,
+        list=list,
+        count=len(list)
+    ).encode('utf8')
+
+    return make_response(info_xml)
+
+
 @mod.route('/socnet/post/<ean>', methods=['POST'])
 @xml_headers
 def api_social_post(ean):
