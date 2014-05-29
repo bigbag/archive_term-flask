@@ -2,8 +2,10 @@
 <info>
     <spot>
         <barcode>{{spot.barcode}}</barcode>
-        <success>0</success>
+        <success>{{success}}</success>
+        {% if error: %}
         <error>{{error}}</error>
+        {% endif %}
         <img>{{img}}</img>
     </spot>
 </info>

@@ -5,13 +5,17 @@
     :copyright: (c) 2013 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
-from libs.socnet.socnet_base import SocnetBase
-from models.soc_token import SocToken
-from grab import Grab
+import os
 import json
 import urllib
 import pprint
+from grab import Grab
+from grab.upload import UploadFile
+
 from helpers import request_helper
+
+from libs.socnet.socnet_base import SocnetBase
+from models.soc_token import SocToken
 
 
 class FacebookApi(SocnetBase):
@@ -118,3 +122,26 @@ class FacebookApi(SocnetBase):
             url)
 
         return request_helper.make_request(self.FQL_PATH + query.replace(' ', '+') + '&access_token=' + socToken.user_token, parse_json)
+
+    def post_photo(self, token_id, filepath, message):
+        answer = False
+        g = Grab()
+
+        socToken = SocToken.query.get(token_id)
+        url = "%s%s" % (self.API_PATH, 'me/photos')
+        data = {
+            'access_token': socToken.user_token,
+            'source': 'image',
+            'image': UploadFile(filepath),
+            'privacy': json.dumps({'value': 'EVERYONE'})
+        }
+        if message:
+            data['message'] = message
+
+        g.setup(multipart_post=data)
+        g.go(url)
+        response = json.loads(g.response.body)
+        if 'id' in response:
+            answer = True
+
+        return answer

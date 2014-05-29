@@ -42,3 +42,9 @@ class SocnetsApi():
         netShared = method(url, token_id, loyalty_id)
 
         return netShared
+
+    def post_photo(self, type, token_id, filepath, message):
+        # пока только facebook
+        socApi = FacebookApi()
+
+        return socApi.post_photo(token_id, filepath, message)
