@@ -35,6 +35,9 @@ class Report(db.Model, BaseModel):
     DEFAULT_PAGE = 1
     POST_ON_PAGE = 10
 
+    STATUS_NEW = 0
+    STATUS_COMPLETE = 1
+
     id = db.Column(db.Integer, primary_key=True)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'), index=True)
     term = db.relationship('Term')
@@ -50,6 +53,7 @@ class Report(db.Model, BaseModel):
     corp_type = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Integer, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
+    status = term_firm_id = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
         self.amount = 0
@@ -65,6 +69,7 @@ class Report(db.Model, BaseModel):
         self.page = self.DEFAULT_PAGE
         self.period = 'day'
         self.payment_type = self.TYPE_WHITE
+        self.status = self.STATUS_NEW
         self.firm_id = 0
         self.person_id = 0
 
@@ -79,9 +84,11 @@ class Report(db.Model, BaseModel):
         if old_report:
             return error
 
+        self.status = self.STATUS_COMPLETE
         # Если операция платежная, создаем задачу на списание с карты
         if int(self.type) == self.TYPE_PAYMENT:
-            PaymentTask.background_payment.delay(self.term_id, self.amount, self.payment_id)
+            self.status = self.STATUS_NEW
+            PaymentTask.background_payment.delay(self)
 
         # Если операция по белому списку и есть корп кошелек, меняем его баланс
         if self.person_id != 0:

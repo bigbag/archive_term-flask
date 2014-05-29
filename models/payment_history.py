@@ -34,6 +34,7 @@ class PaymentHistory(db.Model, BaseModel):
     SYSTEM_PAYMENT = 1
 
     id = db.Column(db.Integer, primary_key=True)
+    report_id = db.Column(db.Integer(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     user = db.relationship('User')
     wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'), index=True)
@@ -52,13 +53,29 @@ class PaymentHistory(db.Model, BaseModel):
         self.status = self.STATUS_NEW
         self.type = self.TYPE_PAYMENT
         self.request_id = 0
+        self.report_id = 0
+        self.invoice_id = 0
         self.creation_date = date_helper.get_curent_date()
+
+    def from_report(self, report, wallet):
+        history = PaymentHistory()
+        history.type = PaymentHistory.TYPE_PAYMENT
+        history.amount = report.amount
+        history.user_id = wallet.user_id
+        history.report_id = report.id
+        history.wallet_id = wallet.id
+        history.term_id = report.term_id
+        history.creation_date = report.creation_date
+        history.report_id = report.id
+        if not history.save():
+            return False
+        return history
 
     def get_fail_linking_record(self, history_id, wallet_id):
         return PaymentHistory().query.filter(PaymentHistory.id != history_id).filter(
             PaymentHistory.wallet_id == wallet_id).filter(
-            PaymentHistory.type == PaymentHistory.TYPE_SYSTEM).filter(
-            PaymentHistory.status == PaymentHistory.STATUS_NEW).all()
+                PaymentHistory.type == PaymentHistory.TYPE_SYSTEM).filter(
+                    PaymentHistory.status == PaymentHistory.STATUS_NEW).all()
 
     def add_linking_record(self, user_id, wallet_id):
         self.type = PaymentHistory.TYPE_SYSTEM

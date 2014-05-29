@@ -53,6 +53,18 @@ class PaymentWallet(db.Model, BaseModel):
         self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_NOACTIVE
 
+    def add_to_blacklist(self):
+        self.blacklist = PaymentWallet.ACTIVE_OFF
+        if self.save():
+            return self
+        return False
+
+    def remove_from_blacklist(self):
+        self.blacklist = PaymentWallet.ACTIVE_ON
+        if self.save():
+            return self
+        return False
+
     def get_pid(self, pids):
         pid = "%s%s" % (pids, random.randint(100000000, 999999999))
         pid = "%s%s" % (pid, hash_helper.get_isin_checksum(pid))

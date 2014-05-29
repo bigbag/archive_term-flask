@@ -203,8 +203,6 @@ class YaMoneyApi(object):
 
         result = self._request_external_payment(
             'request-external-payment', data)
-
-        print result
         if not result:
             return False
 
@@ -269,7 +267,11 @@ class YaMoneyApi(object):
         """
 
         status = self.get_process_external_payment(request_id)
-        if status['status'] != 'success':
+        if not status or not 'status' in status:
+            self.logger.error('Not found fields status')
+            return False
+
+        if status['status'] not in ('success', 'in_progress'):
             self.logging_status(status)
             return False
 
@@ -295,6 +297,8 @@ class YaMoneyApi(object):
 
         status = self.get_process_external_payment(
             payment['request_id'], token)
+
+        status['request_id'] = payment['request_id']
 
         if status['status'] not in ('success', 'in_progress'):
             self.logging_status(status)
