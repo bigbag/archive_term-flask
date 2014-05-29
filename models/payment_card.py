@@ -43,8 +43,8 @@ class PaymentCard(db.Model, BaseModel):
 
         wallet = PaymentWallet.query.filter(
             PaymentWallet.discodes_id == discodes_id).filter(
-            PaymentWallet.user_id != 0).first(
-        )
+                PaymentWallet.user_id != 0).first(
+                )
         if not wallet:
             return False
 
@@ -89,6 +89,9 @@ class PaymentCard(db.Model, BaseModel):
         if not status:
             return False
 
+        if status['status'] != 'success':
+            return False
+
         history.invoice_id = status['invoice_id']
         history.status = PaymentHistory.STATUS_COMPLETE
         if not history.save():
@@ -109,6 +112,7 @@ class PaymentCard(db.Model, BaseModel):
         card.pan = status['card_pan']
         card.type = status['card_type']
         card.status = PaymentCard.STATUS_PAYMENT
+
         if not card.save():
             return False
 
