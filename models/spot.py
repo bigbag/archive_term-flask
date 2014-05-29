@@ -18,6 +18,7 @@ from models.base_model import BaseModel
 
 from models.user import User
 from models.spot_dis import SpotDis
+from models.soc_token import SocToken
 
 
 class Spot(db.Model, BaseModel):
@@ -139,7 +140,7 @@ class Spot(db.Model, BaseModel):
         ]
         return Spot.query.filter(
             Spot.code == code).filter(
-            Spot.status.in_(valid_status)).first()
+                Spot.status.in_(valid_status)).first()
 
     def save(self):
         if not self.registered_date and self.status == self.STATUS_REGISTERED:
@@ -160,3 +161,18 @@ class Spot(db.Model, BaseModel):
             self.code = self.get_code(self.discodes_id)
 
         return BaseModel.save(self)
+
+    def getBindedNets(self):
+        answer = []
+
+        if not self.user_id:
+            return answer
+
+        tokens = SocToken.query.filter_by(
+            user_id=self.user_id, write_access=1).all()
+
+        for token in tokens:
+            item = {'soc_id': token.type, 'name': token.netName()}
+            answer.append(item)
+
+        return answer
