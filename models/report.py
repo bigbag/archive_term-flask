@@ -53,7 +53,7 @@ class Report(db.Model, BaseModel):
     corp_type = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Integer, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
-    status = term_firm_id = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
         self.amount = 0
@@ -97,11 +97,14 @@ class Report(db.Model, BaseModel):
             if person.wallet_status == Person.STATUS_VALID and person.type == Person.TYPE_WALLET:
 
                 self.corp_type = self.CORP_TYPE_ON
-                corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id).first()
+                corp_wallet = TermCorpWallet.query.filter_by(
+                    person_id=person.id).first()
                 if not corp_wallet:
                     return error
 
-                corp_wallet.balance = int(corp_wallet.balance) - int(self.amount)
+                corp_wallet.balance = int(
+                    corp_wallet.balance) - int(
+                        self.amount)
                 corp_wallet.save()
 
         # Блокируем возможность платежей через корпоративный кошелек
@@ -247,7 +250,7 @@ class Report(db.Model, BaseModel):
                     date=creation_date.strftime(date_pattern),
                     event=events[
                         row.event_id] if events[
-                        row.event_id] else 'Empty',
+                            row.event_id] else 'Empty',
                     amount=float(row.amount) / 100,
                     name=row.name,
                 )
