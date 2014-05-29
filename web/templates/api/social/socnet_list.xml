@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<info>
+    <spot>
+        <barcode>{{spot.barcode}}</barcode>
+        {% for net in list %}
+        <socnet>
+            <soc_id>{{net.soc_id}}</soc_id>
+            <name>{{net.name}}</name>
+        </socnet>
+        {% endfor %}
+        <count>{{count}}</count>
+    </spot>
+</info>
