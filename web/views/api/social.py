@@ -25,9 +25,8 @@ from models.wallet_loyalty import WalletLoyalty
 from models.soc_token import SocToken
 from models.likes_stack import LikesStack
 from models.spot import Spot
-
 from web.views.api import base
-
+from libs.socnet.socnets_api import SocnetsApi
 
 mod = Blueprint('api_social', __name__)
 
@@ -206,7 +205,7 @@ def api_socnet_list(ean):
 @xml_headers
 def api_social_post(ean):
     """Публикует пост с картинкой в заданной в soc_id соцсети"""
-    """В данный момент просто сохраняет картинку и отдаёт ссылку на неё"""
+
     base._api_access(request)
 
     ean = str(ean)
@@ -217,12 +216,21 @@ def api_social_post(ean):
     if not spot:
         abort(404)
 
-    error = 'Unknown error'
-    img = ''
+    if not 'soc_id' in request.form:
+        abort(400)
 
-    filepath = False
+    success = 0
+    error = 'Unknown error'
+    soc_id = request.form['soc_id']
     file = request.files['img']
     filesize = 0
+    img = ''
+    token = False
+    filepath = False
+    message = ''
+
+    if 'text' in request.form:
+        message = request.form['text']
 
     if file:
         file.seek(0, os.SEEK_END)
@@ -255,13 +263,24 @@ def api_social_post(ean):
             request.host, app.config['IMG_FOLDER'], imgName)
         img = img.replace('/././', '/')
 
-        error = 'no write rights fo this social account'  # заглушка
+        error = 'no write rights fo this social account'
+
+        token = SocToken.query.filter_by(
+            user_id=spot.user_id, type=soc_id, write_access=1).first()
+
+    if token and img and filepath:
+        if SocnetsApi().post_photo(token, token.id, filepath, message):
+            success = 1
+            error = ''
+        else:
+            error = 'filed when uploading img to socnet'
 
     info_xml = render_template(
         'api/social/spot_post.xml',
         spot=spot,
         error=error,
-        img=img
+        img=img,
+        success=success
     ).encode('utf8')
 
     return make_response(info_xml)
