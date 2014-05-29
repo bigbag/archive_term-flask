@@ -89,7 +89,7 @@ class PaymentCard(db.Model, BaseModel):
         if not status:
             return False
 
-        if not status['status'] != 'success':
+        if status['status'] != 'success':
             return False
 
         history.invoice_id = status['invoice_id']
@@ -112,6 +112,7 @@ class PaymentCard(db.Model, BaseModel):
         card.pan = status['card_pan']
         card.type = status['card_type']
         card.status = PaymentCard.STATUS_PAYMENT
+
         if not card.save():
             return False
 

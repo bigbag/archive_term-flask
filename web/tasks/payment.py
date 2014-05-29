@@ -95,9 +95,6 @@ class PaymentTask (object):
     @staticmethod
     @celery.task
     def check_linking(history):
-        history.status = PaymentHistory.STATUS_FAILURE
-        history.save()
-
         result = PaymentCard().linking_card(history.request_id)
         if not result:
             delta = date_helper.get_curent_date(
@@ -105,9 +102,6 @@ class PaymentTask (object):
             if delta.total_seconds() > PaymentCard.MAX_LINKING_CARD_TIMEOUT:
                 history.delete()
                 return True
-
-            history.status = PaymentHistory.STATUS_NEW
-            history.save()
 
         return True
 
@@ -130,9 +124,9 @@ class PaymentTask (object):
 
         history = PaymentHistory.query.filter(
             PaymentHistory.report_id != 0).filter(
-                PaymentHistory.invoice_id == 0).all(
-                )
-
+                PaymentHistory.invoice_id == 0).filter(
+                    PaymentHistory.request_id != 0).all(
+                    )
         for key in history:
             PaymentTask.check_status.delay(key.request_id)
 
