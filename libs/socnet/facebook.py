@@ -8,10 +8,17 @@
 from libs.socnet.socnet_base import SocnetBase
 from models.soc_token import SocToken
 from grab import Grab
+import os
 import json
 import urllib
 import pprint
+from grab import Grab
+from grab.upload import UploadFile
+
 from helpers import request_helper
+
+from libs.socnet.socnet_base import SocnetBase
+from models.soc_token import SocToken
 
 
 class FacebookApi(SocnetBase):
@@ -76,60 +83,68 @@ class FacebookApi(SocnetBase):
     def parse_username(url):
         username = url
         if FacebookApi.URLS_PARTS['base'] in username:
-            start_char = username.find(FacebookApi.URLS_PARTS['base']) + len(FacebookApi.URLS_PARTS['base'])
-            username = username[start_char:]
+            username = username[
+                username.find(FacebookApi.URLS_PARTS['base']) + len(FacebookApi.URLS_PARTS['base']):]
 
         username = request_helper.clear_get_params(username)
 
         return username
 
     def get_page(self, url, token_id, parse_json):
-        soc_token = SocToken.query.get(token_id)
+        socToken = SocToken.query.get(token_id)
         username = FacebookApi.parse_username(url)
-        url_api = "%s%s?access_token=%s" % (
-            self.API_PATH,
-            username,
-            soc_token.user_token)
-        return request_helper.make_request(url_api, parse_json)
+        urlAPI = self.API_PATH + username + \
+            '?access_token=' + socToken.user_token
+
+        return request_helper.make_request(urlAPI, parse_json)
 
     def get_like(self, page_id, token_id, parse_json):
-        soc_token = SocToken.query.get(token_id)
-        url_api = "%s%s%s?access_token=%s" % (
-            self.API_PATH,
-            self.URLS_PARTS['my_likes'],
-            page_id,
-            soc_token.user_token)
+        socToken = SocToken.query.get(token_id)
+        urlAPI = self.API_PATH + self.URLS_PARTS['my_likes'] + \
+            page_id + '?access_token=' + socToken.user_token
 
-        return request_helper.make_request(url_api, parse_json)
+        return request_helper.make_request(urlAPI, parse_json)
 
     def get_object_like(self, object_id, token_id, parse_json):
-        soc_token = SocToken.query.get(token_id)
-        query = 'SELECT object_id,user_id FROM like WHERE user_id = me() and object_id = %s' % object_id
+        socToken = SocToken.query.get(token_id)
+        query = 'SELECT object_id,user_id FROM like WHERE user_id = me() and object_id = %s' % (
+            object_id)
 
-        url_api = "%s%s&access_token=%s" % (
-            self.FQL_PATH,
-            query.replace(' ', '+'),
-            soc_token.user_toke)
-        return request_helper.make_request(url_api, parse_json)
+        return request_helper.make_request(self.FQL_PATH + query.replace(' ', '+') + '&access_token=' + socToken.user_token, parse_json)
 
     def get_external_like(self, url, token_id):
-        soc_token = SocToken.query.get(token_id)
-        query = 'SELECT attachment ,created_time ,type ,description FROM stream WHERE source_id=me() and strpos(attachment.href,"%s")>=0 and strpos(attachment.href,"fb_action_types=og.likes") > 0' % url
+        socToken = SocToken.query.get(token_id)
+        query = 'SELECT attachment ,created_time ,type ,description FROM stream WHERE source_id=me() and strpos(attachment.href,"%s")>=0 and strpos(attachment.href,"fb_action_types=og.likes") > 0' % (
+            url)
 
-        url_api = "%s%s&access_token=%s" % (
-            self.FQL_PATH,
-            query.replace(' ', '+'),
-            soc_token.user_token)
-        return request_helper.make_request(url_api, True)
+        return request_helper.make_request(self.FQL_PATH + query.replace(' ', '+') + '&access_token=' + socToken.user_token, True)
 
     def get_sharing(self, url, token_id, parse_json):
-        soc_token = SocToken.query.get(token_id)
+        socToken = SocToken.query.get(token_id)
         query = 'SELECT attachment ,created_time ,type ,description FROM stream WHERE source_id=me() and actor_id=me() and type=80 and attachment.href="%s"' % (
             url)
 
-        url_api = "%s%s&access_token=%s" % (
-            self.FQL_PATH,
-            query.replace(' ', '+'),
-            soc_token.user_token)
+        return request_helper.make_request(self.FQL_PATH + query.replace(' ', '+') + '&access_token=' + socToken.user_token, parse_json)
 
-        return request_helper.make_request(url_api, parse_json)
+    def post_photo(self, token_id, filepath, message):
+        answer = False
+        g = Grab()
+
+        socToken = SocToken.query.get(token_id)
+        url = "%s%s" % (self.API_PATH, 'me/photos')
+        data = {
+            'access_token': socToken.user_token,
+            'source': 'image',
+            'image': UploadFile(filepath),
+            'privacy': json.dumps({'value': 'EVERYONE'})
+        }
+        if message:
+            data['message'] = message
+
+        g.setup(multipart_post=data)
+        g.go(url)
+        response = json.loads(g.response.body)
+        if 'id' in response:
+            answer = True
+
+        return answer
