@@ -49,7 +49,7 @@ class Spot(db.Model, BaseModel):
     name = db.Column(db.String(300))
     url = db.Column(db.String(150), nullable=False)
     barcode = db.Column(db.String(32), nullable=False)
-    spot_type_id = db.Column(db.Integer)
+    type = db.Column(db.Integer)
     lang = db.Column(db.String(10), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship('User')
@@ -65,7 +65,7 @@ class Spot(db.Model, BaseModel):
         self.name = 'No name'
         self.premium = 0
         self.status = self.STATUS_GENERATED
-        self.spot_type_id = self.TYPE_FULL
+        self.type = self.TYPE_FULL
         self.generated_date = date_helper.get_curent_date()
 
     def __repr__(self):
