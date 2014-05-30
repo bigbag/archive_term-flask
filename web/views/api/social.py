@@ -215,8 +215,6 @@ def api_social_post(ean):
         abort(400)
     if not 'soc_id' in request.form:
         abort(400)
-    if not 'img' in request.form:
-        abort(400)
 
     soc_id = request.form['soc_id']
     file = request.files['img']
