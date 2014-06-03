@@ -10,11 +10,14 @@
 
 class SocConfig():
     
-    TWITTER_KEY = '' 
-    TWITTER_SECRET = ''
+    TWITTER_KEY = 'Y2ARSl9t2MssD2D6BNQSMQ' 
+    TWITTER_SECRET = 'TiTRhSf3wUbQYKyXzE3SbrJzma6jM69Uwdnu0oRD4'
+    
+    FACEBOOK_ID = '605375279481505'
+    FACEBOOK_SECRET = '4db65a911817eff54a6a94df6f0d7433'
 
-    GOOGLE_ID = ''
-    GOOGLE_KEY = ''
-    GOOGLE_SECRET = ''
+    GOOGLE_ID = '354141098611.apps.googleusercontent.com'
+    GOOGLE_KEY = 'AIzaSyDFh8hYo85IjdRbX5j6BpBxPKpWE5KCv78'
+    GOOGLE_SECRET = 'JOUENWZRO20Pp9a1u_IuJNTa'
     GOOGLE_SCOPE = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
 
