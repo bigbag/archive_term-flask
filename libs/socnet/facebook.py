@@ -5,9 +5,6 @@
     :copyright: (c) 2013 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
-from libs.socnet.socnet_base import SocnetBase
-from models.soc_token import SocToken
-from grab import Grab
 import os
 import json
 import urllib
@@ -225,4 +222,3 @@ class FacebookApi(SocnetBase):
         app_token = request_helper.parse_get_param(app_token, 'access_token=')
 
         return app_token
->>>>>>> cde79cd3cc66ed2149ad4986dce7a44bc5405831

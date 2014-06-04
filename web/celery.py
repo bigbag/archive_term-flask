@@ -68,7 +68,6 @@ app.config.update(
             'schedule': crontab(minute='*/1'),
             'args': (),
         },
-
         'soc_sharing_rechecker': {
             'task': 'web.tasks.soc_sharing.rechek_manager',
             'schedule': crontab(minute=0, hour='*/3'),
