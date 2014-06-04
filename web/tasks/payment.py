@@ -43,7 +43,7 @@ class PaymentTask (object):
 
         history = PaymentHistory().get_new_payment()
         for key in history:
-            PaymentTask.check_status.delay(history.id)
+            PaymentTask.check_status.delay(key.id)
 
         return True
 
@@ -144,7 +144,7 @@ class PaymentTask (object):
             history.delete()
             return False
 
-        history.request_id = result['request_id']
+        history.request_id = payment['request_id']
         history.save()
         return True
 

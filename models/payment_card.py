@@ -117,7 +117,7 @@ class PaymentCard(db.Model, BaseModel):
             return False
 
         ym = YaMoneyApi(YandexMoneyConfig)
-        result = ym.get_process_external_payment(history_id.request_id)
+        result = ym.get_process_external_payment(history.request_id)
         if not result or not 'status' in result:
             app.logger.error('Linking card: Not found status field, request_id=%s' % history_id.request_id)
             return False
