@@ -27,10 +27,6 @@ class YaMoneyApi(object):
         self.instance_id = None
         self.success_uri = const.SUCCESS_URI
         self.fail_uri = const.FAIL_URI
-
-        # logging.basicConfig(format=u'# %(levelname)s, file:%(filename)s,
-        # line:%(lineno)d, time:%(asctime)s], error: %(message)s',
-        # level=logging.INFO)
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
@@ -124,7 +120,6 @@ class YaMoneyApi(object):
             result = json.loads(result)
         except Exception as e:
             self.logger.error(e)
-        print result
         return result
 
     def get_instance_id(self):
@@ -164,9 +159,7 @@ class YaMoneyApi(object):
         if not result:
             return False
 
-        result = self._parse_result(result)
-
-        return result
+        return self._parse_result(result)
 
     def get_request_payment_p2p(self, amount, recipient, message=None):
         """Создание перевода на кошелек"""
@@ -177,20 +170,7 @@ class YaMoneyApi(object):
             to=recipient,
             message=message
         )
-
-        result = self._request_external_payment(
-            'request-external-payment', data)
-        if not result:
-            return False
-
-        if not 'status' in result:
-            self.logger.error('Not found field status')
-            return False
-
-        if result['status'] != 'success':
-            return False
-
-        return result
+        return self._request_external_payment('request-external-payment', data)
 
     def get_request_payment_to_shop(self, amount, pattern_id, order_id=0):
         """Создание платежа в магазин"""
@@ -200,20 +180,7 @@ class YaMoneyApi(object):
             sum=amount,
             customerNumber=order_id
         )
-
-        result = self._request_external_payment(
-            'request-external-payment', data)
-        if not result:
-            return False
-
-        if not 'status' in result:
-            self.logger.error('Not found field status')
-            return False
-
-        if result['status'] != 'success':
-            return False
-
-        return result
+        return self._request_external_payment('request-external-payment', data)
 
     def get_process_external_payment(self, request_id, token=False):
         """Проведение платежа получение информации о статусе платежа"""
@@ -228,83 +195,4 @@ class YaMoneyApi(object):
         if token:
             data['money_source_token'] = token
 
-        result = self._request_external_payment(
-            'process-external-payment', data)
-        return result
-
-    def get_linking_card_params(self, order_id=0):
-        """Запрос параметров для привязки карты"""
-
-        payment = self.get_request_payment_to_shop(
-            1, self.const.CARD_PATTERN_ID, order_id)
-        if not payment:
-            return False
-
-        status = self.get_process_external_payment(payment['request_id'])
-        if not 'status' in status:
-            self.logger.error('Not found field status')
-            return False
-
-        if status['status'] != 'ext_auth_required':
-            self.logging_status(status)
-            return False
-
-        if not 'acs_uri' in status or not 'acs_params' in status:
-            self.logger.error('Not found fields acs_uri or acs_params')
-            return False
-
-        result = dict(
-            url=status['acs_uri'],
-            params=status['acs_params']
-        )
-
-        return result
-
-    def get_payment_info(self, request_id):
-        """
-            Получаем платежный информацию для фоновых платежей и отображения привязанной карты
-            в интерфейсе
-        """
-
-        status = self.get_process_external_payment(request_id)
-        if not status or not 'status' in status:
-            self.logger.error('Not found fields status')
-            return False
-
-        if status['status'] not in ('success', 'in_progress'):
-            self.logging_status(status)
-            return False
-
-        result = dict(
-            status=status['status'],
-            request_id=request_id
-        )
-        if 'invoice_id' in status:
-            result['invoice_id'] = status['invoice_id']
-
-        if 'money_source' in status:
-            result['token'] = status['money_source']['money_source_token']
-            result['card_pan'] = status['money_source']['pan_fragment']
-            result['card_type'] = status['money_source']['payment_card_type']
-
-        return result
-
-    def background_payment(self, amount, token):
-        """Фоновый платеж по карте"""
-
-        payment = self.get_request_payment_to_shop(
-            amount, self.const.PAYMENT_PATTERN_ID)
-
-        if not payment:
-            return False
-
-        status = self.get_process_external_payment(
-            payment['request_id'], token)
-
-        status['request_id'] = payment['request_id']
-
-        if status['status'] not in ('success', 'in_progress'):
-            self.logging_status(status)
-            return False
-
-        return status
+        return self._request_external_payment('process-external-payment', data)

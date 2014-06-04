@@ -85,10 +85,9 @@ class Report(db.Model, BaseModel):
             return error
 
         self.status = self.STATUS_COMPLETE
-        # Если операция платежная, создаем задачу на списание с карты
+        # Если операция платежная
         if int(self.type) == self.TYPE_PAYMENT:
             self.status = self.STATUS_NEW
-            PaymentTask.background_payment.delay(self)
 
         # Если операция по белому списку и есть корп кошелек, меняем его баланс
         if self.person_id != 0:
@@ -104,7 +103,7 @@ class Report(db.Model, BaseModel):
 
                 corp_wallet.balance = int(
                     corp_wallet.balance) - int(
-                        self.amount)
+                    self.amount)
                 corp_wallet.save()
 
         # Блокируем возможность платежей через корпоративный кошелек
@@ -250,7 +249,7 @@ class Report(db.Model, BaseModel):
                     date=creation_date.strftime(date_pattern),
                     event=events[
                         row.event_id] if events[
-                            row.event_id] else 'Empty',
+                        row.event_id] else 'Empty',
                     amount=float(row.amount) / 100,
                     name=row.name,
                 )
