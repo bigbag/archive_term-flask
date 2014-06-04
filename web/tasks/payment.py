@@ -50,7 +50,7 @@ class PaymentTask (object):
         card = PaymentCard.query.filter_by(
             wallet_id=wallet.id,
             status=PaymentCard.STATUS_PAYMENT).first(
-            )
+        )
         if not card:
             history.delete()
             wallet.add_to_blacklist()
@@ -64,8 +64,8 @@ class PaymentTask (object):
         ym = YaMoneyApi(YandexMoneyConfig)
         amount = int(
             report.amount) / int(
-                Term.DEFAULT_FACTOR) * int(
-                    term.factor)
+            Term.DEFAULT_FACTOR) * int(
+            term.factor)
         status = ym.background_payment(amount, card.token)
         if not status:
             app.logger.error(
@@ -94,7 +94,7 @@ class PaymentTask (object):
     @staticmethod
     @celery.task
     def check_linking(history):
-        result = PaymentCard().linking_card(history.request_id)
+        result = PaymentCard().linking_card(history.id)
         if not result:
             delta = date_helper.get_curent_date(
                 format=False) - history.creation_date
@@ -123,9 +123,9 @@ class PaymentTask (object):
 
         history = PaymentHistory.query.filter(
             PaymentHistory.report_id != 0).filter(
-                PaymentHistory.invoice_id == 0).filter(
-                    PaymentHistory.request_id != 0).all(
-                    )
+            PaymentHistory.invoice_id == 0).filter(
+            PaymentHistory.request_id != 0).all(
+        )
         for key in history:
             PaymentTask.check_status.delay(key.request_id)
 

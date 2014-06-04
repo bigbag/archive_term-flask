@@ -23,24 +23,13 @@ mod = Blueprint('api_internal', __name__)
 def api_internal_yandex_linking(discodes_id):
 
     result = {'error': 1}
-    params = PaymentCard().linking_card_init(discodes_id)
+    params = PaymentCard().linking_init(discodes_id)
+
+    print params
     if params:
         result = params
         result['error'] = 0
 
-    return make_response(jsonify(result))
-
-
-@mod.route('/yandex/linking/info/<request_id>', methods=['GET'])
-@json_headers
-def api_internal_get_info(request_id):
-
-    result = {'error': '1'}
-    info = PaymentCard().linking_card(request_id)
-    if info:
-        result = {'error': '0'}
-
-    print result
     return make_response(jsonify(result))
 
 

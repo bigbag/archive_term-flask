@@ -7,7 +7,7 @@
     :license: BSD, see LICENSE for more details.
 """
 
-from web import db
+from web import db, app
 
 from configs.yandex import YandexMoneyConfig
 from libs.ya_money import YaMoneyApi
@@ -38,13 +38,44 @@ class PaymentCard(db.Model, BaseModel):
     type = db.Column(db.String(128), nullable=False, index=True)
     status = db.Column(db.Integer(), nullable=False, index=True)
 
-    def linking_card_init(self, discodes_id):
+    def get_linking_params(self, order_id=0):
+        """Запрос параметров для привязки карты"""
+
+        ym = YaMoneyApi(YandexMoneyConfig)
+        payment = ym.get_request_payment_to_shop(1, ym.const.CARD_PATTERN_ID, order_id)
+        if not payment:
+            return False
+
+        if not 'request_id' in payment:
+            app.logger.error(payment['error'])
+            return False
+
+        status = ym.get_process_external_payment(payment['request_id'])
+        if not 'status' in status:
+            app.logger.error('Not found field status')
+            return False
+
+        if status['status'] != 'ext_auth_required':
+            return False
+
+        if not 'acs_uri' in status or not 'acs_params' in status:
+            app.logger.error('Not found fields acs_uri or acs_params')
+            return False
+
+        result = dict(
+            url=status['acs_uri'],
+            params=status['acs_params']
+        )
+
+        return result
+
+    def linking_init(self, discodes_id):
         """Инициализируем привязку карты"""
 
         wallet = PaymentWallet.query.filter(
             PaymentWallet.discodes_id == discodes_id).filter(
-                PaymentWallet.user_id != 0).first(
-                )
+            PaymentWallet.user_id != 0).first(
+        )
         if not wallet:
             return False
 
@@ -53,10 +84,10 @@ class PaymentCard(db.Model, BaseModel):
         if not history.save():
             return False
 
-        ym = YaMoneyApi(YandexMoneyConfig)
-        status = ym.get_linking_card_params(history.id)
+        status = self.get_linking_params(history.id)
         if not status:
             history.delete()
+            app.logger.error('Fail in getting parameters')
             return False
 
         history.request_id = status['params']['cps_context_id']
@@ -68,12 +99,13 @@ class PaymentCard(db.Model, BaseModel):
         for row in fail_history:
             db.session.delete(row)
         db.session.commit()
+
         return status
 
-    def linking_card(self, request_id):
+    def linking_card(self, history_id):
         """Привязываем карту, получаем платежный токен"""
 
-        history = PaymentHistory.query.filter_by(request_id=request_id).first()
+        history = PaymentHistory.query.get(history_id)
         if not history:
             return False
 
@@ -85,33 +117,24 @@ class PaymentCard(db.Model, BaseModel):
             return False
 
         ym = YaMoneyApi(YandexMoneyConfig)
-        status = ym.get_payment_info(request_id)
-        if not status:
+        result = ym.get_process_external_payment(history_id.request_id)
+        if not result or not 'status' in result:
+            app.logger.error('Not found status field, request_id=%s' % history_id.request_id)
             return False
 
-        if status['status'] != 'success':
+        if result['status'] != 'success':
             return False
 
-        history.invoice_id = status['invoice_id']
+        self.set_archiv(history.wallet_id)
+
+        card = self.add_payment(history, status)
+        if not card:
+            return False
+
+        history.invoice_id = result['invoice_id']
         history.status = PaymentHistory.STATUS_COMPLETE
         if not history.save():
             return False
-
-        old_cards = PaymentCard.query.filter_by(
-            wallet_id=history.wallet_id,
-            status=PaymentCard.STATUS_PAYMENT).all()
-        for row in old_cards:
-            row.status = PaymentCard.STATUS_ARCHIV
-            db.session.add(row)
-        db.session.commit()
-
-        card = PaymentCard()
-        card.user_id = history.user_id
-        card.wallet_id = history.wallet_id
-        card.token = status['token']
-        card.pan = status['card_pan']
-        card.type = status['card_type']
-        card.status = PaymentCard.STATUS_PAYMENT
 
         if not card.save():
             return False
@@ -119,4 +142,39 @@ class PaymentCard(db.Model, BaseModel):
         wallet.blacklist = PaymentWallet.ACTIVE_ON
         wallet.save()
 
-        return status
+        return result
+
+    def set_archiv(self, wallet_id):
+        """Переводим ввсе карты привязанные к кошельку в архивное состояние"""
+
+        old_cards = PaymentCard.query.filter_by(
+            wallet_id=wallet_id,
+            status=PaymentCard.STATUS_PAYMENT).all()
+
+        for row in old_cards:
+            row.status = PaymentCard.STATUS_ARCHIV
+            db.session.add(row)
+        db.session.commit()
+
+        return True
+
+    def add_payment(self, history, status):
+        """ Добавляем платежную карту"""
+
+        card = PaymentCard()
+        card.user_id = history.user_id
+        card.wallet_id = history.wallet_id
+
+        if not 'money_source' in status:
+            app.logger.error('Not found card parameters')
+            return False
+        if not 'pan_fragment' in status['money_source'] or not 'payment_card_type' in status['money_source']:
+            app.logger.error('Not found card parameters')
+            return False
+
+        card.token = status['money_source']['money_source_token']
+        card.pan = status['money_source']['pan_fragment']
+        card.type = status['money_source']['payment_card_type']
+        card.status = PaymentCard.STATUS_PAYMENT
+
+        return card
