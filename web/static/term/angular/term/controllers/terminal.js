@@ -23,7 +23,7 @@ angular.module('term').controller('TerminalController',
       $scope.error.name = true;
       contentService.scrollPage('.m-page-name');
       return false;
-    };
+    }
 
     if (!term.id) term.id = 0;
 
@@ -56,7 +56,7 @@ angular.module('term').controller('TerminalController',
         contentService.setModal(data.message, 'success');
       }
     });
-  }
+  };
 
   $scope.removeTerminal = function(term) {
     term.csrf_token = $scope.token;
@@ -70,13 +70,12 @@ angular.module('term').controller('TerminalController',
         contentService.setModal(data.message, 'error');
       }
     });
-  }
+  };
 
   //Переадресация на страницу редактирования привязанного события
   $scope.getTermEventEdit = function(term_id, term_event_id) {
     $(location).attr('href','/terminal/' + term_id + '/event/' + term_event_id);
-  }
-
+  };
 
   //Привязываем новое событие к терминалу или редактируем уже привязанное
   $scope.saveEventTerminal = function(term_event, valid){
@@ -96,7 +95,7 @@ angular.module('term').controller('TerminalController',
         }, 2000);
       }
     });
-  }
+  };
 
   //Удаляем привязанное событие
   $scope.deleteEventTerminal = function(term_event){
@@ -113,7 +112,7 @@ angular.module('term').controller('TerminalController',
         }, 2000);
       }
     });
-  }
+  };
 
   //Запрос на информацию об сдаче в аренду терминала
   $scope.getRentTerminal= function(){
@@ -125,7 +124,7 @@ angular.module('term').controller('TerminalController',
         $scope.rents = data.rents;
       }
     });
-  }
+  };
 
   //Сохраняем аренду терминала
   $scope.addRentTerminal = function(info, valid) {
@@ -142,7 +141,7 @@ angular.module('term').controller('TerminalController',
         }, 2000);
       }
     });
-  }
+  };
 
   //Удаляем аренду терминала
   $scope.removeRentTerminal = function(id) {
@@ -156,7 +155,7 @@ angular.module('term').controller('TerminalController',
         $scope.getRentTerminal();
       }
     });
-  }
+  };
 
   $scope.alarm_stack = {};
 
@@ -197,7 +196,7 @@ angular.module('term').controller('TerminalController',
       $scope.alarm_stack.emails = emails;
 
       angular.element(e.currentTarget).parent().remove();
-  }
+  };
 
   //Сохранение оповещения
   $scope.saveAlarmStack = function(alarm_stack, valid) {
@@ -214,7 +213,7 @@ angular.module('term').controller('TerminalController',
       return false;
     }
 
-    if (alarm_stack.emails.length == 0) return false;
+    if (alarm_stack.emails.length === 0) return false;
 
     alarm_stack.csrf_token = $scope.token;
     alarm_stack.term_id = $scope.term.id;
@@ -229,7 +228,7 @@ angular.module('term').controller('TerminalController',
         }, 2000);
       }
     });
-  }
+  };
 
   //Удаление оповещения
   $scope.removeAlarmStack = function(alarm_stack) {
@@ -246,6 +245,5 @@ angular.module('term').controller('TerminalController',
           }, 2000);
         }
     });
-  }
-
+  };
 });

@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('term').service('contentService', function() {
     var resultModal = angular.element('.m-result');
     var resultContent = resultModal.find('p');

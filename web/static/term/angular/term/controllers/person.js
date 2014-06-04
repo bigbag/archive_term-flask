@@ -23,7 +23,7 @@ angular.module('term').controller('PersonController',
       $scope.error.name = true;
       contentService.scrollPage('.m-page-name');
       return false;
-    };
+    }
 
     person.csrf_token = $scope.token;
     var url = '/person/' + person.id + '/' + person.action;
@@ -47,7 +47,7 @@ angular.module('term').controller('PersonController',
     if (!valid) {
       $scope.error.card_code = true;
       return false;
-    };
+    }
     person.action = 'bind_card';
 
     var url = '/person/' + person.id + '/' + person.action;
@@ -130,12 +130,12 @@ angular.module('term').controller('PersonController',
         }, 2000);
       }
     });
-  }
+  };
 
   //Переадресация на страницу редактирования привязанного события
   $scope.getPesonEventEdit = function(person_id, person_event_id) {
     $(location).attr('href','/person/' + person_id + '/event/' + person_event_id);
-  }
+  };
 
   //Удаляем привязанное событие
   $scope.deleteEventPerson = function(person_event){
@@ -152,7 +152,7 @@ angular.module('term').controller('PersonController',
         }, 2000);
       }
     });
-  }
+  };
 
   $scope.$watch('corp_wallet.limit', function(term) {
     $scope.error.limit = false;
@@ -163,7 +163,7 @@ angular.module('term').controller('PersonController',
     if (!valid) {
       $scope.error.limit = true;
       return false;
-    };
+    }
     if (corp_wallet.amount < 100) return false;
 
     corp_wallet.csrf_token = $scope.token;
@@ -178,12 +178,12 @@ angular.module('term').controller('PersonController',
         $scope.corp_wallet = data.corp_wallet;
       }
     });
-  }
+  };
 
   //Редактируем кошелёк
   $scope.editCorpWallet = function(corp_wallet){
     $scope.corp_wallet.id = 0;
-  }
+  };
 
   //Удаляем корпоративный кошелёк
   $scope.removeCorpWallet = function(corp_wallet){
@@ -198,7 +198,7 @@ angular.module('term').controller('PersonController',
         $scope.corp_wallet.id = 0;
       }
     });
-  }
+  };
 
   $scope.import_stage = 0;
   $scope.new_employers = []; //список импортируемых сотрудников
@@ -209,7 +209,7 @@ angular.module('term').controller('PersonController',
   $scope.sendFile = function(el) {
   //импорт сотрудников - парсинг xls
     var $form = $(el).parents('form');
-    if ($(el).val() == '') {
+    if ($(el).val() === '') {
         return false;
     }
 
@@ -234,16 +234,18 @@ angular.module('term').controller('PersonController',
             });
         },
     });
-  }
+  };
 
   $scope.saveNewEmployers = function(){
   //подтверждение импорта - сохранение новых сотрудников
     if ($scope.new_employers.length > 0)
     {
-      var data = {csrf_token:$scope.token, employers:$scope.new_employers}
+      var data = {
+        csrf_token:$scope.token,
+        employers:$scope.new_employers};
       contentService.scrollPage('.m-page-name');
       $http.post('/person/import', data).success(function(data) {
-          if (data.error = 'no') {
+          if (data.error == 'no') {
               $scope.import_stage = 2;
               $scope.new_employers = [];
               $scope.added_forms = data.addedForms;
@@ -252,5 +254,5 @@ angular.module('term').controller('PersonController',
           }
       });
     }
-  }
+  };
 });

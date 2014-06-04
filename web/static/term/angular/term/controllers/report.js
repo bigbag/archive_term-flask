@@ -23,7 +23,7 @@ angular.module('term').controller('ReportController',
       },
     },
     function(start, end, label) {
-      var pattern = 'YYYY-MM-DD'
+      var pattern = 'YYYY-MM-DD';
       var data = {start:moment(start).format(pattern), end:moment(end).format(pattern)};
       $scope.$apply(function () {
           $scope.report_stack.details = data;
@@ -70,7 +70,7 @@ angular.module('term').controller('ReportController',
     $scope.report_stack.emails = emails;
 
     angular.element(e.currentTarget).parent().remove();
-  }
+  };
 
   //Сохраняем новый отчет
   $scope.saveReportStack = function(report_stack, valid) {
@@ -84,7 +84,7 @@ angular.module('term').controller('ReportController',
       $scope.error.curent_email = true;
       return false;
     }
-    if (report_stack.emails.length == 0) return false;
+    if (report_stack.emails.length === 0) return false;
 
     report_stack.csrf_token = $scope.token;
     var url = '/report/new';
@@ -98,7 +98,7 @@ angular.module('term').controller('ReportController',
         }, 2000);
       }
     });
-  }
+  };
 
   //Переадресация на страницу информации об отчете
   $scope.getReportView = function(report_id) {
