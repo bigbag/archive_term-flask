@@ -19,6 +19,7 @@ from models.base_model import BaseModel
 from models.user import User
 from models.spot_dis import SpotDis
 from models.soc_token import SocToken
+from models.spot_hard_type import SpotHardType
 
 
 class Spot(db.Model, BaseModel):
@@ -59,6 +60,7 @@ class Spot(db.Model, BaseModel):
     removed_date = db.Column(db.DateTime)
     status = db.Column(db.Integer, nullable=False, index=True)
     code128 = db.Column(db.String(128), nullable=False)
+    hard_type = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
         self.lang = 'en'
@@ -66,6 +68,7 @@ class Spot(db.Model, BaseModel):
         self.premium = 0
         self.status = self.STATUS_GENERATED
         self.type = self.TYPE_FULL
+        self.hard_type = 1
         self.generated_date = date_helper.get_curent_date()
 
     def __repr__(self):
@@ -140,7 +143,7 @@ class Spot(db.Model, BaseModel):
         ]
         return Spot.query.filter(
             Spot.code == code).filter(
-                Spot.status.in_(valid_status)).first()
+            Spot.status.in_(valid_status)).first()
 
     def save(self):
         if not self.registered_date and self.status == self.STATUS_REGISTERED:
