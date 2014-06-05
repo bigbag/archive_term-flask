@@ -127,7 +127,7 @@ class PaymentCard(db.Model, BaseModel):
 
         self.set_archiv(history.wallet_id)
 
-        card = self.add_payment(history, status)
+        card = self.add_payment(history, result)
         if not card:
             return False
 
