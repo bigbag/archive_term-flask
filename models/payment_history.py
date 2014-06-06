@@ -24,9 +24,9 @@ class PaymentHistory(db.Model, BaseModel):
     __tablename__ = 'history'
 
     STATUS_NEW = 0
-    STATUS_COMPLETE = 1
+    STATUS_IN_PROGRESS = 1
+    STATUS_COMPLETE = 2
     STATUS_FAILURE = -1
-    STATUS_MISSING = -2
 
     TYPE_SYSTEM = 1
     TYPE_PAYMENT = 2
@@ -76,8 +76,8 @@ class PaymentHistory(db.Model, BaseModel):
     def get_fail_linking_record(self, history_id, wallet_id):
         return PaymentHistory().query.filter(PaymentHistory.id != history_id).filter(
             PaymentHistory.wallet_id == wallet_id).filter(
-            PaymentHistory.type == PaymentHistory.TYPE_SYSTEM).filter(
-            PaymentHistory.status == PaymentHistory.STATUS_NEW).all()
+                PaymentHistory.type == PaymentHistory.TYPE_SYSTEM).filter(
+                    PaymentHistory.status == PaymentHistory.STATUS_NEW).all()
 
     def add_linking_record(self, user_id, wallet_id):
         self.type = PaymentHistory.TYPE_SYSTEM
@@ -102,6 +102,6 @@ class PaymentHistory(db.Model, BaseModel):
     def get_new_payment(self):
         return PaymentHistory.query.filter(
             PaymentHistory.report_id != 0).filter(
-            PaymentHistory.status == PaymentHistory.STATUS_NEW).filter(
-            PaymentHistory.request_id != 0).all(
-        )
+                PaymentHistory.status == PaymentHistory.STATUS_NEW).filter(
+                    PaymentHistory.request_id != 0).all(
+                    )
