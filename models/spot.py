@@ -43,6 +43,8 @@ class Spot(db.Model, BaseModel):
     CODE128_LEN = 12
     EAN_LEN = 12
 
+    DEFAULT_HARD_TYPE = 1
+
     CODE_CHAR = 'abcdefghjkmnopqrstuvwxyzABCDEFGHJKMNOPQRSTUVWXYZ'
 
     discodes_id = db.Column(db.Integer, primary_key=True)
@@ -68,7 +70,7 @@ class Spot(db.Model, BaseModel):
         self.premium = 0
         self.status = self.STATUS_GENERATED
         self.type = self.TYPE_FULL
-        self.hard_type = 1
+        self.hard_type = self.DEFAULT_HARD_TYPE
         self.generated_date = date_helper.get_curent_date()
 
     def __repr__(self):
@@ -143,7 +145,7 @@ class Spot(db.Model, BaseModel):
         ]
         return Spot.query.filter(
             Spot.code == code).filter(
-            Spot.status.in_(valid_status)).first()
+                Spot.status.in_(valid_status)).first()
 
     def save(self):
         if not self.registered_date and self.status == self.STATUS_REGISTERED:

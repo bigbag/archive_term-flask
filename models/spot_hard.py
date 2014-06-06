@@ -17,3 +17,6 @@ class SpotHard(db.Model, BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), nullable=False)
     show = db.Column(db.Integer, nullable=False)
+
+    def __init__(self):
+        self.show = 0

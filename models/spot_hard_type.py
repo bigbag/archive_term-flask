@@ -19,4 +19,8 @@ class SpotHardType(db.Model, BaseModel):
     hard_id = db.Column(db.Integer, nullable=False)
     color_id = db.Column(db.Integer)
     pattern_id = db.Column(db.Integer)
+    show = db.Column(db.Integer, nullable=False)
     image = db.Column(db.String(150), nullable=False)
+
+    def __init__(self):
+        self.show = 0

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<info count='{{count}}'>
+    {% for row in data %}
+    <type>
+    	<id>{{row.id}}</id>
+    	<hard_id>{{row.hard_id}}</hard_id>
+    	<color_id>{{row.hard_id}}</color_id>
+    	<pattern_id>{{row.hard_id}}</pattern_id>
+    </type>
+    {% endfor %}
+</info>
