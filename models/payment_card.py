@@ -133,7 +133,7 @@ class PaymentCard(db.Model, BaseModel):
             if not history.save():
                 return False
             return False
-        elif result['status'] == 'refused'
+        elif result['status'] == 'refused':
             history.status = PaymentHistory.STATUS_FAILURE
             if not history.save():
                 return False
