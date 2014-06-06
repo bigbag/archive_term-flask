@@ -174,9 +174,13 @@ class PaymentTask (object):
     @staticmethod
     @celery.task
     def check_linking_manager():
-        all_history = PaymentHistory.query.filter_by(
-            type=PaymentHistory.TYPE_SYSTEM,
-            status=PaymentHistory.STATUS_NEW).all()
+        select_status = (
+            PaymentHistory.STATUS_NEW,
+            PaymentHistory.STATUS_IN_PROGRESS)
+
+        all_history = PaymentHistory.query.filter(
+            PaymentHistory.type == PaymentHistory.TYPE_SYSTEM).filter(
+                PaymentHistory.status.in_(select_status)).all()
 
         for key in all_history:
             PaymentTask.check_linking.delay(key)
@@ -191,7 +195,8 @@ class PaymentTask (object):
             delta = date_helper.get_curent_date(
                 format=False) - history.creation_date
             if delta.total_seconds() > PaymentCard.MAX_LINKING_CARD_TIMEOUT:
-                history.delete()
+                history.status = PaymentHistory.STATUS_FAILURE
+                history.save()
                 return True
 
         return True

@@ -42,12 +42,15 @@ class PaymentCard(db.Model, BaseModel):
         """Запрос параметров для привязки карты"""
 
         ym = YaMoneyApi(YandexMoneyConfig)
-        payment = ym.get_request_payment_to_shop(1, ym.const.CARD_PATTERN_ID, order_id)
+        payment = ym.get_request_payment_to_shop(
+            1, ym.const.CARD_PATTERN_ID, order_id)
         if not payment:
             return False
 
         if not 'request_id' in payment:
-            app.logger.error('Linking card: yandex api error - %s' % payment['error'])
+            app.logger.error(
+                'Linking card: yandex api error - %s' %
+                payment['error'])
             return False
 
         status = ym.get_process_external_payment(payment['request_id'])
@@ -59,7 +62,8 @@ class PaymentCard(db.Model, BaseModel):
             return False
 
         if not 'acs_uri' in status or not 'acs_params' in status:
-            app.logger.error('Linking card: Not found fields acs_uri or acs_params')
+            app.logger.error(
+                'Linking card: Not found fields acs_uri or acs_params')
             return False
 
         result = dict(
@@ -74,8 +78,8 @@ class PaymentCard(db.Model, BaseModel):
 
         wallet = PaymentWallet.query.filter(
             PaymentWallet.discodes_id == discodes_id).filter(
-            PaymentWallet.user_id != 0).first(
-        )
+                PaymentWallet.user_id != 0).first(
+                )
         if not wallet:
             return False
 
@@ -119,7 +123,15 @@ class PaymentCard(db.Model, BaseModel):
         ym = YaMoneyApi(YandexMoneyConfig)
         result = ym.get_process_external_payment(history.request_id)
         if not result or not 'status' in result:
-            app.logger.error('Linking card: Not found status field, request_id=%s' % history.request_id)
+            app.logger.error(
+                'Linking card: Not found status field, request_id=%s' %
+                history.request_id)
+            return False
+
+        if result['status'] == 'in_progress':
+            history.status = PaymentHistory.STATUS_IN_PROGRESS
+            if not history.save():
+                return False
             return False
 
         if result['status'] != 'success':
