@@ -62,7 +62,7 @@ class TermCorpWallet(db.Model, BaseModel):
             self.INTERVAL_MONTH: 9999
         }
 
-    # @cache.cached(timeout=120, key_prefix='corp_wallet')
+    @cache.cached(timeout=120, key_prefix='corp_wallet')
     def get_dict_by_firm_id(self, firm_id):
         corp_wallet_interval = self.get_interval_list()
         persons = Person().get_dict_by_firm_id(firm_id)
@@ -76,7 +76,7 @@ class TermCorpWallet(db.Model, BaseModel):
             result[key] = dict(
                 interval=corp_wallet_interval[
                     wallet.interval][
-                    'name'],
+                        'name'],
                 limit=wallet.limit,
                 balance=wallet.balance
             )

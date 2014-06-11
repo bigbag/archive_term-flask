@@ -12,7 +12,7 @@ db = SQLAlchemy(app)
 from web.celery import celery
 
 from libs.redis_sessions import RedisSessionInterface
-app.session_interface = RedisSessionInterface()
+app.session_interface = RedisSessionInterface(app)
 
 from flask.ext.login import LoginManager
 lm = LoginManager()
