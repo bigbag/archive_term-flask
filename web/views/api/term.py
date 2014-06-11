@@ -90,7 +90,7 @@ def api_get_xml_blacklist():
 
 
 @mod.route('/configs/blacklist.xml.gz', methods=['GET'])
-@cache.cached(timeout=120, key_prefix='term_gzip_blacklist')
+#@cache.cached(timeout=120, key_prefix='term_gzip_blacklist')
 @md5_content_headers
 @gzip_content
 def api_get_gzip_blacklist():
@@ -101,13 +101,27 @@ def api_get_blacklist():
     """Возвращает черный список карт"""
     query = PaymentWallet.query
     query = query.filter(PaymentWallet.type == PaymentWallet.TYPE_FULL)
-    query = query.filter((PaymentWallet.blacklist == PaymentWallet.ACTIVE_OFF) | (
-        PaymentWallet.status == PaymentWallet.STATUS_BANNED))
     wallets = query.group_by(PaymentWallet.payment_id).all()
 
-    blacklist = []
+    valid = []
+    invalid = []
     for wallet in wallets:
-        blacklist.append(str(wallet.payment_id))
+        if (wallet.blacklist == PaymentWallet.ACTIVE_OFF) | (wallet.status == PaymentWallet.STATUS_BANNED):
+            invalid.append(str(wallet.payment_id))
+        else:
+            valid.append(str(wallet.payment_id))
+
+    persons = Person.query.group_by(Person.payment_id).all()
+    blacklist = []
+    for person in persons:
+        if not person.payment_id:
+            continue
+
+        if person.payment_id not in valid:
+            if person.payment_id not in invalid:
+                blacklist.append(person.payment_id)
+
+    blacklist = sorted(blacklist + invalid)
 
     config_xml = render_template(
         'api/term/blacklist.xml',

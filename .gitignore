@@ -13,4 +13,6 @@ gunicorn.conf.py
 /pids/
 /archiv/
 /tmp/
+/node_modules/
+node_modules
 celerybeat-schedule
