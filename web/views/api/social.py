@@ -201,22 +201,22 @@ def api_socnet_list(ean):
     return make_response(info_xml)
 
 
-@mod.route('/socnet/post/<ean>', methods=['POST'])
+@mod.route('/socnet/<ean>/<soc_id>', methods=['POST'])
 @xml_headers
-def api_social_post(ean):
+def api_social_post(ean, soc_id):
     """Публикует пост с картинкой в заданной в soc_id соцсети"""
 
-    base._api_access(request)
+    # base._api_access(request)
 
     success = 0
 
     ean = str(ean)
-    if not len(ean) == 13 or not ean.isdigit():
-        abort(400)
-    if not 'soc_id' in request.form:
+    if not len(ean) == 13:
         abort(400)
 
-    soc_id = request.form['soc_id']
+    if not 'img' in request.files:
+        abort(400)
+
     file = request.files['img']
 
     spot = Spot.query.filter_by(barcode=ean).first()
@@ -260,7 +260,7 @@ def api_social_post(ean):
         file.save(filepath)
 
         img = "http://%s/%s/%s" % (
-            request.host, app.config['IMG_FOLDER'], img_name)
+            request.host, 'upload/img', img_name)
         img = img.replace('/././', '/')
 
         error = 'no write rights fo this social account'
