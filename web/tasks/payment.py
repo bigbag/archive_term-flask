@@ -141,7 +141,7 @@ class PaymentTask (object):
         if not term:
             app.logger.error('Payment: Not found term %s' % report.term_id)
 
-        amount = int(
+        amount = float(
             report.amount) / int(
                 Term.DEFAULT_FACTOR) * int(
                     term.factor)
