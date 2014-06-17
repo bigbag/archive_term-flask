@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-    Задачи по формированию отчетов
+    Задачи по разбору отчетов с терминалов
 
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
@@ -114,7 +114,9 @@ class ReportParserTask (object):
                     continue
 
                 payments = []
-                card_nodes = tree.xpath('/Report/Event[@type="%s"]/Card' % event_key)
+                card_nodes = tree.xpath(
+                    '/Report/Event[@type="%s"]/Card' %
+                    event_key)
                 for row in card_nodes:
                     if not row.get('summ'):
                         continue
@@ -127,7 +129,9 @@ class ReportParserTask (object):
                             card=str(row.text).rjust(20, '0'),
                             amount=int(row.get('summ')),
                             type=row.get('type'),
-                            date_time="%s %s" % (row.get('date'), row.get('time')),
+                            date_time="%s %s" % (
+                                row.get('date'),
+                                row.get('time')),
                         )
                     )
 

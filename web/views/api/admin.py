@@ -91,6 +91,8 @@ def api_admin_linking_spot():
     hard_type = Spot.DEFAULT_HARD_TYPE
     if 'hard_type' in request.form:
         hard_type = int(request.form['hard_type'])
+        if not SpotHardType.query.get(hard_type):
+            abort(400)
 
     status = 1
     if 'status' in request.form:
