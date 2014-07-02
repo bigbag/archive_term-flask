@@ -39,3 +39,24 @@ class SocToken(db.Model, BaseModel):
     is_tech = db.Column(db.Integer)
     allow_login = db.Column(db.Integer)
     refresh_token = db.Column(db.String(1024))
+    write_access = db.Column(db.Integer)
+
+    def netName(self):
+        if not self.type:
+            return False
+
+        socNet = {
+            self.TYPE_GOOGLE: 'google_oauth',
+            self.TYPE_FACEBOOK: 'facebook',
+            self.TYPE_TWITTER: 'twitter',
+            self.TYPE_YOUTUBE: 'youtube',
+            self.TYPE_DEVIANTART: 'deviantart',
+            self.TYPE_BEHANCE: 'behance',
+            self.TYPE_VIMEO: 'vimeo',
+            self.TYPE_VK: 'vk',
+            self.TYPE_FOURSQUARE: 'foursquare',
+            self.TYPE_LINKEDIN: 'linkedin',
+            self.TYPE_INSTAGRAM: 'instagram',
+        }
+
+        return socNet[self.type]

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('term').controller('UserController', 
+angular.module('term').controller('UserController',
   function($scope, $http, $compile, $timeout, contentService) {
 
   $scope.error = {};

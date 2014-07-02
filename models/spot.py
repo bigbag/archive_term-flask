@@ -18,6 +18,8 @@ from models.base_model import BaseModel
 
 from models.user import User
 from models.spot_dis import SpotDis
+from models.soc_token import SocToken
+from models.spot_hard_type import SpotHardType
 
 
 class Spot(db.Model, BaseModel):
@@ -41,6 +43,8 @@ class Spot(db.Model, BaseModel):
     CODE128_LEN = 12
     EAN_LEN = 12
 
+    DEFAULT_HARD_TYPE = 1
+
     CODE_CHAR = 'abcdefghjkmnopqrstuvwxyzABCDEFGHJKMNOPQRSTUVWXYZ'
 
     discodes_id = db.Column(db.Integer, primary_key=True)
@@ -48,7 +52,7 @@ class Spot(db.Model, BaseModel):
     name = db.Column(db.String(300))
     url = db.Column(db.String(150), nullable=False)
     barcode = db.Column(db.String(32), nullable=False)
-    spot_type_id = db.Column(db.Integer)
+    type = db.Column(db.Integer)
     lang = db.Column(db.String(10), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship('User')
@@ -58,13 +62,15 @@ class Spot(db.Model, BaseModel):
     removed_date = db.Column(db.DateTime)
     status = db.Column(db.Integer, nullable=False, index=True)
     code128 = db.Column(db.String(128), nullable=False)
+    hard_type = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
         self.lang = 'en'
         self.name = 'No name'
         self.premium = 0
         self.status = self.STATUS_GENERATED
-        self.spot_type_id = self.TYPE_FULL
+        self.type = self.TYPE_FULL
+        self.hard_type = self.DEFAULT_HARD_TYPE
         self.generated_date = date_helper.get_curent_date()
 
     def __repr__(self):
@@ -139,7 +145,7 @@ class Spot(db.Model, BaseModel):
         ]
         return Spot.query.filter(
             Spot.code == code).filter(
-            Spot.status.in_(valid_status)).first()
+                Spot.status.in_(valid_status)).first()
 
     def save(self):
         if not self.registered_date and self.status == self.STATUS_REGISTERED:
@@ -160,3 +166,18 @@ class Spot(db.Model, BaseModel):
             self.code = self.get_code(self.discodes_id)
 
         return BaseModel.save(self)
+
+    def getBindedNets(self):
+        answer = []
+
+        if not self.user_id:
+            return answer
+
+        tokens = SocToken.query.filter_by(
+            user_id=self.user_id, write_access=1).all()
+
+        for token in tokens:
+            item = {'soc_id': token.type, 'name': token.netName()}
+            answer.append(item)
+
+        return answer

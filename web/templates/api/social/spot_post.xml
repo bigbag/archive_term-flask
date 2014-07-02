@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<info>
+    <spot>
+        <barcode>{{spot.barcode}}</barcode>
+        <success>{{success}}</success>
+        {% if error: %}
+        <error>{{error}}</error>
+        {% endif %}
+        <img>{{img}}</img>
+    </spot>
+</info>

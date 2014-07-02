@@ -25,7 +25,6 @@ def _api_access(request):
     true_sign = hash_helper.get_api_sign(
         str(term_user.api_secret),
         request.form)
-
     if not true_sign == headers['Sign']:
         abort(403)
 

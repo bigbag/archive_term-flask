@@ -28,6 +28,8 @@ class TermCorpWallet(db.Model, BaseModel):
     INTERVAL_WEEK = 2
     INTERVAL_MONTH = 3
 
+    BALANCE_MIN = 40
+
     id = db.Column(db.Integer, primary_key=True)
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
     person = db.relationship('Person')
@@ -60,7 +62,7 @@ class TermCorpWallet(db.Model, BaseModel):
             self.INTERVAL_MONTH: 9999
         }
 
-    # @cache.cached(timeout=120, key_prefix='corp_wallet')
+    @cache.cached(timeout=120, key_prefix='corp_wallet')
     def get_dict_by_firm_id(self, firm_id):
         corp_wallet_interval = self.get_interval_list()
         persons = Person().get_dict_by_firm_id(firm_id)

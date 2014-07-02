@@ -53,6 +53,18 @@ class PaymentWallet(db.Model, BaseModel):
         self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_NOACTIVE
 
+    def add_to_blacklist(self):
+        self.blacklist = PaymentWallet.ACTIVE_OFF
+        if self.save():
+            return self
+        return False
+
+    def remove_from_blacklist(self):
+        self.blacklist = PaymentWallet.ACTIVE_ON
+        if self.save():
+            return self
+        return False
+
     def get_pid(self, pids):
         pid = "%s%s" % (pids, random.randint(100000000, 999999999))
         pid = "%s%s" % (pid, hash_helper.get_isin_checksum(pid))
@@ -63,31 +75,6 @@ class PaymentWallet(db.Model, BaseModel):
             self.get_pid(self, pids)
         else:
             return pid
-
-    def update_balance(self, report):
-        from models.payment_lost import PaymentLost
-        from models.payment_history import PaymentHistory
-
-        error = False
-
-        wallet = self.get_by_payment_id(
-            report.payment_id)
-        if not wallet or wallet.user_id == 0:
-            lost = PaymentLost()
-            lost.add_lost_payment(report)
-            return error
-
-        wallet.balance = int(
-            wallet.balance) - int(
-            report.amount)
-
-        if not wallet.save():
-            error = True
-            return error
-
-        history = PaymentHistory()
-        history.add_history(wallet, report)
-        return error
 
     def get_by_payment_id(self, payment_id):
         return self.query.filter_by(payment_id=payment_id).first()

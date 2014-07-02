@@ -23,10 +23,10 @@ from models.event import Event
 from models.person_event import PersonEvent
 from models.card_stack import CardStack
 from models.payment_wallet import PaymentWallet
-from models.payment_reccurent import PaymentReccurent
-from models.payment_lost import PaymentLost
 from models.term_settings import TermSettings
 from models.alarm_stack import AlarmStack
+
+from web.tasks.report_parser import ReportParserTask
 
 mod = Blueprint('api_term', __name__)
 
@@ -103,40 +103,32 @@ def api_get_blacklist():
     query = query.filter(PaymentWallet.type == PaymentWallet.TYPE_FULL)
     wallets = query.group_by(PaymentWallet.payment_id).all()
 
-    valid_payment_id = []
-    invalid_payment_id = []
+    valid = []
+    invalid = []
     for wallet in wallets:
-        if (int(wallet.balance) < PaymentWallet.BALANCE_MIN) | (int(wallet.status) != PaymentWallet.STATUS_ACTIVE):
-            invalid_payment_id.append(str(wallet.payment_id))
+        if (wallet.blacklist == PaymentWallet.ACTIVE_OFF) | (wallet.status == PaymentWallet.STATUS_BANNED):
+            invalid.append(str(wallet.payment_id))
         else:
-            valid_payment_id.append(str(wallet.payment_id))
+            valid.append(str(wallet.payment_id))
 
-    lost_cards = PaymentLost.query.group_by(PaymentLost.payment_id).all()
     persons = Person.query.group_by(Person.payment_id).all()
-
     blacklist = []
     for person in persons:
         if not person.payment_id:
             continue
 
-        if person.payment_id not in valid_payment_id:
-            if not person.payment_id in invalid_payment_id:
+        if person.payment_id not in valid:
+            if person.payment_id not in invalid:
                 blacklist.append(person.payment_id)
 
-    blacklist = sorted(blacklist + invalid_payment_id)
-
-    for card in lost_cards:
-        if not card.payment_id in blacklist:
-            blacklist.append(card.payment_id)
+    blacklist = sorted(blacklist + invalid)
 
     config_xml = render_template(
         'api/term/blacklist.xml',
-        blacklist=blacklist,
+        blacklist=sorted(blacklist),
     ).encode('cp1251')
 
-    response = make_response(config_xml)
-
-    return response
+    return make_response(config_xml)
 
 
 @mod.route('/reports/report_<int:term_id>_<report_datetime>.xml.gz', methods=['PUT'])
@@ -157,7 +149,7 @@ def api_upload_report(term_id, report_datetime):
 
     file = request.stream.read()
     filename = "%s/%s_%s" % (
-        app.config['TMP_PACH'],
+        app.config['REPORT_TMP_PACH'],
         str(term_id),
         str(report_datetime))
 
@@ -175,6 +167,8 @@ def api_upload_report(term_id, report_datetime):
 
     term.report_date = date_helper.get_curent_date()
     term.save()
+
+    ReportParserTask.report_manager.delay(filename)
 
     return set_message('success', hash_helper.get_content_md5(file), 201)
 

@@ -35,6 +35,9 @@ class Report(db.Model, BaseModel):
     DEFAULT_PAGE = 1
     POST_ON_PAGE = 10
 
+    STATUS_NEW = 0
+    STATUS_COMPLETE = 1
+
     id = db.Column(db.Integer, primary_key=True)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'), index=True)
     term = db.relationship('Term')
@@ -50,6 +53,7 @@ class Report(db.Model, BaseModel):
     corp_type = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Integer, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
         self.amount = 0
@@ -65,84 +69,47 @@ class Report(db.Model, BaseModel):
         self.page = self.DEFAULT_PAGE
         self.period = 'day'
         self.payment_type = self.TYPE_WHITE
+        self.status = self.STATUS_NEW
         self.firm_id = 0
         self.person_id = 0
 
-    def get_db_view(self, data):
-        date_pattern = '%Y-%m-%d %H:%M:%S'
-        self.payment_id = str(data.text).rjust(20, '0')
-
-        firm_id_list = FirmTerm().get_list_by_term_id(self.term.id)
-        for firm_id in firm_id_list:
-            person = Person.query.filter_by(
-                payment_id=self.payment_id, firm_id=firm_id).first()
-            if not person:
-                continue
-
-            self.name = person.name
-            self.person_id = person.id
-            self.person_firm_id = person.firm_id
-            break
-
-        firm_term = FirmTerm().query.filter_by(
-            term_id=self.term.id).first()
-        self.term_firm_id = firm_term.firm_id
-
-        if data.get('summ'):
-            self.amount = int(data.get('summ')) * int(self.term.factor)
-
-        if data.get('type'):
-            self.type = data.get('type')
-
-        date_time = "%s %s" % (
-            data.get('date'),
-            data.get('time'))
-
-        date_time_utc = date_helper.convert_date_to_utc(
-            date_time,
-            self.term.tz,
-            date_pattern,
-            date_pattern)
-        self.creation_date = date_time_utc
-        return self
-
-    def add_from_xml(self, card_node):
+    def add_new(self):
         from models.person import Person
-        from models.payment_wallet import PaymentWallet
         from models.term_corp_wallet import TermCorpWallet
 
-        error = False
-        self = self.get_db_view(card_node)
+        from web.tasks.payment import PaymentTask
 
+        error = False
         old_report = self.get_by_params()
         if old_report:
             return error
 
-        # Если операция платежная, обновляем баланс личного кошелька
-        # и пишем информацию в историю, сохраняем отчет
-        if int(self.type) == self.TYPE_PAYMENT or int(self.type) == self.TYPE_MPS:
-            error = PaymentWallet().update_balance(self)
+        self.status = self.STATUS_COMPLETE
+        # Если операция платежная
+        if int(self.type) == self.TYPE_PAYMENT:
+            self.status = self.STATUS_NEW
 
-        # Если операция по белому списку
-        person = Person.query.get(self.person_id)
+        # Если операция по белому списку и есть корп кошелек, меняем его баланс
+        if self.person_id != 0:
+            person = Person.query.get(self.person_id)
 
-        # Если человек имеет корпоративный кошелек, обновляем его баланс
-        if person and person.wallet_status == Person.STATUS_VALID and person.type == Person.TYPE_WALLET:
-            self.corp_type = self.CORP_TYPE_ON
-            corp_wallet = TermCorpWallet.query.filter_by(
-                person_id=person.id).first()
-            if not corp_wallet:
-                return error
+            if person.wallet_status == Person.STATUS_VALID and person.type == Person.TYPE_WALLET:
 
-            corp_wallet.balance = int(
-                corp_wallet.balance) - int(
+                self.corp_type = self.CORP_TYPE_ON
+                corp_wallet = TermCorpWallet.query.filter_by(
+                    person_id=person.id).first()
+                if not corp_wallet:
+                    return error
+
+                corp_wallet.balance = int(
+                    corp_wallet.balance) - int(
                     self.amount)
-            corp_wallet.save()
+                corp_wallet.save()
 
-            # Блокируем возможность платежей через корпоративный кошелек
-            if corp_wallet.balance < PaymentWallet.BALANCE_MIN:
-                person.wallet_status = Person.STATUS_BANNED
-                person.save()
+        # Блокируем возможность платежей через корпоративный кошелек
+                if corp_wallet.balance < TermCorpWallet.BALANCE_MIN:
+                    person.wallet_status = Person.STATUS_BANNED
+                    person.save()
 
         if not self.save():
             error = True
@@ -150,10 +117,10 @@ class Report(db.Model, BaseModel):
         return error
 
     def get_by_params(self):
-        return self.query.filter_by(term_id=self.term.id,
-                                    event_id=self.event_id,
-                                    creation_date=self.creation_date,
-                                    payment_id=self.payment_id).first()
+        return Report.query.filter_by(term_id=self.term_id,
+                                      event_id=self.event_id,
+                                      creation_date=self.creation_date,
+                                      payment_id=self.payment_id).first()
 
     def _get_search_params(self, **kwargs):
         keys = [
@@ -282,7 +249,7 @@ class Report(db.Model, BaseModel):
                     date=creation_date.strftime(date_pattern),
                     event=events[
                         row.event_id] if events[
-                            row.event_id] else 'Empty',
+                        row.event_id] else 'Empty',
                     amount=float(row.amount) / 100,
                     name=row.name,
                 )

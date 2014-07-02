@@ -25,12 +25,37 @@ class YaMoneyApi(object):
         self.const = const
         self.curl = None
         self.instance_id = None
-
+        self.success_uri = const.SUCCESS_URI
+        self.fail_uri = const.FAIL_URI
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
     def __repr__(self):
         return "%s" % self.const
+
+    def logging_status(self, status):
+        error = ''
+        if 'error' in status:
+            error = status['error']
+        info = "%s: %s" % (status['status'], error)
+
+        self.logger.error(info)
+        return True
+
+    def get_random_headers(self):
+        """
+        Copyright: 2011, Grigoriy Petukhov
+        Build headers which sends typical browser.
+        """
+
+        return {
+            'Accept':
+            'text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
+            'Accept-Language': 'en-us,en;q=0.5',
+            'Accept-Charset': 'utf-8,windows-1251;q=0.7,*;q=0.5',
+            'Keep-Alive': '300',
+            'Expect': '',
+        }
 
     def get_url(self, method):
         general_url = self.const.GENERAL_URL
@@ -43,8 +68,12 @@ class YaMoneyApi(object):
         if self.curl:
             return True
 
+        headers = self.get_random_headers()
+        header_tuples = [str('%s: %s' % x) for x
+                         in headers.items()]
+
         self.curl = pycurl.Curl()
-        self.curl .setopt(pycurl.HTTPHEADER, ["Accept:"])
+        self.curl.setopt(pycurl.HTTPHEADER, header_tuples)
         self.curl.setopt(pycurl.CONNECTTIMEOUT, self.CONNECT_TIMEOUT)
         self.curl.setopt(pycurl.TIMEOUT, self.TIMEOUT)
         self.curl.setopt(pycurl.NOSIGNAL, 1)
@@ -66,6 +95,7 @@ class YaMoneyApi(object):
 
     def set_request(self, url, data=None):
         if not self.init_request():
+            self.logger.error('Fail in init pycurl')
             return False
 
         buf = cStringIO.StringIO()
@@ -90,7 +120,6 @@ class YaMoneyApi(object):
             result = json.loads(result)
         except Exception as e:
             self.logger.error(e)
-
         return result
 
     def get_instance_id(self):
@@ -105,10 +134,16 @@ class YaMoneyApi(object):
         data = dict(client_id=self.const.CLIENT_ID)
         result = self.set_request(self.get_url('instance-id'), data)
         if not result:
+            self.logger.error('Fail in instance-id request')
             return False
 
         result = self._parse_result(result)
+        if not 'status' in result:
+            self.logger.error('Not found field status')
+            return False
+
         if result['status'] != 'success':
+            self.logging_status(status)
             return False
 
         self.instance_id = result['instance_id']
@@ -124,9 +159,7 @@ class YaMoneyApi(object):
         if not result:
             return False
 
-        result = self._parse_result(result)
-
-        return result
+        return self._parse_result(result)
 
     def get_request_payment_p2p(self, amount, recipient, message=None):
         """Создание перевода на кошелек"""
@@ -137,15 +170,7 @@ class YaMoneyApi(object):
             to=recipient,
             message=message
         )
-
-        result = self._request_external_payment(
-            'request-external-payment', data)
-        if not result:
-            return False
-        if result['status'] != 'success':
-            return False
-
-        return result
+        return self._request_external_payment('request-external-payment', data)
 
     def get_request_payment_to_shop(self, amount, pattern_id, order_id=0):
         """Создание платежа в магазин"""
@@ -155,52 +180,19 @@ class YaMoneyApi(object):
             sum=amount,
             customerNumber=order_id
         )
+        return self._request_external_payment('request-external-payment', data)
 
-        result = self._request_external_payment(
-            'request-external-payment', data)
-        if not result:
-            return False
-        if result['status'] != 'success':
-            return False
-
-        return result
-
-    def get_process_external_payment(self, request_id):
-        """Проведение платежа"""
+    def get_process_external_payment(self, request_id, token=False):
+        """Проведение платежа получение информации о статусе платежа"""
 
         data = dict(
             request_id=request_id,
-            request_token=True,
-            ext_auth_success_uri='http://mobispot.com',
-            ext_auth_fail_uri='http://mobispot.com'
+            ext_auth_success_uri=self.success_uri,
+            ext_auth_fail_uri=self.fail_uri,
         )
+        if not token:
+            data['request_token'] = True
+        if token:
+            data['money_source_token'] = token
 
-        result = self._request_external_payment(
-            'process-external-payment', data)
-        return result
-
-    def linking_card(self):
-        """Привязка платежной карты"""
-
-        payment = self.get_request_payment_to_shop(1, self.const.CARD_PATTERN_ID)
-        if not payment:
-            return False
-
-        status = self.get_process_external_payment(payment['request_id'])
-        if status['status'] != 'ext_auth_required':
-            error = ''
-            if 'error' in status:
-                error = status['error']
-            info = "%s: %s" % (status['status'], error)
-            self.logger.info(info)
-            return False
-
-        if not 'acs_uri' in status or not 'acs_params' in status:
-            return False
-
-        result = dict(
-            url=status['acs_uri'],
-            params=status['acs_params']
-        )
-
-        return result
+        return self._request_external_payment('process-external-payment', data)
