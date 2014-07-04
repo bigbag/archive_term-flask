@@ -159,7 +159,7 @@ class Term(db.Model, BaseModel):
             self.download_start = term.download_start
         return self
 
-    # S@cache.cached(timeout=60, key_prefix='term_name_dict')
+    #@cache.cached(timeout=60, key_prefix='term_name_dict')
     def select_name_dict(self):
         terms = Term.query.all()
 

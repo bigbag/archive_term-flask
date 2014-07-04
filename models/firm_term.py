@@ -43,7 +43,7 @@ class FirmTerm(db.Model, BaseModel):
 
         return firm_id_list
 
-    @cache.cached(timeout=30, key_prefix='list_by_firm_id')
+    #@cache.cached(timeout=30, key_prefix='list_by_firm_id')
     def get_list_by_firm_id(self, firm_id, child=True):
         if child:
             query = self.query.filter_by(child_firm_id=firm_id)

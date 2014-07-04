@@ -47,7 +47,7 @@ def load_user(id):
 def before_request():
     g.user = current_user
     g.firm_info = get_firm_name(request)
-    g.token = session['_id']
+    g.token = hash_helper.get_user_token(request)
 
 
 @lm.unauthorized_handler

@@ -34,7 +34,7 @@ class PaymentWallet(db.Model, BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.String(20), index=True)
-    hard_id = db.Column(db.Integer(128), index=True)
+    hard_id = db.Column(db.String(128), index=True)
     name = db.Column(db.Integer(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship('User')
