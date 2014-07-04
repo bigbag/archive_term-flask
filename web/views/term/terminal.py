@@ -99,7 +99,7 @@ def terminal_rent_info(term_id):
             FirmTerm.firm_id == g.firm_info[
                 'id']).filter(
                     FirmTerm.firm_id != FirmTerm.child_firm_id).all(
-                    )
+    )
 
     rents = []
     for row in firm_terms:
@@ -191,7 +191,7 @@ def terminal_rent_remove(term_id):
 def terminal_save(term_id, action):
     """Добавляем или редактируем терминал"""
 
-    answer = dict(error='yes', message=u'Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка', id=term_id)
     arg = get_post_arg(request, True)
     action_list = ('add', 'edit')
 
@@ -226,6 +226,7 @@ def terminal_save(term_id, action):
     if result:
         answer['error'] = 'no'
         answer['message'] = u'Данные сохранены'
+        answer['id'] = term.id
         return jsonify(answer)
 
     return jsonify(answer)

@@ -36,8 +36,9 @@ angular.module('term').controller('TerminalController',
         contentService.setModal(data.message, 'error');
       } else {
         contentService.setModal(data.message, 'success');
+
         setTimeout(function(){
-          $(location).attr('href','/terminal/' + term.id );
+          $(location).attr('href','/terminal/' + data.id );
         }, 2000);
       }
     });
