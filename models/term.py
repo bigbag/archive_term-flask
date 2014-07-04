@@ -159,7 +159,7 @@ class Term(db.Model, BaseModel):
             self.download_start = term.download_start
         return self
 
-    @cache.cached(timeout=60, key_prefix='term_name_dict')
+    # S@cache.cached(timeout=60, key_prefix='term_name_dict')
     def select_name_dict(self):
         terms = Term.query.all()
 
@@ -169,7 +169,7 @@ class Term(db.Model, BaseModel):
 
         return result
 
-    @cache.cached(timeout=120, key_prefix='term_list')
+    #@cache.cached(timeout=120, key_prefix='term_list')
     def select_term_list(self, firm_id, **kwargs):
         tz = app.config['TZ']
         date_pattern = '%H:%M %d.%m.%y'
