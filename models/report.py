@@ -273,8 +273,10 @@ class Report(db.Model, BaseModel):
             func.count(Report.id))
 
         query = query.filter(Report.type == self.payment_type)
+
         query = Report()._set_firm_id_filter(
             query, self.firm_id, self.payment_type)
+
         query = Report()._set_period_group(query, self.period)
         query = query.order_by(self.order)
 
@@ -313,6 +315,7 @@ class Report(db.Model, BaseModel):
         return date_pattern
 
     def format_search_date(self, search_date):
+        from datetime import timedelta
         date_pattern = self.get_date_pattern()
 
         if isinstance(search_date, (tuple)):
@@ -326,7 +329,7 @@ class Report(db.Model, BaseModel):
                 search_date, self.period)
             interval = (
                 interval[0].strftime('%d.%m.%Y'),
-                interval[1].strftime('%d.%m.%Y'))
+                (interval[1] - timedelta(days=1)).strftime('%d.%m.%Y'))
             creation_date = '%s - %s' % interval
         else:
             creation_date = search_date.strftime(date_pattern)

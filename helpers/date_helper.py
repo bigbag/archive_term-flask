@@ -75,7 +75,7 @@ def get_date_interval(search_date, period='day'):
         day_of_week = search_date.weekday()
         start_delta = timedelta(days=day_of_week)
         start = search_date - start_delta
-        stop_delta = timedelta(days=6 - day_of_week)
+        stop_delta = timedelta(days=7 - day_of_week)
         stop = search_date + stop_delta
     elif period == 'month':
         start = datetime(search_date.year, search_date.month, 1)
