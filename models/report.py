@@ -288,6 +288,7 @@ class Report(db.Model, BaseModel):
 
     def term_detaled_query(self, search_date):
         interval = date_helper.get_date_interval(search_date, self.period)
+        print interval
 
         query = db.session.query(
             Report.term_id,
@@ -336,7 +337,7 @@ class Report(db.Model, BaseModel):
 
         return creation_date
 
-    @cache.cached(timeout=120, key_prefix='report_interval')
+    #@cache.cached(timeout=120, key_prefix='report_interval')
     def get_term_report(self, **kwargs):
 
         self._get_search_params(**kwargs)
@@ -355,6 +356,7 @@ class Report(db.Model, BaseModel):
             )
 
             detaled_report = self.term_detaled_query(search_date)
+            print detaled_report
             data['detaled'] = []
 
             for row in detaled_report:
