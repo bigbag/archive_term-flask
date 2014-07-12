@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Модель для платежной карты (кошелька)
+    Модель для платежной кошелька Uniteller
 
 
     :copyright: (c) 2014 by Pavel Lyashkov.
@@ -21,6 +21,7 @@ class PaymentWalletOld(db.Model, BaseModel):
 
     __bind_key__ = 'payment_old'
     __tablename__ = 'wallet'
+    __table_args__ = {'extend_existing': True}
 
     STATUS_NOACTIVE = 0
     STATUS_ACTIVE = 1
@@ -32,11 +33,11 @@ class PaymentWalletOld(db.Model, BaseModel):
     TYPE_DEMO = 0
     TYPE_FULL = 1
 
-    BALANCE_MIN = 4000
+    BALANCE_MIN = 0
 
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.String(20), index=True)
-    hard_id = db.Column(db.Integer(128), index=True)
+    hard_id = db.Column(db.Integer(), index=True)
     name = db.Column(db.Integer(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship('User')
@@ -55,44 +56,14 @@ class PaymentWalletOld(db.Model, BaseModel):
         self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_NOACTIVE
 
-    def get_pid(self, pids):
-        pid = "%s%s" % (pids, random.randint(100000000, 999999999))
-        pid = "%s%s" % (pid, hash_helper.get_isin_checksum(pid))
-        pid = str(pid).rjust(20, '0')[-20:]
-
-        wallet = self.query.filter_by(payment_id=pid).first()
-        if wallet:
-            self.get_pid(self, pids)
-        else:
-            return pid
-
-    def update_balance(self, report):
-        from models.payment_lost import PaymentLost
-        from models.payment_history import PaymentHistory
-
-        error = False
-
-        wallet = self.get_by_payment_id(
-            report.payment_id)
-        if not wallet or wallet.user_id == 0:
-            lost = PaymentLost()
-            lost.add_lost_payment(report)
-            return error
-
-        wallet.balance = int(
-            wallet.balance) - int(
-            report.amount)
-
-        if not wallet.save():
-            error = True
-            return error
-
-        history = PaymentHistory()
-        history.add_history(wallet, report)
-        return error
-
     def get_by_payment_id(self, payment_id):
         return self.query.filter_by(payment_id=payment_id).first()
+
+    def get_invalid(self):
+        query = self.query
+        query = query.filter((
+            self.status != self.STATUS_ACTIVE) | (self.balance <= self.BALANCE_MIN))
+        return query.group_by(self.payment_id).all()
 
     def save(self):
         self.payment_id = str(self.payment_id).rjust(20, '0')
