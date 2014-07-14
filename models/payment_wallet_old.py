@@ -20,8 +20,7 @@ from helpers import date_helper, hash_helper
 class PaymentWalletOld(db.Model, BaseModel):
 
     __bind_key__ = 'payment_old'
-    __tablename__ = 'wallet'
-    __table_args__ = {'extend_existing': True}
+    __tablename__ = 'wallet_old'
 
     STATUS_NOACTIVE = 0
     STATUS_ACTIVE = 1

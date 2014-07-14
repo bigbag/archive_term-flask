@@ -84,6 +84,8 @@ class PaymentCard(db.Model, BaseModel):
             PaymentWallet.discodes_id == discodes_id).filter(
                 PaymentWallet.user_id != 0).first(
                 )
+
+        print wallet
         if not wallet:
             return False
 
