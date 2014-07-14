@@ -106,7 +106,7 @@ class PaymentCard(db.Model, BaseModel):
 
         return status
 
-    def linking_card(self, history_id):
+    def linking_card(self, history_id, url=None):
         """Привязываем карту, получаем платежный токен"""
 
         history = PaymentHistory.query.get(history_id)
@@ -121,6 +121,10 @@ class PaymentCard(db.Model, BaseModel):
             return False
 
         ym = YaMoneyApi(YandexMoneyConfig)
+        if url:
+            ym.success_uri = url
+            ym.fail_uri = url
+
         result = ym.get_process_external_payment(history.request_id)
         if not result or not 'status' in result:
             app.logger.error(

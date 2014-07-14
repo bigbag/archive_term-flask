@@ -18,12 +18,12 @@ from models.payment_card import PaymentCard
 mod = Blueprint('api_internal', __name__)
 
 
-@mod.route('/yandex/linking/<int:discodes_id>', methods=['GET'])
+@mod.route('/yandex/linking/<int:discodes_id>/<url>', methods=['GET'])
 @json_headers
-def api_internal_yandex_linking(discodes_id):
+def api_internal_yandex_linking(discodes_id, url):
 
     result = {'error': 1}
-    params = PaymentCard().linking_init(discodes_id)
+    params = PaymentCard().linking_init(discodes_id, url)
     if params:
         result = params
         result['error'] = 0
