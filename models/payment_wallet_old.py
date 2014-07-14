@@ -59,6 +59,12 @@ class PaymentWalletOld(db.Model, BaseModel):
     def get_by_payment_id(self, payment_id):
         return self.query.filter_by(payment_id=payment_id).first()
 
+    def get_valid_by_payment_id(self, payment_id):
+        return self.query.filter(
+            self.payment_id == payment_id).filter(
+                self.status == self.STATUS_ACTIVE).filter(
+                    self.user_id != 0).first()
+
     def get_invalid(self):
         query = self.query
         query = query.filter((
