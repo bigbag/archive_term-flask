@@ -38,7 +38,7 @@ class PaymentCard(db.Model, BaseModel):
     type = db.Column(db.String(128), nullable=False, index=True)
     status = db.Column(db.Integer(), nullable=False, index=True)
 
-    def get_linking_params(self, order_id=0):
+    def get_linking_params(self, order_id=0, url=None):
         """Запрос параметров для привязки карты"""
 
         ym = YaMoneyApi(YandexMoneyConfig)
@@ -52,6 +52,10 @@ class PaymentCard(db.Model, BaseModel):
                 'Linking card: yandex api error - %s' %
                 payment['error'])
             return False
+
+        if url:
+            self.success_uri = url
+            self.fail_uri = url
 
         status = ym.get_process_external_payment(payment['request_id'])
         if not 'status' in status:
@@ -73,7 +77,7 @@ class PaymentCard(db.Model, BaseModel):
 
         return result
 
-    def linking_init(self, discodes_id):
+    def linking_init(self, discodes_id, url=None):
         """Инициализируем привязку карты"""
 
         wallet = PaymentWallet.query.filter(
@@ -88,7 +92,7 @@ class PaymentCard(db.Model, BaseModel):
         if not history.save():
             return False
 
-        status = self.get_linking_params(history.id)
+        status = self.get_linking_params(history.id, url)
         if not status:
             history.delete()
             app.logger.error('Linking card: Fail in getting parameters')
@@ -106,7 +110,7 @@ class PaymentCard(db.Model, BaseModel):
 
         return status
 
-    def linking_card(self, history_id, url=None):
+    def linking_card(self, history_id):
         """Привязываем карту, получаем платежный токен"""
 
         history = PaymentHistory.query.get(history_id)
@@ -121,10 +125,6 @@ class PaymentCard(db.Model, BaseModel):
             return False
 
         ym = YaMoneyApi(YandexMoneyConfig)
-        if url:
-            ym.success_uri = url
-            ym.fail_uri = url
-
         result = ym.get_process_external_payment(history.request_id)
         if not result or not 'status' in result:
             app.logger.error(
