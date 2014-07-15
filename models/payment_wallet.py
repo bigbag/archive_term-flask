@@ -80,14 +80,14 @@ class PaymentWallet(db.Model, BaseModel):
     def get_by_payment_id(self, payment_id):
         return self.query.filter_by(payment_id=payment_id).first()
 
-    def get_full(self):
-        query = self.query
-        query = query.filter(self.type == self.TYPE_FULL)
+    @staticmethod
+    def get_full():
+        query = PaymentWallet.filter(PaymentWallet.type == PaymentWallet.TYPE_FULL)
         return query.group_by(PaymentWallet.payment_id).all()
 
     @staticmethod
     def get_blacklist():
-        wallets = PaymentWallet().get_full()
+        wallets = PaymentWallet.get_full()
         if not wallets:
             return False
 
