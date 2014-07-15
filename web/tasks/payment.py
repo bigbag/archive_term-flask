@@ -190,7 +190,7 @@ class PaymentTask (object):
             return False
 
         old_wallet = PaymentWalletOld.get_valid_by_payment_id(report.payment_id)
-        if not wallet:
+        if not old_wallet:
             app.logger.error(
                 'Payment: Not found old_wallet with pid %s' %
                 report.payment_id)
@@ -200,7 +200,7 @@ class PaymentTask (object):
         if history:
             return False
 
-        history = PaymentHistory().from_report(report, wallet)
+        history = PaymentHistory().from_report(report, old_wallet)
         if not history:
             app.logger.error(
                 'Payment: Fail in history add, report_id=%s' %
