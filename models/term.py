@@ -114,7 +114,7 @@ class Term(db.Model, BaseModel):
     def get_valid_term(hard_id):
         return Term.query.filter_by(
             hard_id=hard_id,
-            status=self.STATUS_VALID).first()
+            status=Term.STATUS_VALID).first()
 
     @staticmethod
     def get_by_hard_id(hard_id):
