@@ -82,7 +82,7 @@ class PaymentWallet(db.Model, BaseModel):
 
     @staticmethod
     def get_full():
-        query = PaymentWallet.filter(PaymentWallet.type == PaymentWallet.TYPE_FULL)
+        query = PaymentWallet.query.filter(PaymentWallet.type == PaymentWallet.TYPE_FULL)
         return query.group_by(PaymentWallet.payment_id).all()
 
     @staticmethod
