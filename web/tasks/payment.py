@@ -224,6 +224,7 @@ class PaymentTask (object):
         new_report = Report()
         new_report = copy.copy(report)
         new_report.amount = abs(new_balance)
+        new_report.status = Report.STATUS_NEW
         new_report.save()
         return True
     # End
