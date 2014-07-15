@@ -55,20 +55,23 @@ class PaymentWalletOld(db.Model, BaseModel):
         self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_NOACTIVE
 
-    def get_by_payment_id(self, payment_id):
-        return self.query.filter_by(payment_id=payment_id).first()
+    @staticmethod
+    def get_by_payment_id(payment_id):
+        return PaymentWalletOld.query.filter_by(payment_id=payment_id).first()
 
-    def get_valid_by_payment_id(self, payment_id):
-        return self.query.filter(
-            self.payment_id == payment_id).filter(
-                self.status == self.STATUS_ACTIVE).filter(
-                    self.user_id != 0).first()
+    @staticmethod
+    def get_valid_by_payment_id(payment_id):
+        return PaymentWalletOld.query.filter(
+            PaymentWalletOld.payment_id == payment_id).filter(
+                PaymentWalletOld.status == PaymentWalletOld.STATUS_ACTIVE).filter(
+                    PaymentWalletOld.user_id != 0).first()
 
-    def get_invalid(self):
-        query = self.query
+    @staticmethod
+    def get_invalid():
+        query = PaymentWalletOld.query
         query = query.filter((
-            self.status != self.STATUS_ACTIVE) | (self.balance <= self.BALANCE_MIN))
-        return query.group_by(self.payment_id).all()
+            PaymentWalletOld.status != PaymentWalletOld.STATUS_ACTIVE) | (PaymentWalletOld.balance <= PaymentWalletOld.BALANCE_MIN))
+        return query.group_by(PaymentWalletOld.payment_id).all()
 
     def save(self):
         self.payment_id = str(self.payment_id).rjust(20, '0')

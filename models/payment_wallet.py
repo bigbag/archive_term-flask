@@ -77,8 +77,9 @@ class PaymentWallet(db.Model, BaseModel):
         else:
             return pid
 
-    def get_by_payment_id(self, payment_id):
-        return self.query.filter_by(payment_id=payment_id).first()
+    @staticmethod
+    def get_by_payment_id(payment_id):
+        return PaymentWallet.query.filter_by(payment_id=payment_id).first()
 
     @staticmethod
     def get_full():

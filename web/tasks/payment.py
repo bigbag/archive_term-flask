@@ -43,8 +43,8 @@ class PaymentTask (object):
                 continue
 
             # Start: Костыль на время перехода от кошельков с балансом
-            wallet_old = PaymentWalletOld().get_valid_by_payment_id(report.payment_id)
-            if wallet_old and wallet_old.balance > 0:
+            wallet_old = PaymentWalletOld.get_valid_by_payment_id(report.payment_id)
+            if wallet_old and int(wallet_old.balance) > 0:
                 PaymentTask.background_old_payment.delay(report.id)
                 continue
             # End
@@ -118,8 +118,7 @@ class PaymentTask (object):
                 report.id)
             return False
 
-        wallet = PaymentWallet.query.filter_by(
-            payment_id=report.payment_id).first()
+        wallet = PaymentWallet.get_by_payment_id(report.payment_id)
         if not wallet:
             app.logger.error(
                 'Payment: Not found wallet with pid %s' %
@@ -190,7 +189,7 @@ class PaymentTask (object):
                 report.id)
             return False
 
-        old_wallet = PaymentWalletOld().get_valid_by_payment_id(report.payment_id)
+        old_wallet = PaymentWalletOld.get_valid_by_payment_id(report.payment_id)
         if not wallet:
             app.logger.error(
                 'Payment: Not found old_wallet with pid %s' %
