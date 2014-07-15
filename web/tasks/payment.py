@@ -225,6 +225,9 @@ class PaymentTask (object):
         new_report.amount = abs(new_balance)
         new_report.status = Report.STATUS_NEW
         new_report.save()
+
+        history.request_id = 'old'
+        history.save()
         return True
     # End
 
