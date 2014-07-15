@@ -157,7 +157,7 @@ class ReportParserTask (object):
             app.logger.error('Not found event %s' % data['event_key'])
             return False
 
-        firm_term = FirmTerm().query.filter_by(term_id=term.id).first()
+        firm_term = FirmTerm.query.filter_by(term_id=term.id).first()
 
         payments = data['payments']
         for payment in payments:

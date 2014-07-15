@@ -54,8 +54,8 @@ class PaymentCard(db.Model, BaseModel):
             return False
 
         if url:
-            self.success_uri = url
-            self.fail_uri = url
+            ym.success_uri = url
+            ym.fail_uri = url
 
         status = ym.get_process_external_payment(payment['request_id'])
         if not 'status' in status:
@@ -83,7 +83,7 @@ class PaymentCard(db.Model, BaseModel):
         wallet = PaymentWallet.query.filter(
             PaymentWallet.discodes_id == discodes_id).filter(
                 PaymentWallet.user_id != 0).first(
-                )
+        )
         if not wallet:
             return False
 
@@ -102,7 +102,7 @@ class PaymentCard(db.Model, BaseModel):
         if not history.save():
             return False
 
-        fail_history = PaymentHistory().get_fail_linking_record(
+        fail_history = PaymentHistory.get_fail_linking_record(
             history.id, history.wallet_id)
         for row in fail_history:
             db.session.delete(row)

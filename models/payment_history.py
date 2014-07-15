@@ -73,8 +73,9 @@ class PaymentHistory(db.Model, BaseModel):
 
         return history
 
-    def get_fail_linking_record(self, history_id, wallet_id):
-        return PaymentHistory().query.filter(PaymentHistory.id != history_id).filter(
+    @staticmethod
+    def get_fail_linking_record(history_id, wallet_id):
+        return PaymentHistory.query.filter(PaymentHistory.id != history_id).filter(
             PaymentHistory.wallet_id == wallet_id).filter(
                 PaymentHistory.type == PaymentHistory.TYPE_SYSTEM).filter(
                     PaymentHistory.status == PaymentHistory.STATUS_NEW).all()
@@ -96,12 +97,14 @@ class PaymentHistory(db.Model, BaseModel):
         self.status = PaymentHistory.STATUS_COMPLETE
         return self.save()
 
-    def get_new_by_wallet_id(self, wallet_id):
-        return self.query.filter_by(status=self.STATUS_NEW, wallet_id=wallet_id).first()
+    @staticmethod
+    def get_new_by_wallet_id(wallet_id):
+        return PaymentHistory.query.filter_by(status=PaymentHistory.STATUS_NEW, wallet_id=wallet_id).first()
 
-    def get_new_payment(self):
+    @staticmethod
+    def get_new_payment():
         return PaymentHistory.query.filter(
             PaymentHistory.report_id != 0).filter(
                 PaymentHistory.status == PaymentHistory.STATUS_NEW).filter(
                     PaymentHistory.request_id != 0).all(
-                    )
+        )

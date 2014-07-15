@@ -92,7 +92,7 @@ class FirmTerm(db.Model, BaseModel):
         from models.term_event import TermEvent
         from models.person_event import PersonEvent
 
-        term_events = TermEvent().query.filter_by(term_id=self.term_id).all()
+        term_events = TermEvent.query.filter_by(term_id=self.term_id).all()
         for term_event in term_events:
             PersonEvent(
             ).query.filter_by(

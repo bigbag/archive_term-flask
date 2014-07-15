@@ -48,7 +48,7 @@ def api_get_gzip_config(term_id):
 
 def api_get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
-    term = Term().get_valid_term(int(term_id))
+    term = Term.get_valid_term(int(term_id))
 
     if term is None:
         abort(400)
@@ -118,7 +118,7 @@ def api_upload_report(term_id, report_datetime):
     if not re.search('\d{6}_\d{6}', str(report_datetime)):
         abort(400)
 
-    term = Term().get_valid_term(term_id)
+    term = Term.get_valid_term(term_id)
 
     if term is None:
         abort(400)
@@ -177,14 +177,14 @@ def api_set_callback(term_id, action, version=None):
     if not action in VALID_ACTITON:
         abort(405)
 
-    term = Term().get_valid_term(term_id)
+    term = Term.get_valid_term(term_id)
 
     if term is None:
         abort(404)
 
     if action == 'config':
         term.config_date = date_helper.get_curent_date()
-        AlarmStack().reset_count(term.id)
+        AlarmStack.reset_count(term.id)
     elif action == 'blacklist':
         term.blacklist_date = date_helper.get_curent_date()
 

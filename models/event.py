@@ -24,8 +24,9 @@ class Event(db.Model, BaseModel):
     def get_by_key(key):
         return Event.query.filter_by(key=key).first()
 
+    @staticmethod
     @cache.cached(timeout=600, key_prefix='all_events_dict')
-    def get_dict(self):
+    def get_dict():
         events = Event.query.all()
         result = {}
         for event in events:

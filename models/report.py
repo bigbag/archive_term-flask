@@ -217,8 +217,8 @@ class Report(db.Model, BaseModel):
         answer = self.person_general_query(**kwargs)
 
         result = []
-        events = Event().get_dict()
-        term_name_dict = Term().select_name_dict()
+        events = Event.get_dict()
+        term_name_dict = Term.select_name_dict()
         for report in answer['reports']:
             search_date = date_helper.from_utc(
                 report[0],
@@ -344,7 +344,7 @@ class Report(db.Model, BaseModel):
         answer = self.term_general_query(**kwargs)
 
         result = []
-        term_name_dict = Term().select_name_dict()
+        term_name_dict = Term.select_name_dict()
         for report in answer['reports']:
             search_date = date_helper.from_utc(report[0], self.tz)
             creation_date = self.format_search_date(search_date)

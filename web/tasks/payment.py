@@ -51,7 +51,7 @@ class PaymentTask (object):
 
             PaymentTask.background_payment.delay(report.id)
 
-        history = PaymentHistory().get_new_payment()
+        history = PaymentHistory.get_new_payment()
         for key in history:
             PaymentTask.check_status.delay(key.id)
 

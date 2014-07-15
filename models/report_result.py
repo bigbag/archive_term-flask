@@ -147,7 +147,7 @@ class ReportResult(object):
         )
 
     def set_terms(self, term_id):
-        terms = Term().select_name_dict()
+        terms = Term.select_name_dict()
         if term_id not in self.terms:
             if term_id not in self.terms:
                 term_name = u'Не известно'

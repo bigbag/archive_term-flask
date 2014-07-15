@@ -95,7 +95,7 @@ class Spot(db.Model, BaseModel):
         rnd = str(random.randint(1000000000, 9999999999))
         ean = "00%s%s" % (rnd, hash_helper.get_ean_checksum(rnd))
 
-        spot = self.query.filter_by(barcode=ean).first()
+        spot = Spot.query.filter_by(barcode=ean).first()
         if spot:
             self.get_barcode
         else:
@@ -130,7 +130,7 @@ class Spot(db.Model, BaseModel):
         url = hashlib.sha1(data).hexdigest()
         url = url[:15]
 
-        spot = self.query.filter_by(url=url).first()
+        spot = Spot.query.filter_by(url=url).first()
         if spot:
             self.get_url
         else:
