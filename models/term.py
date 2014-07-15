@@ -178,7 +178,7 @@ class Term(db.Model, BaseModel):
         limit = kwargs['limit'] if 'limit' in kwargs else 10
         page = kwargs['page'] if 'page' in kwargs else 1
 
-        firm_term = FirmTerm().get_list_by_firm_id(firm_id)
+        firm_term = FirmTerm.get_list_by_firm_id(firm_id)
         g.firm_term = firm_term
 
         query = Term.query.filter(Term.id.in_(firm_term))

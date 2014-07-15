@@ -65,7 +65,7 @@ class TermCorpWallet(db.Model, BaseModel):
     @cache.cached(timeout=120, key_prefix='corp_wallet')
     def get_dict_by_firm_id(self, firm_id):
         corp_wallet_interval = self.get_interval_list()
-        persons = Person().get_dict_by_firm_id(firm_id)
+        persons = Person.get_dict_by_firm_id(firm_id)
 
         result = {}
         for key in persons:

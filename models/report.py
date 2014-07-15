@@ -90,7 +90,7 @@ class Report(db.Model, BaseModel):
             self.status = self.STATUS_NEW
 
         # Если операция по белому списку и есть корп кошелек, меняем его баланс
-        if self.person_id != 0:
+        if self.person_id != 0 and int(self.type) == Report.TYPE_WHITE:
             person = Person.query.get(self.person_id)
 
             if person.wallet_status == Person.STATUS_VALID and person.type == Person.TYPE_WALLET:
@@ -98,6 +98,7 @@ class Report(db.Model, BaseModel):
                 self.corp_type = self.CORP_TYPE_ON
                 corp_wallet = TermCorpWallet.query.filter_by(
                     person_id=person.id).first()
+
                 if not corp_wallet:
                     return error
 
@@ -111,8 +112,8 @@ class Report(db.Model, BaseModel):
                     person.wallet_status = Person.STATUS_BANNED
                     person.save()
 
-        if not self.save():
-            error = True
+        # if not self.save():
+        #     error = True
 
         return error
 
@@ -288,7 +289,6 @@ class Report(db.Model, BaseModel):
 
     def term_detaled_query(self, search_date):
         interval = date_helper.get_date_interval(search_date, self.period)
-        print interval
 
         query = db.session.query(
             Report.term_id,
@@ -356,7 +356,6 @@ class Report(db.Model, BaseModel):
             )
 
             detaled_report = self.term_detaled_query(search_date)
-            print detaled_report
             data['detaled'] = []
 
             for row in detaled_report:

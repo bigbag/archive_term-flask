@@ -54,7 +54,7 @@ def terminal_list():
 def terminal_info(term_id):
     """Информация о терминале"""
 
-    firm_terms = FirmTerm().get_list_by_firm_id(g.firm_info['id'])
+    firm_terms = FirmTerm.get_list_by_firm_id(g.firm_info['id'])
     if not term_id in firm_terms:
         abort(403)
 
@@ -62,7 +62,7 @@ def terminal_info(term_id):
     if not term:
         abort(404)
 
-    term_access = FirmTerm().get_access_by_firm_id(g.firm_info['id'], term_id)
+    term_access = FirmTerm.get_list_by_firm_id(g.firm_info['id'], term_id)
     term_events = TermEvent().get_by_term_id(term_id)
     alarm = AlarmStack(
         firm_id=g.firm_info['id'],
@@ -364,7 +364,7 @@ def terminal_event_delete(term_id, term_event_id):
     answer = dict(error='yes', message=u'Произошла ошибка')
     arg = get_post_arg(request, True)
 
-    firm_term = FirmTerm().get_list_by_firm_id(g.firm_info['id'])
+    firm_term = FirmTerm.get_list_by_firm_id(g.firm_info['id'])
     if term_id not in firm_term:
         abort(403)
 
@@ -399,7 +399,7 @@ def alarm_save():
     if not term:
         abort(404)
 
-    firm_term = FirmTerm().get_list_by_firm_id(g.firm_info['id'])
+    firm_term = FirmTerm.get_list_by_firm_id(g.firm_info['id'])
     if term.id not in firm_term:
         abort(403)
 
@@ -436,7 +436,7 @@ def alarm_remove():
     if not 'term_id' in arg or not Term().get_by_id(arg['term_id']):
         abort(404)
 
-    term_access = FirmTerm().get_access_by_firm_id(
+    term_access = FirmTerm.get_list_by_firm_id(
         g.firm_info['id'], arg['term_id'])
     if not term_access:
         term_rent = FirmTerm.query.filter_by(

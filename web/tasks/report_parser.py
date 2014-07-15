@@ -152,7 +152,7 @@ class ReportParserTask (object):
             app.logger.error('Not found term %s' % params['term_id'])
             return False
 
-        event = event = Event().get_by_key(data['event_key'])
+        event = event = Event.get_by_key(data['event_key'])
         if not event:
             app.logger.error('Not found event %s' % data['event_key'])
             return False
@@ -169,14 +169,13 @@ class ReportParserTask (object):
             report.payment_id = payment['card']
             report.amount = payment['amount'] * int(term.factor)
 
-            person = None
-            firm_list = FirmTerm().get_list_by_term_id(term.id)
-            for firm_id in firm_list:
-                person = Person.query.filter_by(
-                    payment_id=report.payment_id, firm_id=firm_id).first()
+            firm_list = FirmTerm.get_list_by_term_id(term.id)
+            for row in firm_list:
+                person = Person.query.filter(
+                    Person.payment_id == report.payment_id).filter(
+                        Person.firm_id == row).first()
                 if not person:
                     continue
-
             if person:
                 report.name = person.name
                 report.person_id = person.id

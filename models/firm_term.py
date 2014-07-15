@@ -33,33 +33,36 @@ class FirmTerm(db.Model, BaseModel):
     def __init__(self):
         self.creation_date = date_helper.get_curent_date()
 
-    def get_list_by_term_id(self, term_id):
-        firm_terms = self.query.filter_by(
+    @staticmethod
+    def get_list_by_term_id(term_id):
+        firm_terms = FirmTerm.query.filter_by(
             term_id=term_id).all()
 
-        firm_id_list = []
+        firm_id_list = set()
         for firm_term in firm_terms:
-            firm_id_list.append(firm_term.child_firm_id)
+            firm_id_list.add(firm_term.child_firm_id)
 
         return firm_id_list
 
-    #@cache.cached(timeout=30, key_prefix='list_by_firm_id')
-    def get_list_by_firm_id(self, firm_id, child=True):
+    @staticmethod
+    def get_list_by_firm_id(firm_id, child=True):
+        query = FirmTerm.query
         if child:
-            query = self.query.filter_by(child_firm_id=firm_id)
+            query = query.filter_by(child_firm_id=firm_id)
         else:
-            query = self.query.filter_by(firm_id=firm_id)
+            query = query.filter_by(firm_id=firm_id)
 
-        firm_id_list = []
+        firm_id_list = set()
         firm_terms = query.all()
         for firm_term in firm_terms:
-            firm_id_list.append(firm_term.term_id)
+            firm_id_list.add(firm_term.term_id)
 
         return firm_id_list
 
-    def get_access_by_firm_id(self, firm_id, term_id):
+    @staticmethod
+    def get_access_by_firm_id(firm_id, term_id):
         result = False
-        access = self.query.filter_by(
+        access = FirmTerm.query.filter_by(
             firm_id=firm_id).filter_by(
             term_id=term_id).first()
 

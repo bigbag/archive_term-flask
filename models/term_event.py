@@ -84,7 +84,7 @@ class TermEvent(db.Model, BaseModel):
         return self.query.filter_by(term_id=term_id).order_by('start').all()
 
     def get_by_firm_id(self, firm_id):
-        firm_term = FirmTerm().get_list_by_firm_id(firm_id)
+        firm_term = FirmTerm.get_list_by_firm_id(firm_id)
         return self.query.filter(
             TermEvent.term_id.in_(
                 firm_term)).all()
