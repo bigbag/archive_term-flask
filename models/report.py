@@ -112,8 +112,8 @@ class Report(db.Model, BaseModel):
                     person.wallet_status = Person.STATUS_BANNED
                     person.save()
 
-        # if not self.save():
-        #     error = True
+        if not self.save():
+            error = True
 
         return error
 
