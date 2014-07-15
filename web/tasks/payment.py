@@ -212,22 +212,29 @@ class PaymentTask (object):
             app.logger.error('Payment: Not found term %s' % report.term_id)
 
         new_balance = old_wallet.balance - report.amount
-        if new_balance >= 0:
+        if new_balance < 0:
+            old_wallet.balance = 0
+
+            new_report = Report()
+            new_report = copy.copy(report)
+            new_report.amount = abs(new_balance)
+            new_report.status = Report.STATUS_NEW
+            new_report.save()
+        else:
             old_wallet.balance = new_balance
-            old_wallet.save()
-            return True
 
-        old_wallet.balance = 0
-        old_wallet.save()
-
-        new_report = Report()
-        new_report = copy.copy(report)
-        new_report.amount = abs(new_balance)
-        new_report.status = Report.STATUS_NEW
-        new_report.save()
+        if not old_wallet.save():
+            return False
 
         history.request_id = 'old'
-        history.save()
+        history.status = PaymentHistory.STATUS_COMPLETE
+        if not history.save():
+            return False
+
+        report.status = Report.STATUS_COMPLETE
+        if not report.save():
+            return False
+
         return True
     # End
 
