@@ -81,7 +81,7 @@ def api_get_config(term_id):
 
 
 @mod.route('/configs/blacklist.xml', methods=['GET'])
-#@cache.cached(timeout=120, key_prefix='term_xml_blacklist')
+@cache.cached(timeout=120, key_prefix='term_xml_blacklist')
 @md5_content_headers
 @xml_headers
 def api_get_xml_blacklist():

@@ -83,7 +83,7 @@ class PaymentWallet(db.Model, BaseModel):
     def get_full(self):
         query = self.query
         query = query.filter(self.type == self.TYPE_FULL)
-        return query.group_by(self.payment_id).all()
+        return query.group_by(PaymentWallet.payment_id).all()
 
     @staticmethod
     def get_blacklist():
@@ -94,10 +94,13 @@ class PaymentWallet(db.Model, BaseModel):
         valid = set()
         blacklist = set()
         for wallet in wallets:
-            if (wallet.blacklist == PaymentWallet.ACTIVE_OFF) | (wallet.status == PaymentWallet.STATUS_BANNED):
+            if int(wallet.blacklist) == PaymentWallet.ACTIVE_OFF:
                 blacklist.add(str(wallet.payment_id))
             else:
                 valid.add(str(wallet.payment_id))
+                print str(wallet.payment_id)
+
+
 
         # Start: Костыль на время перехода от кошельков с балансом
         from models.payment_wallet_old import PaymentWalletOld
