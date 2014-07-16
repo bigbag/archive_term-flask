@@ -28,4 +28,4 @@ class ReportParser(Command):
         files_all = os.listdir(report_path)
         for file_name in files_all:
             file_name = "%s/%s" % (report_path, file_name)
-            ReportParserTask.report_manager(file_name)
+            ReportParserTask.report_manager.delay(file_name)
