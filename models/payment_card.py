@@ -26,6 +26,8 @@ class PaymentCard(db.Model, BaseModel):
     STATUS_PAYMENT = 1
     STATUS_ARCHIV = 0
 
+    LINKING_AMOUNT = 1
+
     MAX_LINKING_CARD_TIMEOUT = 60 * 60
 
     id = db.Column(db.Integer, primary_key=True)
@@ -43,7 +45,7 @@ class PaymentCard(db.Model, BaseModel):
 
         ym = YaMoneyApi(YandexMoneyConfig)
         payment = ym.get_request_payment_to_shop(
-            1, ym.const.CARD_PATTERN_ID, order_id)
+            self.LINKING_AMOUNT, ym.const.CARD_PATTERN_ID, order_id)
         if not payment:
             return False
 

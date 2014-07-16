@@ -31,7 +31,7 @@ class PaymentHistory(db.Model, BaseModel):
     TYPE_SYSTEM = 1
     TYPE_PAYMENT = 2
 
-    SYSTEM_PAYMENT = 1
+    SYSTEM_PAYMENT = 100
 
     id = db.Column(db.Integer, primary_key=True)
     report_id = db.Column(db.Integer(), nullable=False)
