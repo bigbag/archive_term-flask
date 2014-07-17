@@ -19,7 +19,6 @@ from helpers import date_helper
 from models.payment_history import PaymentHistory
 from models.payment_card import PaymentCard
 from models.payment_wallet import PaymentWallet
-from models.payment_wallet_old import PaymentWalletOld
 from models.term import Term
 from models.report import Report
 
@@ -43,8 +42,8 @@ class PaymentTask (object):
                 continue
 
             # Start: Костыль на время перехода от кошельков с балансом
-            wallet_old = PaymentWalletOld.get_valid_by_payment_id(report.payment_id)
-            if wallet_old and int(wallet_old.balance) > 0:
+            wallet = PaymentWallet.get_valid_by_payment_id(report.payment_id)
+            if wallet and int(wallet.balance) > 0:
                 PaymentTask.background_old_payment.delay(report.id)
                 continue
             # End
@@ -189,10 +188,10 @@ class PaymentTask (object):
                 report.id)
             return False
 
-        old_wallet = PaymentWalletOld.get_valid_by_payment_id(report.payment_id)
-        if not old_wallet:
+        wallet = PaymentWallet.get_valid_by_payment_id(report.payment_id)
+        if not wallet:
             app.logger.error(
-                'Payment: Not found old_wallet with pid %s' %
+                'Payment: Not found wallet with pid %s' %
                 report.payment_id)
             return False
 
@@ -200,7 +199,7 @@ class PaymentTask (object):
         if history:
             return False
 
-        history = PaymentHistory().from_report(report, old_wallet)
+        history = PaymentHistory().from_report(report, wallet)
         if not history:
             app.logger.error(
                 'Payment: Fail in history add, report_id=%s' %
@@ -211,9 +210,9 @@ class PaymentTask (object):
         if not term:
             app.logger.error('Payment: Not found term %s' % report.term_id)
 
-        new_balance = old_wallet.balance - report.amount
+        new_balance = wallet.balance - report.amount
         if new_balance < 0:
-            old_wallet.balance = 0
+            wallet.balance = 0
 
             new_report = Report()
             new_report = copy.copy(report)
@@ -221,9 +220,9 @@ class PaymentTask (object):
             new_report.status = Report.STATUS_NEW
             new_report.save()
         else:
-            old_wallet.balance = new_balance
+            wallet.balance = new_balance
 
-        if not old_wallet.save():
+        if not wallet.save():
             return False
 
         history.request_id = 'old'

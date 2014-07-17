@@ -49,7 +49,6 @@ class Config(object):
         'term': 'mysql://user:pass@localhost/term?charset=utf8',
         'stack': 'mysql://user:pass@localhost/stack?charset=utf8',
         'payment': 'mysql://user:pass@localhost/payment?charset=utf8',
-        'payment_old': 'mysql://user:pass@localhost/payment?charset=utf8',
         'mobispot': 'mysql://user:pass@localhost/mobispot?charset=utf8'
     }
 

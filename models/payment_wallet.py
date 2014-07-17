@@ -33,6 +33,8 @@ class PaymentWallet(db.Model, BaseModel):
     TYPE_DEMO = 0
     TYPE_FULL = 1
 
+    BALANCE_MIN = 0
+
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.String(20), index=True)
     hard_id = db.Column(db.String(128), index=True)
@@ -87,6 +89,19 @@ class PaymentWallet(db.Model, BaseModel):
         return query.group_by(PaymentWallet.payment_id).all()
 
     @staticmethod
+    def get_empty():
+        query = PaymentWallet.query
+        query = query.filter(PaymentWallet.balance <= PaymentWallet.BALANCE_MIN)
+        return query.group_by(PaymentWallet.payment_id).all()
+
+    @staticmethod
+    def get_valid_by_payment_id(payment_id):
+        return PaymentWallet.query.filter(
+            PaymentWallet.payment_id == payment_id).filter(
+                PaymentWallet.status == PaymentWallet.STATUS_ACTIVE).filter(
+                    PaymentWallet.user_id != 0).first()
+
+    @staticmethod
     def get_blacklist():
         wallets = PaymentWallet.get_full()
         if not wallets:
@@ -104,12 +119,10 @@ class PaymentWallet(db.Model, BaseModel):
 
 
         # Start: Костыль на время перехода от кошельков с балансом
-        from models.payment_wallet_old import PaymentWalletOld
-
-        wallets_invalid_old = PaymentWalletOld().get_invalid()
-        for wallet_old in wallets_invalid_old:
-            if wallet_old.payment_id not in valid:
-                blacklist.add(wallet_old.payment_id)
+        wallets_empty = PaymentWallet.get_empty()
+        for wallet_empty in wallets_empty:
+            if wallet_empty.payment_id not in valid:
+                blacklist.add(wallet_empty.payment_id)
         # End
 
         persons = Person.query.group_by(Person.payment_id).all()
