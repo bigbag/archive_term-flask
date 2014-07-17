@@ -45,6 +45,7 @@ class PaymentWallet(db.Model, BaseModel):
     creation_date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.Integer, nullable=False)
     blacklist = db.Column(db.Integer, nullable=False)
+    balance = db.Column(db.Integer)
     type = db.Column(db.Integer(), index=True)
 
     def __init__(self):
@@ -52,6 +53,7 @@ class PaymentWallet(db.Model, BaseModel):
         self.name = 'My spot'
         self.type = self.TYPE_FULL
         self.blacklist = self.ACTIVE_OFF
+        self.balance = 0
         self.user_id = 0
         self.creation_date = date_helper.get_curent_date()
         self.status = self.STATUS_NOACTIVE
