@@ -305,7 +305,7 @@ def api_admin_hard_list(model, request):
 def api_admin_spot_hard_type():
     """Возвращает информацию о типах спотов"""
 
-    # base._api_access(request)
+    base._api_access(request)
     query = SpotHardType.query
 
     args = request.args
