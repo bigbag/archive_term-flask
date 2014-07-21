@@ -38,9 +38,9 @@ class FirmTerm(db.Model, BaseModel):
         firm_terms = FirmTerm.query.filter_by(
             term_id=term_id).all()
 
-        firm_id_list = set()
+        firm_id_list = []
         for firm_term in firm_terms:
-            firm_id_list.add(firm_term.child_firm_id)
+            firm_id_list.append(firm_term.child_firm_id)
 
         return firm_id_list
 
