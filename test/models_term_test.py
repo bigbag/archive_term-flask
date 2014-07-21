@@ -2,12 +2,11 @@
 """
     Тест моделей терминального проекта
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import unittest
-from web import db
-from web import app
+from web import db, app
 
 from models.event import Event
 from models.firm import Firm

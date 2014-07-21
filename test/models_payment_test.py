@@ -2,17 +2,13 @@
 """
     Тест моделей платежки
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 import unittest
-from web import db
-from web import app
+from web import db, app
 
 from models.payment_history import PaymentHistory
-from models.payment_log import PaymentLog
-from models.payment_lost import PaymentLost
-from models.payment_reccurent import PaymentReccurent
 from models.payment_wallet import PaymentWallet
 from models.report import Report
 
@@ -89,24 +85,6 @@ class ModelsPaymentCase(unittest.TestCase):
 
         history.delete()
 
-    def test_payment_log(self):
-        data = dict(
-            history_id=self.HISTORY_ID,
-            wallet_id=self.WALLET_ID,
-            rrn=self.RRN,
-            card_pan=self.CARD_PAN
-        )
-        self.model_test(PaymentLog, data)
-
-    def test_payment_reccurent(self):
-        data = dict(
-            history_id=self.HISTORY_ID,
-            wallet_id=self.WALLET_ID,
-            amount=self.AMOUNT,
-            card_pan=self.CARD_PAN
-        )
-        self.model_test(PaymentReccurent, data)
-
     def test_payment_wallet(self):
         data = dict(
             payment_id=self.PAYMENT_ID,
@@ -121,27 +99,3 @@ class ModelsPaymentCase(unittest.TestCase):
     def test_func_get_pid(self):
         wallet = PaymentWallet()
         wallet.get_pid(self.PIDS)
-
-    def test_payment_lost(self):
-        data = dict(
-            term_id=self.TERM_ID,
-            event_id=self.TERM_ID,
-            payment_id=self.PAYMENT_ID,
-            amount=self.AMOUNT,
-            creation_date=self.TEST_DATE
-        )
-        self.model_test(PaymentLost, data)
-
-    def test_func_add_lost_payment(self):
-        lost = PaymentLost()
-        data_report = dict(
-            term_id=self.TERM_ID,
-            event_id=self.EVENT_ID,
-            person_id=self.PERSON_ID,
-            payment_id=self.FIRM_ID,
-            firm_id=self.FIRM_ID,
-            creation_date=date_helper.get_curent_date(),
-        )
-        report = Report()
-        report.__dict__.update(data_report)
-        lost.add_lost_payment(report)

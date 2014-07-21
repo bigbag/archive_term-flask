@@ -1,8 +1,8 @@
 'use strict';
 
-angular.module('term').controller('GeneralController', 
+angular.module('term').controller('GeneralController',
     function($scope, $http, $compile) {
-  
+
   //Параметры по умолчанию для пагинации
   $scope.pagination = {
       cur: 1,
@@ -15,19 +15,20 @@ angular.module('term').controller('GeneralController',
     $scope.result = {};
     $scope.pagination.total = 7;
     $scope.search.page_count = 7;
-  }
+  };
 
   //Запрос на отображение табличных данных
   $scope.getGridContent = function(search) {
+    var url;
     if (angular.isUndefined(search.page)) search.page = 1;
     if (!angular.isUndefined(search.action)){
-      var url = window.location.pathname + '/' + search.action + '/';
+      url = window.location.pathname + '/' + search.action + '/';
     } else {
-      var url = window.location.pathname
+      url = window.location.pathname;
     }
 
     search.csrf_token = $scope.token;
-    
+
     $http.post(url, search).success(function(data) {
       $scope.result = data.result;
       $scope.search.page_count = data.count;

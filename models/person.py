@@ -49,8 +49,8 @@ class Person(db.Model, BaseModel):
         self.creation_date = date_helper.get_curent_date()
         self.name = u'Пользователь'
 
-    @cache.cached(timeout=120, key_prefix='person_dict')
-    def get_dict_by_firm_id(self, firm_id):
+    @staticmethod
+    def get_dict_by_firm_id(firm_id):
         persons = Person.query.filter_by(firm_id=firm_id).all()
 
         result = {}
@@ -63,7 +63,8 @@ class Person(db.Model, BaseModel):
 
         return result
 
-    def select_list(self, firm_id, **kwargs):
+    @staticmethod
+    def select_list(firm_id, **kwargs):
         order = kwargs[
             'order'] if 'order' in kwargs else 'name asc'
         limit = kwargs['limit'] if 'limit' in kwargs else 10
@@ -87,7 +88,7 @@ class Person(db.Model, BaseModel):
                 id=person.id,
                 name=person.name,
                 card=person.card,
-                wallet_status=int(person.wallet_status == self.STATUS_VALID),
+                wallet_status=int(person.wallet_status == Person.STATUS_VALID),
                 hard_id=int(person.payment_id) if person.payment_id else 0,
             )
             result.append(data)

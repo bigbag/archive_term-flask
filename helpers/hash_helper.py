@@ -9,7 +9,7 @@ import hashlib
 import hmac
 import time
 import base64
-from flaskext.bcrypt import check_password_hash, generate_password_hash
+from flask.ext.bcrypt import check_password_hash, generate_password_hash
 
 from functools import reduce
 
@@ -95,7 +95,6 @@ def get_api_sign(secret, data):
 
     H = hmac.new(secret, digestmod=hashlib.sha512)
     H.update('&'.join(post))
-
     return H.hexdigest()
 
 

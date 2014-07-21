@@ -18,15 +18,14 @@ from helpers import date_helper, hash_helper
 
 from models.term import Term
 from models.term_event import TermEvent
-from models.person import Person
 from models.event import Event
 from models.person_event import PersonEvent
 from models.card_stack import CardStack
 from models.payment_wallet import PaymentWallet
-from models.payment_reccurent import PaymentReccurent
-from models.payment_lost import PaymentLost
 from models.term_settings import TermSettings
 from models.alarm_stack import AlarmStack
+
+from web.tasks.report_parser import ReportParserTask
 
 mod = Blueprint('api_term', __name__)
 
@@ -49,7 +48,7 @@ def api_get_gzip_config(term_id):
 
 def api_get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
-    term = Term().get_valid_term(int(term_id))
+    term = Term.get_valid_term(int(term_id))
 
     if term is None:
         abort(400)
@@ -68,7 +67,7 @@ def api_get_config(term_id):
         if term_events is None:
             abort(400)
 
-        person_events = PersonEvent().get_valid_by_term_id(term.id)
+        person_events = PersonEvent.get_valid_by_term_id(term.id)
 
         config_xml = render_template(
             'api/term/config.xml',
@@ -99,44 +98,13 @@ def api_get_gzip_blacklist():
 
 def api_get_blacklist():
     """Возвращает черный список карт"""
-    query = PaymentWallet.query
-    query = query.filter(PaymentWallet.type == PaymentWallet.TYPE_FULL)
-    wallets = query.group_by(PaymentWallet.payment_id).all()
-
-    valid_payment_id = []
-    invalid_payment_id = []
-    for wallet in wallets:
-        if (int(wallet.balance) < PaymentWallet.BALANCE_MIN) | (int(wallet.status) != PaymentWallet.STATUS_ACTIVE):
-            invalid_payment_id.append(str(wallet.payment_id))
-        else:
-            valid_payment_id.append(str(wallet.payment_id))
-
-    lost_cards = PaymentLost.query.group_by(PaymentLost.payment_id).all()
-    persons = Person.query.group_by(Person.payment_id).all()
-
-    blacklist = []
-    for person in persons:
-        if not person.payment_id:
-            continue
-
-        if person.payment_id not in valid_payment_id:
-            if not person.payment_id in invalid_payment_id:
-                blacklist.append(person.payment_id)
-
-    blacklist = sorted(blacklist + invalid_payment_id)
-
-    for card in lost_cards:
-        if not card.payment_id in blacklist:
-            blacklist.append(card.payment_id)
 
     config_xml = render_template(
         'api/term/blacklist.xml',
-        blacklist=blacklist,
+        blacklist=PaymentWallet.get_blacklist(),
     ).encode('cp1251')
 
-    response = make_response(config_xml)
-
-    return response
+    return make_response(config_xml)
 
 
 @mod.route('/reports/report_<int:term_id>_<report_datetime>.xml.gz', methods=['PUT'])
@@ -150,14 +118,14 @@ def api_upload_report(term_id, report_datetime):
     if not re.search('\d{6}_\d{6}', str(report_datetime)):
         abort(400)
 
-    term = Term().get_valid_term(term_id)
+    term = Term.get_valid_term(term_id)
 
     if term is None:
         abort(400)
 
     file = request.stream.read()
     filename = "%s/%s_%s" % (
-        app.config['TMP_PACH'],
+        app.config['REPORT_TMP_PACH'],
         str(term_id),
         str(report_datetime))
 
@@ -175,6 +143,8 @@ def api_upload_report(term_id, report_datetime):
 
     term.report_date = date_helper.get_curent_date()
     term.save()
+
+    ReportParserTask.report_manager.delay(filename)
 
     return set_message('success', hash_helper.get_content_md5(file), 201)
 
@@ -207,14 +177,14 @@ def api_set_callback(term_id, action, version=None):
     if not action in VALID_ACTITON:
         abort(405)
 
-    term = Term().get_valid_term(term_id)
+    term = Term.get_valid_term(term_id)
 
     if term is None:
         abort(404)
 
     if action == 'config':
         term.config_date = date_helper.get_curent_date()
-        AlarmStack().reset_count(term.id)
+        AlarmStack.reset_count(term.id)
     elif action == 'blacklist':
         term.blacklist_date = date_helper.get_curent_date()
 

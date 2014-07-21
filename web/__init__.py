@@ -12,19 +12,21 @@ db = SQLAlchemy(app)
 from web.celery import celery
 
 from libs.redis_sessions import RedisSessionInterface
-app.session_interface = RedisSessionInterface()
+app.session_interface = RedisSessionInterface(app)
 
 from flask.ext.login import LoginManager
 lm = LoginManager()
 lm.init_app(app)
 
-from web.views.api import admin, term, social
+from web.views.api import admin, term, social, internal
 from web.views.term import general
 
 app.register_blueprint(term.mod, url_prefix='/api/term')
 app.register_blueprint(admin.mod, url_prefix='/api/admin')
-app.register_blueprint(general.mod, url_prefix='/term')
 app.register_blueprint(social.mod, url_prefix='/api/social')
+app.register_blueprint(internal.mod, url_prefix='/api/internal')
+app.register_blueprint(general.mod, url_prefix='/term')
+
 
 if app.debug is not True:
     import logging

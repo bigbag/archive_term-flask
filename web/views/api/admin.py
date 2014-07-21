@@ -15,6 +15,10 @@ from decorators.header import *
 from helpers.error_xml_helper import *
 
 from models.spot import Spot
+from models.spot_color import SpotColor
+from models.spot_pattern import SpotPattern
+from models.spot_hard import SpotHard
+from models.spot_hard_type import SpotHardType
 from models.spot_dis import SpotDis
 from models.payment_wallet import PaymentWallet
 from models.payment_history import PaymentHistory
@@ -84,6 +88,12 @@ def api_admin_linking_spot():
     pids = request.form['pids']
     ean = request.form['ean']
 
+    hard_type = Spot.DEFAULT_HARD_TYPE
+    if 'hard_type' in request.form:
+        hard_type = int(request.form['hard_type'])
+        if not SpotHardType.query.get(hard_type):
+            abort(400)
+
     status = 1
     if 'status' in request.form:
         status = int(request.form['status'])
@@ -104,6 +114,8 @@ def api_admin_linking_spot():
         barcode=ean).first()
     if not spot:
         abort(404)
+
+    spot.hard_type = hard_type
 
     wallet = PaymentWallet.query.filter(
         (PaymentWallet.hard_id == hid) |
@@ -239,3 +251,80 @@ def api_admin_spot_delete():
         wallet.delete()
 
     return set_message('success', 'Success', 201)
+
+
+@mod.route('/spot/hard/color', methods=['GET'])
+@xml_headers
+def api_admin_spot_color():
+    """Возвращает информацию о доступных для спота цветах"""
+
+    base._api_access(request)
+    return api_admin_hard_list(SpotColor, request)
+
+
+@mod.route('/spot/hard/pattern', methods=['GET'])
+@xml_headers
+def api_admin_spot_pattern():
+    """Возвращает информацию о доступных для спота шаблонах"""
+
+    base._api_access(request)
+    return api_admin_hard_list(SpotPattern, request)
+
+
+@mod.route('/spot/hard/model', methods=['GET'])
+@xml_headers
+def api_admin_spot_model():
+    """Возвращает информацию о доступных для спота корпусах"""
+
+    base._api_access(request)
+    return api_admin_hard_list(SpotHard, request)
+
+
+def api_admin_hard_list(model, request):
+
+    query = model.query
+
+    args = request.args
+    if 'show' in args:
+        query = query.filter_by(show=request.args.get('show'))
+
+    data = query.all()
+    if not data:
+        abort(404)
+
+    info_xml = render_template(
+        'api/admin/hard_list.xml',
+        data=data,
+        count=len(data)
+    ).encode('utf8')
+    return make_response(info_xml)
+
+
+@mod.route('/spot/hard/type', methods=['GET'])
+@xml_headers
+def api_admin_spot_hard_type():
+    """Возвращает информацию о типах спотов"""
+
+    base._api_access(request)
+    query = SpotHardType.query
+
+    args = request.args
+    if 'show' in args:
+        query = query.filter_by(show=request.args.get('show'))
+    if 'color_id' in args:
+        query = query.filter_by(color_id=request.args.get('color_id'))
+    if 'pattern_id' in args:
+        query = query.filter_by(pattern_id=request.args.get('pattern_id'))
+    if 'hard_id' in args:
+        query = query.filter_by(hard_id=request.args.get('hard_id'))
+
+    data = query.all()
+    if not data:
+        abort(404)
+
+    info_xml = render_template(
+        'api/admin/hard_type_list.xml',
+        data=data,
+        count=len(data)
+    ).encode('utf8')
+    return make_response(info_xml)

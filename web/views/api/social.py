@@ -201,42 +201,42 @@ def api_socnet_list(ean):
     return make_response(info_xml)
 
 
-@mod.route('/socnet/post/<ean>', methods=['POST'])
+@mod.route('/socnet/<ean>/<soc_id>', methods=['POST'])
 @xml_headers
-def api_social_post(ean):
+def api_social_post(ean, soc_id):
     """Публикует пост с картинкой в заданной в soc_id соцсети"""
 
-    base._api_access(request)
+    # base._api_access(request)
+
+    success = 0
 
     ean = str(ean)
-    if not len(ean) == 13 or not ean.isdigit():
+    if not len(ean) == 13:
         abort(400)
+
+    if not 'img' in request.files:
+        abort(400)
+
+    file = request.files['img']
 
     spot = Spot.query.filter_by(barcode=ean).first()
     if not spot:
         abort(404)
 
-    if not 'soc_id' in request.form:
-        abort(400)
-
-    success = 0
-    error = 'Unknown error'
-    soc_id = request.form['soc_id']
-    file = request.files['img']
-    filesize = 0
-    img = ''
-    token = False
-    filepath = False
     message = ''
-
     if 'text' in request.form:
         message = request.form['text']
 
+    filesize = 0
     if file:
         file.seek(0, os.SEEK_END)
         filesize = file.tell()
         file.seek(0, os.SEEK_SET)
 
+    filepath = False
+    token = False
+    error = 'Unknown error'
+    img = ''
     if not file or '.' not in file.filename:
         error = 'Incorrect file'
     elif file.filename.rsplit('.', 1)[1] not in app.config['IMG_EXTENSIONS']:
@@ -244,27 +244,26 @@ def api_social_post(ean):
     elif filesize > app.config['MAX_IMG_LENGTH']:
         error = 'img too large'
     else:
-        baseName = secure_filename(file.filename)
-        imgName = baseName
+        base_name = secure_filename(file.filename)
+        img_name = base_name
 
         filepath = "%s/%s/%s" % (os.getcwd(), app.config['IMG_FOLDER'],
-                                 imgName)
+                                 img_name)
 
         i = 0
         while (os.path.exists(filepath)):
             i += 1
-            imgName = "%s_%s" % (str(i), baseName)
+            img_name = "%s_%s" % (str(i), base_name)
             filepath = "%s/%s/%s" % (os.getcwd(), app.config['IMG_FOLDER'],
-                                     imgName)
+                                     img_name)
 
         file.save(filepath)
 
         img = "http://%s/%s/%s" % (
-            request.host, app.config['IMG_FOLDER'], imgName)
+            request.host, 'upload/img', img_name)
         img = img.replace('/././', '/')
 
         error = 'no write rights fo this social account'
-
         token = SocToken.query.filter_by(
             user_id=spot.user_id, type=soc_id, write_access=1).first()
 

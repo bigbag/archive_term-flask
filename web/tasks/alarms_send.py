@@ -22,7 +22,7 @@ from web.emails.term.term_alarm import TermAlarmMessage
 def alarm_manager():
     alarm_stack = AlarmStack.query.filter(AlarmStack.count != 0).all()
     for alarm in alarm_stack:
-        term = Term().get_by_id(alarm.term_id)
+        term = Term.get_by_id(alarm.term_id)
         if not term:
             continue
 
@@ -37,7 +37,7 @@ def alarm_manager():
         alarm.save()
 
         emails = alarm.decode_field(alarm.emails)
-        term_info = Term().get_info_by_id(alarm.term_id)
+        term_info = Term.get_info_by_id(alarm.term_id)
         for email in emails:
             mail.send.delay(
                 TermAlarmMessage,

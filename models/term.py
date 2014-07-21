@@ -84,9 +84,9 @@ class Term(db.Model, BaseModel):
         return result
 
     def term_remove(self):
-        FirmTerm().query.filter_by(term_id=self.id).delete()
-        TermEvent().query.filter_by(term_id=self.id).delete()
-        PersonEvent().query.filter_by(term_id=self.id).delete()
+        FirmTerm.query.filter_by(term_id=self.id).delete()
+        TermEvent.query.filter_by(term_id=self.id).delete()
+        PersonEvent.query.filter_by(term_id=self.id).delete()
         self.delete()
 
         return True
@@ -110,22 +110,26 @@ class Term(db.Model, BaseModel):
             {'id': self.BLACKLIST_OFF, 'name': u"Корпоративные деньги"}
         ]
 
-    def get_valid_term(self, hard_id):
-        return self.query.filter_by(
+    @staticmethod
+    def get_valid_term(hard_id):
+        return Term.query.filter_by(
             hard_id=hard_id,
-            status=self.STATUS_VALID).first()
+            status=Term.STATUS_VALID).first()
 
-    def get_by_hard_id(self, hard_id):
-        return self.query.filter_by(
+    @staticmethod
+    def get_by_hard_id(hard_id):
+        return Term.query.filter_by(
             hard_id=int(hard_id)).first()
 
-    def get_by_id(self, id):
-        return self.query.filter_by(
+    @staticmethod
+    def get_by_id(id):
+        return Term.query.filter_by(
             id=int(id)).first()
 
-    def get_info_by_id(self, id):
+    @staticmethod
+    def get_info_by_id(id):
         date_pattern = '%H:%M %d.%m.%y'
-        term = Term().query.get(id)
+        term = Term.query.get(id)
         if term.report_date:
             term.report_date = date_helper.from_utc(
                 term.report_date,
@@ -159,8 +163,8 @@ class Term(db.Model, BaseModel):
             self.download_start = term.download_start
         return self
 
-    @cache.cached(timeout=60, key_prefix='term_name_dict')
-    def select_name_dict(self):
+    @staticmethod
+    def select_name_dict():
         terms = Term.query.all()
 
         result = {}
@@ -169,8 +173,8 @@ class Term(db.Model, BaseModel):
 
         return result
 
-    @cache.cached(timeout=120, key_prefix='term_list')
-    def select_term_list(self, firm_id, **kwargs):
+    @staticmethod
+    def select_term_list(firm_id, **kwargs):
         tz = app.config['TZ']
         date_pattern = '%H:%M %d.%m.%y'
 
@@ -178,7 +182,7 @@ class Term(db.Model, BaseModel):
         limit = kwargs['limit'] if 'limit' in kwargs else 10
         page = kwargs['page'] if 'page' in kwargs else 1
 
-        firm_term = FirmTerm().get_list_by_firm_id(firm_id)
+        firm_term = FirmTerm.get_list_by_firm_id(firm_id)
         g.firm_term = firm_term
 
         query = Term.query.filter(Term.id.in_(firm_term))
@@ -186,7 +190,7 @@ class Term(db.Model, BaseModel):
 
         result = []
         for term in terms:
-            firm_general = FirmTerm().query.filter_by(term_id=term.id).first()
+            firm_general = FirmTerm.query.filter_by(term_id=term.id).first()
 
             seans_date = None
             seans_alarm = 0
@@ -194,7 +198,7 @@ class Term(db.Model, BaseModel):
                 delta = date_helper.get_curent_date(
                     format=False) - term.config_date
 
-                seans_alarm = delta.total_seconds() > self.SEANS_ALARM
+                seans_alarm = delta.total_seconds() > Term.SEANS_ALARM
 
                 seans_date = date_helper.from_utc(term.config_date, tz)
                 seans_date = seans_date.strftime(date_pattern)
@@ -203,7 +207,7 @@ class Term(db.Model, BaseModel):
                 hard_id=term.hard_id,
                 name=term.name,
                 firm=firm_general.firm.name,
-                status=int(term.status == self.STATUS_VALID),
+                status=int(term.status == Term.STATUS_VALID),
                 seans_date=seans_date,
                 seans_alarm=int(seans_alarm),
             )

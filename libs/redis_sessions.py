@@ -27,10 +27,19 @@ class RedisSessionInterface(SessionInterface):
     serializer = pickle
     session_class = RedisSession
 
-    def __init__(self, redis=None, prefix='session:'):
-        if redis is None:
-            redis = Redis()
-        self.redis = redis
+    def __init__(self, app, prefix='session:'):
+        self.app = app
+        self.config = app.config
+
+        params = dict(
+            host=self.config.get('CACHE_REDIS_HOST', 'localhost'),
+            port=self.config.get('CACHE_REDIS_PORT', 6379),
+            password=self.config.get('CACHE_REDIS_PASSWORD', None),
+            db=self.config.get('CACHE_REDIS_DB', 0),
+            default_timeout=300
+        )
+
+        self.redis = Redis()
         self.prefix = prefix
 
     def generate_sid(self):

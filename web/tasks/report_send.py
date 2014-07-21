@@ -119,6 +119,7 @@ class ReportSenderTask (object):
     def _get_money_xls(self, result):
         file_name = result.get_report_file()
         if not file_name:
+            app.logger.error('Not found excel file %s' % file_name)
             return False
 
         workbook = xlsxwriter.Workbook(file_name)
@@ -168,7 +169,7 @@ class ReportSenderTask (object):
         result.col_keys = ReportResult.get_corp_keys()
         result.col_name = ReportResult.get_corp_col_name()
 
-        persons = Person().get_dict_by_firm_id(result.firm.id)
+        persons = Person.get_dict_by_firm_id(result.firm.id)
         corp_wallets = TermCorpWallet().get_dict_by_firm_id(
             result.firm.id)
 
@@ -208,6 +209,7 @@ class ReportSenderTask (object):
     def _get_corp_xls(self, result):
         file_name = result.get_report_file()
         if not file_name:
+            app.logger.error('Not found excel file %s' % file_name)
             return False
 
         workbook = xlsxwriter.Workbook(file_name)
@@ -285,7 +287,7 @@ class ReportSenderTask (object):
         result.col_keys = ReportResult.get_person_keys()
         result.col_name = ReportResult.get_person_col_name()
 
-        persons = Person().get_dict_by_firm_id(result.firm.id)
+        persons = Person.get_dict_by_firm_id(result.firm.id)
 
         for row in result.report:
             result.set_terms(row[2])

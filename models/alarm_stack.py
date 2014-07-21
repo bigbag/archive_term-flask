@@ -48,13 +48,14 @@ class AlarmStack(db.Model, BaseModel):
 
         return alarm
 
-    def reset_count(self, term_id):
+    @staticmethod
+    def reset_count(term_id):
         result = False
-        alarm = self.query.filter_by(term_id=term_id).first()
+        alarm = AlarmStack.query.filter_by(term_id=term_id).first()
         if not alarm:
             return result
 
-        alarm.count = self.DEFAULT_COUNT
+        alarm.count = AlarmStack.DEFAULT_COUNT
         if alarm.save():
             result = True
 

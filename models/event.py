@@ -20,11 +20,13 @@ class Event(db.Model, BaseModel):
     name = db.Column(db.String(150), nullable=False)
     key = db.Column(db.String(150), nullable=False)
 
-    def get_by_key(self, key):
-        return self.query.filter_by(key=key).first()
+    @staticmethod
+    def get_by_key(key):
+        return Event.query.filter_by(key=key).first()
 
+    @staticmethod
     @cache.cached(timeout=600, key_prefix='all_events_dict')
-    def get_dict(self):
+    def get_dict():
         events = Event.query.all()
         result = {}
         for event in events:

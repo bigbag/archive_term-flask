@@ -11,22 +11,26 @@ from test import *
 
 loader = unittest.TestLoader()
 
-models_test = loader.loadTestsFromModule(models_test)
+models_general_test = loader.loadTestsFromModule(models_general_test)
 models_term_test = loader.loadTestsFromModule(models_term_test)
 models_payment_test = loader.loadTestsFromModule(models_payment_test)
-web_api_test = loader.loadTestsFromModule(web_api_test)
-web_api_admin_test = loader.loadTestsFromModule(web_api_admin_test)
+
+api_term_test = loader.loadTestsFromModule(api_term_test)
+api_admin_test = loader.loadTestsFromModule(api_admin_test)
+
 web_term_test = loader.loadTestsFromModule(web_term_test)
 
+libs_yandex_test = loader.loadTestsFromModule(libs_yandex_test)
+
 tests = [
-    models_test,
+    models_general_test,
     models_payment_test,
     models_term_test,
-    web_api_admin_test,
-    web_api_test,
+    api_admin_test,
+    api_term_test,
     web_term_test]
 
-# tests = [web_api_admin_test]
+#tests = [libs_yandex_test]
 
 alltests = unittest.TestSuite(tests)
 
