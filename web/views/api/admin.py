@@ -313,8 +313,8 @@ def api_admin_spot_hard_type():
         query = query.filter_by(show=request.args.get('show'))
     if 'color_id' in args:
         query = query.filter_by(color_id=request.args.get('color_id'))
-    if 'pattern_in' in args:
-        query = query.filter_by(pattern_in=request.args.get('pattern_in'))
+    if 'pattern_id' in args:
+        query = query.filter_by(pattern_id=request.args.get('pattern_id'))
     if 'hard_id' in args:
         query = query.filter_by(hard_id=request.args.get('hard_id'))
 

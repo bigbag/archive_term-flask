@@ -23,7 +23,12 @@ mod = Blueprint('api_internal', __name__)
 def api_internal_yandex_linking(discodes_id):
 
     result = {'error': 1}
-    params = PaymentCard().linking_init(discodes_id)
+    url = None
+
+    if 'url' in request.args:
+        url = request.args['url']
+
+    params = PaymentCard().linking_init(discodes_id, url)
     if params:
         result = params
         result['error'] = 0

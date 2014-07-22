@@ -47,7 +47,7 @@ def load_user(id):
 def before_request():
     g.user = current_user
     g.firm_info = get_firm_name(request)
-    g.token = session['_id']
+    g.token = hash_helper.get_user_token(request)
 
 
 @lm.unauthorized_handler
@@ -75,7 +75,7 @@ def get_firm_name(request):
     if 'Host' in headers:
         host = request.headers['Host']
         host_name = host.split('.')
-        firm = Firm().get_by_sub_domain(host_name[0])
+        firm = Firm.get_by_sub_domain(host_name[0])
 
         if firm:
             name = firm.name

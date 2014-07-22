@@ -43,14 +43,17 @@ class PersonEvent(db.Model, BaseModel):
         self.timeout = 5
         self.status = self.STATUS_ACTIVE
 
-    def get_valid_by_term_id(self, term_id):
-        return self.query.filter_by(term_id=term_id).all()
+    @staticmethod
+    def get_valid_by_term_id(term_id):
+        return PersonEvent.query.filter_by(term_id=term_id).all()
 
-    def get_by_person_id(self, person_id):
-        return self.query.filter_by(person_id=person_id).all()
+    @staticmethod
+    def get_by_person_id(person_id):
+        return PersonEvent.query.filter_by(person_id=person_id).all()
 
-    def set_status_by_person_id(self, person_id, status):
-        person_events = PersonEvent().get_by_person_id(person_id)
+    @staticmethod
+    def set_status_by_person_id(person_id, status):
+        person_events = PersonEvent.get_by_person_id(person_id)
         for person_event in person_events:
             person_event.status = status
             db.session.add(person_event)

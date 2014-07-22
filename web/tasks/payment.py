@@ -5,6 +5,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import copy
 
 from web import app
 
@@ -39,9 +40,17 @@ class PaymentTask (object):
                 report_id=report.id).first()
             if history:
                 continue
+
+            # Start: Костыль на время перехода от кошельков с балансом
+            wallet = PaymentWallet.get_valid_by_payment_id(report.payment_id)
+            if wallet and int(wallet.balance) > 0:
+                PaymentTask.background_old_payment.delay(report.id)
+                continue
+            # End
+
             PaymentTask.background_payment.delay(report.id)
 
-        history = PaymentHistory().get_new_payment()
+        history = PaymentHistory.get_new_payment()
         for key in history:
             PaymentTask.check_status.delay(key.id)
 
@@ -101,7 +110,6 @@ class PaymentTask (object):
     def background_payment(report_id):
         """Проводим фоновый платеж"""
 
-        status = False
         report = Report.query.get(report_id)
         if not report:
             app.logger.error(
@@ -109,8 +117,7 @@ class PaymentTask (object):
                 report.id)
             return False
 
-        wallet = PaymentWallet.query.filter_by(
-            payment_id=report.payment_id).first()
+        wallet = PaymentWallet.get_by_payment_id(report.payment_id)
         if not wallet:
             app.logger.error(
                 'Payment: Not found wallet with pid %s' %
@@ -131,7 +138,7 @@ class PaymentTask (object):
         card = PaymentCard.query.filter_by(
             wallet_id=wallet.id,
             status=PaymentCard.STATUS_PAYMENT).first(
-            )
+        )
         if not card:
             history.delete()
             wallet.add_to_blacklist()
@@ -141,10 +148,7 @@ class PaymentTask (object):
         if not term:
             app.logger.error('Payment: Not found term %s' % report.term_id)
 
-        amount = float(
-            report.amount) / int(
-                Term.DEFAULT_FACTOR) * int(
-                    term.factor)
+        amount = float(report.amount) / int(Term.DEFAULT_FACTOR)
 
         ym = YaMoneyApi(YandexMoneyConfig)
         payment = ym.get_request_payment_to_shop(
@@ -170,6 +174,68 @@ class PaymentTask (object):
         history.request_id = payment['request_id']
         history.save()
         return True
+
+    # Start: Костыль на время перехода от кошельков с балансом
+    @staticmethod
+    @celery.task
+    def background_old_payment(report_id):
+        """Платеж с кошелька uniteller"""
+
+        report = Report.query.get(report_id)
+        if not report:
+            app.logger.error(
+                'Payment: Not found report with id %s' %
+                report.id)
+            return False
+
+        wallet = PaymentWallet.get_valid_by_payment_id(report.payment_id)
+        if not wallet:
+            app.logger.error(
+                'Payment: Not found wallet with pid %s' %
+                report.payment_id)
+            return False
+
+        history = PaymentHistory.query.filter_by(report_id=report.id).first()
+        if history:
+            return False
+
+        history = PaymentHistory().from_report(report, wallet)
+        if not history:
+            app.logger.error(
+                'Payment: Fail in history add, report_id=%s' %
+                report.id)
+            return False
+
+        term = Term.query.get(report.term_id)
+        if not term:
+            app.logger.error('Payment: Not found term %s' % report.term_id)
+
+        new_balance = wallet.balance - report.amount
+        if new_balance < 0:
+            wallet.balance = 0
+
+            new_report = Report()
+            new_report = copy.copy(report)
+            new_report.amount = abs(new_balance)
+            new_report.status = Report.STATUS_NEW
+            new_report.save()
+        else:
+            wallet.balance = new_balance
+
+        if not wallet.save():
+            return False
+
+        history.request_id = 'old'
+        history.status = PaymentHistory.STATUS_COMPLETE
+        if not history.save():
+            return False
+
+        report.status = Report.STATUS_COMPLETE
+        if not report.save():
+            return False
+
+        return True
+    # End
 
     @staticmethod
     @celery.task

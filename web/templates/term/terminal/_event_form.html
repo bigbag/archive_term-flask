@@ -13,7 +13,7 @@
                         {% for key in events %}
                         <option
                             {% if key == term_event.event_id %} selected {% endif %}
-                            value="{{row}}">
+                            value="{{key}}">
                             {{events[key]}}
                         </option>
                         {% endfor %}

@@ -46,7 +46,7 @@ def get_person_list():
     """Получаем список сотрудников фирмы"""
 
     arg = json.loads(request.stream.read())
-    answer = Person().select_list(g.firm_info['id'], **arg)
+    answer = Person.select_list(g.firm_info['id'], **arg)
 
     return jsonify(answer)
 
@@ -77,7 +77,7 @@ def person_info(person_id):
         'term/person/view.html',
         person=person,
         person_event=PersonEvent(),
-        person_events=PersonEvent().get_by_person_id(person.id),
+        person_events=PersonEvent.get_by_person_id(person.id),
         term_event=term_event,
         term_events=term_events,
         corp_wallet=corp_wallet,
@@ -327,12 +327,12 @@ def person_lock(person_id):
 
     if person.status == Person.STATUS_VALID:
         person.status = Person.STATUS_BANNED
-        PersonEvent().set_status_by_person_id(
+        PersonEvent.set_status_by_person_id(
             person_id, PersonEvent.STATUS_BANNED)
 
     elif person.status == Person.STATUS_BANNED:
         person.status = Person.STATUS_VALID
-        PersonEvent().set_status_by_person_id(
+        PersonEvent.set_status_by_person_id(
             person_id, PersonEvent.STATUS_ACTIVE)
 
     if person.save():
@@ -384,7 +384,7 @@ def person_event_info(person_id, person_event_id):
         'term/person/event_view.html',
         person=person,
         person_event=person_event,
-        person_events=PersonEvent().get_by_person_id(person.id),
+        person_events=PersonEvent.get_by_person_id(person.id),
         term_event=term_event,
         term_events=TermEvent().get_by_firm_id(g.firm_info['id']),
     )
@@ -510,7 +510,7 @@ def person_save_corp_wallet(person_id):
     person.wallet_status = Person.STATUS_VALID
     person.type = Person.TYPE_WALLET
 
-    person_events = PersonEvent().get_by_person_id(person.id)
+    person_events = PersonEvent.get_by_person_id(person.id)
     for person_event in person_events:
         person_event.timeout = 0
         person_event.save()

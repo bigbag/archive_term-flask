@@ -90,7 +90,7 @@ class Report(db.Model, BaseModel):
             self.status = self.STATUS_NEW
 
         # Если операция по белому списку и есть корп кошелек, меняем его баланс
-        if self.person_id != 0:
+        if self.person_id != 0 and int(self.type) == Report.TYPE_WHITE:
             person = Person.query.get(self.person_id)
 
             if person.wallet_status == Person.STATUS_VALID and person.type == Person.TYPE_WALLET:
@@ -98,6 +98,7 @@ class Report(db.Model, BaseModel):
                 self.corp_type = self.CORP_TYPE_ON
                 corp_wallet = TermCorpWallet.query.filter_by(
                     person_id=person.id).first()
+
                 if not corp_wallet:
                     return error
 
@@ -216,8 +217,8 @@ class Report(db.Model, BaseModel):
         answer = self.person_general_query(**kwargs)
 
         result = []
-        events = Event().get_dict()
-        term_name_dict = Term().select_name_dict()
+        events = Event.get_dict()
+        term_name_dict = Term.select_name_dict()
         for report in answer['reports']:
             search_date = date_helper.from_utc(
                 report[0],
@@ -273,8 +274,10 @@ class Report(db.Model, BaseModel):
             func.count(Report.id))
 
         query = query.filter(Report.type == self.payment_type)
+
         query = Report()._set_firm_id_filter(
             query, self.firm_id, self.payment_type)
+
         query = Report()._set_period_group(query, self.period)
         query = query.order_by(self.order)
 
@@ -313,6 +316,7 @@ class Report(db.Model, BaseModel):
         return date_pattern
 
     def format_search_date(self, search_date):
+        from datetime import timedelta
         date_pattern = self.get_date_pattern()
 
         if isinstance(search_date, (tuple)):
@@ -326,21 +330,21 @@ class Report(db.Model, BaseModel):
                 search_date, self.period)
             interval = (
                 interval[0].strftime('%d.%m.%Y'),
-                interval[1].strftime('%d.%m.%Y'))
+                (interval[1] - timedelta(days=1)).strftime('%d.%m.%Y'))
             creation_date = '%s - %s' % interval
         else:
             creation_date = search_date.strftime(date_pattern)
 
         return creation_date
 
-    @cache.cached(timeout=120, key_prefix='report_interval')
+    #@cache.cached(timeout=120, key_prefix='report_interval')
     def get_term_report(self, **kwargs):
 
         self._get_search_params(**kwargs)
         answer = self.term_general_query(**kwargs)
 
         result = []
-        term_name_dict = Term().select_name_dict()
+        term_name_dict = Term.select_name_dict()
         for report in answer['reports']:
             search_date = date_helper.from_utc(report[0], self.tz)
             creation_date = self.format_search_date(search_date)

@@ -26,6 +26,8 @@ class PaymentCard(db.Model, BaseModel):
     STATUS_PAYMENT = 1
     STATUS_ARCHIV = 0
 
+    LINKING_AMOUNT = 1
+
     MAX_LINKING_CARD_TIMEOUT = 60 * 60
 
     id = db.Column(db.Integer, primary_key=True)
@@ -38,12 +40,12 @@ class PaymentCard(db.Model, BaseModel):
     type = db.Column(db.String(128), nullable=False, index=True)
     status = db.Column(db.Integer(), nullable=False, index=True)
 
-    def get_linking_params(self, order_id=0):
+    def get_linking_params(self, order_id=0, url=None):
         """Запрос параметров для привязки карты"""
 
         ym = YaMoneyApi(YandexMoneyConfig)
         payment = ym.get_request_payment_to_shop(
-            1, ym.const.CARD_PATTERN_ID, order_id)
+            self.LINKING_AMOUNT, ym.const.CARD_PATTERN_ID, order_id)
         if not payment:
             return False
 
@@ -52,6 +54,10 @@ class PaymentCard(db.Model, BaseModel):
                 'Linking card: yandex api error - %s' %
                 payment['error'])
             return False
+
+        if url:
+            ym.success_uri = url
+            ym.fail_uri = url
 
         status = ym.get_process_external_payment(payment['request_id'])
         if not 'status' in status:
@@ -73,13 +79,13 @@ class PaymentCard(db.Model, BaseModel):
 
         return result
 
-    def linking_init(self, discodes_id):
+    def linking_init(self, discodes_id, url=None):
         """Инициализируем привязку карты"""
 
         wallet = PaymentWallet.query.filter(
             PaymentWallet.discodes_id == discodes_id).filter(
                 PaymentWallet.user_id != 0).first(
-                )
+        )
         if not wallet:
             return False
 
@@ -88,7 +94,7 @@ class PaymentCard(db.Model, BaseModel):
         if not history.save():
             return False
 
-        status = self.get_linking_params(history.id)
+        status = self.get_linking_params(history.id, url)
         if not status:
             history.delete()
             app.logger.error('Linking card: Fail in getting parameters')
@@ -98,7 +104,7 @@ class PaymentCard(db.Model, BaseModel):
         if not history.save():
             return False
 
-        fail_history = PaymentHistory().get_fail_linking_record(
+        fail_history = PaymentHistory.get_fail_linking_record(
             history.id, history.wallet_id)
         for row in fail_history:
             db.session.delete(row)

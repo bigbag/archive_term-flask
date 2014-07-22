@@ -38,5 +38,6 @@ class Firm(db.Model, BaseModel):
 
         return self
 
-    def get_by_sub_domain(self, sub_domain):
-        return self.query.filter_by(sub_domain=sub_domain).first()
+    @staticmethod
+    def get_by_sub_domain(sub_domain):
+        return Firm.query.filter_by(sub_domain=sub_domain).first()

@@ -43,7 +43,7 @@ def terminal_list():
     """Получаем список терминалов принадлежащих фирме"""
 
     arg = get_post_arg(request, True)
-    answer = Term().select_term_list(
+    answer = Term.select_term_list(
         g.firm_info['id'], **arg)
 
     return jsonify(answer)
@@ -54,15 +54,15 @@ def terminal_list():
 def terminal_info(term_id):
     """Информация о терминале"""
 
-    firm_terms = FirmTerm().get_list_by_firm_id(g.firm_info['id'])
+    firm_terms = FirmTerm.get_list_by_firm_id(g.firm_info['id'])
     if not term_id in firm_terms:
         abort(403)
 
-    term = Term().get_info_by_id(term_id)
+    term = Term.get_info_by_id(term_id)
     if not term:
         abort(404)
 
-    term_access = FirmTerm().get_access_by_firm_id(g.firm_info['id'], term_id)
+    term_access = FirmTerm.get_list_by_firm_id(g.firm_info['id'], term_id)
     term_events = TermEvent().get_by_term_id(term_id)
     alarm = AlarmStack(
         firm_id=g.firm_info['id'],
@@ -72,7 +72,7 @@ def terminal_info(term_id):
     return render_template(
         'term/terminal/view.html',
         term=term,
-        events=EventType().get_dict(term.type),
+        events=EventType.get_dict(term.type),
         term_event=TermEvent(),
         term_events=term_events,
         term_access=term_access,
@@ -90,7 +90,7 @@ def terminal_rent_info(term_id):
 
     answer = dict(error='yes', message=u'Произошла ошибка')
 
-    term = Term().get_info_by_id(term_id)
+    term = Term.get_info_by_id(term_id)
     if not term:
         abort(404)
 
@@ -99,7 +99,7 @@ def terminal_rent_info(term_id):
             FirmTerm.firm_id == g.firm_info[
                 'id']).filter(
                     FirmTerm.firm_id != FirmTerm.child_firm_id).all(
-                    )
+    )
 
     rents = []
     for row in firm_terms:
@@ -120,7 +120,7 @@ def terminal_rent_add(term_id):
     arg = get_post_arg(request, True)
     error = False
 
-    if not Term().get_by_id(term_id):
+    if not Term.get_by_id(term_id):
         abort(404)
 
     firm_terms = FirmTerm.query.filter_by(
@@ -171,7 +171,7 @@ def terminal_rent_remove(term_id):
     if 'id' not in arg:
         abort(405)
 
-    term = Term().get_by_id(term_id)
+    term = Term.get_by_id(term_id)
     if not term:
         abort(404)
 
@@ -191,7 +191,7 @@ def terminal_rent_remove(term_id):
 def terminal_save(term_id, action):
     """Добавляем или редактируем терминал"""
 
-    answer = dict(error='yes', message=u'Произошла ошибка')
+    answer = dict(error='yes', message=u'Произошла ошибка', id=term_id)
     arg = get_post_arg(request, True)
     action_list = ('add', 'edit')
 
@@ -201,12 +201,12 @@ def terminal_save(term_id, action):
     id = int(arg['id']) if 'id' in arg else None
 
     if 'hard_id' in arg:
-        term = Term().get_by_hard_id(arg['hard_id'])
+        term = Term.get_by_hard_id(arg['hard_id'])
         if term and term.id and term.id != id:
             answer['message'] = u'Терминал с таким SN уже есть в системе'
             return jsonify(answer)
 
-    term = Term().get_by_id(id)
+    term = Term.get_by_id(id)
     if not term:
         term = Term()
 
@@ -226,6 +226,7 @@ def terminal_save(term_id, action):
     if result:
         answer['error'] = 'no'
         answer['message'] = u'Данные сохранены'
+        answer['id'] = term.id
         return jsonify(answer)
 
     return jsonify(answer)
@@ -267,7 +268,7 @@ def terminal_remove(term_id):
     answer = dict(error='yes', message=u'Произошла ошибка')
     arg = get_post_arg(request, True)
 
-    term = Term().get_info_by_id(term_id)
+    term = Term.get_info_by_id(term_id)
     if not term:
         abort(404)
 
@@ -291,7 +292,7 @@ def terminal_remove(term_id):
 def terminal_event_info(term_id, term_event_id):
     """Информация о событии привязаном к терминалу"""
 
-    term = Term().get_info_by_id(term_id)
+    term = Term.get_info_by_id(term_id)
     if not term:
         abort(404)
 
@@ -305,7 +306,7 @@ def terminal_event_info(term_id, term_event_id):
     return render_template(
         'term/terminal/event_view.html',
         term=term,
-        events=EventType().get_dict(term.type),
+        events=EventType.get_dict(term.type),
         term_event=term_event,
         factor=term_event.term.factor
     )
@@ -363,7 +364,7 @@ def terminal_event_delete(term_id, term_event_id):
     answer = dict(error='yes', message=u'Произошла ошибка')
     arg = get_post_arg(request, True)
 
-    firm_term = FirmTerm().get_list_by_firm_id(g.firm_info['id'])
+    firm_term = FirmTerm.get_list_by_firm_id(g.firm_info['id'])
     if term_id not in firm_term:
         abort(403)
 
@@ -394,11 +395,11 @@ def alarm_save():
     if not 'term_id' in arg:
         abort(404)
 
-    term = Term().get_by_id(arg['term_id'])
+    term = Term.get_by_id(arg['term_id'])
     if not term:
         abort(404)
 
-    firm_term = FirmTerm().get_list_by_firm_id(g.firm_info['id'])
+    firm_term = FirmTerm.get_list_by_firm_id(g.firm_info['id'])
     if term.id not in firm_term:
         abort(403)
 
@@ -432,10 +433,10 @@ def alarm_remove():
     arg = get_post_arg(request, True)
     arg['firm_id'] = int(g.firm_info['id'])
 
-    if not 'term_id' in arg or not Term().get_by_id(arg['term_id']):
+    if not 'term_id' in arg or not Term.get_by_id(arg['term_id']):
         abort(404)
 
-    term_access = FirmTerm().get_access_by_firm_id(
+    term_access = FirmTerm.get_list_by_firm_id(
         g.firm_info['id'], arg['term_id'])
     if not term_access:
         term_rent = FirmTerm.query.filter_by(

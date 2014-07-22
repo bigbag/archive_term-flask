@@ -18,7 +18,6 @@ from helpers import date_helper, hash_helper
 
 from models.term import Term
 from models.term_event import TermEvent
-from models.person import Person
 from models.event import Event
 from models.person_event import PersonEvent
 from models.card_stack import CardStack
@@ -49,7 +48,7 @@ def api_get_gzip_config(term_id):
 
 def api_get_config(term_id):
     """Возвращает конфигурационный файл для терминала"""
-    term = Term().get_valid_term(int(term_id))
+    term = Term.get_valid_term(int(term_id))
 
     if term is None:
         abort(400)
@@ -68,7 +67,7 @@ def api_get_config(term_id):
         if term_events is None:
             abort(400)
 
-        person_events = PersonEvent().get_valid_by_term_id(term.id)
+        person_events = PersonEvent.get_valid_by_term_id(term.id)
 
         config_xml = render_template(
             'api/term/config.xml',
@@ -99,33 +98,10 @@ def api_get_gzip_blacklist():
 
 def api_get_blacklist():
     """Возвращает черный список карт"""
-    query = PaymentWallet.query
-    query = query.filter(PaymentWallet.type == PaymentWallet.TYPE_FULL)
-    wallets = query.group_by(PaymentWallet.payment_id).all()
-
-    valid = []
-    invalid = []
-    for wallet in wallets:
-        if (wallet.blacklist == PaymentWallet.ACTIVE_OFF) | (wallet.status == PaymentWallet.STATUS_BANNED):
-            invalid.append(str(wallet.payment_id))
-        else:
-            valid.append(str(wallet.payment_id))
-
-    persons = Person.query.group_by(Person.payment_id).all()
-    blacklist = []
-    for person in persons:
-        if not person.payment_id:
-            continue
-
-        if person.payment_id not in valid:
-            if person.payment_id not in invalid:
-                blacklist.append(person.payment_id)
-
-    blacklist = sorted(blacklist + invalid)
 
     config_xml = render_template(
         'api/term/blacklist.xml',
-        blacklist=sorted(blacklist),
+        blacklist=PaymentWallet.get_blacklist(),
     ).encode('cp1251')
 
     return make_response(config_xml)
@@ -142,7 +118,7 @@ def api_upload_report(term_id, report_datetime):
     if not re.search('\d{6}_\d{6}', str(report_datetime)):
         abort(400)
 
-    term = Term().get_valid_term(term_id)
+    term = Term.get_valid_term(term_id)
 
     if term is None:
         abort(400)
@@ -201,14 +177,14 @@ def api_set_callback(term_id, action, version=None):
     if not action in VALID_ACTITON:
         abort(405)
 
-    term = Term().get_valid_term(term_id)
+    term = Term.get_valid_term(term_id)
 
     if term is None:
         abort(404)
 
     if action == 'config':
         term.config_date = date_helper.get_curent_date()
-        AlarmStack().reset_count(term.id)
+        AlarmStack.reset_count(term.id)
     elif action == 'blacklist':
         term.blacklist_date = date_helper.get_curent_date()
 

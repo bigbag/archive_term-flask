@@ -3,9 +3,10 @@
     {% for row in data %}
     <type>
     	<id>{{row.id}}</id>
+        <name>{{row.name}}</name>
     	<hard_id>{{row.hard_id}}</hard_id>
-    	<color_id>{{row.hard_id}}</color_id>
-    	<pattern_id>{{row.hard_id}}</pattern_id>
+    	<color_id>{{row.color_id}}</color_id>
+    	<pattern_id>{{row.pattern_id}}</pattern_id>
     </type>
     {% endfor %}
 </info>
