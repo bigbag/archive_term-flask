@@ -157,27 +157,23 @@ class ReportParserTask (object):
             app.logger.error('Not found event %s' % data['event_key'])
             return False
 
-        firm_term = FirmTerm.query.filter_by(term_id=term.id).first()
-
+        firm_terms = FirmTerm.query.filter_by(term_id=term.id).all()
         payments = data['payments']
         for payment in payments:
             report = Report()
             report.term_id = term.id
             report.event_id = event.id
             report.type = payment['type']
-            report.term_firm_id = firm_term.firm_id
             report.payment_id = payment['card']
             report.amount = payment['amount'] * int(term.factor)
 
-            firm_list = FirmTerm.get_list_by_term_id(term.id)
-            print firm_list
-            for row in firm_list:
+            for row in firm_terms:
+                report.term_firm_id = row.firm_id
                 person = Person.query.filter(
                     Person.payment_id == report.payment_id).filter(
-                        Person.firm_id == row).first()
+                        Person.firm_id == row.child_firm_id).first()
                 if not person:
                     continue
-            print person
             if person:
                 report.name = person.name
                 report.person_id = person.id
