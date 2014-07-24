@@ -5,6 +5,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import json
 from web import db
 from helpers import date_helper
 
@@ -36,3 +37,7 @@ class MailStack(db.Model, BaseModel):
         self.senders = json.loads(self.senders)
         self.recipients = json.loads(self.recipients)
         return self
+
+    @staticmethod
+    def get_new():
+        return MailStack.query.filter_by(lock=MailStack.LOCK_FREE).all()

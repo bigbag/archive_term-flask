@@ -67,4 +67,10 @@ class TestCommand(Command):
                 wallet.save()
 
     def run(self):
+        from web.tasks import mail
+
+
+        mail.mail_stack_sender()
+
+
         pass
