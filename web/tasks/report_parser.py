@@ -183,14 +183,14 @@ class ReportParserTask (object):
                 report.person_id = person.id
                 report.person_firm_id = person.firm_id
 
-            # date_pattern = '%Y-%m-%d %H:%M:%S'
-            # date_time_utc = date_helper.convert_date_to_utc(
-            #     payment['date_time'],
-            #     term.tz,
-            #     date_pattern,
-            #     date_pattern)
-            # report.creation_date = date_time_utc
+            date_pattern = '%Y-%m-%d %H:%M:%S'
+            date_time_utc = date_helper.convert_date_to_utc(
+                payment['date_time'],
+                term.tz,
+                date_pattern,
+                date_pattern)
+            report.creation_date = date_time_utc
 
-            # error = report.add_new()
+            error = report.add_new()
 
         return error
