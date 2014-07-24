@@ -73,6 +73,11 @@ app.config.update(
             'schedule': crontab(minute=0, hour='*/3'),
             'args': (),
         },
+        'mail_stack_sender': {
+            'task': 'web.tasks.mail.mail_stack_sender',
+            'schedule': crontab(minute='*/1'),
+            'args': (),
+        },
     },
 )
 
