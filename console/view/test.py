@@ -67,10 +67,17 @@ class TestCommand(Command):
                 wallet.save()
 
     def run(self):
-        from web.tasks import mail
+        # from web.tasks.report_parser import ReportParserTask
 
+        # file_name = "./tmp/report/107_164025"
+        # params = dict(
+        #     term_id=107,
+        #     date=250714,
+        #     time=164025
+        # )
 
-        mail.mail_stack_sender()
-
+        # result = ReportParserTask.parse_xml(file_name)
+        # for row in result:
+        #     ReportParserTask.generate_report(params, row)
 
         pass
