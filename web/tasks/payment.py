@@ -47,7 +47,6 @@ class PaymentTask (object):
                 PaymentTask.background_old_payment.delay(report.id)
                 continue
             # End
-
             PaymentTask.background_payment.delay(report.id)
 
         history = PaymentHistory.get_new_payment()
@@ -211,14 +210,11 @@ class PaymentTask (object):
             app.logger.error('Payment: Not found term %s' % report.term_id)
 
         new_balance = wallet.balance - report.amount
-        if new_balance < 0:
-            wallet.balance = 0
 
-            new_report = Report()
-            new_report = copy.copy(report)
-            new_report.amount = abs(new_balance)
-            new_report.status = Report.STATUS_NEW
-            new_report.save()
+        if new_balance < 0:
+            history.amount = wallet.balance
+            wallet.balance = 0
+            report.copy_new_from_old(new_balance)
         else:
             wallet.balance = new_balance
 
