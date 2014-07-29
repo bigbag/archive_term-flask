@@ -11,6 +11,10 @@ from flask.ext.mail import Message
 
 class ReportMessage(Message):
 
+    @classmethod
+    def desc(cls):
+        return 'report'
+
     def __init__(self, **kwargs):
         required = ['to', 'result', 'template']
         for k in required:

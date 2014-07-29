@@ -9,6 +9,10 @@ from flask.ext.mail import Message
 
 class StackMessage(Message):
 
+    @classmethod
+    def desc(cls):
+        return 'stack'
+
     def __init__(self, **kwargs):
         required = ['to', 'body', 'subject']
 
