@@ -97,6 +97,12 @@ class PaymentWallet(db.Model, BaseModel):
         return query.group_by(PaymentWallet.payment_id).all()
 
     @staticmethod
+    def get_not_empty():
+        query = PaymentWallet.query
+        query = query.filter(PaymentWallet.balance > PaymentWallet.BALANCE_MIN)
+        return query.group_by(PaymentWallet.payment_id).all()
+
+    @staticmethod
     def get_valid_by_payment_id(payment_id):
         return PaymentWallet.query.filter(
             PaymentWallet.payment_id == payment_id).filter(
@@ -118,13 +124,16 @@ class PaymentWallet(db.Model, BaseModel):
                 valid.add(str(wallet.payment_id))
                 print str(wallet.payment_id)
 
-
-
         # Start: Костыль на время перехода от кошельков с балансом
+        wallets_not_empty = PaymentWallet.get_not_empty()
+        for wallet in wallets_not_empty:
+            blacklist.discard(wallet.payment_id)
+
+
         wallets_empty = PaymentWallet.get_empty()
-        for wallet_empty in wallets_empty:
-            if wallet_empty.payment_id not in valid:
-                blacklist.add(wallet_empty.payment_id)
+        for wallet in wallets_empty:
+            if wallet.payment_id not in valid:
+                blacklist.add(wallet.payment_id)
         # End
 
         persons = Person.query.group_by(Person.payment_id).all()
