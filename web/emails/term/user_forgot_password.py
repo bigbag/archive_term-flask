@@ -11,6 +11,10 @@ from flask.ext.mail import Message
 
 class UserForgotPasswordMessage(Message):
 
+    @classmethod
+    def desc(cls):
+        return 'recovery'
+
     def __init__(self, **kwargs):
         Message.__init__(self, "Восстановление пароля")
 

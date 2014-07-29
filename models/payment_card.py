@@ -129,24 +129,23 @@ class PaymentCard(db.Model, BaseModel):
         ym = YaMoneyApi(YandexMoneyConfig)
         result = ym.get_process_external_payment(history.request_id)
         if not result or not 'status' in result:
-            app.logger.error(
-                'Linking card: Not found status field, request_id=%s' %
-                history.request_id)
-            return False
+            message = 'Linking card: Not found status field, request_id=%s' % history.request_id
+            app.logger.error(message)
+            return message
 
         if result['status'] == 'in_progress':
             history.status = PaymentHistory.STATUS_IN_PROGRESS
             if not history.save():
                 return False
-            return False
+            return result
         elif result['status'] == 'refused':
             history.status = PaymentHistory.STATUS_FAILURE
             if not history.save():
                 return False
-            return False
+            return result
 
         if result['status'] != 'success':
-            return False
+            return result
 
         self.set_archiv(history.wallet_id)
 
@@ -168,7 +167,7 @@ class PaymentCard(db.Model, BaseModel):
         return result
 
     def set_archiv(self, wallet_id):
-        """Переводим ввсе карты привязанные к кошельку в архивное состояние"""
+        """Переводим все карты привязанные к кошельку в архивное состояние"""
 
         old_cards = PaymentCard.query.filter_by(
             wallet_id=wallet_id,

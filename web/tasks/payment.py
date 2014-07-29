@@ -60,26 +60,25 @@ class PaymentTask (object):
     def check_status(history_id):
         history = PaymentHistory.query.get(history_id)
         if not history:
-            app.logger.error(
-                'Check: Not found history, history_id=%s' %
-                history_id)
-            return False
+            message = 'Check: Not found history, history_id=%s' % history_id
+            app.logger.error(message)
+            return message
 
         wallet = PaymentWallet.query.get(history.wallet_id)
         if not wallet:
-            app.logger.error(
-                'Check: Not found wallet, wallet_id=%s' %
-                wallet_id)
-            return False
+            message = 'Check: Not found wallet, wallet_id=%s' % wallet_id
+            app.logger.error(message)
+            return message
 
         ym = YaMoneyApi(YandexMoneyConfig)
         result = ym.get_process_external_payment(history.request_id)
 
         if result['status'] in ('refused', 'ext_auth_required'):
-            app.logger.error('Check: Fail, status=%s' % result['status'])
             wallet.add_to_blacklist()
             history.delete()
-            return False
+            message = 'Check: Fail, status=%s' % result['status']
+            app.logger.error(message)
+            return message
 
         if result['status'] == 'in_progress':
             history.status = PaymentHistory.STATUS_IN_PROGRESS
@@ -87,10 +86,9 @@ class PaymentTask (object):
 
         elif result['status'] == 'success':
             if not 'invoice_id' in result:
-                app.logger.error(
-                    'Check: Fail, not found invoice_id, history_id=%s' %
-                    history_id)
-                return False
+                message = 'Check: Fail, not found invoice_id, history_id=%s' % history_id
+                app.logger.error(message)
+                return message
 
             history.invoice_id = result['invoice_id']
             history.status = PaymentHistory.STATUS_COMPLETE
@@ -111,17 +109,15 @@ class PaymentTask (object):
 
         report = Report.query.get(report_id)
         if not report:
-            app.logger.error(
-                'Payment: Not found report with id %s' %
-                report.id)
-            return False
+            message = 'Payment: Not found report with id %s' % report.id
+            app.logger.error(message)
+            return message
 
         wallet = PaymentWallet.get_by_payment_id(report.payment_id)
         if not wallet:
-            app.logger.error(
-                'Payment: Not found wallet with pid %s' %
-                report.payment_id)
-            return False
+            message = 'Payment: Not found wallet with pid %s' % report.payment_id
+            app.logger.error(message)
+            return message
 
         history = PaymentHistory.query.filter_by(report_id=report.id).first()
         if history:
@@ -129,10 +125,9 @@ class PaymentTask (object):
 
         history = PaymentHistory().from_report(report, wallet)
         if not history:
-            app.logger.error(
-                'Payment: Fail in history add, report_id=%s' %
-                report.id)
-            return False
+            message = 'Payment: Fail in history add, report_id=%s' % report.id
+            app.logger.error(message)
+            return message
 
         card = PaymentCard.query.filter_by(
             wallet_id=wallet.id,
@@ -153,22 +148,20 @@ class PaymentTask (object):
         payment = ym.get_request_payment_to_shop(
             amount, ym.const.PAYMENT_PATTERN_ID)
         if not payment or not 'request_id' in payment:
-            app.logger.error(
-                'Payment: Fail in request payment, report_id %s' %
-                report_id)
             wallet.add_to_blacklist()
             history.delete()
-            return False
+            message = 'Payment: Fail in request payment, report_id %s' % report_id
+            app.logger.error(message)
+            return message
 
         result = ym.get_process_external_payment(
             payment['request_id'], card.token)
         if result['status'] not in ('success', 'in_progress'):
-            app.logger.error(
-                'Payment: Fail in process payment, report_id %s' %
-                report_id)
             wallet.add_to_blacklist()
             history.delete()
-            return False
+            message = 'Payment: Fail in request payment, report_id %s' % report_id
+            app.logger.error(message)
+            return message
 
         history.request_id = payment['request_id']
         history.save()
@@ -182,17 +175,15 @@ class PaymentTask (object):
 
         report = Report.query.get(report_id)
         if not report:
-            app.logger.error(
-                'Payment: Not found report with id %s' %
-                report.id)
-            return False
+            message = 'Payment: Not found report with id %s' % report.id
+            app.logger.error(message)
+            return message
 
         wallet = PaymentWallet.get_valid_by_payment_id(report.payment_id)
         if not wallet:
-            app.logger.error(
-                'Payment: Not found wallet with pid %s' %
-                report.payment_id)
-            return False
+            message = 'Payment: Not found wallet with pid %s' % report.payment_id
+            app.logger.error(message)
+            return message
 
         history = PaymentHistory.query.filter_by(report_id=report.id).first()
         if history:
@@ -200,10 +191,9 @@ class PaymentTask (object):
 
         history = PaymentHistory().from_report(report, wallet)
         if not history:
-            app.logger.error(
-                'Payment: Fail in history add, report_id=%s' %
-                report.id)
-            return False
+            message = 'Payment: Fail in history add, report_id=%s' % report.id
+            app.logger.error(message)
+            return message
 
         term = Term.query.get(report.term_id)
         if not term:
@@ -253,12 +243,4 @@ class PaymentTask (object):
     @celery.task
     def check_linking(history):
         result = PaymentCard().linking_card(history.id)
-        if not result:
-            delta = date_helper.get_curent_date(
-                format=False) - history.creation_date
-            if delta.total_seconds() > PaymentCard.MAX_LINKING_CARD_TIMEOUT:
-                history.status = PaymentHistory.STATUS_FAILURE
-                history.save()
-                return True
-
-        return True
+        return result
