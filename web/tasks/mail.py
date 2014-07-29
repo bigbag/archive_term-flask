@@ -16,6 +16,9 @@ def send(MessageClass, **kwargs):
         mailer = Mail(app)
         mailer.send(MessageClass(**kwargs))
 
+    if 'to' in kwargs:
+        return "Mail type: %s, recipient: %s" % (MessageClass.desc(), kwargs['to'])
+
     return True
 
 @celery.task
