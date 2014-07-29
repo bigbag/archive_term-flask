@@ -253,12 +253,7 @@ class PaymentTask (object):
     @celery.task
     def check_linking(history):
         result = PaymentCard().linking_card(history.id)
-        if not result:
-            delta = date_helper.get_curent_date(
-                format=False) - history.creation_date
-            if delta.total_seconds() > PaymentCard.MAX_LINKING_CARD_TIMEOUT:
-                history.status = PaymentHistory.STATUS_FAILURE
-                history.save()
-                return True
+        if result:
+            return True
 
-        return True
+        return False
