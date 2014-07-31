@@ -62,7 +62,7 @@ def terminal_info(term_id):
     if not term:
         abort(404)
 
-    term_access = FirmTerm.get_list_by_firm_id(g.firm_info['id'], term_id)
+    term_access = term_id in FirmTerm.get_list_by_firm_id(g.firm_info['id'], False)
     term_events = TermEvent().get_by_term_id(term_id)
     alarm = AlarmStack(
         firm_id=g.firm_info['id'],
@@ -436,8 +436,8 @@ def alarm_remove():
     if not 'term_id' in arg or not Term.get_by_id(arg['term_id']):
         abort(404)
 
-    term_access = FirmTerm.get_list_by_firm_id(
-        g.firm_info['id'], arg['term_id'])
+    term_access = arg['term_id'] in FirmTerm.get_list_by_firm_id(
+        g.firm_info['id'], False)
     if not term_access:
         term_rent = FirmTerm.query.filter_by(
             term_id=arg['term_id'], child_firm_id=g.firm_info['id']).all()
