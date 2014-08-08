@@ -133,3 +133,19 @@
 {
     margin-top: 10px;
 }
+
+input.report-picker {
+    border: none;
+    text-align: center;
+    font-family: Mobispot,Arial,sans-serif;
+    font-weight: 100;
+    font-size: 1.4375em;
+    outline:none;
+    cursor:pointer;
+    box-shadow: none;
+}
+
+input.report-picker:focus {
+    background: transparent;
+    outline:none;
+}

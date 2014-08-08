@@ -17,7 +17,18 @@
                     <tbody>
                     <tr class="m-table-bottom"  ng-show="search.page_count">
                         <td colspan="4">
-                            <h4 class="text-center">{[{report.creation_date}]}</h4>
+                            <input 
+                                jqdatepicker
+                                report-index="{[{$index}]}"
+                                ng-init=
+                                    "reportDates[$index]=result[$index].creation_date;" 
+                                class="report-picker" 
+                                type="text" 
+                                ng-model="reportDates[$index]"ng-change="personByDate($index, reportDates[$index])"
+                                readonly="readonly"
+                                >
+                            <span ng-init="initPersonPageDates($index, report.page_dates)">
+                            </span>
                         </td>
                     </tr>
                     <tr ng-repeat="row in report.detaled" class="m-t-cont-row">
