@@ -104,7 +104,7 @@ class Report(db.Model, BaseModel):
 
                 corp_wallet.balance = int(
                     corp_wallet.balance) - int(
-                    self.amount)
+                        self.amount)
                 corp_wallet.save()
 
         # Блокируем возможность платежей через корпоративный кошелек
@@ -204,6 +204,10 @@ class Report(db.Model, BaseModel):
         answer['reports_count'] = query.count()
         answer['reports'] = query.limit(
             self.limit).offset((self.page - 1) * self.limit).all()
+        reports_all = query.all()
+        answer['page_dates'] = []
+        for row in reports_all:
+            answer['page_dates'].append(row[0].strftime('%d.%m.%Y'))
 
         return answer
 
@@ -253,6 +257,7 @@ class Report(db.Model, BaseModel):
                 count=int(report[2])
             )
 
+            data['page_dates'] = answer['page_dates']
             data['detaled'] = []
             detaled_reports = self.person_detaled_query(search_date)
             for row in detaled_reports:
@@ -272,7 +277,7 @@ class Report(db.Model, BaseModel):
                     date=creation_date.strftime(date_pattern),
                     event=events[
                         row.event_id] if events[
-                        row.event_id] else 'Empty',
+                            row.event_id] else 'Empty',
                     amount=float(row.amount) / 100,
                     name=row.name,
                 )

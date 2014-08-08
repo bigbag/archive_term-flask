@@ -122,4 +122,23 @@ angular.module('term').controller('ReportController',
     });
   };
 
+  $scope.reportDates = [];
+  
+  //Переход к странице отчета по людям из календаря
+  $scope.personByDate = function(index, date) {
+    if (angular.isUndefined(index) || angular.isUndefined(date))
+      return false;
+
+    var page = -1;
+    for (var i = 0; i < $scope.result[index].page_dates.length; i++) {
+        if ($scope.result[index].page_dates[i] == date) {
+            page = i + 1;
+            break;
+        }
+    }
+    
+    if (page > 0)
+        $scope.pagination.cur = page;
+  }
+
 });
