@@ -118,7 +118,9 @@ class Report(db.Model, BaseModel):
         return error
 
     def copy_new_from_old(self, new_balance=False):
-        fields = ['name', 'person_id', 'type', 'term_id', 'event_id', 'payment_id', 'term_firm_id', 'person_firm_id', 'creation_date']
+        fields = report.__dict__.keys()
+        fields.remove('_sa_instance_state')
+        fields.remove('amount')
 
         new_report = Report()
         map(lambda field: setattr(new_report, field, getattr(report, field)), fields)
