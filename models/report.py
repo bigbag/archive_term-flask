@@ -118,16 +118,10 @@ class Report(db.Model, BaseModel):
         return error
 
     def copy_new_from_old(self, new_balance=False):
+        fields = ['name', 'person_id', 'type', 'term_id', 'event_id', 'payment_id', 'term_firm_id', 'person_firm_id', 'creation_date']
+
         new_report = Report()
-        new_report.name = self.name
-        new_report.person_id = self.person_id
-        new_report.type = self.type
-        new_report.term_id = self.term_id
-        new_report.event_id = self.event_id
-        new_report.payment_id = self.payment_id
-        new_report.term_firm_id = self.term_firm_id
-        new_report.person_firm_id = self.person_firm_id
-        new_report.creation_date = self.creation_date
+        map(lambda field: setattr(new_report, field, getattr(report, field)), fields)
         new_report.status = Report.STATUS_NEW
 
         if new_balance:
