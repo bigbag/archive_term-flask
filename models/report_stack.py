@@ -167,6 +167,18 @@ class ReportStack(db.Model, BaseModel):
         )
         return value
 
+    def copy_new_from_old(self):
+        fields = self.__dict__.keys()
+        fields.remove('id')
+        fields.remove('_sa_instance_state')
+        fields.remove('launch_date')
+        fields.remove('check_summ')
+
+        stack = ReportStack()
+        map(lambda field: setattr(stack, field, getattr(self, field)), fields)
+
+        return stack
+
     def set_check_summ(self):
         data = [
             str(self.firm_id),

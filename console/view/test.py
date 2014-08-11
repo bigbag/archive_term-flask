@@ -69,15 +69,27 @@ class TestCommand(Command):
     def run(self):
         # from web.tasks.report_parser import ReportParserTask
 
-        # file_name = "./tmp/report/107_164025"
+        # file_name = "./tmp/report/12802_131231"
         # params = dict(
-        #     term_id=107,
-        #     date=250714,
-        #     time=164025
+        #     term_id='12802',
+        #     date='090814',
+        #     time='131231'
         # )
 
         # result = ReportParserTask.parse_xml(file_name)
         # for row in result:
         #     ReportParserTask.generate_report(params, row)
+
+        # from models.report import Report
+
+        # report = Report.query.get(9)
+
+        # fields = report.__dict__.keys()
+        # fields.remove('_sa_instance_state')
+        # fields.remove('amount')
+
+        # new_report = Report()
+        # map(lambda field: setattr(new_report, field, getattr(report, field)), fields)
+        # print new_report.__dict__
 
         pass
