@@ -23,8 +23,9 @@ from models.event import Event
 from models.term import Term
 from models.firm_term import FirmTerm
 
-
 from helpers import date_helper
+
+from web.tasks.report_send import ReportSenderTask
 
 
 class ReportParserTask (object):
@@ -159,6 +160,7 @@ class ReportParserTask (object):
 
         firm_terms = FirmTerm.query.filter_by(term_id=term.id).all()
         payments = data['payments']
+        report_max_date = ''
         for payment in payments:
             report = Report()
             report.term_id = term.id
@@ -187,6 +189,12 @@ class ReportParserTask (object):
                 date_pattern)
             report.creation_date = date_time_utc
 
+            if report.creation_date > report_max_date:
+                report_max_date = report.creation_date
+
             error = report.add_new()
+
+        if not error:
+            ReportSenderTask.lost_report_watcher.delay(firm_terms, report_max_date)
 
         return error

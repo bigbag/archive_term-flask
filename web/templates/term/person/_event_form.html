@@ -8,45 +8,45 @@
                     {% if person_event.id %}
                     <p for="type-event">
                         <label for="type-event">Событие*</label>
-                        <select id="type-event" 
+                        <select id="type-event"
                             class="large"
                             min="1"
                             ng-model="person_event.term_event_id"
                             required>
-                                <option selected 
+                                <option selected
                                     value="{{term_event.id}}">
                                     №{{term_event.term.hard_id}}, {{term_event.term.name}}, {{term_event.event.name}}
                                 </option>
                         </select>
                     </p>
-                    {% else%}
+                    {% else %}
                     <label for="type-event">Событие*</label>
-                    <select id="type-event" 
+                    <select id="type-event"
                         class="large"
                         min="1"
                         ng-model="person_event.term_event_id"
                         required>
                         {% for row in term_events %}
                             {% if row.term.hard_id %}
-                            <option 
-                                {% if row.id == term_event.id %} selected {% endif %} 
+                            <option
+                                {% if row.id == term_event.id %} selected {% endif %}
                                 value="{{row.id}}">
                                 №{{row.term.hard_id}}, {{row.term.name}}, {{row.event.name}}
                             </option>
                             {% endif %}
                         {% endfor %}
                     </select>
-                    {% endif %}                   
+                    {% endif %}
                 </div>
             </div>
         </div>
         <div class="content-row g-clearfix"
             ng-init="person_event.timeout={{person_event.timeout}}">
             <label for="time-out">Тайм-аут (в минутах)*</label>
-            <input id="time-out" 
+            <input id="time-out"
                 class="f-input-small left"
                 minlength="1"
-                maxlength="5" 
+                maxlength="5"
                 type="text"
                 ng-model="person_event.timeout"
                 required>
@@ -59,7 +59,7 @@
             <span ng-hide="person_event.id">Добавить</span>
             <span ng-show="person_event.id">Сохранить</span>
         </a>
-        <a ng-show="person_event.id" 
+        <a ng-show="person_event.id"
             ng-click="deleteEventPerson(person_event)"
             class="f-spot-button bg-red">
             Удалить событие

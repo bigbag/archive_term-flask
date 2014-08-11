@@ -150,7 +150,7 @@ class PaymentTask (object):
         if not payment or not 'request_id' in payment:
             wallet.add_to_blacklist()
             history.delete()
-            message = 'Payment: Fail in request payment, report_id %s' % report_id
+            message = 'Payment: Fail in request payment, report_id %s, request %s' % (report_id, payment)
             app.logger.error(message)
             return message
 
@@ -159,7 +159,7 @@ class PaymentTask (object):
         if result['status'] not in ('success', 'in_progress'):
             wallet.add_to_blacklist()
             history.delete()
-            message = 'Payment: Fail in request payment, report_id %s' % report_id
+            message = 'Payment: Fail in request payment, report_id %s, request %s' % (report_id, result)
             app.logger.error(message)
             return message
 
