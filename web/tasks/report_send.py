@@ -20,6 +20,7 @@ from models.report import Report
 from models.person import Person
 from models.term import Term
 from models.firm import Firm
+from models.firm_term import FirmTerm
 from models.report_stack import ReportStack
 from models.report_result import ReportResult
 from models.term_corp_wallet import TermCorpWallet
@@ -41,6 +42,33 @@ class ReportSenderTask (object):
 
         for key in element_keys:
             ReportSenderTask.report_generate.delay(key)
+
+        return True
+
+    @staticmethod
+    @celery.task
+    def lost_report_watcher(term_id, report_max_date):
+        report_max_date = datetime.strptime(report_max_date, '%Y-%m-%d %H:%M:%S')
+        details = date_helper.get_date_interval(report_max_date)
+        details = map(lambda row: str(row), details)
+        details = {'start': details[0], 'end': details[0]}
+
+        firms = FirmTerm.get_list_by_term_id(term_id)
+        for firm in firms:
+            report_stack = ReportStack.query.filter_by(
+                firm_id=firm, interval=ReportStack.INTERVAL_DAY).all()
+            if not report_stack:
+                continue
+
+            for row in report_stack:
+                if not report_max_date < row.launch_date:
+                    continue
+
+                stack = row.copy_new_from_old()
+                stack.interval = ReportStack.INTERVAL_ONCE
+                stack.name = 'Lost'
+                stack.details = details
+                stack.save()
 
         return True
 

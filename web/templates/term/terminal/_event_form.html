@@ -3,10 +3,16 @@
         <div class="row"
             ng-init="term_event.id={{term_event.id|replace("None", 0)}};term_event.term_id={{term.id}}">
             <div class="large-5 columns">
-                <div class="content-row" ng-init="term_event.event_id={{term_event.event_id}}">
+                <div class="content-row"
+                    {% if not term_event.id %}
+                        ng-init="term_event.event_id='{{events.iterkeys().next()}}'"
+                    {% else %}
+                        ng-init="term_event.event_id='{{term_event.event_id}}'"
+                    {% endif %}
+                    >
                     <label for="type-event">Событие*</label>
                     <select id="type-event"
-                        class="medium"
+                        class="large"
                         min="1"
                         ng-model="term_event.event_id"
                         required>
