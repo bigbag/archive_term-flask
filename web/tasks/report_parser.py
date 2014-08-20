@@ -169,6 +169,7 @@ class ReportParserTask (object):
             report.payment_id = payment['card']
             report.amount = payment['amount'] * int(term.factor)
 
+            real_person = None
             for row in firm_terms:
                 report.term_firm_id = row.firm_id
                 person = Person.query.filter(
@@ -176,10 +177,12 @@ class ReportParserTask (object):
                         Person.firm_id == row.child_firm_id).first()
                 if not person:
                     continue
-            if person:
-                report.name = person.name
-                report.person_id = person.id
-                report.person_firm_id = person.firm_id
+                real_person = person
+
+            if real_person:
+                report.name = real_person.name
+                report.person_id = real_person.id
+                report.person_firm_id = real_person.firm_id
 
             date_pattern = '%Y-%m-%d %H:%M:%S'
             date_time_utc = date_helper.convert_date_to_utc(
