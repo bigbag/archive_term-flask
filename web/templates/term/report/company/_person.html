@@ -17,6 +17,8 @@
                     <tbody>
                     <tr class="m-table-bottom"  ng-show="search.page_count">
                         <td colspan="4">
+                            <div class="right-center-wrapper">
+                            <div class="f-datepicker left-center">
                             <input 
                                 jqdatepicker
                                 report-index="{[{$index}]}"
@@ -29,6 +31,8 @@
                                 >
                             <span ng-init="initPersonPageDates($index, report.page_dates)">
                             </span>
+                            </div>
+                            </div>
                         </td>
                     </tr>
                     <tr ng-repeat="row in report.detaled" class="m-t-cont-row">
