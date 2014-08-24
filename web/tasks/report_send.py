@@ -51,7 +51,7 @@ class ReportSenderTask (object):
         report_max_date = datetime.strptime(report_max_date, '%Y-%m-%d %H:%M:%S')
         details = date_helper.get_date_interval(report_max_date)
         details = map(lambda row: str(row), details)
-        details = {'start': details[0], 'end': details[0]}
+        details = {'period': {'start': details[0], 'end': details[0]}}
 
         firms = FirmTerm.get_list_by_term_id(term_id)
         for firm in firms:
