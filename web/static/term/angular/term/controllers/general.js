@@ -36,13 +36,14 @@ angular.module('term').controller('GeneralController',
     });
   };
 
+
   //Тригер на запрос табличных данных по параметрам
-  $scope.$watch('pagination.cur + search.period  + search.status + search.person_name + search.report_type', function() {
+  $scope.$watch('pagination.cur + search.period  + search.status + search.request + search.report_type', function() {
     if (!$scope.search) return false;
     var search = $scope.search;
     search.page = $scope.pagination.cur;
 
-    if (!angular.isUndefined($scope.search.person_name)){
+    if (!angular.isUndefined($scope.search.request)){
       $scope.search.custom_filer = 1;
     }
     if (search.status < 0){
