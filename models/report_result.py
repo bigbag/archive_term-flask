@@ -56,7 +56,8 @@ class ReportResult(object):
         if self.task.interval == ReportStack.INTERVAL_ONCE:
             details = self.task.details
             if details and 'period' in details:
-                interval = self.task.decode_field(details['period'])
+                details = self.task.decode_field(details)
+                interval = details['period']
                 result['search'] = (datetime.strptime(interval['start'], '%Y-%m-%d'), datetime.strptime(interval['end'], '%Y-%m-%d'))
                 result['date'] = result['search']
 
