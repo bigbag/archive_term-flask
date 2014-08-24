@@ -36,7 +36,8 @@ angular.module('term').controller('ReportController',
       var pattern = 'YYYY-MM-DD';
       var data = {start:moment(start).format(pattern), end:moment(end).format(pattern)};
       $scope.$apply(function () {
-          $scope.report_stack.details = data;
+          $scope.report_stack.details = {};
+          $scope.report_stack.details['period'] = data;
       });
     }
   );
@@ -133,7 +134,7 @@ angular.module('term').controller('ReportController',
   };
 
   $scope.reportDates = [];
-  
+
   //Переход к странице отчета по людям из календаря
   $scope.personByDate = function(index, date) {
     if (angular.isUndefined(index) || angular.isUndefined(date))
@@ -146,7 +147,7 @@ angular.module('term').controller('ReportController',
             break;
         }
     }
-    
+
     if (page > 0)
         $scope.pagination.cur = page;
   }
