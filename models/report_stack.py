@@ -194,6 +194,9 @@ class ReportStack(db.Model, BaseModel):
         if not self.check_summ:
             self.check_summ = self.set_check_summ()
 
+        if not self.name:
+            self.name = 'empty'
+
         self.emails = self.encode_field(self.emails)
 
         if self.details:

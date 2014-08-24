@@ -2,17 +2,6 @@
     <form class="custom" name="reportForm">
         <span ng-init="report_stack.id='{{report_stack.id |replace("None", 0)}}'"></span>
         <div class="content-row">
-            <label for="add-name">Название*</label>
-            <input id="add-name"
-                type="text"
-                name="name"
-                ng-maxlength="300"
-                ng-init="report_stack.name='{{report_stack.name |replace("None", "")}}'"
-                ng-model="report_stack.name"
-                ng-class="{error: error.name}"
-                required>
-        </div>
-        <div class="content-row">
             <label for="interval-report">Как часто отсылать отчет</label>
             <select id="interval-report"
                 class="medium"
@@ -28,7 +17,17 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="content-row g-clearfix" ng-hide="report_stack.interval">
+        <div class="content-row" ng-show="report_stack.interval!=0">
+            <label for="add-name">Название*</label>
+            <input id="add-name"
+                type="text"
+                name="name"
+                ng-maxlength="300"
+                ng-init="report_stack.name='{{report_stack.name |replace("None", "")}}'"
+                ng-model="report_stack.name"
+                ng-class="{error: error.name}">
+        </div>
+        <div class="content-row g-clearfix" ng-show="report_stack.interval==0">
             <label for="add-name">Интервал</label>
             <div class="f-datepicker">
                 <input type="text"
