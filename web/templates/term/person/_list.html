@@ -10,11 +10,10 @@
     </div>
     <div class="m-grid-search">
         <input type="text"
-            name="person_name"
-            ng-init="search.person_name=''"
-            ng-minlength="3"]
-            ng-model="search.person_name"
-            placeholder="Поиск по имени (минимум 3 символа)">
+            name="request"
+            ng-init="search.request=''"
+            ng-model="search.request"
+            placeholder="Поиск по имени или карте">
     </div>
     <table class="m-spot-table" ng-controller="PersonController">
         <thead>

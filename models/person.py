@@ -64,21 +64,24 @@ class Person(db.Model, BaseModel):
         return result
 
     @staticmethod
+    @cache.cached(timeout=30)
     def select_list(firm_id, **kwargs):
         order = kwargs[
             'order'] if 'order' in kwargs else 'name asc'
         limit = kwargs['limit'] if 'limit' in kwargs else 10
         page = kwargs['page'] if 'page' in kwargs else 1
         status = kwargs['status'] if 'status' in kwargs else 1
-        person_name = kwargs[
-            'person_name'] if 'person_name' in kwargs else False
+        search_request = kwargs[
+            'request'] if 'request' in kwargs else False
 
         query = Person.query.filter(Person.firm_id == firm_id)
         query = query.filter(Person.status == status)
         query = query.order_by(order)
 
-        if person_name:
-            query = query.filter(Person.name.like('%' + person_name + '%'))
+        if search_request:
+            query = query.filter(
+                Person.name.like('%' + search_request + '%') |
+                Person.card.like('%' + search_request + '%'))
 
         persons = query.paginate(page, limit, False).items
 
