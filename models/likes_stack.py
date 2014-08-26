@@ -18,3 +18,4 @@ class LikesStack(db.Model, BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     token_id = db.Column(db.Integer, nullable=False)
     loyalty_id = db.Column(db.Integer, nullable=False)
+    sharing_id = db.Column(db.Integer, nullable=False)

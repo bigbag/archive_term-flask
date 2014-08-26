@@ -10,8 +10,9 @@ import json
 
 
 class SocnetBase():
-    TOKEN_NOT_SHARED = -1  # для тестов
-    TOKEN_FOR_SHARED = -2  # для тестов
+    CONDITION_PASSED = 1
+    CONDITION_FAILED = 0
+    CONDITION_ERROR = -1
 
     def dummy_control(self, loyalty_id):
         """заглушка для еще нериализованных в конкретной соцсети методов"""
