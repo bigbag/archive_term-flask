@@ -41,6 +41,7 @@ class PaymentLoyalty(db.Model, BaseModel):
     GOOGLE_PLUS_ONE = 13
     YOUTUBE_FOLLOWING = 14
     YOUTUBE_VIEWS = 15
+    VK_SUBS = 18
 
     DEFAULT_COUNT = 20
     MAX_COUNT = 100
@@ -66,6 +67,7 @@ class PaymentLoyalty(db.Model, BaseModel):
     timeout = db.Column(db.Integer)
     bonus_limit = db.Column(db.Integer)
     control_value = db.Column(db.String(256))
+    tz = db.Column(db.String(300), nullable=False)
 
     def __init__(self):
         self.rules = self.RULE_FIXED
