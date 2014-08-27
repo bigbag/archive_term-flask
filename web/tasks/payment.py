@@ -20,6 +20,7 @@ from models.payment_history import PaymentHistory
 from models.payment_card import PaymentCard
 from models.payment_wallet import PaymentWallet
 from models.term import Term
+from models.firm import Firm
 from models.report import Report
 
 
