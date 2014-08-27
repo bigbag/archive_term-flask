@@ -142,11 +142,15 @@ class PaymentTask (object):
         if not term:
             app.logger.error('Payment: Not found term %s' % report.term_id)
 
+        firm = Firm.query.get(report.term_firm_id)
+        if not firm:
+            app.logger.error('Payment: Not found firm, with term %s' % report.term_id)
+
         amount = float(report.amount) / int(Term.DEFAULT_FACTOR)
 
         ym = YaMoneyApi(YandexMoneyConfig)
         payment = ym.get_request_payment_to_shop(
-            amount, ym.const.PAYMENT_PATTERN_ID)
+            amount, firm.pattern_id)
         if not payment or not 'request_id' in payment:
             wallet.add_to_blacklist()
             history.delete()
