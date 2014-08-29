@@ -59,19 +59,19 @@ class VkApi(SocnetBase):
         api_url = self.API_PATH \
             + 'users.getSubscriptions?user_id=' \
             + soc_token.soc_id
-            
+
         userSubs = request_helper.make_request(api_url, True)
-        
+
         if not ('response' in userSubs and 'groups' in userSubs['response']):
             return self.CONDITION_ERROR
-            
+
         answer = self.CONDITION_FAILED
-        
+
         if not ('items' in userSubs['response']['groups']):
             return answer
-            
+
         for item in userSubs['response']['groups']['items']:
             if str(item) == str(condition.data):
-                answer = self. CONDITION_PASSED
+                answer = self.CONDITION_PASSED
 
         return answer
