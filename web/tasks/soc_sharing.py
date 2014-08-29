@@ -69,13 +69,35 @@ class SocSharingTask (object):
 
         for wl in wallet_loyalties:
             if page_liked == SocnetBase.CONDITION_PASSED:
-                wl.checked = 1
-                PersonEvent.add_by_user_loyalty_id(
-                    soc_token.user_id, condition.loyalty_id)
-            else:
+                checked = []
+                if wl.checked:
+                    checked = json.loads(wl.checked)
+
+                if condition.id not in checked:
+                    checked.append(condition.id)
+                    wl.checked = json.dumps(checked)
+
+                if PaymentLoyaltySharing.query.filter_by(loyalty_id=wl.loyalty_id).count() <= len(checked):
+                    wl.status = WalletLoyalty.STATUS_ON
+                    PersonEvent.add_by_user_loyalty_id(
+                        soc_token.user_id, condition.loyalty_id)
+
+            elif page_liked == SocnetBase.CONDITION_FAILED and (wl.status == WalletLoyalty.STATUS_CONNECTING or wl.status == WalletLoyalty.STATUS_ERROR):
+                wl.status = WalletLoyalty.STATUS_ERROR
+                errors = []
+                if wl.errors:
+                    errors = json.loads(wl.errors)
+
+                if condition.desc not in errors:
+                    errors.append(condition.desc)
+                    wl.errors = json.dumps(errors)
+
+            elif page_liked == SocnetBase.CONDITION_FAILED and wl.status == WalletLoyalty.STATUS_ON:
                 PersonEvent.delete_by_user_loyalty_id(
                     soc_token.user_id, condition.loyalty_id)
-                wl.checked = 0
+
+                wl.status = WalletLoyalty.STATUS_OFF
+                wl.checked = '[]'
             wl.save()
 
         task.delete()

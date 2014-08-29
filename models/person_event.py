@@ -96,6 +96,8 @@ class PersonEvent(db.Model, BaseModel):
                     event.event_id = loyalty.event_id
                     event.firm_id = loyalty.firm_id
                     event.timeout = PersonEvent.LIKE_TIMEOUT
+                    if loyalty.timeout:
+                        event.timeout = loyalty.timeout
                     event.save()
                     answer = event.id
 
