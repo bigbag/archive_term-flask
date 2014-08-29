@@ -120,15 +120,15 @@ class PaymentWallet(db.Model, BaseModel):
         for wallet in wallets:
             if int(wallet.blacklist) == PaymentWallet.ACTIVE_OFF:
                 blacklist.add(str(wallet.payment_id))
+            elif int(wallet.status) != PaymentWallet.STATUS_ACTIVE:
+                blacklist.add(str(wallet.payment_id))
             else:
                 valid.add(str(wallet.payment_id))
-                print str(wallet.payment_id)
 
         # Start: Костыль на время перехода от кошельков с балансом
         wallets_not_empty = PaymentWallet.get_not_empty()
         for wallet in wallets_not_empty:
             blacklist.discard(wallet.payment_id)
-
 
         wallets_empty = PaymentWallet.get_empty()
         for wallet in wallets_empty:
