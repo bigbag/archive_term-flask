@@ -62,12 +62,10 @@ class PaymentLoyalty(db.Model, BaseModel):
     sharing_type = db.Column(db.Integer)
     data = db.Column(db.String(1024))
     coupon_class = db.Column(db.String(64))
-    target_url = db.Column(db.String(1024))
     limit = db.Column(db.Integer)
     timeout = db.Column(db.Integer)
     bonus_limit = db.Column(db.Integer)
     control_value = db.Column(db.String(256))
-    tz = db.Column(db.String(300), nullable=False)
 
     def __init__(self):
         self.rules = self.RULE_FIXED

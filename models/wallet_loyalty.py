@@ -17,11 +17,16 @@ class WalletLoyalty(db.Model, BaseModel):
     __bind_key__ = 'payment'
     __tablename__ = 'wallet_loyalty'
 
+    STATUS_OFF = 0
+    STATUS_CONNECTING = 1
+    STATUS_ERROR = 2
+    STATUS_ON = 3
+
     id = db.Column(db.Integer, primary_key=True)
     wallet_id = db.Column(db.Integer)
     loyalty_id = db.Column(db.Integer)
     summ = db.Column(db.String(50))
-    part_count = db.Column(db.Integer)
-    bonus_count = db.Column(db.Integer)
     bonus_limit = db.Column(db.Integer)
-    checked = db.Column(db.Integer)
+    checked = db.Column(db.String(1024))
+    status = db.Column(db.Integer)
+    errors = db.Column(db.String(1024))
