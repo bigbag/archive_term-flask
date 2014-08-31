@@ -96,7 +96,33 @@ class PersonEvent(db.Model, BaseModel):
                     event.event_id = loyalty.event_id
                     event.firm_id = loyalty.firm_id
                     event.timeout = PersonEvent.LIKE_TIMEOUT
+                    if loyalty.timeout:
+                        event.timeout = loyalty.timeout
                     event.save()
                     answer = event.id
 
             return answer
+
+    @staticmethod
+    def delete_by_user_loyalty_id(user_id, loyalty_id):
+        loyalty = PaymentLoyalty.query.filter_by(
+            id=loyalty_id).first()
+        wallet = PaymentWallet.query.filter_by(
+            user_id=user_id).first()
+        if loyalty and wallet:
+            person = Person.query.filter_by(
+                firm_id=loyalty.firm_id, payment_id=wallet.payment_id).first()
+
+            if not person:
+                return False
+
+            if loyalty.terms_id:
+                terms = json.loads(loyalty.terms_id)
+                for term in terms:
+                    event = PersonEvent.query.filter_by(
+                        person_id=person.id, term_id=term, event_id=loyalty.event_id, firm_id=loyalty.firm_id).first()
+
+                if event:
+                    event.delete()
+
+            return True

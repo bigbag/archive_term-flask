@@ -41,6 +41,7 @@ class PaymentLoyalty(db.Model, BaseModel):
     GOOGLE_PLUS_ONE = 13
     YOUTUBE_FOLLOWING = 14
     YOUTUBE_VIEWS = 15
+    VK_SUBS = 18
 
     DEFAULT_COUNT = 20
     MAX_COUNT = 100
@@ -61,7 +62,6 @@ class PaymentLoyalty(db.Model, BaseModel):
     sharing_type = db.Column(db.Integer)
     data = db.Column(db.String(1024))
     coupon_class = db.Column(db.String(64))
-    target_url = db.Column(db.String(1024))
     limit = db.Column(db.Integer)
     timeout = db.Column(db.Integer)
     bonus_limit = db.Column(db.Integer)
