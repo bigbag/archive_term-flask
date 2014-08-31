@@ -32,8 +32,8 @@ class FacebookApi(SocnetBase):
         'object_likes': '?fields=likes.limit(1).summary(1)',
     }
 
-    def check_like(self, url, token_id, loyalty_id):
-        pageLiked = False
+    def check_like(self, url, token_id, sharing_id):
+        pageLiked = self.CONDITION_ERROR
         object_id = 0
 
         if self.URLS_PARTS['base'] in url and (self.URLS_PARTS['photo'] in url or self.URLS_PARTS['posts'] in url):
@@ -49,7 +49,7 @@ class FacebookApi(SocnetBase):
             if 'data' in like and len(like['data']) > 0 \
                 and 'object_id' in like['data'][0] \
                     and like['data'][0]['object_id'] == object_id:
-                pageLiked = True
+                pageLiked = self.CONDITION_PASSED
         elif self.URLS_PARTS['base'] in url:
             page = self.get_page(url, token_id, True)
 
@@ -57,14 +57,16 @@ class FacebookApi(SocnetBase):
                 like = self.get_like(page['id'], token_id, True)
 
                 if 'data' in like and len(like['data']) > 0 and like['data'][0].get('id'):
-                    pageLiked = True
+                    pageLiked = self.CONDITION_PASSED
+                elif 'data' in like:
+                    pageLiked = self.CONDITION_FAILED
         else:
             # like внешней ссылки
             like = self.get_external_like(url, token_id)
             if 'data' in like and len(like['data']) > 0 \
                 and 'attachment' in like['data'][0] \
                     and 'href' in like['data'][0]['attachment']:
-                pageLiked = True
+                pageLiked = self.CONDITION_PASSED
 
         return pageLiked
 

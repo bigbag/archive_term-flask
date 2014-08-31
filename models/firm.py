@@ -17,8 +17,9 @@ class Firm(db.Model, BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(300), nullable=False)
-    inn = db.Column(db.String(300))
+    inn = db.Column(db.String(50))
     sub_domain = db.Column(db.Text(), nullable=False, index=True)
+    pattern_id = db.Column(db.String(200), nullable=False)
     logo = db.Column(db.Text())
     address = db.Column(db.Text())
     email = db.Column(db.Text())
