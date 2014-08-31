@@ -32,12 +32,12 @@ angular.module('term').controller('ReportController',
           yearSuffix: ''
       },
     },
-    function(start, end, label) {
+    function(start, end) {
       var pattern = 'YYYY-MM-DD';
       var data = {start:moment(start).format(pattern), end:moment(end).format(pattern)};
       $scope.$apply(function () {
           $scope.report_stack.details = {};
-          $scope.report_stack.details['period'] = data;
+          $scope.report_stack.details.period = data;
       });
     }
   );
@@ -46,7 +46,7 @@ angular.module('term').controller('ReportController',
   $scope.report_stack = {};
 
   //Тригер на изменение снятие ошибки при изменение полей
-  $scope.$watch('report_stack.curent_email', function(user) {
+  $scope.$watch('report_stack.curent_email', function() {
     $scope.error.curent_email = false;
     $scope.error.name = false;
   });
@@ -150,6 +150,42 @@ angular.module('term').controller('ReportController',
 
     if (page > 0)
         $scope.pagination.cur = page;
-  }
+  };
 
+  //Тригер на ввод имени сотрудника
+  $scope.$watch('report_stack.request', function() {
+    if (angular.isUndefined($scope.report_stack.request)) {
+      return false;
+    }
+    if ($scope.report_stack.request.length < 2)
+      {
+      return false;
+    }
+    $scope.report_stack.limit = 1;
+    $http.post('/person',$scope.report_stack).success(function(data) {
+      $scope.persons = data.result;
+    });
+  });
+
+  $scope.myOption = {
+    options: {
+      minLength: 2,
+      messages: {
+          noResults: '',
+          results: function() {}
+      },
+      source: function (request, response) {
+        var search = {
+          'token': $scope.token,
+          'request': request.term,
+          'limit': 5
+        };
+        $http.post('/person/search',search).success(function(data) {
+          if (data.error === 'no') {
+            response(data.result);
+          }
+        });
+      }
+    },
+  };
 });

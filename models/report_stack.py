@@ -50,8 +50,8 @@ class ReportStack(db.Model, BaseModel):
 
     def __init__(self):
         self.excel = self.EXCEL_YES
-        self.type = self.TYPE_PERSON
-        self.interval = self.INTERVAL_MONTH
+        self.type = self.TYPE_TERM
+        self.interval = self.INTERVAL_DAY
         self.lock = self.LOCK_FREE
 
     def get_interval_list(self):
