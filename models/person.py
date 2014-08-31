@@ -64,6 +64,26 @@ class Person(db.Model, BaseModel):
         return result
 
     @staticmethod
+    def get_by_firm_id_search(firm_id, search, limit=5):
+        query = Person.query.filter(Person.firm_id == firm_id)
+        query = query.filter(Person.name.like('%' + search + '%'))
+        persons = query.limit(limit).all()
+
+        result = []
+        for person in persons:
+            result.append(dict(id=person.id, name=person.name))
+
+        return result
+
+    @staticmethod
+    @cache.cached(timeout=30)
+    def get_by_name(firm_id, name, limit):
+        query = Person.query
+        query = query.filter_by(firm_id=firm_id)
+        query = query.filter(Person.name.like('%' + name + '%'))
+        return query.limit(limit).all()
+
+    @staticmethod
     @cache.cached(timeout=30)
     def select_list(firm_id, **kwargs):
         order = kwargs[

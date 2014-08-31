@@ -50,8 +50,8 @@ class ReportStack(db.Model, BaseModel):
 
     def __init__(self):
         self.excel = self.EXCEL_YES
-        self.type = self.TYPE_PERSON
-        self.interval = self.INTERVAL_MONTH
+        self.type = self.TYPE_TERM
+        self.interval = self.INTERVAL_DAY
         self.lock = self.LOCK_FREE
 
     def get_interval_list(self):
@@ -193,6 +193,9 @@ class ReportStack(db.Model, BaseModel):
     def save(self):
         if not self.check_summ:
             self.check_summ = self.set_check_summ()
+
+        if not self.name:
+            self.name = 'empty'
 
         self.emails = self.encode_field(self.emails)
 

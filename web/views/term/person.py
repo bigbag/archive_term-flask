@@ -51,6 +51,26 @@ def get_person_list():
     return jsonify(answer)
 
 
+@mod.route('/person/search', methods=['POST'])
+@login_required
+@json_headers
+def get_person_search_result():
+    """Поиск сотрудников по запросу"""
+
+    answer = dict(error='yes', result={})
+    arg = json.loads(request.stream.read())
+    if 'request' not in arg:
+        abort(400)
+
+    limit = arg['limit'] if 'limit' in arg else 5
+    result = Person.get_by_name(g.firm_info['id'], arg['request'], limit)
+
+    answer['error'] = 'no'
+    answer['result'] = [row.name for row in result]
+
+    return jsonify(answer)
+
+
 @mod.route('/person/<int:person_id>', methods=['GET'])
 @login_required
 def person_info(person_id):
@@ -163,9 +183,9 @@ def person_import():
     """Импорт списка сотрудников из json"""
     answer = dict(
         error='yes',
-        wrongForms=[],
-        wrongCards=[],
-        addedForms=0
+        wrong_forms=[],
+        wrong_cards=[],
+        added_forms=0
     )
 
     data = json.loads(request.stream.read())
@@ -173,7 +193,7 @@ def person_import():
     for json_employer in employers:
 
         if not len(json_employer['name']):
-            answer['wrongForms'].append(json_employer)
+            answer['wrong_forms'].append(json_employer)
             continue
 
         employer = request_helper.name_together(json_employer)
@@ -184,7 +204,7 @@ def person_import():
                 employer['birthday'] = employer[
                     'birthday'].strftime('%Y-%m-%d %H:%M:%S')
             except ValueError:
-                answer['wrongForms'].append(json_employer)
+                answer['wrong_forms'].append(json_employer)
                 continue
 
         if not len(employer['tabel_id']):
@@ -196,7 +216,7 @@ def person_import():
 
         form = PersonAddForm.from_json(employer)
         if not form.validate():
-            answer['wrongForms'].append(json_employer)
+            answer['wrong_forms'].append(json_employer)
             continue
 
         form.populate_obj(person)
@@ -208,11 +228,11 @@ def person_import():
                 person.payment_id = wallet.payment_id
                 person.hard_id = wallet.hard_id
             else:
-                answer['wrongCards'].append(json_employer)
+                answer['wrong_cards'].append(json_employer)
         else:
-            answer['wrongCards'].append(json_employer)
+            answer['wrong_cards'].append(json_employer)
 
-        answer['addedForms'] = answer['addedForms'] + 1
+        answer['added_forms'] = answer['added_forms'] + 1
         db.session.add(person)
 
     if db.session.commit():
@@ -571,4 +591,20 @@ def person_report(person_id):
     arg['id'] = person_id
     answer = Report().get_person_report(**arg)
 
+    return jsonify(answer)
+
+
+@mod.route('/person/search/', methods=['POST'])
+@login_required
+@json_headers
+def person_search():
+    """Поиск человека"""
+
+    arg = get_post_arg(request, True)
+    answer = dict(error='yes', content='')
+    if 'person_name' not in arg:
+        abort(400)
+
+    answer['content'] = 'no'
+    answer['content'] = Person.get_by_firm_id_search(g.firm_info['id'], arg['person_name'])
     return jsonify(answer)
