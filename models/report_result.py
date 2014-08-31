@@ -28,6 +28,7 @@ class ReportResult(object):
         self.report = self.get_report()
         self.terms = {}
         self.persons = []
+        self.person_id = self.get_person_id()
         self.data = {}
         self.all = dict(summ=0, count=0)
 
@@ -40,6 +41,17 @@ class ReportResult(object):
     def get_report_file(self):
         return "%s/excel%s_%s.xlsx" % (app.config['EXCEL_FOLDER'],
                                        self.firm.id, int(time.time()))
+
+    def get_person_id(self):
+        result = False
+        if not self.task:
+            return False
+
+        details = self.task.details
+        if details and 'person' in details:
+            result = details['person']
+
+        return result
 
     def get_interval_dict(self):
         result = {}
@@ -89,6 +101,7 @@ class ReportResult(object):
         report = Report()
         report.firm_id = self.firm.id
         report.period = self.interval['meta']
+        report.person_id = self.person_id
 
         report_query_name = "%s_query" % self.type['meta']
         if report_query_name not in Report.__dict__:

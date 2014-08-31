@@ -57,9 +57,9 @@ class Report(db.Model, BaseModel):
 
     def __init__(self):
         self.amount = 0
-        self.person_id = 0
-        self.person_firm_id = 0
         self.firm_id = 0
+        self.person_firm_id = 0
+        self.person_id = False
         self.corp_type = self.CORP_TYPE_OFF
         self.type = self.TYPE_WHITE
         self.name = 'Anonim'
@@ -70,8 +70,6 @@ class Report(db.Model, BaseModel):
         self.period = 'day'
         self.payment_type = self.TYPE_WHITE
         self.status = self.STATUS_NEW
-        self.firm_id = 0
-        self.person_id = 0
 
     def add_new(self):
         from models.person import Person
@@ -90,7 +88,7 @@ class Report(db.Model, BaseModel):
             self.status = self.STATUS_NEW
 
         # Если операция по белому списку и есть корп кошелек, меняем его баланс
-        if self.person_id != 0 and int(self.type) == Report.TYPE_WHITE:
+        if self.person_id and int(self.type) == Report.TYPE_WHITE:
             person = Person.query.get(self.person_id)
 
             if person.wallet_status == Person.STATUS_VALID and person.type == Person.TYPE_WALLET:
@@ -439,6 +437,9 @@ class Report(db.Model, BaseModel):
             func.sum(Report.amount),
             Report.term_id,
             Report.name)
+
+        if self.person_id:
+            query = query.filter(Report.person_id == self.person_id)
 
         query = query.filter(Report.type == Report.TYPE_WHITE)
         query = query.filter(Report.person_firm_id == self.firm_id)
