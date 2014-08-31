@@ -10,6 +10,7 @@ import json
 from web.views.term.general import *
 
 from models.report import Report
+from models.person import Person
 from models.report_stack import ReportStack
 
 
@@ -77,6 +78,14 @@ def report_create_new():
     report_stack = ReportStack.query.get(arg['id'])
     if not report_stack:
         report_stack = ReportStack()
+
+    if 'details' in arg and 'person' in arg['details']:
+        name = arg['details']['person']
+        person = Person.get_by_name(g.firm_info['id'], name, 1)
+        if not person:
+            del arg['details']['person']
+        else:
+            arg['details']['person'] = person[0].id
 
     for key in arg:
         setattr(report_stack, key, arg[key])
