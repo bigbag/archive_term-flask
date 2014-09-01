@@ -184,6 +184,7 @@ class ReportStack(db.Model, BaseModel):
             str(self.firm_id),
             str(self.emails),
             str(self.excel),
+            str(self.details),
             str(self.type),
             str(self.interval)]
 
