@@ -53,7 +53,8 @@ class ReportSenderTask (object):
         details = map(lambda row: str(row), details)
         details = {'period': {'start': details[0], 'end': details[0]}}
 
-        firms = FirmTerm.get_list_by_term_id(term_id)
+        firm_terms = FirmTerm.query.filter_by(term_id=term_id).all()
+        firms = list(set(firm_term.child_firm_id for firm_term in firm_terms))
         for firm in firms:
             report_stack = ReportStack.query.filter_by(
                 firm_id=firm, interval=ReportStack.INTERVAL_DAY).all()

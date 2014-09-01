@@ -76,6 +76,9 @@
         </div>
         <div class="content-row"
             ng-show="report_stack.interval==0 && report_stack.type==3">
+            <label for="type-report">
+                Введите фамилию сотрудника, по которому хотите получить отчет.<br /> Если данные не введены выгрузка будет по всем сотрудникам.
+            </label>
             <input type="text" ng-model="report_stack.details.person" ui-autocomplete="myOption">
         </div>
         <div class="content-row">
