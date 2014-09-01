@@ -79,8 +79,9 @@ class SocSharingTask (object):
 
                 if PaymentLoyaltySharing.query.filter_by(loyalty_id=wl.loyalty_id).count() <= len(checked):
                     wl.status = WalletLoyalty.STATUS_ON
-                    PersonEvent.add_by_user_loyalty_id(
-                        soc_token.user_id, condition.loyalty_id)
+                    if not PersonEvent.add_by_user_loyalty_id(
+                        soc_token.user_id, condition.loyalty_id):
+                        return False
 
             elif page_liked == SocnetBase.CONDITION_FAILED and (wl.status == WalletLoyalty.STATUS_CONNECTING or wl.status == WalletLoyalty.STATUS_ERROR):
                 wl.status = WalletLoyalty.STATUS_ERROR
@@ -98,9 +99,10 @@ class SocSharingTask (object):
 
                 wl.status = WalletLoyalty.STATUS_OFF
                 wl.checked = '[]'
-            wl.save()
-
-        task.delete()
+                
+            if wl.save():
+                task.delete()
+                
         return True
 
     @staticmethod
