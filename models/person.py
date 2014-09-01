@@ -69,11 +69,7 @@ class Person(db.Model, BaseModel):
         query = query.filter(Person.name.like('%' + search + '%'))
         persons = query.limit(limit).all()
 
-        result = []
-        for person in persons:
-            result.append(dict(id=person.id, name=person.name))
-
-        return result
+        return list(dict(id=person.id, name=person.name) for person in persons)
 
     @staticmethod
     @cache.cached(timeout=30)
