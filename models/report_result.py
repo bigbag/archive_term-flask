@@ -49,6 +49,7 @@ class ReportResult(object):
 
         details = self.task.details
         if details and 'person' in details:
+            details = self.task.decode_field(details)
             result = details['person']
 
         return result
@@ -101,7 +102,7 @@ class ReportResult(object):
         report = Report()
         report.firm_id = self.firm.id
         report.period = self.interval['meta']
-        report.person_id = self.person_id
+        report.person_id = self.get_person_id()
 
         report_query_name = "%s_query" % self.type['meta']
         if report_query_name not in Report.__dict__:
