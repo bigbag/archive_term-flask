@@ -71,44 +71,45 @@ class SocSharingTask (object):
 
         delete_task = True
         for wl in wallet_loyalties:
+            new_wl = WalletLoyalty.query.get(wl.id)
             if page_liked == SocnetBase.CONDITION_PASSED:
                 checked = []
-                if wl.checked:
-                    checked = json.loads(wl.checked)
+                if new_wl.checked:
+                    checked = json.loads(new_wl.checked)
 
                 if condition.id not in checked:
                     checked.append(condition.id)
-                    wl.checked = json.dumps(checked)
-                if not wl.save():
+                    new_wl.checked = json.dumps(checked)
+                if not new_wl.save():
                     delete_task = False
 
-                if PaymentLoyaltySharing.query.filter_by(loyalty_id=wl.loyalty_id).count() > len(checked):
+                if PaymentLoyaltySharing.query.filter_by(loyalty_id=new_wl.loyalty_id).count() > len(checked):
                     continue
 
-                wl.status = WalletLoyalty.STATUS_ON
-                if not wl.save():
+                new_wl.status = WalletLoyalty.STATUS_ON
+                if not new_wl.save():
                     delete_task = False
                 if not PersonEvent.add_by_user_loyalty_id(
                     soc_token.user_id, condition.loyalty_id):
                     delete_task = False
 
-            elif page_liked == SocnetBase.CONDITION_FAILED and (wl.status == WalletLoyalty.STATUS_CONNECTING or wl.status == WalletLoyalty.STATUS_ERROR):
-                wl.status = WalletLoyalty.STATUS_ERROR
+            elif page_liked == SocnetBase.CONDITION_FAILED and (new_wl.status == WalletLoyalty.STATUS_CONNECTING or new_wl.status == WalletLoyalty.STATUS_ERROR):
+                new_wl.status = WalletLoyalty.STATUS_ERROR
                 errors = []
-                if wl.errors:
-                    errors = json.loads(wl.errors)
+                if new_wl.errors:
+                    errors = json.loads(new_wl.errors)
 
                 if condition.desc not in errors:
                     errors.append(condition.desc)
-                    wl.errors = json.dumps(errors)
+                    new_wl.errors = json.dumps(errors)
 
-                if not wl.save():
+                if not new_wl.save():
                     delete_task = False
 
-            elif page_liked == SocnetBase.CONDITION_FAILED and wl.status == WalletLoyalty.STATUS_ON:
-                wl.status = WalletLoyalty.STATUS_OFF
-                wl.checked = '[]'
-                if not wl.save():
+            elif page_liked == SocnetBase.CONDITION_FAILED and new_wl.status == WalletLoyalty.STATUS_ON:
+                new_wl.status = WalletLoyalty.STATUS_OFF
+                new_wl.checked = '[]'
+                if not new_wl.save():
                     delete_task = False
 
                 PersonEvent.delete_by_user_loyalty_id(

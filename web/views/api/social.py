@@ -206,7 +206,7 @@ def api_socnet_list(ean):
 def api_social_post(ean, soc_id):
     """Публикует пост с картинкой в заданной в soc_id соцсети"""
 
-    # base._api_access(request)
+    base._api_access(request)
 
     success = 0
 
