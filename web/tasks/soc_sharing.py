@@ -10,6 +10,7 @@ from grab import Grab
 
 from web import app
 from web.celery import celery
+from helpers import date_helper
 
 from models.payment_loyalty import PaymentLoyalty
 from models.person_event import PersonEvent
@@ -40,6 +41,7 @@ class SocSharingTask (object):
     @staticmethod
     @celery.task
     def check_sharing(task):
+
         condition = PaymentLoyaltySharing.query.get(task.sharing_id)
         if not condition:
             return False
@@ -67,6 +69,7 @@ class SocSharingTask (object):
         query = query.filter(WalletLoyalty.wallet_id.in_(wallet_list))
         wallet_loyalties = query.filter_by(loyalty_id=condition.loyalty_id)
 
+        delete_task = True
         for wl in wallet_loyalties:
             if page_liked == SocnetBase.CONDITION_PASSED:
                 checked = []
@@ -76,12 +79,18 @@ class SocSharingTask (object):
                 if condition.id not in checked:
                     checked.append(condition.id)
                     wl.checked = json.dumps(checked)
+                if not wl.save():
+                    delete_task = False
 
-                if PaymentLoyaltySharing.query.filter_by(loyalty_id=wl.loyalty_id).count() <= len(checked):
-                    wl.status = WalletLoyalty.STATUS_ON
-                    if not PersonEvent.add_by_user_loyalty_id(
-                        soc_token.user_id, condition.loyalty_id):
-                        return False
+                if PaymentLoyaltySharing.query.filter_by(loyalty_id=wl.loyalty_id).count() > len(checked):
+                    continue
+
+                wl.status = WalletLoyalty.STATUS_ON
+                if not wl.save():
+                    delete_task = False
+                if not PersonEvent.add_by_user_loyalty_id(
+                    soc_token.user_id, condition.loyalty_id):
+                    delete_task = False
 
             elif page_liked == SocnetBase.CONDITION_FAILED and (wl.status == WalletLoyalty.STATUS_CONNECTING or wl.status == WalletLoyalty.STATUS_ERROR):
                 wl.status = WalletLoyalty.STATUS_ERROR
@@ -93,16 +102,23 @@ class SocSharingTask (object):
                     errors.append(condition.desc)
                     wl.errors = json.dumps(errors)
 
-            elif page_liked == SocnetBase.CONDITION_FAILED and wl.status == WalletLoyalty.STATUS_ON:
-                PersonEvent.delete_by_user_loyalty_id(
-                    soc_token.user_id, condition.loyalty_id)
+                if not wl.save():
+                    delete_task = False
 
+            elif page_liked == SocnetBase.CONDITION_FAILED and wl.status == WalletLoyalty.STATUS_ON:
                 wl.status = WalletLoyalty.STATUS_OFF
                 wl.checked = '[]'
-                
-            if wl.save():
-                task.delete()
-                
+                if not wl.save():
+                    delete_task = False
+
+                PersonEvent.delete_by_user_loyalty_id(
+                    soc_token.user_id, condition.loyalty_id)
+            else:
+                delete_task = False
+
+        if delete_task:
+            task.delete()
+
         return True
 
     @staticmethod
@@ -130,43 +146,6 @@ class SocSharingTask (object):
 
     @staticmethod
     @celery.task
-    def recheck_loyalty(loyalty):
-        control_value = SocnetsApi().get_control_value(loyalty.id)
-        if control_value == loyalty.control_value:
-            return False
-
-        wallet_loyalties = WalletLoyalty.query.filter_by(
-            loyalty_id=loyalty.id, checked=1).all()
-
-        for wl in wallet_loyalties:
-            wallet = PaymentWallet.query.filter_by(id=wl.wallet_id).first()
-            if not wallet:
-                continue
-
-            token_type = SocnetsApi().get_token_type_by_sharing(
-                loyalty.sharing_type)
-            token = SocToken.query.filter_by(
-                user_id=wallet.user_id, type=token_type).first()
-            if not token:
-                continue
-
-            task_exists = LikesStack.query.filter_by(
-                token_id=token.id, loyalty_id=loyalty.id).first()
-            if task_exists:
-                continue
-
-            task = LikesStack()
-            task.token_id = token.id
-            task.loyalty_id = loyalty.id
-            task.save()
-
-        loyalty.control_value = control_value
-        loyalty.save()
-
-        return True
-
-    @staticmethod
-    @celery.task
     def recheck_condition(condition_id):
         condition = PaymentLoyaltySharing.query.get(condition_id)
         if not condition:
@@ -177,7 +156,7 @@ class SocSharingTask (object):
             return False
 
         wallet_loyalties = WalletLoyalty.query.filter_by(
-            loyalty_id=condition.loyalty_id, checked=1).all()
+            loyalty_id=condition.loyalty_id, status=WalletLoyalty.STATUS_ON).all()
 
         for wl in wallet_loyalties:
             wallet = PaymentWallet.query.filter_by(id=wl.wallet_id).first()
