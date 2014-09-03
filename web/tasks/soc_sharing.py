@@ -71,7 +71,7 @@ class SocSharingTask (object):
 
         delete_task = True
         for wl in wallet_loyalties:
-            new_wl = WalletLoyalty.query.get(wl.id)
+            new_wl = WalletLoyalty.query.with_lockmode('update').get(wl.id)
             if page_liked == SocnetBase.CONDITION_PASSED:
                 checked = []
                 if new_wl.checked:
