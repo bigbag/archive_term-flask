@@ -90,7 +90,7 @@ class SocSharingTask (object):
                 if not new_wl.save():
                     delete_task = False
                 if not PersonEvent.add_by_user_loyalty_id(
-                    soc_token.user_id, condition.loyalty_id):
+                        soc_token.user_id, condition.loyalty_id):
                     delete_task = False
 
             elif page_liked == SocnetBase.CONDITION_FAILED and (new_wl.status == WalletLoyalty.STATUS_CONNECTING or new_wl.status == WalletLoyalty.STATUS_ERROR):
