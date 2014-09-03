@@ -113,6 +113,10 @@ class YaMoneyApi(object):
             self.logger.error(e)
             return False
         else:
+            code = self.curl.getinfo(self.curl.RESPONSE_CODE)
+            if int(code) != 200:
+                self.logger.error('Fail in request url %s, code %s' % (url, code))
+                return False
             return buf.getvalue()
 
     def _parse_result(self, result):
