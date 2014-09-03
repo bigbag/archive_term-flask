@@ -198,6 +198,6 @@ class ReportParserTask (object):
             error = report.add_new()
 
         if not error:
-            ReportSenderTask.lost_report_watcher.delay(firm_terms, report_max_date)
+            ReportSenderTask.lost_report_watcher.delay(term.id, report_max_date)
 
         return error
