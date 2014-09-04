@@ -91,7 +91,10 @@ def get_api_sign(secret, data):
 
     post = []
     for key in keys:
-        post.append('%s=%s' % (key, data[key]))
+        if isinstance(data[key], unicode):
+            post.append('%s=%s' % (key, data[key].encode('utf-8')))
+        else:
+            post.append('%s=%s' % (key, data[key]))
 
     H = hmac.new(secret, digestmod=hashlib.sha512)
     H.update('&'.join(post))
