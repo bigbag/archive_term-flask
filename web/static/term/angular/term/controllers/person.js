@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('term').controller('PersonController',
-    function($scope, $http, $compile, contentService) {
+    function($scope, $http, $compile, contentService, dialogService) {
 
   $scope.error = {};
 
@@ -66,50 +66,75 @@ angular.module('term').controller('PersonController',
     });
   };
 
-  //Отвязываем карту от человеку
+  //Отвязываем карту от человека
   $scope.unbindCard = function(person) {
-    var url = '/person/' + person.id + '/unbind_card';
-    person.csrf_token = $scope.token;
-    $http.post(url, person).success(function(data) {
-      if (data.error === 'yes') {
-        contentService.setModal(data.message, 'error');
-      } else {
-        contentService.setModal(data.message, 'success');
-        setTimeout(function(){
-          $(location).attr('href', '/person/' + person.id);
-        }, 2000);
-      }
-    });
+    dialogService.yesNoDialog(function(dialog_result) {
+      if (dialog_result != 'yes')
+        return false;
+      
+      var url = '/person/' + person.id + '/unbind_card';
+      person.csrf_token = $scope.token;
+      $http.post(url, person).success(function(data) {
+        if (data.error === 'yes') {
+          contentService.setModal(data.message, 'error');
+        } else {
+          contentService.setModal(data.message, 'success');
+          setTimeout(function(){
+            $(location).attr('href', '/person/' + person.id);
+          }, 2000);
+        }
+      });
+    },
+    'Отвязать карту от пользователя<br>"' + person.name +'"?'
+    );  
   };
 
   //Блокируем или разблокируем пользователя
   $scope.lockPerson = function(person) {
-    person.csrf_token = $scope.token;
-    $http.post('/person/' + person.id + '/lock', person).success(function(data) {
-      if (data.error === 'no') {
-        if ($scope.person.status === 0) {
-          $scope.person.status = 1;
-        } else {
-          $scope.person.status = 0;
+    var question = 'Заблокировать пользователя<br>"' + person.name +'"?';
+    if (person.status == 0)
+        question = 'Разблокировать пользователя<br>"' + person.name +'"?';
+    
+    dialogService.yesNoDialog(function(dialog_result) {
+      if (dialog_result != 'yes')
+        return false;
+      
+      person.csrf_token = $scope.token;
+      $http.post('/person/' + person.id + '/lock', person).success(function(data) {
+        if (data.error === 'no') {
+          if ($scope.person.status === 0) {
+            $scope.person.status = 1;
+          } else {
+            $scope.person.status = 0;
+          }
+          contentService.setModal(data.message, 'success');
         }
-        contentService.setModal(data.message, 'success');
-      }
-    });
+      });
+    },
+    question
+    );
   };
 
   //Удаляем пользователя
   $scope.removePerson = function(person) {
-    person.csrf_token = $scope.token;
-    $http.post('/person/' + person.id + '/remove', person).success(function(data) {
-      if (data.error === 'no') {
-        contentService.setModal(data.message, 'success');
-        setTimeout(function(){
-          $(location).attr('href', '/person');
-        });
-      } else {
-        contentService.setModal(data.message, 'error');
-      }
-    });
+    dialogService.yesNoDialog(function(dialog_result) {
+      if (dialog_result != 'yes')
+        return false;
+      
+      person.csrf_token = $scope.token;
+      $http.post('/person/' + person.id + '/remove', person).success(function(data) {
+        if (data.error === 'no') {
+          contentService.setModal(data.message, 'success');
+          setTimeout(function(){
+            $(location).attr('href', '/person');
+          });
+        } else {
+          contentService.setModal(data.message, 'error');
+        }
+      });
+    },
+    'Удалить пользователя<br>"' + person.name +'"?'
+    );
   };
 
 

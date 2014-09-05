@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('term').controller('ReportController',
-  function($scope, $http, $compile, contentService) {
+  function($scope, $http, $compile, contentService, dialogService) {
 
   //Список периодов для отчетов
   $scope.report_detaled_periods = [
@@ -118,19 +118,26 @@ angular.module('term').controller('ReportController',
 
   //Удаляем отчет
   $scope.removeReport = function(id) {
-    var report_stack = $scope.report_stack;
-    report_stack.id = id;
-    report_stack.csrf_token = $scope.token;
-    $http.post('/report/' + report_stack.id + '/remove', report_stack).success(function(data) {
-      if (data.error === 'no') {
-        contentService.setModal(data.message, 'success');
-        setTimeout(function(){
-          $(location).attr('href', '/report/list');
-        });
-      } else {
-        contentService.setModal(data.message, 'error');
-      }
-    });
+    dialogService.yesNoDialog(function(dialog_result) {
+      if (dialog_result != 'yes')
+        return false;
+      
+      var report_stack = $scope.report_stack;
+      report_stack.id = id;
+      report_stack.csrf_token = $scope.token;
+      $http.post('/report/' + report_stack.id + '/remove', report_stack).success(function(data) {
+        if (data.error === 'no') {
+          contentService.setModal(data.message, 'success');
+          setTimeout(function(){
+            $(location).attr('href', '/report/list');
+          });
+        } else {
+          contentService.setModal(data.message, 'error');
+        }
+      });
+    },
+    'Удалить отчет?'
+    );  
   };
 
   $scope.reportDates = [];

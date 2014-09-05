@@ -29,3 +29,34 @@ angular.module('term').service('contentService', function() {
       };
 });
 
+angular.module('term').service('dialogService', function() {
+    var dialogDOM = angular.element("#dialog-confirm");
+    var dialogQuestion = angular.element("#dialog-question");
+    
+    var yesNoDialog = function(callback, question) {
+      dialogQuestion.html(question);
+      dialogDOM.dialog({
+        resizable: true,
+        height:240,
+        minHeight:240,
+        minWidth: 380,
+        modal: true,
+        buttons: {
+          'Да': function() {
+            callback('yes');
+            $( this ).dialog( "close" );
+          },
+          'Нет': function() {
+            callback('no');
+            $( this ).dialog( "close" );
+          }
+        }
+      });    
+
+    };
+
+    return {
+      yesNoDialog: yesNoDialog
+    };
+
+});    

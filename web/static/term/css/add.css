@@ -163,3 +163,21 @@ div.left-center {
     float: left;
     left: 50%;
 }
+
+div.ui-dialog.ui-widget.ui-widget-content div.ui-dialog-buttonpane.ui-widget-content {
+    border-radius: 0px;
+    width: 100%;
+}
+
+span.ui-icon.ui-icon-closethick {
+    background-image: url('../img/ui-icons_888888_256x240.png');
+    background-position: -96px -128px;
+    display: block;
+    text-indent: -99999px;
+    overflow: hidden;
+    background-repeat: no-repeat;
+}
+
+#dialog-question {
+    font-size: 16px;
+}
