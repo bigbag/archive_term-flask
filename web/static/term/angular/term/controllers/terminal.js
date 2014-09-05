@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('term').controller('TerminalController',
-    function($scope, $http, $compile, contentService) {
+    function($scope, $http, $compile, contentService, dialogService) {
 
   $scope.error = {};
 
@@ -46,31 +46,29 @@ angular.module('term').controller('TerminalController',
 
   //Блокируем и разблокируем терминал
   $scope.lockingTerminal = function(term) {
-    term.csrf_token = $scope.token;
-    $http.post('/terminal/' + term.id + '/locking', term).success(function(data) {
-      if (data.error === 'no') {
-        if ($scope.term.status === 0) {
-          $scope.term.status = 1;
-        } else {
-          $scope.term.status = 0;
+    var question = 'Заблокировать терминал<br>"' + term.hard_id +', ' + term.name +'"?';
+    if (term.status == 0)
+        question = 'Разблокировать терминал<br>"' + term.hard_id +', ' + term.name +'"?';
+    
+    dialogService.yesNoDialog(function(dialog_result) {
+      if (dialog_result != 'yes')
+        return false;
+      
+      term.csrf_token = $scope.token;
+      $http.post('/terminal/' + term.id + '/locking', term).success(function(data) {
+        if (data.error === 'no') {
+          if ($scope.term.status === 0) {
+            $scope.term.status = 1;
+          } else {
+            $scope.term.status = 0;
+          }
+          contentService.setModal(data.message, 'success');
         }
-        contentService.setModal(data.message, 'success');
-      }
-    });
-  };
-
-  $scope.removeTerminal = function(term) {
-    term.csrf_token = $scope.token;
-    $http.post('/terminal/' + term.id + '/remove', term).success(function(data) {
-      if (data.error === 'no') {
-        contentService.setModal(data.message, 'success');
-        setTimeout(function(){
-          $(location).attr('href','/terminal');
-        }, 2000);
-      } else {
-        contentService.setModal(data.message, 'error');
-      }
-    });
+      });
+    },
+    question
+    );
+    
   };
 
   //Переадресация на страницу редактирования привязанного события
@@ -100,19 +98,26 @@ angular.module('term').controller('TerminalController',
 
   //Удаляем привязанное событие
   $scope.deleteEventTerminal = function(term_event){
-    var url = '/terminal/' + term_event.term_id + '/event/' + term_event.id + '/delete';
-    term_event.csrf_token = $scope.token;
-    $http.post(url, term_event).success(function(data) {
-      contentService.scrollPage('.m-page-name');
-      if (data.error === 'yes') {
-        contentService.setModal(data.message, 'error');
-      } else {
-        contentService.setModal(data.message, 'success');
-        setTimeout(function(){
-          $(location).attr('href','/terminal/' + term_event.term_id);
-        }, 2000);
-      }
-    });
+    dialogService.yesNoDialog(function(dialog_result) {
+      if (dialog_result != 'yes')
+        return false;
+      
+      var url = '/terminal/' + term_event.term_id + '/event/' + term_event.id + '/delete';
+      term_event.csrf_token = $scope.token;
+      $http.post(url, term_event).success(function(data) {
+        contentService.scrollPage('.m-page-name');
+        if (data.error === 'yes') {
+          contentService.setModal(data.message, 'error');
+        } else {
+          contentService.setModal(data.message, 'success');
+          setTimeout(function(){
+            $(location).attr('href','/terminal/' + term_event.term_id);
+          }, 2000);
+        }
+      });
+    },
+    'Удалить событие?'
+    );   
   };
 
   //Запрос на информацию об сдаче в аренду терминала
