@@ -5,6 +5,7 @@
 /configs/yandex.py
 /configs/uniteller.py
 /configs/smsru.py
+alembic.ini
 gunicorn.conf.py
 /venv/
 /env/
