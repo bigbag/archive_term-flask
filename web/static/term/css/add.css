@@ -181,3 +181,31 @@ span.ui-icon.ui-icon-closethick {
 #dialog-question {
     font-size: 16px;
 }
+
+#ui-datepicker-div .ui-datepicker-calendar td a {
+    display: block;
+    width:100%;
+    line-height:1.1em;
+    text-align: right;
+    
+}
+
+#ui-datepicker-div .ui-datepicker-calendar th span{
+    display: block;
+    width:100%;    
+}
+
+#ui-datepicker-div .ui-datepicker-prev, #ui-datepicker-div .ui-datepicker-next {
+    width: 1.6em;
+    height: 1.6em;
+}
+
+#ui-datepicker-div .ui-datepicker-next:hover{
+    background: url('../img/icons.28x2.png') no-repeat scroll 0% 0% / 100% auto #0061FF;
+    background-position: 3px -15px;
+}
+
+#ui-datepicker-div .ui-datepicker-prev:hover {
+    background: url('../img/icons.28x2.png') no-repeat scroll 0% 0% / 100% auto #0061FF;
+    background-position: 0px 7px;
+}
