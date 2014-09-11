@@ -30,3 +30,12 @@ class WalletLoyalty(db.Model, BaseModel):
     checked = db.Column(db.String(1024))
     status = db.Column(db.Integer)
     errors = db.Column(db.String(1024))
+
+    @staticmethod
+    def get_by_wallet_list(wallet_list, loyalty_id=False):
+        query = WalletLoyalty.query
+        query = query.filter(WalletLoyalty.wallet_id.in_(wallet_list))
+
+        if loyalty_id:
+            query = query.filter_by(loyalty_id=loyalty_id)
+        return query.all()

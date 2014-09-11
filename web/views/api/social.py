@@ -268,7 +268,7 @@ def api_social_post(ean, soc_id):
             user_id=spot.user_id, type=soc_id, write_access=1).first()
 
     if token and img and filepath:
-        if SocnetsApi().post_photo(token, token.id, filepath, message):
+        if SocnetsApi.post_photo(token, token.id, filepath, message):
             success = 1
             error = ''
         else:
