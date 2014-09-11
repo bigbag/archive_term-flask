@@ -182,6 +182,8 @@ span.ui-icon.ui-icon-closethick {
     font-size: 16px;
 }
 
+/* datepicker  (/report/company)*/
+
 #ui-datepicker-div .ui-datepicker-calendar td a {
     display: block;
     width:100%;
@@ -209,3 +211,56 @@ span.ui-icon.ui-icon-closethick {
     background: url('../img/icons.28x2.png') no-repeat scroll 0% 0% / 100% auto #0061FF;
     background-position: 0px 7px;
 }
+/* end datepicker */
+
+/* daterangepicker */
+
+.daterangepicker td.available {
+    cursor: pointer;
+}
+
+.daterangepicker td.available {
+    cursor: pointer;
+}
+
+.daterangepicker td.available:hover {
+    background: none repeat scroll 0% 0% #0061FF;
+}
+
+.daterangepicker {
+    border: 1px solid #AAA;
+    padding: 0.2em;
+}
+
+.daterangepicker th i.icon-arrow-left, .daterangepicker th i.icon-arrow-right {
+    position: relative;
+    display: block;
+}
+.daterangepicker thead {
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
+    border-collapse: collapse;
+    overflow: hidden;
+}
+
+.daterangepicker table tr th{
+    border:none;
+}
+
+.daterangepicker thead tr {
+    background: #CCC;
+    padding-top:5px;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
+}
+
+.daterangepicker div.calendar {
+    overflow: hidden;
+    border: 1px solid #AAA;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
+}
+/*end daterangepicker */
