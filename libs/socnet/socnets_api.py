@@ -57,23 +57,24 @@ class SocnetsApi():
         PaymentLoyalty.VK_SUBS: SocToken.TYPE_VK,
     }
 
-    def check_soc_sharing(self, type, url, token_id, sharing_id):
+    @staticmethod
+    def check_soc_sharing(type, url, token_id, sharing_id):
         netShared = False
 
-        socApi = self.SHARING_TYPES[type]['netClass']()
-        method = getattr(socApi, self.SHARING_TYPES[type]['sharingCheck'])
+        soc_api = SocnetsApi.SHARING_TYPES[type]['netClass']()
+        method = getattr(soc_api, SocnetsApi.SHARING_TYPES[type]['sharingCheck'])
         netShared = method(url, token_id, sharing_id)
 
         return netShared
 
-    def post_photo(self, type, token_id, filepath, message):
-        # пока только facebook
-        socApi = FacebookApi()
+    @staticmethod
+    def post_photo(type, token_id, filepath, message):
+        return FacebookApi.post_photo(token_id, filepath, message)
 
-        return socApi.post_photo(token_id, filepath, message)
-
+    @staticmethod
     def get_control_value(self, condition_id):
-        """контрольное значение для условия акции"""
+        """Контрольное значение для условия акции"""
+
         answer = False
         condition = PaymentLoyaltySharing.query.get(condition_id)
         if not condition:
@@ -81,14 +82,15 @@ class SocnetsApi():
 
         type = condition.sharing_type
 
-        socApi = self.SHARING_TYPES[type]['netClass']()
-        method = getattr(socApi, self.SHARING_TYPES[type]['get_control_value'])
+        soc_api = SocnetsApi.SHARING_TYPES[type]['netClass']()
+        method = getattr(soc_api, self.SHARING_TYPES[type]['get_control_value'])
         answer = method(condition_id)
 
         return answer
 
     def need_control_value(self, condition_id):
-        """опреляется ли контрольное значение для условия акции"""
+        """Опреляется ли контрольное значение для условия акции"""
+
         answer = False
         condition = PaymentLoyaltySharing.query.get(condition_id)
         if not condition:
