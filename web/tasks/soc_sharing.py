@@ -53,25 +53,25 @@ class SocSharingTask (object):
     def check_sharing(sharing_id):
         likes_stack = LikesStack.query.filter_by(sharing_id=sharing_id).first()
         if not likes_stack:
-            return False
+            SocSharingTask.remove_lock_and_exit(likes_stack)
 
         condition = PaymentLoyaltySharing.query.get(sharing_id)
         if not condition:
-            return False
+            SocSharingTask.remove_lock_and_exit(likes_stack)
 
         url = condition.link
         if not len(url):
-            return False
+            SocSharingTask.remove_lock_and_exit(likes_stack)
 
         soc_token = SocToken.query.get(likes_stack.token_id)
         if not soc_token:
-            return False
+            SocSharingTask.remove_lock_and_exit(likes_stack)
 
         page_liked = SocnetsApi.check_soc_sharing(
             condition.sharing_type, url, soc_token.id, sharing_id)
 
         if page_liked == SocnetBase.CONDITION_ERROR:
-            return False
+            SocSharingTask.remove_lock_and_exit(likes_stack)
 
         user_wallets = PaymentWallet.query.filter_by(user_id=soc_token.user_id).all()
         if not user_wallets:
