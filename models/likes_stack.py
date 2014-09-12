@@ -23,6 +23,7 @@ class LikesStack(db.Model, BaseModel):
     loyalty_id = db.Column(db.Integer, nullable=False)
     sharing_id = db.Column(db.Integer, nullable=False)
     lock = db.Column(db.Integer, nullable=False)
+    wl_id = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
         self.lock = self.LOCK_FREE
