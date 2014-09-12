@@ -53,7 +53,7 @@ class SocSharingTask (object):
     def check_sharing(sharing_id):
         likes_stack = LikesStack.query.filter_by(sharing_id=sharing_id).first()
         if not likes_stack:
-            SocSharingTask.remove_lock_and_exit(likes_stack)
+            False
 
         condition = PaymentLoyaltySharing.query.get(sharing_id)
         if not condition:
