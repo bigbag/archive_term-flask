@@ -29,15 +29,24 @@ class SocSharingTask (object):
     @staticmethod
     @celery.task
     def sharing_manager():
-        likes_stack = LikesStack.query.filter_by(lock=LikesStack.LOCK_FREE).all()
+        likes_stack = LikesStack.query.filter_by(
+            lock=LikesStack.LOCK_FREE).all()
         if not likes_stack:
             return False
 
+        active_stack = LikesStack.query.filter_by(
+            lock=LikesStack.LOCK_SET).all()
+        locked_loyalties = [task.wl_id for task in active_stack]
+
         for element in likes_stack:
+            if element.wl_id in locked_loyalties:
+                continue
+
+            locked_loyalties.append(element.wl_id)
             element.lock = LikesStack.LOCK_SET
             element.save()
 
-            SocSharingTask.check_sharing.delay(element.sharing_id)
+            SocSharingTask.check_sharing.delay(element.id)
 
         return True
 
@@ -50,19 +59,17 @@ class SocSharingTask (object):
 
     @staticmethod
     @celery.task
-    def check_sharing(sharing_id):
-        likes_stack = LikesStack.query.filter_by(sharing_id=sharing_id).first()
+    def check_sharing(stack_id):
+        likes_stack = LikesStack.query.get(stack_id)
         if not likes_stack:
-            False
+            return False
 
+        sharing_id = likes_stack.sharing_id
         condition = PaymentLoyaltySharing.query.get(sharing_id)
         if not condition:
             SocSharingTask.remove_lock_and_exit(likes_stack)
 
         url = condition.link
-        if not len(url):
-            SocSharingTask.remove_lock_and_exit(likes_stack)
-
         soc_token = SocToken.query.get(likes_stack.token_id)
         if not soc_token:
             SocSharingTask.remove_lock_and_exit(likes_stack)
@@ -73,63 +80,57 @@ class SocSharingTask (object):
         if page_liked == SocnetBase.CONDITION_ERROR:
             SocSharingTask.remove_lock_and_exit(likes_stack)
 
-        user_wallets = PaymentWallet.query.filter_by(user_id=soc_token.user_id).all()
-        if not user_wallets:
-            SocSharingTask.remove_lock_and_exit(likes_stack)
-
-        wallet_list = [wallet.id for wallet in user_wallets]
-
-        wallet_loyalties = WalletLoyalty.get_by_wallet_list(wallet_list, condition.loyalty_id)
-
         delete_task = True
-        for wallet in wallet_loyalties:
 
-            new_wallet = WalletLoyalty.query.get(wallet.id)
-            if page_liked == SocnetBase.CONDITION_PASSED:
-                checked = []
-                if new_wallet.checked:
-                    checked = json.loads(new_wallet.checked)
+        new_wallet = WalletLoyalty.query.with_lockmode(
+            'update').get(likes_stack.wl_id)
+        if page_liked == SocnetBase.CONDITION_PASSED:
+            checked = []
+            if new_wallet.checked:
+                checked = new_wallet.decode_field(new_wallet.checked)
 
-                if condition.id not in checked:
-                    checked.append(condition.id)
-                    new_wallet.checked = json.dumps(checked)
+            if condition.id not in checked:
+                checked.append(condition.id)
 
-                if not new_wallet.save():
-                    delete_task = False
+            new_wallet.checked = new_wallet.encode_field(checked)
 
-                if PaymentLoyaltySharing.query.filter_by(loyalty_id=new_wallet.loyalty_id).count() > len(checked):
-                    continue
+            if not new_wallet.save():
+                delete_task = False
 
+            if PaymentLoyaltySharing.query.filter_by(loyalty_id=new_wallet.loyalty_id).count() <= len(checked):
+                # подключение акции
                 new_wallet.status = WalletLoyalty.STATUS_ON
                 if not new_wallet.save():
                     delete_task = False
                 if not PersonEvent.add_by_user_loyalty_id(
                         soc_token.user_id, condition.loyalty_id):
                     delete_task = False
+            # else:
+            #    SocSharingTask.sharing_manager.delay()
 
-            elif page_liked == SocnetBase.CONDITION_FAILED and (new_wallet.status == WalletLoyalty.STATUS_CONNECTING or new_wallet.status == WalletLoyalty.STATUS_ERROR):
-                new_wallet.status = WalletLoyalty.STATUS_ERROR
-                errors = []
-                if new_wallet.errors:
-                    errors = json.loads(new_wallet.errors)
+        elif page_liked == SocnetBase.CONDITION_FAILED and (new_wallet.status == WalletLoyalty.STATUS_CONNECTING or new_wallet.status == WalletLoyalty.STATUS_ERROR):
+            new_wallet.status = WalletLoyalty.STATUS_ERROR
+            errors = []
+            if new_wallet.errors:
+                errors = json.loads(new_wallet.errors)
 
-                if condition.desc not in errors:
-                    errors.append(condition.desc)
-                    new_wallet.errors = json.dumps(errors)
+            if condition.desc not in errors:
+                errors.append(condition.desc)
+                new_wallet.errors = json.dumps(errors)
 
-                if not new_wallet.save():
-                    delete_task = False
-
-            elif page_liked == SocnetBase.CONDITION_FAILED and new_wallet.status == WalletLoyalty.STATUS_ON:
-                new_wallet.status = WalletLoyalty.STATUS_OFF
-                new_wallet.checked = '[]'
-                if not new_wallet.save():
-                    delete_task = False
-
-                PersonEvent.delete_by_user_loyalty_id(
-                    soc_token.user_id, condition.loyalty_id)
-            else:
+            if not new_wallet.save():
                 delete_task = False
+
+        elif page_liked == SocnetBase.CONDITION_FAILED and new_wallet.status == WalletLoyalty.STATUS_ON:
+            new_wallet.status = WalletLoyalty.STATUS_OFF
+            new_wallet.checked = '[]'
+            if not new_wallet.save():
+                delete_task = False
+
+            PersonEvent.delete_by_user_loyalty_id(
+                soc_token.user_id, condition.loyalty_id)
+        else:
+            delete_task = False
 
         if not delete_task:
             SocSharingTask.remove_lock_and_exit(likes_stack)
