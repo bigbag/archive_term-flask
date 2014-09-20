@@ -20,7 +20,7 @@ class TermSettings(db.Model, BaseModel):
     STATUS_OFF = 0
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150))
+    name = db.Column(db.String(150), nullable=False)
     download_status = db.Column(db.Integer, index=True, nullable=False)
     download_ip = db.Column(db.String(150), nullable=False)
     download_port = db.Column(db.Integer, nullable=False)

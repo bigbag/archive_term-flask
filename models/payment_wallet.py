@@ -36,9 +36,9 @@ class PaymentWallet(db.Model, BaseModel):
     BALANCE_MIN = 0
 
     id = db.Column(db.Integer, primary_key=True)
-    payment_id = db.Column(db.String(20), index=True)
-    hard_id = db.Column(db.String(128), index=True)
-    name = db.Column(db.Integer(), nullable=False)
+    payment_id = db.Column(db.String(20))
+    hard_id = db.Column(db.String(128))
+    name = db.Column(db.String(150), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship('User')
     discodes_id = db.Column(db.Integer(), index=True)

@@ -31,7 +31,7 @@ class TermUser(db.Model, BaseModel):
     creation_date = db.Column(db.DateTime, nullable=False)
     group = db.Column(db.Integer, nullable=False)
     lastvisit = db.Column(db.DateTime)
-    api_key = db.Column(db.String(150), index=True)
+    api_key = db.Column(db.String(150))
     api_secret = db.Column(db.String(150))
     status = db.Column(db.Integer, index=True)
 
