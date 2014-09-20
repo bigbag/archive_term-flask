@@ -40,6 +40,9 @@ class PaymentCard(db.Model, BaseModel):
     type = db.Column(db.String(128), nullable=False, index=True)
     status = db.Column(db.Integer(), nullable=False, index=True)
 
+    def __init__(self):
+        self.status = 0
+
     def get_linking_params(self, order_id=0, url=None):
         """Запрос параметров для привязки карты"""
 

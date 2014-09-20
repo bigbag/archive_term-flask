@@ -27,6 +27,20 @@ class SocToken(db.Model, BaseModel):
     TYPE_LINKEDIN = 9
     TYPE_INSTAGRAM = 10
 
+    SOC_NET = {
+        TYPE_GOOGLE: 'google_oauth',
+        TYPE_FACEBOOK: 'facebook',
+        TYPE_TWITTER: 'twitter',
+        TYPE_YOUTUBE: 'youtube',
+        TYPE_DEVIANTART: 'deviantart',
+        TYPE_BEHANCE: 'behance',
+        TYPE_VIMEO: 'vimeo',
+        TYPE_VK: 'vk',
+        TYPE_FOURSQUARE: 'foursquare',
+        TYPE_LINKEDIN: 'linkedin',
+        TYPE_INSTAGRAM: 'instagram',
+    }
+
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer)
@@ -45,18 +59,4 @@ class SocToken(db.Model, BaseModel):
         if not self.type:
             return False
 
-        socNet = {
-            self.TYPE_GOOGLE: 'google_oauth',
-            self.TYPE_FACEBOOK: 'facebook',
-            self.TYPE_TWITTER: 'twitter',
-            self.TYPE_YOUTUBE: 'youtube',
-            self.TYPE_DEVIANTART: 'deviantart',
-            self.TYPE_BEHANCE: 'behance',
-            self.TYPE_VIMEO: 'vimeo',
-            self.TYPE_VK: 'vk',
-            self.TYPE_FOURSQUARE: 'foursquare',
-            self.TYPE_LINKEDIN: 'linkedin',
-            self.TYPE_INSTAGRAM: 'instagram',
-        }
-
-        return socNet[self.type]
+        return self.SOC_NET[self.type]

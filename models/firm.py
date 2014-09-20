@@ -22,22 +22,6 @@ class Firm(db.Model, BaseModel):
     pattern_id = db.Column(db.String(200), nullable=False)
     logo = db.Column(db.Text())
     address = db.Column(db.Text())
-    email = db.Column(db.Text())
-    report_email = db.Column(db.Text())
-    report_excel = db.Column(db.Text(), nullable=False)
-    report_time = db.Column(db.Time, nullable=False)
-    sending_date = db.Column(db.DateTime)
-
-    def __init__(self):
-        self.report_excel = str({"day": 0, "month": 0, "singl": 0})
-        self.report_time = "23:10:00"
-
-    def get_json(self):
-        self.report_email = json.loads(self.report_email)
-        self.report_excel = json.loads(self.report_excel)
-        self.report_time = json.loads(self.upload)
-
-        return self
 
     @staticmethod
     def get_by_sub_domain(sub_domain):

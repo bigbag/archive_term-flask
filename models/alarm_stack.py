@@ -20,6 +20,9 @@ class AlarmStack(db.Model, BaseModel):
     DEFAULT_COUNT = 1
     DEFAULT_INTERVAL = 86400
 
+    LOCK_FREE = 0
+    LOCK_SET = 1
+
     id = db.Column(db.Integer, primary_key=True)
     firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
     firm = db.relationship('Firm')
@@ -28,8 +31,10 @@ class AlarmStack(db.Model, BaseModel):
     emails = db.Column(db.Text, nullable=False)
     interval = db.Column(db.Integer, nullable=False)
     count = db.Column(db.Integer, nullable=False)
+    lock = db.Column(db.Integer, index=True, nullable=False)
 
     def __init__(self, firm_id=None, term_id=None):
+        self.lock = self.LOCK_FREE
         self.interval = self.DEFAULT_INTERVAL
         self.count = self.DEFAULT_COUNT
         self.term_id = term_id

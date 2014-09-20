@@ -26,7 +26,16 @@ class WalletLoyalty(db.Model, BaseModel):
     wallet_id = db.Column(db.Integer)
     loyalty_id = db.Column(db.Integer)
     summ = db.Column(db.String(50))
+    count = db.Column(db.Integer)
+    part_count = db.Column(db.Integer)
+    bonus_count = db.Column(db.Integer)
     bonus_limit = db.Column(db.Integer)
-    checked = db.Column(db.String(1024))
+    checked = db.Column(db.Text())
     status = db.Column(db.Integer)
-    errors = db.Column(db.String(1024))
+    errors = db.Column(db.Text())
+
+    def __init__(self):
+        self.status = self.STATUS_OFF
+        self.count = 0
+        self.part_count = 0
+        self.bonus_count = 0
