@@ -39,11 +39,11 @@ class Report(db.Model, BaseModel):
     STATUS_COMPLETE = 1
 
     id = db.Column(db.Integer, primary_key=True)
-    term_id = db.Column(db.Integer, db.ForeignKey('term.id'), index=True)
+    term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
     term = db.relationship('Term')
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     event = db.relationship('Event')
-    person_id = db.Column(db.Integer, db.ForeignKey('person.id'), index=True)
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
     person = db.relationship('Person')
     name = db.Column(db.Text, nullable=False)
     payment_id = db.Column(db.String(20))

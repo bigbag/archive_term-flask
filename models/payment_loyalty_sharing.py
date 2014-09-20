@@ -18,9 +18,9 @@ class PaymentLoyaltySharing(db.Model, BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     loyalty_id = db.Column(db.Integer)
     sharing_type = db.Column(db.Integer)
-    desc = db.Column(db.String(1024))
-    data = db.Column(db.String(1024))
-    link = db.Column(db.String(1024))
+    desc = db.Column(db.Text())
+    data = db.Column(db.Text())
+    link = db.Column(db.Text())
     control_value = db.Column(db.String(256))
 
     @staticmethod
