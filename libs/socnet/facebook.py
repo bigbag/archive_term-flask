@@ -128,12 +128,13 @@ class FacebookApi(SocnetBase):
 
         return request_helper.make_request(self.FQL_PATH + query.replace(' ', '+') + '&access_token=' + socToken.user_token, parse_json)
 
-    def post_photo(self, token_id, filepath, message):
+    @staticmethod
+    def post_photo(token_id, filepath, message):
         answer = False
         g = Grab()
 
         socToken = SocToken.query.get(token_id)
-        url = "%s%s" % (self.API_PATH, 'me/photos')
+        url = "%s%s" % (FacebookApi.API_PATH, 'me/photos')
         data = {
             'access_token': socToken.user_token,
             'source': 'image',
@@ -183,8 +184,8 @@ class FacebookApi(SocnetBase):
             return -1
 
         if type(object_likes['likes']) == type({}) \
-            and 'summary' in object_likes['likes'] \
-            and 'total_count' in object_likes['likes']['summary']:
+                and 'summary' in object_likes['likes'] \
+                and 'total_count' in object_likes['likes']['summary']:
             try:
                 answer = int(object_likes['likes']['summary']['total_count'])
             except ValueError:

@@ -32,6 +32,7 @@ class WalletLoyalty(db.Model, BaseModel):
     bonus_limit = db.Column(db.Integer)
     checked = db.Column(db.Text())
     status = db.Column(db.Integer)
+
     errors = db.Column(db.Text())
 
     def __init__(self):
@@ -39,3 +40,12 @@ class WalletLoyalty(db.Model, BaseModel):
         self.count = 0
         self.part_count = 0
         self.bonus_count = 0
+
+    @staticmethod
+    def get_by_wallet_list(wallet_list, loyalty_id=False):
+        query = WalletLoyalty.query
+        query = query.filter(WalletLoyalty.wallet_id.in_(wallet_list))
+
+        if loyalty_id:
+            query = query.filter_by(loyalty_id=loyalty_id)
+        return query.all()
