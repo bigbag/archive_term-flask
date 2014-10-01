@@ -21,6 +21,10 @@ def get_curent_date(format='%Y-%m-%d %H:%M:%S'):
     return client_time
 
 
+def get_curent_utc():
+    return datetime.utcnow()
+
+
 def to_utc(date, tz):
     tz = timezone(tz)
     utc = pytz.timezone('UTC')
@@ -90,3 +94,4 @@ def validate_date(d, format):
         return True
     except ValueError:
         return False
+e
