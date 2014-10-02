@@ -22,7 +22,7 @@ def get_curent_date(format='%Y-%m-%d %H:%M:%S'):
 
 
 def get_curent_utc():
-    return datetime.utcnow()
+    return calendar.timegm(datetime.utcnow().utctimetuple())
 
 
 def to_utc(date, tz):
