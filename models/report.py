@@ -35,8 +35,10 @@ class Report(db.Model, BaseModel):
     DEFAULT_PAGE = 1
     POST_ON_PAGE = 10
 
-    STATUS_NEW = 0
     STATUS_COMPLETE = 1
+    STATUS_NEW = 0
+    STATUS_FAIL = -1
+    STATUS_LOST = -2
 
     id = db.Column(db.Integer, primary_key=True)
     term_id = db.Column(db.Integer, db.ForeignKey('term.id'))
@@ -114,6 +116,18 @@ class Report(db.Model, BaseModel):
             error = True
 
         return error
+
+    @staticmethod
+    def get_new_payment():
+        return Report.query.filter_by(
+            type=Report.TYPE_PAYMENT,
+            status=Report.STATUS_NEW).all()
+
+    @staticmethod
+    def get_fail_payment():
+        return Report.query.filter_by(
+            type=Report.TYPE_PAYMENT,
+            status=Report.STATUS_FAIL).all()
 
     def copy_new_from_old(self, new_balance=False):
         fields = self.__dict__.keys()
