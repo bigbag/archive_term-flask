@@ -63,7 +63,7 @@ app.config.update(
             'schedule': crontab(minute='*/1'),
             'args': (),
         },
-        'payment_payment_check': {
+        'payment_check': {
             'task': 'web.tasks.payment.payment_manager',
             'schedule': crontab(minute='*/1'),
             'args': (),
