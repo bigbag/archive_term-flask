@@ -19,6 +19,7 @@ from helpers import date_helper
 from models.payment_history import PaymentHistory
 from models.payment_card import PaymentCard
 from models.payment_wallet import PaymentWallet
+from models.payment_fail import PaymentFail
 from models.term import Term
 from models.firm import Firm
 from models.report import Report
@@ -27,12 +28,68 @@ from models.report import Report
 class PaymentTask (object):
 
     @staticmethod
+    def get_fail_algorithm():
+
+        def condition_generator(interval, start_interval, start, count):
+            condition = [dict(count=i + start, delta=i * interval + start_interval)
+                         for i in xrange(1, 1 + count)]
+
+            return dict(condition=condition, start=start + count)
+
+        algorithm = [
+            dict(count=3, interval=5 * 60),
+            dict(count=2, interval=60 * 60),
+            dict(count=30, interval=24 * 60 * 60),
+            dict(count=5, interval=7 * 24 * 60 * 60,
+                 start_interval=30 * 24 * 60 * 60),
+        ]
+
+        result = []
+        start = 0
+        start_interval = 5 * 60
+        for row in algorithm:
+            if 'start_interval' in row:
+                start_interval = row['start_interval']
+
+            condition = condition_generator(
+                row['interval'], start_interval, start, row['count'])
+            result += condition['condition']
+            start = condition['start']
+
+        result.sort(reverse=True)
+
+        return result
+
+    @staticmethod
     @celery.task
     def payment_manager():
-        reports = Report.query.filter_by(
-            type=Report.TYPE_PAYMENT,
-            status=Report.STATUS_NEW).all()
+        PaymentTask.new_payment_manager.delay()
+        PaymentTask.fail_payment_manager.delay()
 
+    @staticmethod
+    @celery.task
+    def fail_payment_manager():
+        payments = PaymentFail.query.all()
+        if not payments:
+            return False
+
+        algorithm = PaymentTask.get_fail_algorithm()
+        for payment in payments:
+            delta = date_helper.get_curent_utc() - payment.timestamp
+            for row in algorithm:
+                if payment.count != row['count']:
+                    continue
+
+                if delta < row['delta']:
+                    continue
+
+                PaymentFail.add_or_update(payment.report_id)
+                PaymentTask.background_payment.delay(payment.report_id)
+
+    @staticmethod
+    @celery.task
+    def new_payment_manager():
+        reports = Report.get_new_payment()
         if not reports:
             return False
 
@@ -75,6 +132,8 @@ class PaymentTask (object):
         result = ym.get_process_external_payment(history.request_id)
 
         if result['status'] in ('refused', 'ext_auth_required'):
+            PaymentFail.add_or_update(report_id)
+
             wallet.add_to_blacklist()
             history.delete()
             message = 'Check: Fail, status=%s' % result['status']
@@ -133,7 +192,7 @@ class PaymentTask (object):
         card = PaymentCard.query.filter_by(
             wallet_id=wallet.id,
             status=PaymentCard.STATUS_PAYMENT).first(
-        )
+            )
         if not card:
             history.delete()
             wallet.add_to_blacklist()
@@ -145,7 +204,8 @@ class PaymentTask (object):
 
         firm = Firm.query.get(report.term_firm_id)
         if not firm:
-            app.logger.error('Payment: Not found firm, with term %s' % report.term_id)
+            app.logger.error(
+                'Payment: Not found firm, with term %s' % report.term_id)
 
         amount = float(report.amount) / int(Term.DEFAULT_FACTOR)
 
@@ -155,7 +215,8 @@ class PaymentTask (object):
         if not payment or not 'request_id' in payment:
             wallet.add_to_blacklist()
             history.delete()
-            message = 'Payment: Fail in request payment, report_id %s, request %s' % (report_id, payment)
+            message = 'Payment: Fail in request payment, report_id %s, request %s' % (
+                report_id, payment)
             app.logger.error(message)
             return message
 
@@ -164,7 +225,8 @@ class PaymentTask (object):
         if result['status'] not in ('success', 'in_progress'):
             wallet.add_to_blacklist()
             history.delete()
-            message = 'Payment: Fail in request payment, report_id %s, request %s' % (report_id, result)
+            message = 'Payment: Fail in request payment, report_id %s, request %s' % (
+                report_id, result)
             app.logger.error(message)
             return message
 
