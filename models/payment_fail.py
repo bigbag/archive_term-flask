@@ -13,18 +13,28 @@ from helpers import date_helper
 from models.base_model import BaseModel
 
 
-class PaymentLost(db.Model, BaseModel):
+class PaymentFail(db.Model, BaseModel):
 
     __bind_key__ = 'payment'
     __tablename__ = 'fail'
 
+    LOCK_FREE = 0
+    LOCK_SET = 1
+
     report_id = db.Column(db.Integer, primary_key=True)
     count = db.Column(db.Integer, nullable=False, index=True)
-    create_timestamp = db.Column(db.Integer, nullable=False)
+    timestamp = db.Column(db.Integer, nullable=False)
+    lock = db.Column(db.Integer, index=True, nullable=False)
 
-    def __init__(self):
+    def __init__(self, report_id):
         self.count = 0
+        self.lock = self.LOCK_FREE
+        self.report_id = report_id
+
+    def __repr__(self):
+        return '<report_id %r>' % (self.report_id)
 
     def save(self):
-        self.create_timestamp = date_helper.get_curent_utc
+        self.count += 1
+        self.timestamp = date_helper.get_curent_utc
         return BaseModel.save(self)
