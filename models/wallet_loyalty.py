@@ -32,7 +32,6 @@ class WalletLoyalty(db.Model, BaseModel):
     bonus_limit = db.Column(db.Integer)
     checked = db.Column(db.Text())
     status = db.Column(db.Integer)
-
     errors = db.Column(db.Text())
 
     def __init__(self):
