@@ -10,7 +10,9 @@ import hashlib
 from web import db
 
 from helpers import date_helper
+
 from models.base_model import BaseModel
+from models.report import Report
 
 
 class PaymentFail(db.Model, BaseModel):
@@ -39,6 +41,12 @@ class PaymentFail(db.Model, BaseModel):
         payment = PaymentFail.query.get(report_id)
         if not payment:
             payment = PaymentFail(report_id)
+
+            report = Report.query.get(report_id)
+            if report:
+                report.status = Report.STATUS_FAIL
+                report.save()
+
         return payment.save()
 
     def save(self):
