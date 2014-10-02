@@ -117,6 +117,18 @@ class Report(db.Model, BaseModel):
 
         return error
 
+    @staticmethod
+    def get_new_payment():
+        return Report.query.filter_by(
+            type=Report.TYPE_PAYMENT,
+            status=Report.STATUS_NEW).all()
+
+    @staticmethod
+    def get_fail_payment():
+        return Report.query.filter_by(
+            type=Report.TYPE_PAYMENT,
+            status=Report.STATUS_FAIL).all()
+
     def copy_new_from_old(self, new_balance=False):
         fields = self.__dict__.keys()
         fields.remove('id')
