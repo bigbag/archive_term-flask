@@ -133,9 +133,9 @@ class PaymentTask (object):
 
         if result['status'] in ('refused', 'ext_auth_required'):
             PaymentFail.add_or_update(report_id)
-
             wallet.add_to_blacklist()
             history.delete()
+
             message = 'Check: Fail, status=%s' % result['status']
             app.logger.error(message)
             return message
@@ -194,8 +194,10 @@ class PaymentTask (object):
             status=PaymentCard.STATUS_PAYMENT).first(
             )
         if not card:
-            history.delete()
+            PaymentFail.add_or_update(report_id)
             wallet.add_to_blacklist()
+            history.delete()
+
             return False
 
         term = Term.query.get(report.term_id)
@@ -213,8 +215,10 @@ class PaymentTask (object):
         payment = ym.get_request_payment_to_shop(
             amount, firm.pattern_id)
         if not payment or not 'request_id' in payment:
+            PaymentFail.add_or_update(report_id)
             wallet.add_to_blacklist()
             history.delete()
+
             message = 'Payment: Fail in request payment, report_id %s, request %s' % (
                 report_id, payment)
             app.logger.error(message)
@@ -223,8 +227,10 @@ class PaymentTask (object):
         result = ym.get_process_external_payment(
             payment['request_id'], card.token)
         if result['status'] not in ('success', 'in_progress'):
+            PaymentFail.add_or_update(report_id)
             wallet.add_to_blacklist()
             history.delete()
+
             message = 'Payment: Fail in request payment, report_id %s, request %s' % (
                 report_id, result)
             app.logger.error(message)
