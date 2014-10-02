@@ -34,7 +34,14 @@ class PaymentFail(db.Model, BaseModel):
     def __repr__(self):
         return '<report_id %r>' % (self.report_id)
 
+    @staticmethod
+    def add_or_update(report_id):
+        payment = PaymentFail.query.get(report_id)
+        if not payment:
+            payment = PaymentFail(report_id)
+        return payment.save()
+
     def save(self):
         self.count += 1
-        self.timestamp = date_helper.get_curent_utc
+        self.timestamp = date_helper.get_curent_utc()
         return BaseModel.save(self)
