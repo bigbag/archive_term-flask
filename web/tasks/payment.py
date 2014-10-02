@@ -61,6 +61,18 @@ class PaymentTask (object):
         return result
 
     @staticmethod
+    def set_fail(report_id, wallet):
+        PaymentFail.add_or_update(report_id)
+        wallet.add_to_blacklist()
+
+    @staticmethod
+    def set_success(report_id, wallet):
+        payment = PaymentFail.query.get(report_id)
+        if payment:
+            payment.delete()
+        wallet.remove_from_blacklist()
+
+    @staticmethod
     @celery.task
     def payment_manager():
         PaymentTask.new_payment_manager.delay()
@@ -132,8 +144,7 @@ class PaymentTask (object):
         result = ym.get_process_external_payment(history.request_id)
 
         if result['status'] in ('refused', 'ext_auth_required'):
-            PaymentFail.add_or_update(report_id)
-            wallet.add_to_blacklist()
+            PaymentTask.set_fail(history.report_id, wallet)
             history.delete()
 
             message = 'Check: Fail, status=%s' % result['status']
@@ -154,11 +165,11 @@ class PaymentTask (object):
             history.status = PaymentHistory.STATUS_COMPLETE
             history.save()
 
+            PaymentTask.set_success(history.report_id, wallet)
+
             report = Report.query.get(history.report_id)
             report.status = Report.STATUS_COMPLETE
             report.save()
-
-            wallet.remove_from_blacklist()
 
         return True
 
@@ -192,12 +203,10 @@ class PaymentTask (object):
         card = PaymentCard.query.filter_by(
             wallet_id=wallet.id,
             status=PaymentCard.STATUS_PAYMENT).first(
-            )
+        )
         if not card:
-            PaymentFail.add_or_update(report_id)
-            wallet.add_to_blacklist()
+            PaymentTask.set_fail(report_id, wallet)
             history.delete()
-
             return False
 
         term = Term.query.get(report.term_id)
@@ -215,10 +224,8 @@ class PaymentTask (object):
         payment = ym.get_request_payment_to_shop(
             amount, firm.pattern_id)
         if not payment or not 'request_id' in payment:
-            PaymentFail.add_or_update(report_id)
-            wallet.add_to_blacklist()
+            PaymentTask.set_fail(report_id, wallet)
             history.delete()
-
             message = 'Payment: Fail in request payment, report_id %s, request %s' % (
                 report_id, payment)
             app.logger.error(message)
@@ -227,10 +234,8 @@ class PaymentTask (object):
         result = ym.get_process_external_payment(
             payment['request_id'], card.token)
         if result['status'] not in ('success', 'in_progress'):
-            PaymentFail.add_or_update(report_id)
-            wallet.add_to_blacklist()
+            PaymentTask.set_fail(report_id, wallet)
             history.delete()
-
             message = 'Payment: Fail in request payment, report_id %s, request %s' % (
                 report_id, result)
             app.logger.error(message)
@@ -317,3 +322,4 @@ class PaymentTask (object):
     def check_linking(history):
         result = PaymentCard().linking_card(history.id)
         return result
+n result
