@@ -322,4 +322,3 @@ class PaymentTask (object):
     def check_linking(history):
         result = PaymentCard().linking_card(history.id)
         return result
-n result
