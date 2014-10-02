@@ -94,4 +94,3 @@ def validate_date(d, format):
         return True
     except ValueError:
         return False
-e
