@@ -6,8 +6,10 @@
     :license: BSD, see LICENSE for more details.
 """
 
+from celery.schedules import crontab
 
-class Config(object):
+
+class Config():
     DEBUG = False
     TESTING = False
 
@@ -68,6 +70,9 @@ class Config(object):
     USE_CELERY = True
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+
+    CELERY_TIMEZONE='Europe/Moscow',
+    CELERYBEAT_SCHEDULE={}
 
     FAIL_PAYMENT_ALGORITHM = [
         dict(count=3, interval=5 * 60),
