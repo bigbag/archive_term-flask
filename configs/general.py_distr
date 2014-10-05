@@ -69,6 +69,14 @@ class Config(object):
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
+    FAIL_PAYMENT_ALGORITHM = [
+        dict(count=3, interval=5 * 60),
+        dict(count=2, interval=60 * 60),
+        dict(count=30, interval=24 * 60 * 60),
+        dict(count=5, interval=7 * 24 * 60 * 60,
+             start_interval=30 * 24 * 60 * 60),
+    ]
+
 
 class ProductionConfig(Config):
     SQLALCHEMY_ECHO = False
