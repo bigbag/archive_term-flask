@@ -11,6 +11,8 @@ from web import app
 
 from web.celery import celery
 
+from configs.general import Config
+
 from configs.yandex import YandexMoneyConfig
 from libs.ya_money import YaMoneyApi
 
@@ -28,21 +30,13 @@ from models.report import Report
 class PaymentTask (object):
 
     @staticmethod
-    def get_fail_algorithm():
+    def get_fail_algorithm(algorithm):
 
         def condition_generator(interval, start_interval, start, count):
             condition = [dict(count=i + start, delta=i * interval + start_interval)
                          for i in xrange(1, 1 + count)]
 
             return dict(condition=condition, start=start + count)
-
-        algorithm = [
-            dict(count=3, interval=5 * 60),
-            dict(count=2, interval=60 * 60),
-            dict(count=30, interval=24 * 60 * 60),
-            dict(count=5, interval=7 * 24 * 60 * 60,
-                 start_interval=30 * 24 * 60 * 60),
-        ]
 
         result = []
         start = 0
@@ -73,7 +67,7 @@ class PaymentTask (object):
         if not payments:
             return False
 
-        algorithm = PaymentTask.get_fail_algorithm()
+        algorithm = PaymentTask.get_fail_algorithm(Config.FAIL_PAYMENT_ALGORITHM)
         for payment in payments:
             delta = date_helper.get_curent_utc() - payment.timestamp
             for row in algorithm:
