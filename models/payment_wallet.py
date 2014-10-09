@@ -144,7 +144,7 @@ class PaymentWallet(db.Model, BaseModel):
             if person.payment_id not in valid:
                 blacklist.add(person.payment_id)
 
-        return sorted(list(blacklist))
+        return set(list(blacklist))
 
     def save(self):
         self.payment_id = str(self.payment_id).rjust(20, '0')
