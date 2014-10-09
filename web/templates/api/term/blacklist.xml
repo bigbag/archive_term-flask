@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="windows-1251"?>
-<blacklist>
+<blacklist timestamp="{{max_timestamp}}">
     {% for row in blacklist %}
-    <card>{{row}}</card>
+    <card status="{{row.status}}">{{row.payment_id}}</card>
     {% endfor %}
 </blacklist>
