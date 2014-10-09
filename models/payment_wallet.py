@@ -109,43 +109,6 @@ class PaymentWallet(db.Model, BaseModel):
                 PaymentWallet.status == PaymentWallet.STATUS_ACTIVE).filter(
                     PaymentWallet.user_id != 0).first()
 
-    @staticmethod
-    def get_blacklist():
-        wallets = PaymentWallet.get_full()
-        if not wallets:
-            return False
-
-        valid = set()
-        blacklist = set()
-        for wallet in wallets:
-            if int(wallet.blacklist) == PaymentWallet.ACTIVE_OFF:
-                blacklist.add(str(wallet.payment_id))
-            elif int(wallet.status) != PaymentWallet.STATUS_ACTIVE:
-                blacklist.add(str(wallet.payment_id))
-            else:
-                valid.add(str(wallet.payment_id))
-
-        # Start: Костыль на время перехода от кошельков с балансом
-        wallets_not_empty = PaymentWallet.get_not_empty()
-        for wallet in wallets_not_empty:
-            blacklist.discard(wallet.payment_id)
-
-        wallets_empty = PaymentWallet.get_empty()
-        for wallet in wallets_empty:
-            if wallet.payment_id not in valid:
-                blacklist.add(wallet.payment_id)
-        # End
-
-        persons = Person.query.group_by(Person.payment_id).all()
-        for person in persons:
-            if not person.payment_id:
-                continue
-
-            if person.payment_id not in valid:
-                blacklist.add(person.payment_id)
-
-        return set(list(blacklist))
-
     def save(self):
         self.payment_id = str(self.payment_id).rjust(20, '0')
         return BaseModel.save(self)

@@ -24,6 +24,8 @@ from models.card_stack import CardStack
 from models.payment_wallet import PaymentWallet
 from models.term_settings import TermSettings
 from models.alarm_stack import AlarmStack
+from models.term_blacklist import TermBlacklist
+
 
 from web.tasks.report_parser import ReportParserTask
 
@@ -81,27 +83,37 @@ def api_get_config(term_id):
 
 
 @mod.route('/configs/blacklist.xml', methods=['GET'])
-@cache.cached(timeout=30, key_prefix='term_xml_blacklist')
+@mod.route('/configs/blacklist_<int:timestamp>.xml', methods=['GET'])
+# @cache.cached(timeout=30, key_prefix='term_xml_blacklist')
 @md5_content_headers
 @xml_headers
-def api_get_xml_blacklist():
-    return api_get_blacklist()
+def api_get_xml_blacklist(timestamp=None):
+    return api_get_blacklist(timestamp)
 
 
 @mod.route('/configs/blacklist.xml.gz', methods=['GET'])
-@cache.cached(timeout=30, key_prefix='term_gzip_blacklist')
+@mod.route('/configs/blacklist_<int:timestamp>.xml.gz', methods=['GET'])
+# @cache.cached(timeout=30, key_prefix='term_gzip_blacklist')
 @md5_content_headers
 @gzip_content
-def api_get_gzip_blacklist():
-    return api_get_blacklist()
+def api_get_gzip_blacklist(timestamp=None):
+    return api_get_blacklist(timestamp)
 
 
-def api_get_blacklist():
+def api_get_blacklist(timestamp=None):
     """Возвращает черный список карт"""
+
+    if not timestamp:
+        blacklist = TermBlacklist.query.filter(
+            TermBlacklist.status == TermBlacklist.STATUS_BLACK).all()
+    else:
+        blacklist = TermBlacklist.query.filter(
+            TermBlacklist.timestamp > timestamp).all()
 
     config_xml = render_template(
         'api/term/blacklist.xml',
-        blacklist=PaymentWallet.get_blacklist(),
+        blacklist=blacklist,
+        max_timestamp=TermBlacklist.get_max_timestamp(),
     ).encode('cp1251')
 
     return make_response(config_xml)

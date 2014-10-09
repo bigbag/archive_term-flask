@@ -12,14 +12,13 @@ from web.celery import celery
 
 from helpers import date_helper
 from models.term_blacklist import TermBlacklist
-from models.payment_wallet import PaymentWallet
 
 
 class BlacklistTask (object):
 
     @celery.task
     def generate_blacklist():
-        new = PaymentWallet.get_blacklist()
+        new = TermBlacklist.generate_blacklist()
         old = TermBlacklist.get_all_black_list()
 
         black = new - old
