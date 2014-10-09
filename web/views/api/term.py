@@ -84,7 +84,7 @@ def api_get_config(term_id):
 
 @mod.route('/configs/blacklist.xml', methods=['GET'])
 @mod.route('/configs/blacklist_<int:timestamp>.xml', methods=['GET'])
-# @cache.cached(timeout=30, key_prefix='term_xml_blacklist')
+@cache.cached(timeout=30)
 @md5_content_headers
 @xml_headers
 def api_get_xml_blacklist(timestamp=None):
@@ -93,7 +93,7 @@ def api_get_xml_blacklist(timestamp=None):
 
 @mod.route('/configs/blacklist.xml.gz', methods=['GET'])
 @mod.route('/configs/blacklist_<int:timestamp>.xml.gz', methods=['GET'])
-# @cache.cached(timeout=30, key_prefix='term_gzip_blacklist')
+@cache.cached(timeout=30)
 @md5_content_headers
 @gzip_content
 def api_get_gzip_blacklist(timestamp=None):
@@ -108,7 +108,7 @@ def api_get_blacklist(timestamp=None):
             TermBlacklist.status == TermBlacklist.STATUS_BLACK).all()
     else:
         blacklist = TermBlacklist.query.filter(
-            TermBlacklist.timestamp > timestamp).all()
+            TermBlacklist.timestamp >= timestamp).all()
 
     config_xml = render_template(
         'api/term/blacklist.xml',
