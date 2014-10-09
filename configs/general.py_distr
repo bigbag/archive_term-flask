@@ -72,7 +72,78 @@ class Config():
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
     CELERY_TIMEZONE='Europe/Moscow',
-    CELERYBEAT_SCHEDULE={}
+    CELERYBEAT_SCHEDULE={
+        'empty-recovery-limit-day': {
+            'task': 'web.tasks.corp_wallet.recovery_limit',
+            'schedule': crontab(hour=0, minute=11),
+            'args': ('1',),
+        },
+        'empty-recovery-limit-wheek': {
+            'task': 'web.tasks.corp_wallet.recovery_limit',
+            'schedule': crontab(hour=0, minute=11, day_of_week=1),
+            'args': ('2',),
+        },
+        'empty-recovery-limit-month': {
+            'task': 'web.tasks.corp_wallet.recovery_limit',
+            'schedule': crontab(hour=0, minute=22, day_of_month=1),
+            'args': ('3',),
+        },
+        'report-sender': {
+            'task': 'web.tasks.report_send.report_manager',
+            'schedule': crontab(minute='*/1'),
+            'args': ('0',),
+        },
+        'report-sender-day': {
+            'task': 'web.tasks.report_send.report_manager',
+            'schedule': crontab(hour=10, minute=11),
+            'args': ('1',),
+        },
+        'report-sender-wheek': {
+            'task': 'web.tasks.report_send.report_manager',
+            'schedule': crontab(hour=10, minute=10, day_of_week=1),
+            'args': ('2',),
+        },
+        'report-sender-month': {
+            'task': 'web.tasks.report_send.report_manager',
+            'schedule': crontab(hour=10, minute=25, day_of_month=1),
+            'args': ('3',),
+        },
+        'alarm-sender': {
+            'task': 'web.tasks.alarms_send.alarm_manager',
+            'schedule': crontab(minute='*/1'),
+            'args': (),
+        },
+        'soc_sharing_checker': {
+            'task': 'web.tasks.soc_sharing.sharing_manager',
+            'schedule': crontab(minute='*/1'),
+            'args': (),
+        },
+        'payment_check_linking': {
+            'task': 'web.tasks.payment.check_linking_manager',
+            'schedule': crontab(minute='*/1'),
+            'args': (),
+        },
+        'payment_check': {
+            'task': 'web.tasks.payment.payment_manager',
+            'schedule': crontab(minute='*/1'),
+            'args': (),
+        },
+        'soc_sharing_rechecker': {
+            'task': 'web.tasks.soc_sharing.rechek_manager',
+            'schedule': crontab(minute=0, hour='*/3'),
+            'args': (),
+        },
+        'mail_stack_sender': {
+            'task': 'web.tasks.mail.mail_stack_sender',
+            'schedule': crontab(minute='*/1'),
+            'args': (),
+        },
+        'generate_blacklist': {
+            'task': 'web.tasks.blacklist.generate_blacklist',
+            'schedule': crontab(minute='*/1'),
+            'args': (),
+        },
+    }
 
     FAIL_PAYMENT_ALGORITHM = [
         dict(count=3, interval=5 * 60),
