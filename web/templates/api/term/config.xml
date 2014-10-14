@@ -18,6 +18,12 @@
         <stop time="{{ term.upload_stop }}:00"/>
     </upload>
     {% endif %}
+    {% if blacklist %}
+    <blacklist>
+        <partial force_on_restart="{{blacklist.partial_on_restart}}">{{blacklist.partial_timeout}}</partial>
+        <full force_on_restart="{{blacklist.full_on_restart}}">{{blacklist.full_timeout}}</full>
+    </blacklist>
+    {% endif %}
     {% if term.keyload_qid %}
     <keyload>
         <qid>{{term.keyload_qid}}</qid>

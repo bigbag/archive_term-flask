@@ -25,6 +25,7 @@ from models.payment_wallet import PaymentWallet
 from models.term_settings import TermSettings
 from models.alarm_stack import AlarmStack
 from models.term_blacklist import TermBlacklist
+from models.term_blacklist_settings import BlacklistSettings
 
 
 from web.tasks.report_parser import ReportParserTask
@@ -33,7 +34,7 @@ mod = Blueprint('api_term', __name__)
 
 
 @mod.route('/configs/config_<int:term_id>.xml', methods=['GET'])
-@cache.cached(timeout=30, key_prefix='term_xml_config')
+@cache.cached(timeout=30)
 @md5_content_headers
 @xml_headers
 def api_get_xml_config(term_id):
@@ -41,7 +42,7 @@ def api_get_xml_config(term_id):
 
 
 @mod.route('/configs/config_<int:term_id>.xml.gz', methods=['GET'])
-@cache.cached(timeout=30, key_prefix='term_gzip_config')
+@cache.cached(timeout=30)
 @md5_content_headers
 @gzip_content
 def api_get_gzip_config(term_id):
@@ -70,10 +71,12 @@ def api_get_config(term_id):
             abort(400)
 
         person_events = PersonEvent.get_valid_by_term_id(term.id)
+        blacklist = BlacklistSettings.query.get(term.id)
 
         config_xml = render_template(
             'api/term/config.xml',
             term=term,
+            blacklist=blacklist,
             config=term_settings,
             term_events=term_events,
             person_events=person_events).encode('cp1251')
