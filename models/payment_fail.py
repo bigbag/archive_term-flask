@@ -5,8 +5,6 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import hashlib
-
 from web import db
 
 from helpers import date_helper

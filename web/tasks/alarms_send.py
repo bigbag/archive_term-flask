@@ -5,8 +5,6 @@
     :copyright: (c) 2014 by Denis Amelin, Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-
-from web import app
 from web.celery import celery
 
 from models.alarm_stack import AlarmStack

@@ -7,7 +7,6 @@
 """
 import os
 import xlrd
-from datetime import datetime
 from werkzeug.utils import secure_filename
 
 from web import app, db, cache

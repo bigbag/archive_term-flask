@@ -6,24 +6,18 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
-import json
-from flask import Blueprint, abort, request, make_response, url_for, render_template
+from flask import Blueprint, abort, request, make_response, render_template
 from werkzeug.utils import secure_filename
 
-from web import app, cache
+from web import app
 
 from decorators.header import *
 from helpers.error_xml_helper import *
-from helpers import date_helper
-from helpers import hash_helper
 
 from models.payment_loyalty import PaymentLoyalty
-from models.person_event import PersonEvent
-from models.person import Person
 from models.payment_wallet import PaymentWallet
 from models.wallet_loyalty import WalletLoyalty
 from models.soc_token import SocToken
-from models.likes_stack import LikesStack
 from models.spot import Spot
 from web.views.api import base
 from libs.socnet.socnets_api import SocnetsApi
@@ -131,7 +125,7 @@ def api_social_spot_loyalty(ean):
         # данные только по требуемой акции
         try:
             loyalty_id = int(request.args['id'])
-        except Exception as e:
+        except:
             abort(405)
 
         loyalty = PaymentLoyalty.query.get(loyalty_id)

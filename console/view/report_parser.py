@@ -6,17 +6,11 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
-import time
-from multiprocessing.dummy import Pool as ThreadPool
-from lxml import etree
-from flask import Flask, render_template
 from flask.ext.script import Command
 
 from console import app
 
 from web.tasks.report_parser import ReportParserTask
-
-from helpers import date_helper
 
 
 class ReportParser(Command):

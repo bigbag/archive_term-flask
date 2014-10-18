@@ -6,9 +6,8 @@
     :license: BSD, see LICENSE for more details.
 """
 
-from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
+from flask import Blueprint, jsonify, request, make_response
 
-from web import app, cache
 
 from decorators.header import *
 from helpers.error_json_helper import *

@@ -105,7 +105,6 @@ class UnitellerApi(object):
             return self.grab
         return False
 
-
     def get_payment_info(self, order_id=None):
         return_data = False
 
