@@ -66,6 +66,12 @@ class FirmTerm(db.Model, BaseModel):
 
         return result
 
+    @staticmethod
+    def get_rent(term_id, firm_id):
+        query = FirmTerm.query.filter(FirmTerm.term_id == term_id)
+        query = query.filter(FirmTerm.firm_id == firm_id)
+        return query.filter(FirmTerm.firm_id != FirmTerm.child_firm_id).all()
+
     def to_json(self):
         date_pattern = '%H:%M %d.%m.%Y'
         creation_date = date_helper.from_utc(
