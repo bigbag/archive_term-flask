@@ -9,8 +9,6 @@ from web import db
 
 from models.base_model import BaseModel
 
-from helpers import hash_helper
-
 
 class AlarmStack(db.Model, BaseModel):
 

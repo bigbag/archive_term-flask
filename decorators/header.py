@@ -9,7 +9,7 @@ import gzip
 import StringIO
 
 from functools import wraps
-from flask import Flask, make_response
+from flask import make_response
 from helpers import hash_helper
 
 

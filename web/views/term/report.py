@@ -156,7 +156,6 @@ def report_remove(report_id):
     """Удаление отчета"""
 
     answer = dict(error='yes', message=u'Произошла ошибка', status=False)
-    arg = get_post_arg(request, True)
 
     report_stack = ReportStack.query.get(report_id)
     if not report_stack:

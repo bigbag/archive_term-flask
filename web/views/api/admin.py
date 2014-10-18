@@ -5,11 +5,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import re
-import os
-
-from flask import Flask, Blueprint, jsonify, abort, request, make_response, url_for, render_template
-from web import app, cache
+from flask import Blueprint, abort, request, make_response, render_template
 
 from decorators.header import *
 from helpers.error_xml_helper import *
@@ -21,7 +17,6 @@ from models.spot_hard import SpotHard
 from models.spot_hard_type import SpotHardType
 from models.spot_dis import SpotDis
 from models.payment_wallet import PaymentWallet
-from models.payment_history import PaymentHistory
 
 from web.views.api import base
 
@@ -40,7 +35,7 @@ def api_admin_spot_generate():
     if 'count' in request.form:
         try:
             count = int(request.form['count'])
-        except Exception as e:
+        except:
             abort(405)
 
         count = 1 if count > Spot.MAX_GENERATE else count
@@ -71,7 +66,6 @@ def api_admin_spot_generate():
         result=result,
         count=len(result)
     ).encode('cp1251')
-    response = make_response(spot_list)
 
     return spot_list
 
@@ -107,7 +101,7 @@ def api_admin_linking_spot():
     try:
         hid = int(hid)
         pids = int(pids)
-    except Exception as e:
+    except Exception:
         abort(405)
 
     spot = Spot.query.filter_by(
@@ -165,7 +159,7 @@ def api_admin_get_info(hid=False, ean=False, code128=False):
 
     try:
         hid = int(hid)
-    except Exception as e:
+    except:
         abort(405)
 
     if hid:

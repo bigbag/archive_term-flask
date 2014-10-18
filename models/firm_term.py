@@ -5,7 +5,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import app, db, cache
+from web import app, db
 from helpers import date_helper
 
 from models.base_model import BaseModel
@@ -59,8 +59,7 @@ class FirmTerm(db.Model, BaseModel):
     def get_access_by_firm_id(firm_id, term_id):
         result = False
         access = FirmTerm.query.filter_by(
-            firm_id=firm_id).filter_by(
-            term_id=term_id).first()
+            firm_id=firm_id).filter_by(term_id=term_id).first()
 
         if access:
             result = True
@@ -94,8 +93,7 @@ class FirmTerm(db.Model, BaseModel):
             ).query.filter_by(
                 term_id=self.term_id,
                 firm_id=self.child_firm_id,
-                event_id=term_event.event_id).delete(
-            )
+                event_id=term_event.event_id).delete()
         self.delete()
 
         return True

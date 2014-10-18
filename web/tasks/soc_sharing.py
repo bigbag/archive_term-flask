@@ -6,9 +6,6 @@
     :license: BSD, see LICENSE for more details.
 """
 import json
-from grab import Grab
-
-from web import app
 from web.celery import celery
 from helpers import date_helper
 

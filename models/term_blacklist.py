@@ -5,9 +5,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from sqlalchemy.sql import func
-
-from web import db, cache
+from web import db
 
 from helpers import date_helper
 

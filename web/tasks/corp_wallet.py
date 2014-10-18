@@ -5,11 +5,9 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import app
 from web.celery import celery
 
 from models.person import Person
-from models.payment_wallet import PaymentWallet
 from models.term_corp_wallet import TermCorpWallet
 
 
@@ -18,8 +16,7 @@ def recovery_limit(interval):
     result = False
     corp_wallets = TermCorpWallet.query.filter(
         TermCorpWallet.interval == interval).filter(
-            TermCorpWallet.balance != TermCorpWallet.limit).all(
-            )
+            TermCorpWallet.balance != TermCorpWallet.limit).all()
 
     for corp_wallet in corp_wallets:
         corp_wallet.balance = corp_wallet.limit

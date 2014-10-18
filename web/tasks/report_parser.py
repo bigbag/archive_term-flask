@@ -6,13 +6,9 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import time
 import os.path
 
 from lxml import etree
-
-from datetime import datetime, timedelta
-from sqlalchemy.sql import func
 
 from web import app
 from web.celery import celery

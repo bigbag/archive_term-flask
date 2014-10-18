@@ -6,14 +6,12 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import hashlib
 import random
 
 from web import db
 
 from models.base_model import BaseModel
 from models.user import User
-from models.person import Person
 
 from helpers import date_helper, hash_helper
 

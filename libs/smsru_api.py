@@ -7,10 +7,8 @@
 """
 import hashlib
 import time
-import string
-import csv
 from grab import Grab
-from lxml import etree
+
 from console import app
 
 

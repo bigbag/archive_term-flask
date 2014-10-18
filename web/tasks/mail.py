@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-	Задача отправки email
+    Задача отправки email
 
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
@@ -10,9 +10,10 @@ from web.celery import celery
 
 from flask.ext.mail import Mail
 
+
 @celery.task
 def send(MessageClass, **kwargs):
-    with app.test_request_context() as request:
+    with app.test_request_context():
         mailer = Mail(app)
         mailer.send(MessageClass(**kwargs))
 
@@ -20,6 +21,7 @@ def send(MessageClass, **kwargs):
         return "Mail type: %s, recipient: %s" % (MessageClass.desc(), kwargs['to'])
 
     return True
+
 
 @celery.task
 def mail_stack_sender():
@@ -43,4 +45,3 @@ def mail_stack_sender():
         row.delete()
 
     return True
-

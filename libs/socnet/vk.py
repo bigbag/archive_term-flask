@@ -5,18 +5,10 @@
     :copyright: (c) 2013 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
-import os
-import json
-import urllib
-from grab import Grab
-from grab.upload import UploadFile
-
-from configs.soc_config import SocConfig
 from helpers import request_helper
 
 from libs.socnet.socnet_base import SocnetBase
 from models.soc_token import SocToken
-from models.payment_loyalty import PaymentLoyalty
 from models.payment_loyalty_sharing import PaymentLoyaltySharing
 
 
@@ -39,7 +31,7 @@ class VkApi(SocnetBase):
         group = request_helper.make_request(api_url, True)
 
         if 'response' in group and len(group['response']) > 0 \
-            and 'members_count' in group['response'][0]:
+                and 'members_count' in group['response'][0]:
             answer = group['response'][0]['members_count']
 
         return answer

@@ -5,7 +5,6 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import app
 from web.celery import celery
 
 from libs.smsru_api import SmsruApi

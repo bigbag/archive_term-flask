@@ -7,6 +7,7 @@
 """
 from flask.ext.mail import Message
 
+
 class StackMessage(Message):
 
     @classmethod

@@ -5,6 +5,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import string
 import hashlib
 import hmac
 import time

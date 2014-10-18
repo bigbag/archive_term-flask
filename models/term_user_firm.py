@@ -7,7 +7,6 @@
     :license: BSD, see LICENSE for more details.
 """
 from web import db
-from helpers import date_helper, hash_helper
 
 from models.base_model import BaseModel
 
@@ -26,6 +25,4 @@ class TermUserFirm(db.Model, BaseModel):
         'TermUser',
         primaryjoin="TermUser.id==TermUserFirm.user_id")
     firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
-    firm = db.relationship(
-        'Firm',
-        primaryjoin="Firm.id==TermUserFirm.firm_id")
+    firm = db.relationship('Firm', primaryjoin="Firm.id==TermUserFirm.firm_id")

@@ -9,7 +9,6 @@
 from configs.soc_config import SocConfig
 from libs.socnet.socnet_base import SocnetBase
 from models.soc_token import SocToken
-from grab import Grab
 from twython import Twython
 from helpers import request_helper
 

@@ -6,7 +6,6 @@
     :license: BSD, see LICENSE for more details.
 """
 import json
-from flask import Flask, render_template
 from flask.ext.mail import Message
 from flask.ext.script import Command
 

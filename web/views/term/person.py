@@ -307,7 +307,6 @@ def person_unbind_card(person_id):
     """Отвязываем карту от человека"""
 
     answer = dict(error='yes', message=u'Произошла ошибка')
-    arg = json.loads(request.stream.read())
 
     person = Person.query.get(person_id)
     if not person:
@@ -370,7 +369,6 @@ def person_remove(person_id):
     """Удаление сотрудника"""
 
     answer = dict(error='yes', message=u'Произошла ошибка', status=False)
-    arg = get_post_arg(request, True)
 
     person = Person.query.get(person_id)
     if not person:
@@ -474,7 +472,6 @@ def person_event_delete(person_id, person_event_id):
     """Удаляем событие привязаное к человеку"""
 
     answer = dict(error='yes', message='Произошла ошибка')
-    arg = get_post_arg(request, True)
 
     person_event = PersonEvent.query.filter_by(
         person_id=person_id, id=person_event_id).first()
