@@ -201,11 +201,14 @@ class ReportSenderTask (object):
                 result.persons.append(row.person_id)
 
             if row[0] not in result.data:
+                tabel_id = persons[row[0]]['tabel_id'] or ''
+                card = persons[row[0]]['card'] or ''
+
                 result.data[row[0]] = dict(
                     amount=0,
                     name=persons[row[0]]['name'],
-                    tabel_id=persons[row[0]]['tabel_id'],
-                    card=persons[row[0]]['card']
+                    tabel_id=tabel_id,
+                    card=card
                 )
 
             data = result.data[row[0]]
