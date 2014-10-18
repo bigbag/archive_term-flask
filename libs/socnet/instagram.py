@@ -7,11 +7,6 @@
 """
 from libs.socnet.socnet_base import SocnetBase
 from models.soc_token import SocToken
-from models.payment_loyalty import PaymentLoyalty
-from grab import Grab
-import json
-import urllib
-import pprint
 from helpers import request_helper
 
 

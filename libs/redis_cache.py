@@ -5,11 +5,10 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import uuid
 import hashlib
 import functools
 
-from flask import request, current_app
+from flask import current_app
 from werkzeug.contrib.cache import RedisCache
 
 

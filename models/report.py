@@ -5,9 +5,6 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import hashlib
-import time
-
 from web import db, app, cache
 from sqlalchemy.sql import func
 
@@ -17,7 +14,6 @@ from models.base_model import BaseModel
 from models.term import Term
 from models.person import Person
 from models.event import Event
-from models.firm_term import FirmTerm
 
 
 class Report(db.Model, BaseModel):
@@ -74,10 +70,7 @@ class Report(db.Model, BaseModel):
         self.status = self.STATUS_NEW
 
     def add_new(self):
-        from models.person import Person
         from models.term_corp_wallet import TermCorpWallet
-
-        from web.tasks.payment import PaymentTask
 
         error = False
         old_report = self.get_by_params()

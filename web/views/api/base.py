@@ -33,7 +33,7 @@ def _get_request_count(request, max):
     limit = request.args.get('count', max)
     try:
         limit = int(limit)
-    except Exception as e:
+    except:
         abort(405)
     if limit > max:
         limit = max
@@ -45,7 +45,7 @@ def _get_request_offset(request):
     offset = request.args.get('offset', 0)
     try:
         offset = int(offset)
-    except Exception as e:
+    except:
         abort(405)
 
     return offset

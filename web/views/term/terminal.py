@@ -6,7 +6,6 @@
     :license: BSD, see LICENSE for more details.
 """
 
-import json
 from web.views.term.general import *
 
 from web.form.term.term import TermAddForm, TermAlarmForm
@@ -14,7 +13,6 @@ from web.form.term.event import TermEventAddForm
 
 from models.term import Term
 from models.report import Report
-from models.event import Event
 from models.event_type import EventType
 from models.firm import Firm
 from models.firm_term import FirmTerm
@@ -94,16 +92,8 @@ def terminal_rent_info(term_id):
     if not term:
         abort(404)
 
-    firm_terms = FirmTerm.query.filter(
-        FirmTerm.term_id == term.id).filter(
-            FirmTerm.firm_id == g.firm_info[
-                'id']).filter(
-                    FirmTerm.firm_id != FirmTerm.child_firm_id).all(
-    )
-
-    rents = []
-    for row in firm_terms:
-        rents.append(row.to_json())
+    firm_terms = FirmTerm.get_rent(term.id, g.firm_info['id'])
+    rents = [row.to_json() for row in firm_terms]
 
     answer['error'] = 'no'
     answer['message'] = ''
@@ -266,7 +256,6 @@ def terminal_remove(term_id):
     """Удаление терминала"""
 
     answer = dict(error='yes', message=u'Произошла ошибка')
-    arg = get_post_arg(request, True)
 
     term = Term.get_info_by_id(term_id)
     if not term:
@@ -362,7 +351,6 @@ def terminal_event_delete(term_id, term_event_id):
     """Удаляем событие привязаное к терминалу"""
 
     answer = dict(error='yes', message=u'Произошла ошибка')
-    arg = get_post_arg(request, True)
 
     firm_term = FirmTerm.get_list_by_firm_id(g.firm_info['id'])
     if term_id not in firm_term:

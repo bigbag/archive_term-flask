@@ -7,7 +7,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask import g
-from web import app, db, cache
+from web import app, db
 
 from helpers import date_helper
 

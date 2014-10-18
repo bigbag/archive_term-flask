@@ -6,7 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from web import app
-from flask import Flask, jsonify, make_response
+from flask import jsonify, make_response
 from decorators.header import *
 
 

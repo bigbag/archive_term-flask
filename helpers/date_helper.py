@@ -10,8 +10,6 @@ import time
 import calendar
 from datetime import datetime, timedelta
 from pytz import timezone
-from web import app
-from flask import request, url_for
 
 
 def get_curent_date(format='%Y-%m-%d %H:%M:%S'):

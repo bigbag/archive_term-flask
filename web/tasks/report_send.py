@@ -6,20 +6,14 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import time
-import json
 import xlsxwriter
 
-from datetime import datetime, timedelta
-from sqlalchemy.sql import func
+from datetime import datetime
 
 from web import app
 from web.celery import celery
 
-from models.report import Report
 from models.person import Person
-from models.term import Term
-from models.firm import Firm
 from models.firm_term import FirmTerm
 from models.report_stack import ReportStack
 from models.report_result import ReportResult

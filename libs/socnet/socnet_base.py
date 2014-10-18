@@ -5,8 +5,6 @@
     :copyright: (c) 2013 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
-from grab import Grab
-import json
 
 
 class SocnetBase():

@@ -6,9 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import re
-import os
-
-from flask import Blueprint, abort, request, make_response, url_for, render_template
+from flask import Blueprint, abort, request, make_response, render_template
 
 from web import app, cache
 
@@ -18,10 +16,7 @@ from helpers import date_helper, hash_helper
 
 from models.term import Term
 from models.term_event import TermEvent
-from models.event import Event
 from models.person_event import PersonEvent
-from models.card_stack import CardStack
-from models.payment_wallet import PaymentWallet
 from models.term_settings import TermSettings
 from models.alarm_stack import AlarmStack
 from models.term_blacklist import TermBlacklist

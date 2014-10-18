@@ -5,8 +5,6 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import copy
-
 from web import app
 
 from web.celery import celery
@@ -130,7 +128,7 @@ class PaymentTask (object):
 
         wallet = PaymentWallet.query.get(history.wallet_id)
         if not wallet:
-            message = 'Check: Not found wallet, wallet_id=%s' % wallet_id
+            message = 'Check: Not found wallet, wallet_id=%s' % wallet.id
             app.logger.error(message)
             return message
 
@@ -196,8 +194,7 @@ class PaymentTask (object):
 
         card = PaymentCard.query.filter_by(
             wallet_id=wallet.id,
-            status=PaymentCard.STATUS_PAYMENT).first(
-        )
+            status=PaymentCard.STATUS_PAYMENT).first()
         if not card:
             PaymentTask.set_fail(report_id, wallet)
             history.delete()

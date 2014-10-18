@@ -17,9 +17,7 @@ from helpers import date_helper, hash_helper
 from models.base_model import BaseModel
 
 from models.user import User
-from models.spot_dis import SpotDis
 from models.soc_token import SocToken
-from models.spot_hard_type import SpotHardType
 
 
 class Spot(db.Model, BaseModel):

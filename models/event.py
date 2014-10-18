@@ -8,7 +8,6 @@
 from web import db, cache
 
 from models.base_model import BaseModel
-from models.event_type import EventType
 
 
 class Event(db.Model, BaseModel):

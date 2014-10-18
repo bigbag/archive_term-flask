@@ -5,11 +5,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-
-import hashlib
 import json
-import string
-import csv
 import pycurl
 import urllib
 import logging
@@ -147,7 +143,7 @@ class YaMoneyApi(object):
             return False
 
         if result['status'] != 'success':
-            self.logging_status(status)
+            self.logging_status(result['status'])
             return False
 
         self.instance_id = result['instance_id']

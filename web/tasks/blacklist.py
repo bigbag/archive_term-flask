@@ -5,9 +5,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from sqlalchemy import update
-
-from web import app, cache, db
+from web import db
 from web.celery import celery
 
 from helpers import date_helper

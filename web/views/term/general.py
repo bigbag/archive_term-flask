@@ -5,18 +5,15 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-import re
-import os
 import json
-from datetime import datetime
-from time import strptime
 
-from flask import Blueprint, render_template, redirect, url_for
-from flask import session, request, g, abort, make_response, jsonify
-from flask.ext.login import login_user, logout_user, current_user, login_required, make_secure_token
-from web import app, cache, lm
+from flask import Blueprint, render_template, redirect
+from flask import session, request, g, abort, jsonify
+from flask.ext.login import (login_user, logout_user, current_user,
+                             login_required)
+from web import cache, lm
 
-from helpers import hash_helper, date_helper
+from helpers import hash_helper
 
 from decorators.header import *
 
@@ -78,7 +75,6 @@ def get_firm_name(request):
         firm = Firm.get_by_sub_domain(host_name[0])
 
         if firm:
-            name = firm.name
             result = dict(name=firm.name, id=firm.id)
             session['firm_info'] = result
     return result
