@@ -1,9 +1,2 @@
-import sms
-import mail
-import payment
-import blacklist
-import corp_wallet
-import report_send
-import report_parser
-import alarms_send
-import soc_sharing
+__all__ = ["mail", "payment", "blacklist", "corp_wallet",
+           "report_send", "report_parser", "alarms_send", "soc_sharing"]
