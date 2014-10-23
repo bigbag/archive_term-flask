@@ -207,7 +207,9 @@ def person_import():
                 answer['wrong_forms'].append(json_employer)
                 continue
 
-        if not len(employer['tabel_id']):
+        if 'tabel_id' not in employer:
+            employer['tabel_id'] = None
+        elif not len(employer['tabel_id']):
             employer['tabel_id'] = None
 
         employer['firm_id'] = g.firm_info['id']
