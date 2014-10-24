@@ -9,6 +9,8 @@ import json
 
 from helpers import request_helper
 
+from web import cache
+
 from libs.socnet.socnet_base import SocnetBase
 from models.soc_token import SocToken
 from models.payment_loyalty_sharing import PaymentLoyaltySharing
@@ -73,12 +75,12 @@ class VkApi(SocnetBase):
 
     def check_like(self, url, token_id, sharing_id):
         """лайк объекта"""
-        
+
         answer = self.CONDITION_ERROR
         condition = PaymentLoyaltySharing.query.get(sharing_id)
         if not condition:
             return self.CONDITION_FAILED
-            
+
         data = json.loads(condition.data)
         if not ('owner_id' in data and 'type' in data and 'item_id' in data):
             return self.CONDITION_FAILED
@@ -86,12 +88,26 @@ class VkApi(SocnetBase):
         soc_token = SocToken.query.get(token_id)
         if not soc_token:
             return self.CONDITION_FAILED
-        
+
+        key = 'vk_likes_list_%s' % str(condition.id)
+
+        if cache.get(key):
+            likes_list = cache.get(key)
+            answer = self.CONDITION_FAILED
+
+            for user_id in likes_list:
+                if str(user_id) == str(soc_token.soc_id):
+                    answer = self.CONDITION_PASSED
+                    break
+
+            return answer
+
         offset = 0
         likes_count = self.MAX_LIKES_COUNT
-        
-        while not (answer == self.CONDITION_PASSED or offset > likes_count):
-            
+        likes_list = []
+
+        while not (offset > likes_count):
+
             api_url = self.API_PATH \
                 + 'likes.getList' \
                 + '?type=' \
@@ -108,29 +124,34 @@ class VkApi(SocnetBase):
             likes = request_helper.make_request(api_url, True)
             if not('response' in likes and 'count' in likes['response'] and 'users' in likes['response']):
                 return self.CONDITION_ERROR
-            
-            answer = self.CONDITION_FAILED
+
+            if answer == self.CONDITION_ERROR:
+                answer = self.CONDITION_FAILED
+
             likes_count = int(likes['response']['count'])
 
             for user_id in likes['response']['users']:
+                likes_list.append(user_id)
                 if str(user_id) == str(soc_token.soc_id):
                     answer = self.CONDITION_PASSED
-                    
+
             offset += self.MAX_LIKES_COUNT
-            
+
+        cache.set(key, likes_list, 50)
+
         return answer
-        
+
     def likes_control_value(self, condition_id):
         answer = False
 
         condition = PaymentLoyaltySharing.query.get(condition_id)
         if not condition:
             return False
-            
+
         data = json.loads(condition.data)
         if not ('owner_id' in data and 'type' in data and 'item_id' in data):
             return False
-            
+
         api_url = self.API_PATH \
             + 'likes.getList' \
             + '?type=' \
@@ -139,13 +160,13 @@ class VkApi(SocnetBase):
             + str(data['owner_id']) \
             + '&item_id=' \
             + str(data['item_id']) \
-            + '&count=1'      
-            
+            + '&count=1'
+
         likes = request_helper.make_request(api_url, True)
-        
+
         if not('response' in likes and 'count' in likes['response'] and 'users' in likes['response']):
-                return False
-                
+            return False
+
         answer = int(likes['response']['count'])
-        
+
         return answer
