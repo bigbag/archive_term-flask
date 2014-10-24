@@ -42,6 +42,7 @@ class PaymentLoyalty(db.Model, BaseModel):
     YOUTUBE_FOLLOWING = 14
     YOUTUBE_VIEWS = 15
     VK_SUBS = 18
+    VK_LIKE = 19
 
     DEFAULT_COUNT = 20
     MAX_COUNT = 100
