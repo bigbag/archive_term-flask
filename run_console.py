@@ -8,7 +8,6 @@
 
 from flask.ext.script import Manager
 from console import app
-from console.view.mail_send import MailSend
 from console.view.report_parser import ReportParser
 from console.view.test import TestCommand
 
