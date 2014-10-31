@@ -165,7 +165,7 @@ def api_upload_log(filename):
 
     file = request.stream.read()
     filename = "%s/%s" % (
-        app.config['UPLOAD_LOG'], filename)
+        app.config['TERM_LOG_PATH'], filename)
     if file:
         with open(filename, 'w') as f:
             f.write(file)
