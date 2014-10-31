@@ -30,13 +30,11 @@ class Config():
     REPORT_TMP_PACH = './%s/tmp' % TMP_PACH
     EXCEL_FOLDER = './%s/excel' % TMP_PACH
     IMG_FOLDER = './%s/img' % TMP_PACH
-    UPLOAD_LOG = './logs'
+    TERM_LOG_PATH = './logs/term'
     IMPORT_EXTENSIONS = set(['xls', 'xlsx'])
     IMG_EXTENSIONS = set(['jpg', 'png'])
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
     MAX_IMG_LENGTH = 16 * 1024 * 1024
-
-    LOG_PATH = './logs'
 
     MAIL_DEFAULT_SENDER = "no-reply@mobispot.com"
     MAIL_SERVER = '127.0.0.1'
@@ -152,6 +150,8 @@ class Config():
         dict(count=5, interval=7 * 24 * 60 * 60,
              start_interval=30 * 24 * 60 * 60),
     ]
+
+    LOG_PATH = './logs'
 
 
 class ProductionConfig(Config):
