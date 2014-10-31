@@ -53,7 +53,7 @@ class BaseModel(object):
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            app.logger.error(e)
+            app.log_model.error(e)
             return False
         else:
             return True

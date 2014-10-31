@@ -27,21 +27,30 @@ app.register_blueprint(social.mod, url_prefix='/api/social')
 app.register_blueprint(internal.mod, url_prefix='/api/internal')
 app.register_blueprint(general.mod, url_prefix='/term')
 
-
-if app.debug is not True:
+if app.config['LOG_ENABLE']:
     import logging
-    from logging import Formatter
-    from logging.handlers import RotatingFileHandler
+    import logging.config
 
-    log_name = '%s/%s' % (app.config['LOG_PATH'], 'web_error.log')
-    file_handler = RotatingFileHandler(
-        log_name,
-        maxBytes=1024 * 1024 * 100,
-        backupCount=20)
-    file_handler.setFormatter(Formatter(
-        '%(asctime)s %(levelname)s: %(message)s '
-        '[in %(pathname)s:%(lineno)d]'
-    ))
-    file_handler.setLevel(logging.WARNING)
-    app.logger.setLevel(logging.WARNING)
-    app.logger.addHandler(file_handler)
+    for app_name in app.config['LOG_APP']:
+        log_settings = app.config['LOG_SETTINGS'].copy()
+        log_name = "log_%s" % app_name
+        log_handler = "%s_handler" % app_name
+        file_name = "%s/%s.log" % (app.config['LOG_PATH'], app_name)
+        handlers = app.config['LOG_DEFAULT_HANFLERS'] + [log_handler, ]
+
+        log_settings['handlers'][log_handler] = {
+            'level': app.config['LOG_LEVEL'],
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'default',
+            'encoding': 'utf8',
+            'maxBytes': app.config['LOG_MAX_SIZE'],
+            'backupCount': 20,
+            'filename': file_name
+        }
+        log_settings['loggers'][app_name] = {
+            'level': app.config['LOG_LEVEL'],
+            'handlers': handlers
+        }
+        logging.config.dictConfig(log_settings)
+
+        setattr(app, log_name, logging.getLogger(app_name))

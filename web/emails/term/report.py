@@ -5,7 +5,6 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import app
 
 from flask import render_template
 from flask.ext.mail import Message
@@ -22,7 +21,6 @@ class ReportMessage(Message):
         for k in required:
             if not k in kwargs:
                 msg = "These values must be provided: %s" % ",".join(required)
-                app.logger.error(msg)
                 raise KeyError(msg)
         title = u"Отчет"
         result = kwargs['result']

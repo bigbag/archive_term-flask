@@ -31,7 +31,7 @@ class ReportParserTask (object):
     def report_manager(file_path):
 
         if not os.path.isfile(file_path):
-            app.logger.error('File %s not found' % file_path)
+            app.log_tasks.error('File %s not found' % file_path)
             return False
 
         file_name = os.path.basename(file_path)
@@ -65,27 +65,27 @@ class ReportParserTask (object):
 
         data = file_name.split('_')
         if not len(data) == 3:
-            app.logger.error('Invalid file name %s' % file_name)
+            app.log_tasks.error('Invalid file name %s' % file_name)
             return False
 
         try:
             term_id = int(data[0])
         except Exception as e:
-            app.logger.error(e)
+            app.log_tasks.error(e)
             return False
 
         report_date = data[1]
         report_time = data[2]
         if len(report_date) != 6 or len(report_time) != 6:
-            app.logger.error('Invalid time or date in file name')
+            app.log_tasks.error('Invalid time or date in file name')
             return False
 
         if not date_helper.validate_date(report_time, '%H%M%S'):
-            app.logger.error('Invalid time format %s' % report_time)
+            app.log_tasks.error('Invalid time format %s' % report_time)
             return False
 
         if not date_helper.validate_date(report_date, '%y%m%d'):
-            app.logger.error('Invalid date format %s' % report_date)
+            app.log_tasks.error('Invalid date format %s' % report_date)
             return False
 
         return dict(
@@ -101,7 +101,7 @@ class ReportParserTask (object):
         try:
             tree = etree.parse(file_path)
         except Exception as e:
-            app.logger.error(e)
+            app.log_tasks.error(e)
         else:
             event_nodes = tree.xpath('/Report/Event')
             for event_node in event_nodes:
@@ -146,12 +146,12 @@ class ReportParserTask (object):
         error = False
         term = Term.query.filter_by(hard_id=params['term_id']).first()
         if not term:
-            app.logger.error('Not found term %s' % params['term_id'])
+            app.log_tasks.error('Not found term %s' % params['term_id'])
             return False
 
         event = Event.get_by_key(data['event_key'])
         if not event:
-            app.logger.error('Not found event %s' % data['event_key'])
+            app.log_tasks.error('Not found event %s' % data['event_key'])
             return False
 
         firm_terms = FirmTerm.query.filter_by(term_id=term.id).all()

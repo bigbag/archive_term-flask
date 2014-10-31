@@ -53,7 +53,7 @@ class PaymentCard(db.Model, BaseModel):
             return False
 
         if not 'request_id' in payment:
-            app.logger.error(
+            app.log_model.error(
                 'Linking card: yandex api error - %s' %
                 payment['error'])
             return False
@@ -64,14 +64,14 @@ class PaymentCard(db.Model, BaseModel):
 
         status = ym.get_process_external_payment(payment['request_id'])
         if not 'status' in status:
-            app.logger.error('Linking card: Not found field status')
+            app.log_model.error('Linking card: Not found field status')
             return False
 
         if status['status'] != 'ext_auth_required':
             return False
 
         if not 'acs_uri' in status or not 'acs_params' in status:
-            app.logger.error(
+            app.log_model.error(
                 'Linking card: Not found fields acs_uri or acs_params')
             return False
 
@@ -100,7 +100,7 @@ class PaymentCard(db.Model, BaseModel):
         status = self.get_linking_params(history.id, url)
         if not status:
             history.delete()
-            app.logger.error('Linking card: Fail in getting parameters')
+            app.log_model.error('Linking card: Fail in getting parameters')
             return False
 
         history.request_id = status['params']['cps_context_id']
@@ -133,7 +133,7 @@ class PaymentCard(db.Model, BaseModel):
         result = ym.get_process_external_payment(history.request_id)
         if not result or not 'status' in result:
             message = 'Linking card: Not found status field, request_id=%s' % history.request_id
-            app.logger.error(message)
+            app.log_model.error(message)
             return message
 
         if result['status'] == 'in_progress':
@@ -191,10 +191,10 @@ class PaymentCard(db.Model, BaseModel):
         card.wallet_id = history.wallet_id
 
         if not 'money_source' in status:
-            app.logger.error('Linking card: Not found card parameters')
+            app.log_model.error('Linking card: Not found card parameters')
             return False
         if not 'pan_fragment' in status['money_source'] or not 'payment_card_type' in status['money_source']:
-            app.logger.error('Linking card: Not found card parameters')
+            app.log_model.error('Linking card: Not found card parameters')
             return False
 
         card.token = status['money_source']['money_source_token']

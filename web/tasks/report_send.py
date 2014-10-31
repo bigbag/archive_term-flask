@@ -71,11 +71,11 @@ class ReportSenderTask (object):
     def report_generate(task):
         result = ReportResult(task)
         if not result.task:
-            app.logger.error('Not found task')
+            app.log_tasks.error('Not found task')
             return False
 
         if not result.interval:
-            app.logger.error('Faled interval')
+            app.log_tasks.error('Faled interval')
             return False
 
         sender_task = ReportSenderTask()
@@ -141,7 +141,7 @@ class ReportSenderTask (object):
     def _get_money_xls(self, result):
         file_name = result.get_report_file()
         if not file_name:
-            app.logger.error('Not found excel file %s' % file_name)
+            app.log_tasks.error('Not found excel file %s' % file_name)
             return False
 
         workbook = xlsxwriter.Workbook(file_name)
@@ -234,7 +234,7 @@ class ReportSenderTask (object):
     def _get_corp_xls(self, result):
         file_name = result.get_report_file()
         if not file_name:
-            app.logger.error('Not found excel file %s' % file_name)
+            app.log_tasks.error('Not found excel file %s' % file_name)
             return False
 
         workbook = xlsxwriter.Workbook(file_name)
