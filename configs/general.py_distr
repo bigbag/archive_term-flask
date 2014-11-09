@@ -155,7 +155,7 @@ class Config():
     LOG_ENABLE = True
     LOG_LEVEL = 'DEBUG'
     LOG_MAX_SIZE = 1024 * 1024
-    LOG_APP = ('api', 'web', 'model', 'task')
+    LOG_APP = ('api', 'web', 'model', 'task', 'payment')
     LOG_DEFAULT_HANFLERS = ['console', ]
     LOG_SETTINGS = {
         'version': 1,

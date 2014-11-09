@@ -14,8 +14,5 @@ mail = Mail(app)
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
 
-if app.config['LOG_ENABLE']:
-    import logging
-    import logging.config
-
-    logging.config.dictConfig(app.config['LOG_SETTINGS'])
+from helpers import logging_helper
+logging_helper.init(app)

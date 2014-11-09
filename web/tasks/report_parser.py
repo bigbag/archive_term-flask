@@ -6,6 +6,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 import os.path
 
 from lxml import etree
@@ -29,9 +30,10 @@ class ReportParserTask (object):
     @staticmethod
     @celery.task
     def report_manager(file_path):
+        log = logging.getLogger('task')
 
         if not os.path.isfile(file_path):
-            app.log_tasks.error('File %s not found' % file_path)
+            log.error('File %s not found' % file_path)
             return False
 
         file_name = os.path.basename(file_path)
@@ -62,30 +64,31 @@ class ReportParserTask (object):
 
     @staticmethod
     def parse_file_name(file_name):
+        log = logging.getLogger('task')
 
         data = file_name.split('_')
         if not len(data) == 3:
-            app.log_tasks.error('Invalid file name %s' % file_name)
+            log.error('Invalid file name %s' % file_name)
             return False
 
         try:
             term_id = int(data[0])
         except Exception as e:
-            app.log_tasks.error(e)
+            log.error(e)
             return False
 
         report_date = data[1]
         report_time = data[2]
         if len(report_date) != 6 or len(report_time) != 6:
-            app.log_tasks.error('Invalid time or date in file name')
+            log.error('Invalid time or date in file name')
             return False
 
         if not date_helper.validate_date(report_time, '%H%M%S'):
-            app.log_tasks.error('Invalid time format %s' % report_time)
+            log.error('Invalid time format %s' % report_time)
             return False
 
         if not date_helper.validate_date(report_date, '%y%m%d'):
-            app.log_tasks.error('Invalid date format %s' % report_date)
+            log.error('Invalid date format %s' % report_date)
             return False
 
         return dict(
@@ -96,12 +99,13 @@ class ReportParserTask (object):
 
     @staticmethod
     def parse_xml(file_path):
+        log = logging.getLogger('task')
 
         result = []
         try:
             tree = etree.parse(file_path)
         except Exception as e:
-            app.log_tasks.error(e)
+            log.error(e)
         else:
             event_nodes = tree.xpath('/Report/Event')
             for event_node in event_nodes:
@@ -143,15 +147,17 @@ class ReportParserTask (object):
 
     @staticmethod
     def generate_report(params, data):
+        log = logging.getLogger('task')
+
         error = False
         term = Term.query.filter_by(hard_id=params['term_id']).first()
         if not term:
-            app.log_tasks.error('Not found term %s' % params['term_id'])
+            log.error('Not found term %s' % params['term_id'])
             return False
 
         event = Event.get_by_key(data['event_key'])
         if not event:
-            app.log_tasks.error('Not found event %s' % data['event_key'])
+            log.error('Not found event %s' % data['event_key'])
             return False
 
         firm_terms = FirmTerm.query.filter_by(term_id=term.id).all()

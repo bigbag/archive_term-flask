@@ -7,7 +7,8 @@
     :license: BSD, see LICENSE for more details.
 """
 
-from web import db, app
+import logging
+from web import db
 
 from configs.yandex import YandexMoneyConfig
 from libs.ya_money import YaMoneyApi
@@ -29,6 +30,8 @@ class PaymentCard(db.Model, BaseModel):
     LINKING_AMOUNT = 1
 
     MAX_LINKING_CARD_TIMEOUT = 60 * 60
+
+    log = logging.getLogger('payment')
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
@@ -53,9 +56,8 @@ class PaymentCard(db.Model, BaseModel):
             return False
 
         if not 'request_id' in payment:
-            app.log_model.error(
-                'Linking card: yandex api error - %s' %
-                payment['error'])
+            self.log.error(
+                'Linking card: yandex api error - %s' % payment['error'])
             return False
 
         if url:
@@ -64,14 +66,14 @@ class PaymentCard(db.Model, BaseModel):
 
         status = ym.get_process_external_payment(payment['request_id'])
         if not 'status' in status:
-            app.log_model.error('Linking card: Not found field status')
+            self.log.error('Linking card: Not found field status')
             return False
 
         if status['status'] != 'ext_auth_required':
             return False
 
         if not 'acs_uri' in status or not 'acs_params' in status:
-            app.log_model.error(
+            self.log.error(
                 'Linking card: Not found fields acs_uri or acs_params')
             return False
 
@@ -87,8 +89,7 @@ class PaymentCard(db.Model, BaseModel):
 
         wallet = PaymentWallet.query.filter(
             PaymentWallet.discodes_id == discodes_id).filter(
-                PaymentWallet.user_id != 0).first(
-        )
+                PaymentWallet.user_id != 0).first()
         if not wallet:
             return False
 
@@ -100,7 +101,7 @@ class PaymentCard(db.Model, BaseModel):
         status = self.get_linking_params(history.id, url)
         if not status:
             history.delete()
-            app.log_model.error('Linking card: Fail in getting parameters')
+            self.log.error('Linking card: Fail in getting parameters')
             return False
 
         history.request_id = status['params']['cps_context_id']
@@ -133,7 +134,7 @@ class PaymentCard(db.Model, BaseModel):
         result = ym.get_process_external_payment(history.request_id)
         if not result or not 'status' in result:
             message = 'Linking card: Not found status field, request_id=%s' % history.request_id
-            app.log_model.error(message)
+            self.log.error(message)
             return message
 
         if result['status'] == 'in_progress':
@@ -191,10 +192,10 @@ class PaymentCard(db.Model, BaseModel):
         card.wallet_id = history.wallet_id
 
         if not 'money_source' in status:
-            app.log_model.error('Linking card: Not found card parameters')
+            self.log.error('Linking card: Not found card parameters')
             return False
         if not 'pan_fragment' in status['money_source'] or not 'payment_card_type' in status['money_source']:
-            app.log_model.error('Linking card: Not found card parameters')
+            self.log.error('Linking card: Not found card parameters')
             return False
 
         card.token = status['money_source']['money_source_token']
