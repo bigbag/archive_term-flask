@@ -36,6 +36,7 @@ class SocnetsApi():
         PaymentLoyalty.YOUTUBE_FOLLOWING: {'netClass': YouTubeApi, 'sharingCheck': 'check_following', 'get_control_value': 'dummy_control', 'changing_control_value': False},
         PaymentLoyalty.YOUTUBE_VIEWS: {'netClass': YouTubeApi, 'sharingCheck': 'check_views', 'get_control_value': 'dummy_control', 'changing_control_value': False},
         PaymentLoyalty.VK_SUBS: {'netClass': VkApi, 'sharingCheck': 'check_subscription', 'get_control_value': 'subscription_control', 'changing_control_value': True},
+        PaymentLoyalty.VK_LIKE: {'netClass': VkApi, 'sharingCheck': 'check_like', 'get_control_value': 'likes_control_value', 'changing_control_value': True},
     }
 
     TOKEN_TYPES = {
@@ -55,6 +56,7 @@ class SocnetsApi():
         PaymentLoyalty.YOUTUBE_FOLLOWING: SocToken.TYPE_YOUTUBE,
         PaymentLoyalty.YOUTUBE_VIEWS: SocToken.TYPE_YOUTUBE,
         PaymentLoyalty.VK_SUBS: SocToken.TYPE_VK,
+        PaymentLoyalty.VK_LIKE: SocToken.TYPE_VK,
     }
 
     @staticmethod
@@ -62,7 +64,8 @@ class SocnetsApi():
         netShared = False
 
         soc_api = SocnetsApi.SHARING_TYPES[type]['netClass']()
-        method = getattr(soc_api, SocnetsApi.SHARING_TYPES[type]['sharingCheck'])
+        method = getattr(
+            soc_api, SocnetsApi.SHARING_TYPES[type]['sharingCheck'])
         netShared = method(url, token_id, sharing_id)
 
         return netShared
@@ -71,7 +74,6 @@ class SocnetsApi():
     def post_photo(type, token_id, filepath, message):
         return FacebookApi.post_photo(token_id, filepath, message)
 
-    @staticmethod
     def get_control_value(self, condition_id):
         """Контрольное значение для условия акции"""
 
@@ -83,7 +85,8 @@ class SocnetsApi():
         type = condition.sharing_type
 
         soc_api = SocnetsApi.SHARING_TYPES[type]['netClass']()
-        method = getattr(soc_api, self.SHARING_TYPES[type]['get_control_value'])
+        method = getattr(
+            soc_api, self.SHARING_TYPES[type]['get_control_value'])
         answer = method(condition_id)
 
         return answer

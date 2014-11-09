@@ -20,7 +20,7 @@ class LikesStack(db.Model, BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     token_id = db.Column(db.Integer, nullable=False)
-    loyalty_id = db.Column(db.Integer, nullable=False)
+    loyalty_id = db.Column(db.Integer, nullable=True)
     sharing_id = db.Column(db.Integer, nullable=False)
     lock = db.Column(db.Integer, nullable=False)
     wl_id = db.Column(db.Integer, nullable=False)

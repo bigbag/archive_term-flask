@@ -166,15 +166,16 @@ class SocSharingTask (object):
         if not condition:
             return False
 
-        control_value = SocnetsApi().get_control_value(condition_id)
-        if control_value == condition.control_value:
+        netsApi = SocnetsApi()
+        control_value = netsApi.get_control_value(condition_id)
+        if str(control_value) == str(condition.control_value):
             return False
 
         wallet_loyalties = WalletLoyalty.query.filter_by(
             loyalty_id=condition.loyalty_id, status=WalletLoyalty.STATUS_ON).all()
 
-        for wallet in wallet_loyalties:
-            wallet = PaymentWallet.query.filter_by(id=wallet.wallet_id).first()
+        for wl in wallet_loyalties:
+            wallet = PaymentWallet.query.filter_by(id=wl.wallet_id).first()
             if not wallet:
                 continue
 
@@ -192,7 +193,10 @@ class SocSharingTask (object):
 
             task = LikesStack()
             task.token_id = token.id
+            task.loyalty_id = condition.loyalty_id
             task.sharing_id = condition.id
+            task.lock = LikesStack().LOCK_FREE
+            task.wl_id = wl.id
             task.save()
 
         condition.control_value = control_value
