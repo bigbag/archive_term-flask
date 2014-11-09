@@ -26,4 +26,7 @@ def make_celery(app):
 
 celery = make_celery(app)
 
+from helpers import logging_helper
+logging_helper.init(app)
+
 from web.tasks import *

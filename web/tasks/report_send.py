@@ -6,6 +6,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 import xlsxwriter
 
 from datetime import datetime
@@ -69,13 +70,15 @@ class ReportSenderTask (object):
     @staticmethod
     @celery.task
     def report_generate(task):
+        log = logging.getLogger('task')
+
         result = ReportResult(task)
         if not result.task:
-            app.logger.error('Not found task')
+            log.error('Not found task')
             return False
 
         if not result.interval:
-            app.logger.error('Faled interval')
+            log.error('Faled interval')
             return False
 
         sender_task = ReportSenderTask()
@@ -139,9 +142,11 @@ class ReportSenderTask (object):
         return result
 
     def _get_money_xls(self, result):
+        log = logging.getLogger('task')
+
         file_name = result.get_report_file()
         if not file_name:
-            app.logger.error('Not found excel file %s' % file_name)
+            log.error('Not found excel file %s' % file_name)
             return False
 
         workbook = xlsxwriter.Workbook(file_name)
@@ -232,9 +237,11 @@ class ReportSenderTask (object):
         return result
 
     def _get_corp_xls(self, result):
+        log = logging.getLogger('task')
+
         file_name = result.get_report_file()
         if not file_name:
-            app.logger.error('Not found excel file %s' % file_name)
+            log.error('Not found excel file %s' % file_name)
             return False
 
         workbook = xlsxwriter.Workbook(file_name)

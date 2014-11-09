@@ -5,7 +5,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import app
+import logging
 
 from web.celery import celery
 
@@ -120,16 +120,18 @@ class PaymentTask (object):
     @staticmethod
     @celery.task
     def check_status(history_id):
+        log = logging.getLogger('payment')
+
         history = PaymentHistory.query.get(history_id)
         if not history:
             message = 'Check: Not found history, history_id=%s' % history_id
-            app.logger.error(message)
+            log.error(message)
             return message
 
         wallet = PaymentWallet.query.get(history.wallet_id)
         if not wallet:
             message = 'Check: Not found wallet, wallet_id=%s' % wallet.id
-            app.logger.error(message)
+            log.error(message)
             return message
 
         ym = YaMoneyApi(YandexMoneyConfig)
@@ -140,7 +142,7 @@ class PaymentTask (object):
             history.delete()
 
             message = 'Check: Fail, status=%s' % result['status']
-            app.logger.error(message)
+            log.error(message)
             return message
 
         if result['status'] == 'in_progress':
@@ -150,7 +152,7 @@ class PaymentTask (object):
         elif result['status'] == 'success':
             if not 'invoice_id' in result:
                 message = 'Check: Fail, not found invoice_id, history_id=%s' % history_id
-                app.logger.error(message)
+                log.error(message)
                 return message
 
             history.invoice_id = result['invoice_id']
@@ -170,16 +172,18 @@ class PaymentTask (object):
     def background_payment(report_id):
         """Проводим фоновый платеж"""
 
+        log = logging.getLogger('payment')
+
         report = Report.query.get(report_id)
         if not report:
             message = 'Payment: Not found report with id %s' % report.id
-            app.logger.error(message)
+            log.error(message)
             return message
 
         wallet = PaymentWallet.get_by_payment_id(report.payment_id)
         if not wallet:
             message = 'Payment: Not found wallet with pid %s' % report.payment_id
-            app.logger.error(message)
+            log.error(message)
             return message
 
         history = PaymentHistory.query.filter_by(report_id=report.id).first()
@@ -189,7 +193,7 @@ class PaymentTask (object):
         history = PaymentHistory().from_report(report, wallet)
         if not history:
             message = 'Payment: Fail in history add, report_id=%s' % report.id
-            app.logger.error(message)
+            log.error(message)
             return message
 
         card = PaymentCard.query.filter_by(
@@ -198,15 +202,17 @@ class PaymentTask (object):
         if not card:
             PaymentTask.set_fail(report_id, wallet)
             history.delete()
+            message = 'Payment: Not found card? for wallet_id=%s' % wallet.id
+            log.error(message)
             return False
 
         term = Term.query.get(report.term_id)
         if not term:
-            app.logger.error('Payment: Not found term %s' % report.term_id)
+            log.error('Payment: Not found term %s' % report.term_id)
 
         firm = Firm.query.get(report.term_firm_id)
         if not firm:
-            app.logger.error(
+            log.error(
                 'Payment: Not found firm, with term %s' % report.term_id)
 
         amount = float(report.amount) / int(Term.DEFAULT_FACTOR)
@@ -219,7 +225,7 @@ class PaymentTask (object):
             history.delete()
             message = 'Payment: Fail in request payment, report_id %s, request %s' % (
                 report_id, payment)
-            app.logger.error(message)
+            log.error(message)
             return message
 
         result = ym.get_process_external_payment(
@@ -229,7 +235,7 @@ class PaymentTask (object):
             history.delete()
             message = 'Payment: Fail in request payment, report_id %s, request %s' % (
                 report_id, result)
-            app.logger.error(message)
+            log.error(message)
             return message
 
         history.request_id = payment['request_id']
@@ -242,16 +248,18 @@ class PaymentTask (object):
     def background_old_payment(report_id):
         """Платеж с кошелька uniteller"""
 
+        log = logging.getLogger('payment')
+
         report = Report.query.get(report_id)
         if not report:
             message = 'Payment: Not found report with id %s' % report.id
-            app.logger.error(message)
+            log.error(message)
             return message
 
         wallet = PaymentWallet.get_valid_by_payment_id(report.payment_id)
         if not wallet:
             message = 'Payment: Not found wallet with pid %s' % report.payment_id
-            app.logger.error(message)
+            log.error(message)
             return message
 
         history = PaymentHistory.query.filter_by(report_id=report.id).first()
@@ -261,12 +269,12 @@ class PaymentTask (object):
         history = PaymentHistory().from_report(report, wallet)
         if not history:
             message = 'Payment: Fail in history add, report_id=%s' % report.id
-            app.logger.error(message)
+            log.error(message)
             return message
 
         term = Term.query.get(report.term_id)
         if not term:
-            app.logger.error('Payment: Not found term %s' % report.term_id)
+            log.error('Payment: Not found term %s' % report.term_id)
 
         new_balance = wallet.balance - report.amount
 

@@ -25,11 +25,6 @@ from models.spot import Spot
 from models.spot_dis import SpotDis
 from models.report_stack import ReportStack
 
-from web.tasks import report as ReportTask
-
-from configs.uniteller import UnitellerConfig
-from libs.uniteller_api import UnitellerApi
-
 
 from helpers import hash_helper, date_helper
 

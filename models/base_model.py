@@ -5,11 +5,14 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+
+import logging
 import json
-from web import db, app
+from web import db
 
 
 class BaseModel(object):
+    log = logging.getLogger('model')
 
     def __repr__(self):
         return '<id %r>' % (self.id)
@@ -53,7 +56,7 @@ class BaseModel(object):
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            app.logger.error(e)
+            self.log.error(e)
             return False
         else:
             return True
