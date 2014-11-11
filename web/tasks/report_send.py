@@ -11,7 +11,6 @@ import xlsxwriter
 
 from datetime import datetime
 
-from web import app
 from web.celery import celery
 
 from models.person import Person
@@ -94,6 +93,7 @@ class ReportSenderTask (object):
         result = getattr(sender_task, "_get_%s" % result.type['meta'])(result)
         if result.data and result.all['summ'] != 0:
 
+            attach = None
             if task.excel == ReportStack.EXCEL_YES:
                 attach = getattr(
                     sender_task, "_get_%s_xls" %
