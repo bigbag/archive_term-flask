@@ -8,6 +8,7 @@
 import logging
 
 from web.celery import celery
+from yandex_money.api import Wallet, ExternalPayment
 
 from configs.general import Config
 
@@ -25,7 +26,7 @@ from models.firm import Firm
 from models.report import Report
 
 
-class PaymentTask (object):
+class PaymentTask(object):
 
     @staticmethod
     def get_fail_algorithm(algorithm):
@@ -320,3 +321,53 @@ class PaymentTask (object):
     def check_linking(history):
         result = PaymentCard().linking_card(history.id)
         return result
+
+    @staticmethod
+    @celery.task
+    def get_ym_token(discodes_id, code):
+        wallet = PaymentWallet.get_valid_by_discodes_id(discodes_id)
+        if not wallet:
+            return False
+
+        try:
+            access_token = Wallet.get_access_token(
+                YandexMoneyConfig.CLIENT_ID,
+                code,
+                YandexMoneyConfig.REDIRECT_URL,
+                client_secret=None)
+        except:
+            return False
+        else:
+            card = PaymentCard.add_ym_wallet(wallet, access_token)
+            card.save()
+            return True
+
+    @staticmethod
+    @celery.task
+    def ym_account_manager():
+        cards = PaymentCard.query.filter(PaymentCard.pan.is_(None)).all()
+        if not cards:
+            return False
+
+        for card in cards:
+            PaymentTask.get_ym_account.delay(card.id)
+
+    @staticmethod
+    @celery.task
+    def get_ym_account(card_id):
+        card = PaymentCard.query.get(card_id)
+        if not card_id:
+            return False
+
+        wallet = Wallet(card.token)
+        try:
+            info = wallet.account_info()
+        except:
+            return False
+        else:
+            if 'account' not in info:
+                return False
+
+            card.pan = info['account']
+            card.save()
+            return True
