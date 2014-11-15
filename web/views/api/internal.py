@@ -17,7 +17,7 @@ from helpers.error_json_helper import *
 from models.payment_card import PaymentCard
 from models.payment_wallet import PaymentWallet
 
-from web.payment import get_ym_token
+from web.tasks import payment
 
 mod = Blueprint('api_internal', __name__)
 
@@ -73,7 +73,7 @@ def api_internal_yandex_get_token(discodes_id, code):
     if not PaymentWallet.get_valid_by_discodes_id(discodes_id):
         return make_response(jsonify(result))
 
-    get_ym_token.send.delay(discodes_id, code)
+    payment.get_ym_token.send.delay(discodes_id, code)
     result['error'] = 0
 
     return make_response(jsonify(result))
