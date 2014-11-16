@@ -29,6 +29,10 @@ class PaymentCard(db.Model, BaseModel):
 
     LINKING_AMOUNT = 1
 
+    TYPE_YM = 'Yandex'
+    TYPE_MC = 'MasterCard'
+    TYPE_VISA = 'VISA'
+
     MAX_LINKING_CARD_TIMEOUT = 60 * 60
 
     log = logging.getLogger('payment')
@@ -38,7 +42,7 @@ class PaymentCard(db.Model, BaseModel):
     user = db.relationship('User')
     wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'), index=True)
     wallet = db.relationship('PaymentWallet')
-    pan = db.Column(db.String(128), nullable=False)
+    pan = db.Column(db.String(128), nullable=True)
     token = db.Column(db.Text(), nullable=False)
     type = db.Column(db.String(128), nullable=False, index=True)
     status = db.Column(db.Integer(), nullable=False, index=True)
@@ -87,9 +91,7 @@ class PaymentCard(db.Model, BaseModel):
     def linking_init(self, discodes_id, url=None):
         """Инициализируем привязку карты"""
 
-        wallet = PaymentWallet.query.filter(
-            PaymentWallet.discodes_id == discodes_id).filter(
-                PaymentWallet.user_id != 0).first()
+        wallet = PaymentWallet.get_valid_by_discodes_id(discodes_id)
         if not wallet:
             return False
 
@@ -201,6 +203,18 @@ class PaymentCard(db.Model, BaseModel):
         card.token = status['money_source']['money_source_token']
         card.pan = status['money_source']['pan_fragment']
         card.type = status['money_source']['payment_card_type']
+        card.status = PaymentCard.STATUS_PAYMENT
+
+        return card
+
+    def add_ym_wallet(self, wallet, token):
+        """ Добавляем кошелек яндекс"""
+
+        card = PaymentCard()
+        card.user_id = wallet.user_id
+        card.wallet_id = wallet.id
+        card.token = token
+        card.type = PaymentCard.TYPE_YM
         card.status = PaymentCard.STATUS_PAYMENT
 
         return card
