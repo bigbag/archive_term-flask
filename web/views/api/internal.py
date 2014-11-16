@@ -50,11 +50,16 @@ def api_internal_yandex_get_auth_url(discodes_id):
     if not PaymentWallet.get_valid_by_discodes_id(discodes_id):
         return make_response(jsonify(result))
 
-    redirect_url = "%s/%s" % (YandexMoneyConfig.REDIRECT_URL, discodes_id)
+    url = None
+    if 'url' in request.args:
+        url = request.args['url']
+    if not url:
+        return make_response(jsonify(result))
+
     try:
         auth_url = Wallet.build_obtain_token_url(
             YandexMoneyConfig.CLIENT_ID,
-            redirect_url,
+            url,
             YandexMoneyConfig.WALLET_SCOPE)
     except:
         pass
