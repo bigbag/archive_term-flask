@@ -324,7 +324,7 @@ class PaymentTask(object):
 
     @staticmethod
     @celery.task
-    def get_ym_token(discodes_id, code):
+    def get_ym_token(discodes_id, code, url):
         wallet = PaymentWallet.get_valid_by_discodes_id(discodes_id)
         if not wallet:
             return False
@@ -333,7 +333,7 @@ class PaymentTask(object):
             access_token = Wallet.get_access_token(
                 YandexMoneyConfig.CLIENT_ID,
                 code,
-                YandexMoneyConfig.REDIRECT_URL,
+                url,
                 client_secret=None)
         except:
             return False
