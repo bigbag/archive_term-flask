@@ -207,7 +207,8 @@ class PaymentCard(db.Model, BaseModel):
 
         return card
 
-    def add_ym_wallet(self, wallet, token):
+    @staticmethod
+    def add_ym_wallet(wallet, token):
         """ Добавляем кошелек яндекс"""
 
         card = PaymentCard()

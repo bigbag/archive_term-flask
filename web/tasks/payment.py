@@ -325,20 +325,26 @@ class PaymentTask(object):
     @staticmethod
     @celery.task
     def get_ym_token(discodes_id, code, url):
+        log = logging.getLogger('payment')
+
         wallet = PaymentWallet.get_valid_by_discodes_id(discodes_id)
         if not wallet:
             return False
 
         try:
-            access_token = Wallet.get_access_token(
+            info = Wallet.get_access_token(
                 YandexMoneyConfig.CLIENT_ID,
                 code,
                 url,
                 client_secret=None)
         except:
+            log.error(info)
             return False
         else:
-            card = PaymentCard.add_ym_wallet(wallet, access_token)
+            if 'error' in info:
+                log.error(info)
+                return False
+            card = PaymentCard.add_ym_wallet(wallet, info['token'])
             card.save()
             return True
 
