@@ -78,7 +78,13 @@ def api_internal_yandex_get_token(discodes_id, code):
     if not PaymentWallet.get_valid_by_discodes_id(discodes_id):
         return make_response(jsonify(result))
 
-    payment.get_ym_token.send.delay(discodes_id, code)
+    url = None
+    if 'url' in request.args:
+        url = request.args['url']
+    if not url:
+        return make_response(jsonify(result))
+
+    payment.get_ym_token.send.delay(discodes_id, code, url)
     result['error'] = 0
 
     return make_response(jsonify(result))
