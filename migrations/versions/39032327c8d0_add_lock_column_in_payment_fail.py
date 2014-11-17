@@ -44,7 +44,7 @@ def upgrade_payment():
 
 
 def downgrade_payment():
-    op.drop_column('fail', 'type')
+    op.drop_column('fail', 'lock')
 
 
 def upgrade_mobispot():
