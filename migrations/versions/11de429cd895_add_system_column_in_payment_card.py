@@ -41,10 +41,12 @@ def downgrade_stack():
 def upgrade_payment():
     op.add_column('payment_card', sa.Column(
         'system', sa.Integer(), nullable=False, server_default='0'))
+    op.create_index('ik_payment_card_system', 'payment_card', ['system'])
 
 
 def downgrade_payment():
     op.drop_column('payment_card', 'system')
+    op.drop_index("ik_payment_card_system")
 
 
 def upgrade_mobispot():
