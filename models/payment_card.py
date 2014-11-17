@@ -33,6 +33,9 @@ class PaymentCard(db.Model, BaseModel):
     TYPE_MC = 'MasterCard'
     TYPE_VISA = 'VISA'
 
+    SYSTEM_MPS = 0
+    SYSTEM_YANDEX = 1
+
     MAX_LINKING_CARD_TIMEOUT = 60 * 60
 
     log = logging.getLogger('payment')
@@ -45,10 +48,12 @@ class PaymentCard(db.Model, BaseModel):
     pan = db.Column(db.String(128), nullable=True)
     token = db.Column(db.Text(), nullable=False)
     type = db.Column(db.String(128), nullable=False, index=True)
+    system = db.Column(db.Integer(), nullable=False, index=True)
     status = db.Column(db.Integer(), nullable=False, index=True)
 
     def __init__(self):
-        self.status = 0
+        self.system = self.SYSTEM_MPS
+        self.status = self.STATUS_ARCHIV
 
     def get_linking_params(self, order_id=0, url=None):
         """Запрос параметров для привязки карты"""
@@ -216,6 +221,7 @@ class PaymentCard(db.Model, BaseModel):
         card.wallet_id = wallet.id
         card.token = token
         card.type = PaymentCard.TYPE_YM
+        card.system = PaymentCard.SYSTEM_YANDEX
         card.status = PaymentCard.STATUS_PAYMENT
 
         return card

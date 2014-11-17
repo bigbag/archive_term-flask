@@ -172,7 +172,6 @@ class PaymentTask(object):
     @celery.task
     def background_payment(report_id):
         """Проводим фоновый платеж"""
-
         log = logging.getLogger('payment')
 
         report = Report.query.get(report_id)
@@ -201,11 +200,19 @@ class PaymentTask(object):
             wallet_id=wallet.id,
             status=PaymentCard.STATUS_PAYMENT).first()
         if not card:
-            PaymentTask.set_fail(report_id, wallet)
+            PaymentTask.set_fail(report.id, wallet)
             history.delete()
-            message = 'Payment: Not found card? for wallet_id=%s' % wallet.id
+            message = 'Payment: Not found card, for wallet_id=%s' % wallet.id
             log.error(message)
             return False
+
+        if card.system == PaymentCard.SYSTEM_MPS:
+            PaymentTask.background_card_payment(wallet, history, report, card)
+
+    @staticmethod
+    def background_card_payment(wallet, history, report, card):
+        """Проводим фоновый платеж по карте"""
+        log = logging.getLogger('payment')
 
         term = Term.query.get(report.term_id)
         if not term:
@@ -222,9 +229,9 @@ class PaymentTask(object):
         payment = ym.get_request_payment_to_shop(
             amount, firm.pattern_id)
         if not payment or not 'request_id' in payment:
-            PaymentTask.set_fail(report_id, wallet)
+            PaymentTask.set_fail(report.id, wallet)
             message = 'Payment: Fail in request payment, report_id %s, request %s' % (
-                report_id, payment)
+                report.id, payment)
             log.error(message)
             history.delete()
             return message
@@ -232,8 +239,8 @@ class PaymentTask(object):
         result = ym.get_process_external_payment(
             payment['request_id'], card.token)
         if result['status'] not in ('success', 'in_progress'):
-            PaymentTask.set_fail(report_id, wallet)
-            message = 'Payment: Fail in request payment, report_id %s, request %s, request_id %s' % (report_id, result, payment['request_id'])
+            PaymentTask.set_fail(report.id, wallet)
+            message = 'Payment: Fail in request payment, report_id %s, request %s, request_id %s' % (report.id, result, payment['request_id'])
             log.error(message)
             history.delete()
             return message
@@ -333,17 +340,18 @@ class PaymentTask(object):
 
         try:
             info = Wallet.get_access_token(
-                YandexMoneyConfig.CLIENT_ID,
-                code,
-                url,
-                client_secret=None)
-        except:
-            log.error(info)
+                client_id=YandexMoneyConfig.CLIENT_ID,
+                code=code,
+                redirect_uri=url,
+                client_secret=YandexMoneyConfig.OAUTH_KEY)
+        except Exception as e:
+            log.error(e)
             return False
         else:
             if 'error' in info:
                 log.error(info)
                 return False
+
             card = PaymentCard.add_ym_wallet(wallet, info['token'])
             card.save()
             return True
@@ -351,7 +359,9 @@ class PaymentTask(object):
     @staticmethod
     @celery.task
     def ym_account_manager():
-        cards = PaymentCard.query.filter(PaymentCard.pan.is_(None)).all()
+        query = PaymentCard.query.filter(
+            PaymentCard.system == PaymentCard.SYSTEM_YANDEX)
+        cards = query.filter(PaymentCard.pan.is_(None)).all()
         if not cards:
             return False
 
@@ -361,14 +371,19 @@ class PaymentTask(object):
     @staticmethod
     @celery.task
     def get_ym_account(card_id):
+        log = logging.getLogger('payment')
+
         card = PaymentCard.query.get(card_id)
-        if not card_id:
+        if not card:
+            message = 'Payment: Not found card card_id=%s' % card_id
+            log.error(message)
             return False
 
         wallet = Wallet(card.token)
         try:
             info = wallet.account_info()
-        except:
+        except Exception as e:
+            log.error(e)
             return False
         else:
             if 'account' not in info:
