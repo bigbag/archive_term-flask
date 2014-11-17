@@ -135,8 +135,25 @@ class PaymentTask(object):
             log.error(message)
             return message
 
-        ym = YaMoneyApi(YandexMoneyConfig)
-        result = ym.get_process_external_payment(history.request_id)
+        if history.system == PaymentHistory.SYSTEM_MPS:
+            ym = YaMoneyApi(YandexMoneyConfig)
+            result = ym.get_process_external_payment(history.request_id)
+
+        elif history.system == PaymentHistory.SYSTEM_YANDEX:
+            card = PaymentCard.query.filter(
+                PaymentCard.wallet_id == history.wallet_id).filter(
+                    PaymentCard.status == PaymentCard.STATUS_PAYMENT).first()
+            if not card:
+                message = 'Payment: Not found card, for history_id=%s' % history.id
+                log.error(message)
+                return False
+
+            ym_wallet = Wallet(card.token)
+            request_options = {"request_id": history.request_id}
+            result = ym_wallet.request_payment(request_options)
+
+        else:
+            return False
 
         if result['status'] in ('refused', 'ext_auth_required'):
             PaymentTask.set_fail(history.report_id, wallet)
@@ -206,14 +223,6 @@ class PaymentTask(object):
             log.error(message)
             return False
 
-        if card.system == PaymentCard.SYSTEM_MPS:
-            PaymentTask.background_card_payment(wallet, history, report, card)
-
-    @staticmethod
-    def background_card_payment(wallet, history, report, card):
-        """Проводим фоновый платеж по карте"""
-        log = logging.getLogger('payment')
-
         term = Term.query.get(report.term_id)
         if not term:
             log.error('Payment: Not found term %s' % report.term_id)
@@ -225,9 +234,24 @@ class PaymentTask(object):
 
         amount = float(report.amount) / int(Term.DEFAULT_FACTOR)
 
-        ym = YaMoneyApi(YandexMoneyConfig)
-        payment = ym.get_request_payment_to_shop(
-            amount, firm.pattern_id)
+        if card.system == PaymentCard.SYSTEM_MPS:
+            ym = YaMoneyApi(YandexMoneyConfig)
+            payment = ym.get_request_payment_to_shop(amount, firm.pattern_id)
+            history.system = PaymentHistory.SYSTEM_MPS
+
+        elif card.system == PaymentCard.SYSTEM_YANDEX:
+            ym_wallet = Wallet(card.token)
+            request_options = {
+                "pattern_id": firm.pattern_id,
+                "amount_due": amount,
+                "label": history.id,
+            }
+            payment = ym_wallet.request_payment(request_options)
+            history.system = PaymentHistory.SYSTEM_YANDEX
+
+        else:
+            return False
+
         if not payment or not 'request_id' in payment:
             PaymentTask.set_fail(report.id, wallet)
             message = 'Payment: Fail in request payment, report_id %s, request %s' % (
@@ -254,7 +278,6 @@ class PaymentTask(object):
     @celery.task
     def background_old_payment(report_id):
         """Платеж с кошелька uniteller"""
-
         log = logging.getLogger('payment')
 
         report = Report.query.get(report_id)
