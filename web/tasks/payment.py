@@ -351,9 +351,12 @@ class PaymentTask(object):
             if 'error' in info:
                 log.error(info)
                 return False
-
-            card = PaymentCard.add_ym_wallet(wallet, info['token'])
-            card.save()
+            try:
+                card = PaymentCard.add_ym_wallet(wallet, info['access_token'])
+                card.save()
+            except Exception as e:
+                log.error(e)
+                return False
             return True
 
     @staticmethod
