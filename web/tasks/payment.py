@@ -161,6 +161,7 @@ class PaymentTask(object):
 
             message = 'Check: Fail, status=%s' % result['status']
             log.error(message)
+            log.error(result)
             return message
 
         if result['status'] == 'in_progress':
@@ -275,6 +276,7 @@ class PaymentTask(object):
             PaymentTask.set_fail(report.id, wallet)
             message = 'Payment: Fail in request payment, report_id %s, request %s, request_id %s' % (report.id, result, payment['request_id'])
             log.error(message)
+            log.error(result)
             history.delete()
             return message
 
