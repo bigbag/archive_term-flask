@@ -252,7 +252,7 @@ class PaymentTask(object):
         else:
             return False
 
-        if not payment or not 'request_id' in payment:
+        if not payment or 'request_id' not in payment:
             PaymentTask.set_fail(report.id, wallet)
             message = 'Payment: Fail in request payment, report_id %s, request %s' % (
                 report.id, payment)
@@ -260,8 +260,17 @@ class PaymentTask(object):
             history.delete()
             return message
 
-        result = ym.get_process_external_payment(
-            payment['request_id'], card.token)
+        if card.system == PaymentCard.SYSTEM_MPS:
+            result = ym.get_process_external_payment(
+                payment['request_id'], card.token)
+
+        elif card.system == PaymentCard.SYSTEM_YANDEX:
+            ym_wallet = Wallet(card.token)
+            request_options = {
+                "request_id": payment['request_id'],
+            }
+            payment = ym_wallet.process_payment(request_options)
+
         if result['status'] not in ('success', 'in_progress'):
             PaymentTask.set_fail(report.id, wallet)
             message = 'Payment: Fail in request payment, report_id %s, request %s, request_id %s' % (report.id, result, payment['request_id'])
