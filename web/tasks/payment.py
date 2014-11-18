@@ -269,7 +269,7 @@ class PaymentTask(object):
             request_options = {
                 "request_id": payment['request_id'],
             }
-            payment = ym_wallet.process_payment(request_options)
+            result = ym_wallet.process_payment(request_options)
 
         if result['status'] not in ('success', 'in_progress'):
             PaymentTask.set_fail(report.id, wallet)
