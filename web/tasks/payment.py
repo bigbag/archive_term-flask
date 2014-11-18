@@ -380,6 +380,9 @@ class PaymentTask(object):
             except Exception as e:
                 log.error(e)
                 return False
+            else:
+                wallet.blacklist = PaymentWallet.ACTIVE_ON
+                wallet.save()
             return True
 
     @staticmethod
