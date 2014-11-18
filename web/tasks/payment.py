@@ -375,6 +375,8 @@ class PaymentTask(object):
                 log.error(info)
                 return False
             try:
+                PaymentCard.set_archiv(wallet.id)
+
                 card = PaymentCard.add_ym_wallet(wallet, info['access_token'])
                 card.save()
             except Exception as e:

@@ -158,7 +158,7 @@ class PaymentCard(db.Model, BaseModel):
         if result['status'] != 'success':
             return result
 
-        self.set_archiv(history.wallet_id)
+        PaymentCard.set_archiv(history.wallet_id)
 
         card = self.add_payment(history, result)
         if not card:
@@ -177,7 +177,8 @@ class PaymentCard(db.Model, BaseModel):
 
         return result
 
-    def set_archiv(self, wallet_id):
+    @staticmethod
+    def set_archiv(wallet_id):
         """Переводим все карты привязанные к кошельку в архивное состояние"""
 
         old_cards = PaymentCard.query.filter_by(
