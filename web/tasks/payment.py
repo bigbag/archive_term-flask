@@ -243,8 +243,8 @@ class PaymentTask(object):
             ym_wallet = Wallet(card.token)
             request_options = {
                 "pattern_id": firm.pattern_id,
-                "amount_due": amount,
-                "label": history.id,
+                "sum": amount,
+                "customerNumber": history.id,
             }
             payment = ym_wallet.request_payment(request_options)
             history.system = PaymentHistory.SYSTEM_YANDEX
