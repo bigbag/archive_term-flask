@@ -141,6 +141,11 @@ class Config():
             'schedule': crontab(minute='*/1'),
             'args': (),
         },
+        'yandex_money_account_manager': {
+            'task': 'web.tasks.payment.ym_account_manager',
+            'schedule': crontab(minute='*/1'),
+            'args': (),
+        },
     }
 
     FAIL_PAYMENT_ALGORITHM = [

@@ -1,14 +1,14 @@
-"""add_lock_column_in_payment_fail
+"""add_system_column_in_payment_history
 
-Revision ID: 39032327c8d0
-Revises: 2513e69619ee
-Create Date: 2014-10-02 14:59:38.968462
+Revision ID: 1e23e53e86bb
+Revises: 11de429cd895
+Create Date: 2014-11-17 18:06:13.179893
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '39032327c8d0'
-down_revision = '2513e69619ee'
+revision = '1e23e53e86bb'
+down_revision = '11de429cd895'
 
 from alembic import op
 import sqlalchemy as sa
@@ -39,12 +39,14 @@ def downgrade_stack():
 
 
 def upgrade_payment():
-    op.add_column('fail', sa.Column(
-        'lock', sa.Integer(), nullable=False, server_default='0'))
+    op.add_column('history', sa.Column(
+        'system', sa.Integer(), nullable=False, server_default='0'))
+    op.create_index('ik_history_system', 'history', ['system'])
 
 
 def downgrade_payment():
-    op.drop_column('fail', 'lock')
+    op.drop_column('history', 'system')
+    op.drop_index("ik_history_system")
 
 
 def upgrade_mobispot():

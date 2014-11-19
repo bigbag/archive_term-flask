@@ -107,6 +107,12 @@ class PaymentWallet(db.Model, BaseModel):
                 PaymentWallet.status == PaymentWallet.STATUS_ACTIVE).filter(
                     PaymentWallet.user_id != 0).first()
 
+    @staticmethod
+    def get_valid_by_discodes_id(discodes_id):
+        return PaymentWallet.query.filter(
+            PaymentWallet.discodes_id == discodes_id).filter(
+                PaymentWallet.user_id != 0).first()
+
     def save(self):
         self.payment_id = str(self.payment_id).rjust(20, '0')
         return BaseModel.save(self)

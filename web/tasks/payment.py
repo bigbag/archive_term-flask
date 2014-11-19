@@ -8,6 +8,7 @@
 import logging
 
 from web.celery import celery
+from yandex_money.api import Wallet, ExternalPayment
 
 from configs.general import Config
 
@@ -25,7 +26,7 @@ from models.firm import Firm
 from models.report import Report
 
 
-class PaymentTask (object):
+class PaymentTask(object):
 
     @staticmethod
     def get_fail_algorithm(algorithm):
@@ -134,8 +135,25 @@ class PaymentTask (object):
             log.error(message)
             return message
 
-        ym = YaMoneyApi(YandexMoneyConfig)
-        result = ym.get_process_external_payment(history.request_id)
+        if history.system == PaymentHistory.SYSTEM_MPS:
+            ym = YaMoneyApi(YandexMoneyConfig)
+            result = ym.get_process_external_payment(history.request_id)
+
+        elif history.system == PaymentHistory.SYSTEM_YANDEX:
+            card = PaymentCard.query.filter(
+                PaymentCard.wallet_id == history.wallet_id).filter(
+                    PaymentCard.status == PaymentCard.STATUS_PAYMENT).first()
+            if not card:
+                message = 'Payment: Not found card, for history_id=%s' % history.id
+                log.error(message)
+                return False
+
+            ym_wallet = Wallet(card.token)
+            request_options = {"request_id": history.request_id}
+            result = ym_wallet.request_payment(request_options)
+
+        else:
+            return False
 
         if result['status'] in ('refused', 'ext_auth_required'):
             PaymentTask.set_fail(history.report_id, wallet)
@@ -171,7 +189,6 @@ class PaymentTask (object):
     @celery.task
     def background_payment(report_id):
         """Проводим фоновый платеж"""
-
         log = logging.getLogger('payment')
 
         report = Report.query.get(report_id)
@@ -200,9 +217,9 @@ class PaymentTask (object):
             wallet_id=wallet.id,
             status=PaymentCard.STATUS_PAYMENT).first()
         if not card:
-            PaymentTask.set_fail(report_id, wallet)
+            PaymentTask.set_fail(report.id, wallet)
             history.delete()
-            message = 'Payment: Not found card? for wallet_id=%s' % wallet.id
+            message = 'Payment: Not found card, for wallet_id=%s' % wallet.id
             log.error(message)
             return False
 
@@ -217,13 +234,28 @@ class PaymentTask (object):
 
         amount = float(report.amount) / int(Term.DEFAULT_FACTOR)
 
-        ym = YaMoneyApi(YandexMoneyConfig)
-        payment = ym.get_request_payment_to_shop(
-            amount, firm.pattern_id)
+        if card.system == PaymentCard.SYSTEM_MPS:
+            ym = YaMoneyApi(YandexMoneyConfig)
+            payment = ym.get_request_payment_to_shop(amount, firm.pattern_id)
+            history.system = PaymentHistory.SYSTEM_MPS
+
+        elif card.system == PaymentCard.SYSTEM_YANDEX:
+            ym_wallet = Wallet(card.token)
+            request_options = {
+                "pattern_id": firm.pattern_id,
+                "amount_due": amount,
+                "label": history.id,
+            }
+            payment = ym_wallet.request_payment(request_options)
+            history.system = PaymentHistory.SYSTEM_YANDEX
+
+        else:
+            return False
+
         if not payment or not 'request_id' in payment:
-            PaymentTask.set_fail(report_id, wallet)
+            PaymentTask.set_fail(report.id, wallet)
             message = 'Payment: Fail in request payment, report_id %s, request %s' % (
-                report_id, payment)
+                report.id, payment)
             log.error(message)
             history.delete()
             return message
@@ -231,8 +263,8 @@ class PaymentTask (object):
         result = ym.get_process_external_payment(
             payment['request_id'], card.token)
         if result['status'] not in ('success', 'in_progress'):
-            PaymentTask.set_fail(report_id, wallet)
-            message = 'Payment: Fail in request payment, report_id %s, request %s, request_id %s' % (report_id, result, payment['request_id'])
+            PaymentTask.set_fail(report.id, wallet)
+            message = 'Payment: Fail in request payment, report_id %s, request %s, request_id %s' % (report.id, result, payment['request_id'])
             log.error(message)
             history.delete()
             return message
@@ -246,7 +278,6 @@ class PaymentTask (object):
     @celery.task
     def background_old_payment(report_id):
         """Платеж с кошелька uniteller"""
-
         log = logging.getLogger('payment')
 
         report = Report.query.get(report_id)
@@ -320,3 +351,75 @@ class PaymentTask (object):
     def check_linking(history):
         result = PaymentCard().linking_card(history.id)
         return result
+
+    @staticmethod
+    @celery.task
+    def get_ym_token(discodes_id, code, url):
+        log = logging.getLogger('payment')
+
+        wallet = PaymentWallet.get_valid_by_discodes_id(discodes_id)
+        if not wallet:
+            return False
+
+        try:
+            info = Wallet.get_access_token(
+                client_id=YandexMoneyConfig.CLIENT_ID,
+                code=code,
+                redirect_uri=url,
+                client_secret=YandexMoneyConfig.OAUTH_KEY)
+        except Exception as e:
+            log.error(e)
+            return False
+        else:
+            if 'error' in info:
+                log.error(info)
+                return False
+            try:
+                PaymentCard.set_archiv(wallet.id)
+
+                card = PaymentCard.add_ym_wallet(wallet, info['access_token'])
+                card.save()
+            except Exception as e:
+                log.error(e)
+                return False
+            else:
+                wallet.blacklist = PaymentWallet.ACTIVE_ON
+                wallet.save()
+            return True
+
+    @staticmethod
+    @celery.task
+    def ym_account_manager():
+        query = PaymentCard.query.filter(
+            PaymentCard.system == PaymentCard.SYSTEM_YANDEX)
+        cards = query.filter(PaymentCard.pan.is_(None)).all()
+        if not cards:
+            return False
+
+        for card in cards:
+            PaymentTask.get_ym_account.delay(card.id)
+
+    @staticmethod
+    @celery.task
+    def get_ym_account(card_id):
+        log = logging.getLogger('payment')
+
+        card = PaymentCard.query.get(card_id)
+        if not card:
+            message = 'Payment: Not found card card_id=%s' % card_id
+            log.error(message)
+            return False
+
+        wallet = Wallet(card.token)
+        try:
+            info = wallet.account_info()
+        except Exception as e:
+            log.error(e)
+            return False
+        else:
+            if 'account' not in info:
+                return False
+
+            card.pan = info['account']
+            card.save()
+            return True

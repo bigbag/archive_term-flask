@@ -1,14 +1,14 @@
-"""add_lock_column_in_payment_fail
+"""add_status_column_in_payment_card
 
-Revision ID: 39032327c8d0
-Revises: 2513e69619ee
-Create Date: 2014-10-02 14:59:38.968462
+Revision ID: 11de429cd895
+Revises: 45422317ee1a
+Create Date: 2014-11-17 16:47:28.406010
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '39032327c8d0'
-down_revision = '2513e69619ee'
+revision = '11de429cd895'
+down_revision = '45422317ee1a'
 
 from alembic import op
 import sqlalchemy as sa
@@ -39,12 +39,14 @@ def downgrade_stack():
 
 
 def upgrade_payment():
-    op.add_column('fail', sa.Column(
-        'lock', sa.Integer(), nullable=False, server_default='0'))
+    op.add_column('payment_card', sa.Column(
+        'system', sa.Integer(), nullable=False, server_default='0'))
+    op.create_index('ik_payment_card_system', 'payment_card', ['system'])
 
 
 def downgrade_payment():
-    op.drop_column('fail', 'lock')
+    op.drop_column('payment_card', 'system')
+    op.drop_index("ik_payment_card_system")
 
 
 def upgrade_mobispot():

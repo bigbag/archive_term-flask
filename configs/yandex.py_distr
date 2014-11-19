@@ -14,6 +14,9 @@ class YandexMoneyConfig(object):
 
     FAIL_URI = ''
     SUCCESS_URI = ''
+    REDIRECT_URL = ''
+
+    WALLET_SCOPE = ['account-info', 'payment-shop']
 
     TEST = True
     DEBUG = True
