@@ -150,7 +150,7 @@ class PaymentTask(object):
 
             ym_wallet = Wallet(card.token)
             request_options = {"request_id": history.request_id}
-            result = ym_wallet.request_payment(request_options)
+            result = ym_wallet.process_payment(request_options)
 
         else:
             return False
@@ -159,7 +159,7 @@ class PaymentTask(object):
             PaymentTask.set_fail(history.report_id, wallet)
             history.delete()
 
-            message = 'Check: Fail, status=%s' % result['status']
+            message = 'Check: Fail, request_id=%s' % history.request_id
             log.error(message)
             log.error(result)
             return message
