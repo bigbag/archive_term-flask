@@ -145,7 +145,11 @@ class PaymentTask(object):
             return False
 
         try:
-            request_options = {"request_id": history.request_id}
+            request_options = dict(
+                request_id=history.request_id,
+                ext_auth_success_uri=YandexMoneyConfig.SUCCESS_URI,
+                ext_auth_fail_uri=YandexMoneyConfig.FAIL_URI,
+            )
             if card.system == PaymentCard.SYSTEM_MPS:
                 ym = ExternalPayment(YandexMoneyConfig.INSTANCE_ID)
                 result = ym.process(request_options)
@@ -417,3 +421,23 @@ class PaymentTask(object):
             card.pan = info['account']
             card.save()
             return True
+
+    @staticmethod
+    @celery.task
+    def restart_fail_algorithm(wallet_id):
+        wallet = PaymentWallet.query.get(wallet_id)
+        if not wallet:
+            return False
+
+        reports = Report.queryfilter_by(status=Report.STATUS_FAIL).filter_by(
+            payment_id=wallet.payment_id).all()
+        if not reports:
+            return False
+
+        for report in reports:
+            fail = PaymentFail.query.filter_by(report_id=report.id).first()
+            if not fail:
+                continue
+            fail.count = 1
+            fail.save()
+        return True
