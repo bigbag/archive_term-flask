@@ -55,6 +55,12 @@ class PaymentCard(db.Model, BaseModel):
         self.system = self.SYSTEM_MPS
         self.status = self.STATUS_ARCHIV
 
+    @staticmethod
+    def get_payment_card(wallet_id):
+        return PaymentCard.query.filter_by(
+            wallet_id=wallet_id,
+            status=PaymentCard.STATUS_PAYMENT).first()
+
     def get_linking_params(self, order_id=0, url=None):
         """Запрос параметров для привязки карты"""
 
