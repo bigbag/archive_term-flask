@@ -132,6 +132,8 @@ class PaymentCard(db.Model, BaseModel):
     def linking_card(self, history_id):
         """Привязываем карту, получаем платежный токен"""
 
+        from web.tasks.payment import PaymentTask
+
         history = PaymentHistory.query.get(history_id)
         if not history:
             return False
@@ -177,6 +179,8 @@ class PaymentCard(db.Model, BaseModel):
 
         if not card.save():
             return False
+
+        PaymentTask.restart_fail_algorithm.delay(history.wallet_id)
 
         wallet.blacklist = PaymentWallet.ACTIVE_ON
         wallet.save()
