@@ -151,6 +151,7 @@ class PaymentTask(object):
                 ext_auth_fail_uri=YandexMoneyConfig.FAIL_URI,
             )
             if card.system == PaymentCard.SYSTEM_MPS:
+                request_options['money_source_token'] = card.token
                 ym = ExternalPayment(YandexMoneyConfig.INSTANCE_ID)
                 result = ym.process(request_options)
             elif card.system == PaymentCard.SYSTEM_YANDEX:
