@@ -88,13 +88,15 @@ class PaymentTask(object):
                     continue
 
                 PaymentFail.add_or_update(payment.report_id)
-                payment_task = PaymentTask()
-                PaymentTask.background_payment.delay(payment_task,
-                                                     payment.report_id)
+                PaymentTask.background_payment.delay(payment.report_id)
 
     @staticmethod
     @celery.task
     def new_payment_manager():
+        history = PaymentHistory.get_new_payment()
+        for key in history:
+            PaymentTask.check_status.delay(key.id)
+
         reports = Report.get_new_payment()
         if not reports:
             return False
@@ -105,19 +107,13 @@ class PaymentTask(object):
             if history:
                 continue
 
-            payment_task = PaymentTask()
             # Start: Костыль на время перехода от кошельков с балансом
             wallet = PaymentWallet.get_valid_by_payment_id(report.payment_id)
             if wallet and int(wallet.balance) > 0:
-                PaymentTask.background_old_payment.delay(payment_task,
-                                                         report.id)
+                PaymentTask.background_old_payment.delay(report.id)
                 continue
             # End
-            PaymentTask.background_payment.delay(payment_task, report.id)
-
-        history = PaymentHistory.get_new_payment()
-        for key in history:
-            PaymentTask.check_status.delay(key.id)
+            PaymentTask.background_payment.delay(report.id)
 
         return True
 
@@ -140,6 +136,7 @@ class PaymentTask(object):
 
         card = PaymentCard.get_payment_card(history.wallet_id)
         if not card:
+            PaymentTask.set_fail(history.report_id, wallet)
             message = 'Payment: Not found card, for history_id=%s' % history.id
             log.error(message)
             return False
@@ -204,59 +201,54 @@ class PaymentTask(object):
 
             return True
 
-    def check_payment_data(self, report_id):
-        """Проверяем входные данные"""
+    @staticmethod
+    @celery.task
+    def background_payment(report_id):
+        """Проводим фоновый платеж"""
         log = logging.getLogger('payment')
 
-        self.report = Report.query.get(report_id)
-        if not self.report:
+        report = Report.query.get(report_id)
+        if not report:
             message = 'Payment: Not found report with id %s' % report_id
             log.error(message)
             return message
 
-        self.wallet = PaymentWallet.get_by_payment_id(self.report.payment_id)
-        if not self.wallet:
-            message = 'Payment: Not found wallet with pid %s' % self.report.payment_id
+        wallet = PaymentWallet.get_by_payment_id(report.payment_id)
+        if not wallet:
+            message = 'Payment: Not found wallet with pid %s' % report.payment_id
             log.error(message)
             return message
 
-        self.history = PaymentHistory.query.filter_by(report_id=self.report.id).first()
-        if self.history:
+        history = PaymentHistory.query.filter_by(report_id=report.id).first()
+        if history:
             return False
 
-    @celery.task
-    def background_payment(self, report_id):
-        """Проводим фоновый платеж"""
-        log = logging.getLogger('payment')
-
-        self.check_payment_data(report_id)
-
-        history = PaymentHistory().from_report(self.report, self.wallet)
+        history = PaymentHistory().from_report(report, wallet)
         if not history:
             message = 'Payment: Fail in history add, report_id=%s' % report_id
             log.error(message)
             return message
 
-        card = PaymentCard.get_payment_card(self.wallet.id)
+        card = PaymentCard.get_payment_card(wallet.id)
         if not card:
-            PaymentTask.set_fail(report_id, self.wallet)
+            PaymentTask.set_fail(report_id, wallet)
             history.delete()
-            message = 'Payment: Not found card, for wallet_id=%s' % self.wallet.id
+            message = 'Payment: Not found card, for wallet_id=%s' % wallet.id
             log.error(message)
             return False
 
-        term = Term.query.get(self.report.term_id)
+        term = Term.query.get(report.term_id)
         if not term:
-            log.error('Payment: Not found term %s' % self.report.term_id)
+            log.error('Payment: Not found term %s' % report.term_id)
 
-        firm = Firm.query.get(self.report.term_firm_id)
+        firm = Firm.query.get(report.term_firm_id)
         if not firm:
             log.error(
-                'Payment: Not found firm, with term %s' % self.report.term_id)
+                'Payment: Not found firm, with term %s' % report.term_id)
 
         request_options = {
             "pattern_id": firm.pattern_id,
-            "sum": float(self.report.amount) / int(Term.DEFAULT_FACTOR),
+            "sum": float(report.amount) / int(Term.DEFAULT_FACTOR),
             "customerNumber": history.id,
         }
 
@@ -276,7 +268,7 @@ class PaymentTask(object):
             return False
         else:
             if not payment or 'request_id' not in payment:
-                PaymentTask.set_fail(report_id, self.wallet)
+                PaymentTask.set_fail(report_id, wallet)
                 message = 'Payment: Fail in request payment, report_id %s, request %s' % (
                     report_id, payment)
                 log.error(message)
@@ -288,33 +280,48 @@ class PaymentTask(object):
             return True
 
     # Start: Костыль на время перехода от кошельков с балансом
+    @staticmethod
     @celery.task
-    def background_old_payment(self, report_id):
+    def background_old_payment(report_id):
         """Платеж с кошелька uniteller"""
         log = logging.getLogger('payment')
 
-        self.check_payment_data(report_id)
+        report = Report.query.get(report_id)
+        if not report:
+            message = 'Payment: Not found report with id %s' % report_id
+            log.error(message)
+            return message
 
-        history = PaymentHistory().from_report(self.report, self.wallet)
+        wallet = PaymentWallet.get_by_payment_id(report.payment_id)
+        if not wallet:
+            message = 'Payment: Not found wallet with pid %s' % report.payment_id
+            log.error(message)
+            return message
+
+        history = PaymentHistory.query.filter_by(report_id=report.id).first()
+        if history:
+            return False
+
+        history = PaymentHistory().from_report(report, wallet)
         if not history:
             message = 'Payment: Fail in history add, report_id=%s' % report_id
             log.error(message)
             return message
 
-        term = Term.query.get(self.report.term_id)
+        term = Term.query.get(report.term_id)
         if not term:
-            log.error('Payment: Not found term %s' % self.report.term_id)
+            log.error('Payment: Not found term %s' % report.term_id)
 
-        new_balance = self.wallet.balance - self.report.amount
+        new_balance = wallet.balance - report.amount
 
         if new_balance < 0:
-            self.history.amount = self.wallet.balance
-            self.wallet.balance = 0
-            self.report.copy_new_from_old(new_balance)
+            history.amount = wallet.balance
+            wallet.balance = 0
+            report.copy_new_from_old(new_balance)
         else:
-            self.wallet.balance = new_balance
+            wallet.balance = new_balance
 
-        if not self.wallet.save():
+        if not wallet.save():
             return False
 
         history.request_id = 'old'
@@ -322,8 +329,8 @@ class PaymentTask(object):
         if not history.save():
             return False
 
-        self.report.status = Report.STATUS_COMPLETE
-        if not self.report.save():
+        report.status = Report.STATUS_COMPLETE
+        if not report.save():
             return False
 
         return True
