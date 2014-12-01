@@ -81,8 +81,10 @@ def get_date_interval(search_date, period='day'):
         stop = search_date + stop_delta
     elif period == 'month':
         start = datetime(search_date.year, search_date.month, 1)
-        stop = datetime(search_date.year, search_date.month + 1, 1)
-
+        try:
+            stop = datetime(search_date.year, search_date.month + 1, 1)
+        except ValueError:
+            stop = datetime(search_date.year + 1, 1, 1)
     return (start, stop)
 
 
