@@ -55,6 +55,12 @@ class PaymentCard(db.Model, BaseModel):
         self.system = self.SYSTEM_MPS
         self.status = self.STATUS_ARCHIV
 
+    @staticmethod
+    def get_payment_card(wallet_id):
+        return PaymentCard.query.filter_by(
+            wallet_id=wallet_id,
+            status=PaymentCard.STATUS_PAYMENT).first()
+
     def get_linking_params(self, order_id=0, url=None):
         """Запрос параметров для привязки карты"""
 
@@ -126,6 +132,8 @@ class PaymentCard(db.Model, BaseModel):
     def linking_card(self, history_id):
         """Привязываем карту, получаем платежный токен"""
 
+        from web.tasks.payment import PaymentTask
+
         history = PaymentHistory.query.get(history_id)
         if not history:
             return False
@@ -171,6 +179,8 @@ class PaymentCard(db.Model, BaseModel):
 
         if not card.save():
             return False
+
+        PaymentTask.restart_fail_algorithm.delay(history.wallet_id)
 
         wallet.blacklist = PaymentWallet.ACTIVE_ON
         wallet.save()

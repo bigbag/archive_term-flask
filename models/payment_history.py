@@ -106,7 +106,8 @@ class PaymentHistory(db.Model, BaseModel):
 
     @staticmethod
     def get_new_payment():
-        return PaymentHistory.query.filter(
-            PaymentHistory.report_id != 0).filter(
-                PaymentHistory.status == PaymentHistory.STATUS_NEW).filter(
-                    PaymentHistory.request_id != 0).all()
+        query = PaymentHistory.query.filter(PaymentHistory.report_id != 0)
+        query = query.filter((PaymentHistory.status == PaymentHistory.STATUS_NEW) |
+                             (PaymentHistory.status == PaymentHistory.STATUS_IN_PROGRESS))
+
+        return query.filter(PaymentHistory.request_id != 0).all()
