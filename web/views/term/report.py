@@ -12,6 +12,8 @@ from web.views.term.general import *
 from models.report import Report
 from models.person import Person
 from models.report_stack import ReportStack
+from models.payment_account import PaymentAccount
+from models.firm import Firm
 
 
 @mod.route('/report/<action>', methods=['GET'])
@@ -162,6 +164,88 @@ def report_remove(report_id):
         abort(404)
 
     report_stack.delete()
+    answer['error'] = 'no'
+    answer['message'] = u'Операция успешно выполнена'
+
+    return jsonify(answer)
+
+
+@mod.route('/report/account', methods=['GET'])
+@login_required
+def account_page():
+    """страница счетов"""
+
+    firm = Firm.query.get(g.firm_info['id'])
+
+    return render_template(
+        'term/report/account.html',
+        account_email=firm.account_email
+    )
+
+
+@mod.route('/report/account', methods=['POST'])
+@login_required
+def account_list():
+    """список счетов"""
+
+    arg = json.loads(request.stream.read())
+    answer = PaymentAccount().select_list(g.firm_info['id'], **arg)
+
+    return jsonify(answer)
+
+
+@mod.route('/report/account/add_email', methods=['POST'])
+@login_required
+def add_account_email():
+    """Добавление e-mail в список рассылки счетов"""
+
+    arg = get_post_arg(request, True)
+    answer = dict(error='yes', message=u'Произошла ошибка')
+
+    if not 'new_email' in arg:
+        return jsonify(answer)
+
+    firm = Firm.query.get(g.firm_info['id'])
+    emails = []
+    if firm.account_email and len(firm.account_email):
+        emails = json.loads(firm.account_email)
+
+    if not arg['new_email'] in emails:
+        emails.append(arg['new_email'])
+        firm.account_email = json.dumps(emails)
+        firm.save()
+
+    answer['error'] = 'no'
+    answer['message'] = u'Операция успешно выполнена'
+
+    return jsonify(answer)
+
+
+@mod.route('/report/account/remove_email', methods=['POST'])
+@login_required
+def remove_account_email():
+    """Удаление e-mail из списка рассылки счетов"""
+
+    arg = get_post_arg(request, True)
+    answer = dict(error='yes', message=u'Произошла ошибка')
+
+    if not 'target_email' in arg:
+        return jsonify(answer)
+
+    firm = Firm.query.get(g.firm_info['id'])
+
+    if not firm.account_email or not len(firm.account_email):
+        return jsonify(answer)
+
+    emails = json.loads(firm.account_email)
+    if not arg['target_email'] in emails:
+        return jsonify(answer)
+
+    new_emails = [e for e in emails if not e == arg['target_email']]
+
+    firm.account_email = json.dumps(new_emails)
+    firm.save()
+
     answer['error'] = 'no'
     answer['message'] = u'Операция успешно выполнена'
 

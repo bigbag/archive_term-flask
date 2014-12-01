@@ -29,6 +29,7 @@ class Config():
     TMP_PACH = './tmp'
     REPORT_TMP_PACH = './%s/tmp' % TMP_PACH
     EXCEL_FOLDER = './%s/excel' % TMP_PACH
+    PDF_FOLDER = './%s/pdf' % TMP_PACH
     IMG_FOLDER = './%s/img' % TMP_PACH
     TERM_LOG_PATH = './logs/term'
     IMPORT_EXTENSIONS = set(['xls', 'xlsx'])
@@ -139,6 +140,11 @@ class Config():
         'generate_blacklist': {
             'task': 'web.tasks.blacklist.generate_blacklist',
             'schedule': crontab(minute='*/1'),
+            'args': (),
+        },
+        'generate_accounts': {
+            'task': 'web.tasks.account_gen.generate',
+            'schedule': crontab(0, 0, 0, day_of_month='5'),
             'args': (),
         },
     }

@@ -9,6 +9,18 @@
 <div class="row m-content" ng-controller="GeneralController" ng-init="token='{{g.token}}'">
     <div class="large-3 columns">
     {% block menu %}
+    {% set nav_statistic = [
+            ('/report/company', 'Корпоративные расходы'),
+            ('/report/money', 'Личные расходы'),
+            ('/report/list', 'Отчеты')]  %}
+    {% if g.show_account %}
+        {% set nav_statistic = [
+                ('/report/company', 'Корпоративные расходы'),
+                ('/report/money', 'Личные расходы'),
+                ('/report/list', 'Отчеты'),
+                ('/report/account', 'Счета')]  %}
+    {% endif %}
+    
     {% set nav = [dict(
                 title='Управление',
                 data=[
@@ -16,10 +28,8 @@
                     ('/terminal', 'Терминалы')]),
             dict(
                 title='Статистика',
-                data=[
-                    ('/report/company', 'Корпоративные расходы'),
-                    ('/report/money', 'Личные расходы'),
-                    ('/report/list', 'Отчеты')])] %}
+                data=nav_statistic)]  %}
+
         <ul class="m-nav-page">
         {% for row in nav %}
         <li>
