@@ -148,7 +148,7 @@ class Config():
             'args': (),
         },
         'generate_accounts': {
-            'task': 'web.tasks.account_gen.generate',
+            'task': 'web.tasks.accounts_send.accounts_manager',
             'schedule': crontab(0, 0, 0, day_of_month='5'),
             'args': (),
         },

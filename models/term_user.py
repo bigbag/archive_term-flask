@@ -38,7 +38,7 @@ class TermUser(db.Model, BaseModel):
     def __init__(self):
         self.group = self.GROUP_DEFAULT
         self.status = self.STATUS_NOACTIVE
-        self.creation_date = date_helper.get_curent_date()
+        self.creation_date = date_helper.get_current_date()
 
     def is_authenticated(self):
         return True

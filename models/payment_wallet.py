@@ -53,7 +53,7 @@ class PaymentWallet(db.Model, BaseModel):
         self.blacklist = self.ACTIVE_OFF
         self.balance = 0
         self.user_id = 0
-        self.creation_date = date_helper.get_curent_date()
+        self.creation_date = date_helper.get_current_date()
         self.status = self.STATUS_NOACTIVE
 
     def add_to_blacklist(self):

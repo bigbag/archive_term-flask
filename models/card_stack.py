@@ -23,7 +23,7 @@ class CardStack(db.Model, BaseModel):
     creation_date = db.Column(db.DateTime, nullable=False)
 
     def __init__(self):
-        self.creation_date = date_helper.get_curent_date()
+        self.creation_date = date_helper.get_current_date()
 
     def save(self):
         self.payment_id = str(self.payment_id).rjust(20, '0')

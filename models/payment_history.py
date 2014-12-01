@@ -58,7 +58,7 @@ class PaymentHistory(db.Model, BaseModel):
         self.request_id = 0
         self.report_id = 0
         self.invoice_id = 0
-        self.creation_date = date_helper.get_curent_date()
+        self.creation_date = date_helper.get_current_date()
 
     def from_report(self, report, wallet):
         history = PaymentHistory()

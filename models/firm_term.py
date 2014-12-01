@@ -31,7 +31,7 @@ class FirmTerm(db.Model, BaseModel):
     creation_date = db.Column(db.DateTime, nullable=False)
 
     def __init__(self):
-        self.creation_date = date_helper.get_curent_date()
+        self.creation_date = date_helper.get_current_date()
 
     @staticmethod
     def get_list_by_term_id(term_id):

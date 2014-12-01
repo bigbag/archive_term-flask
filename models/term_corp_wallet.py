@@ -43,7 +43,7 @@ class TermCorpWallet(db.Model, BaseModel):
         self.limit = 0
         self.balance = 0
         self.interval = self.INTERVAL_MONTH
-        self.creation_date = date_helper.get_curent_date()
+        self.creation_date = date_helper.get_current_date()
         self.status = self.STATUS_ACTIVE
 
     def get_interval_list(self):

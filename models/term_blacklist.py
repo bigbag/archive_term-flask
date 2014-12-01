@@ -86,5 +86,5 @@ class TermBlacklist(db.Model, BaseModel):
         return set([str(row.payment_id) for row in all_cards])
 
     def save(self):
-        self.timestamp = date_helper.get_curent_utc()
+        self.timestamp = date_helper.get_current_utc()
         return BaseModel.save(self)

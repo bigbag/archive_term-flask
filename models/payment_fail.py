@@ -49,5 +49,5 @@ class PaymentFail(db.Model, BaseModel):
 
     def save(self):
         self.count += 1
-        self.timestamp = date_helper.get_curent_utc()
+        self.timestamp = date_helper.get_current_utc()
         return BaseModel.save(self)

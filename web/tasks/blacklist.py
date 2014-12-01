@@ -32,7 +32,7 @@ class BlacklistTask (object):
                 card.status = TermBlacklist.STATUS_BLACK
             else:
                 card.status = TermBlacklist.STATUS_PAYMENT
-            card.timestamp = date_helper.get_curent_utc()
+            card.timestamp = date_helper.get_current_utc()
             db.session.add(card)
         db.session.commit()
 

@@ -151,7 +151,7 @@ def api_upload_report(term_id, report_datetime):
     else:
         abort(400)
 
-    term.report_date = date_helper.get_curent_date()
+    term.report_date = date_helper.get_current_date()
     term.save()
 
     ReportParserTask.report_manager.delay(filename)
@@ -193,10 +193,10 @@ def api_set_callback(term_id, action, version=None):
         abort(404)
 
     if action == 'config':
-        term.config_date = date_helper.get_curent_date()
+        term.config_date = date_helper.get_current_date()
         AlarmStack.reset_count(term.id)
     elif action == 'blacklist':
-        term.blacklist_date = date_helper.get_curent_date()
+        term.blacklist_date = date_helper.get_current_date()
 
     term.save()
 

@@ -70,7 +70,7 @@ class PaymentLoyalty(db.Model, BaseModel):
 
     def __init__(self):
         self.rules = self.RULE_FIXED
-        self.creation_date = date_helper.get_curent_date()
+        self.creation_date = date_helper.get_current_date()
 
     def get_rules_dict(self):
         return {
