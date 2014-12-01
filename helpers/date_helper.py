@@ -11,6 +11,8 @@ import calendar
 from datetime import datetime, timedelta
 from pytz import timezone
 
+from web import app
+
 
 def get_curent_date(format='%Y-%m-%d %H:%M:%S'):
     client_time = datetime.utcnow()
@@ -92,3 +94,30 @@ def validate_date(d, format):
         return True
     except ValueError:
         return False
+
+
+def prev_month_begin(date):
+    date_pattern = '%Y-%m-%d %H:%M:%S'
+    begin_str = '%s-%s-01 00:00:00' % (date.year, (date.month - 1))
+
+    begin_date = convert_date_to_utc(
+        begin_str,
+        app.config['TZ'],
+        date_pattern,
+        date_pattern)
+
+    return begin_date
+
+
+def prev_month_end(date):
+    date_pattern = '%Y-%m-%d %H:%M:%S'
+    month_end = str(calendar.monthrange(date.year, (date.month - 1))[1])
+    end_str = '%s-%s-%s 23:59:59' % (date.year, (date.month - 1), month_end)
+
+    end_date = convert_date_to_utc(
+        end_str,
+        app.config['TZ'],
+        date_pattern,
+        date_pattern)
+
+    return end_date
