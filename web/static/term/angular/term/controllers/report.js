@@ -195,4 +195,66 @@ angular.module('term').controller('ReportController',
       }
     },
   };
+  
+  
+  $scope.account_emails = [];
+  //$scope.new_account_email = '';
+  
+  //Добавляем email в список рассылки счетов
+  $scope.addAccountEmail = function() {
+    if (angular.isUndefined($scope.new_account_email) || !$scope.new_account_email) return false;
+    
+    var url = '/report/account/add_email';
+    var data = {
+        'csrf_token': $scope.token,
+        'new_email' : $scope.new_account_email
+    }
+    
+    $http.post(url, data).success(function(data) {
+      if (data.error === 'yes') {
+        contentService.setModal(data.message, 'error');
+      } else {
+        $scope.account_emails = $scope.setAccountEmail($scope.new_account_email);
+        delete $scope.new_account_email;
+      }
+    });
+  };
+  
+  $scope.setAccountEmail = function(email) {
+    var emails = [];
+    if ($scope.account_emails)
+        emails = $scope.account_emails;
+    emails[emails.length] = email;
+    
+    return emails;
+  };
+  
+  //Удаляем email из списока рассылки счетов
+  $scope.removeAccountEmail = function(key, e) {
+    if (!$scope.account_emails)
+        return false;
+        
+    var emails = $scope.account_emails;
+    
+    var url = '/report/account/remove_email';
+    var data = {
+        'csrf_token': $scope.token,
+        'target_email' : emails[key]
+    }
+    
+    $http.post(url, data).success(function(data) {
+      if (data.error === 'yes') {
+        contentService.setModal(data.message, 'error');
+      } else {
+        emails.splice(key,1);
+        $scope.account_emails = emails;
+        angular.element(e.currentTarget).parent().remove();
+      }
+    });
+  };
+  
+  $scope.initAccountEmails = function(json) {
+    $scope.account_emails = angular.fromJson(json);
+  };
+  
 });

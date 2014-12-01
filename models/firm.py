@@ -22,6 +22,12 @@ class Firm(db.Model, BaseModel):
     pattern_id = db.Column(db.String(200), nullable=False)
     logo = db.Column(db.Text())
     address = db.Column(db.Text())
+    account_email = db.Column(db.Text())
+    transaction_percent = db.Column(db.Integer())
+    transaction_comission = db.Column(db.Integer())
+    legal_entity = db.Column(db.String(256))
+    general_manager = db.Column(db.String(128))
+    chief_accountant = db.Column(db.String(128))
 
     @staticmethod
     def get_by_sub_domain(sub_domain):

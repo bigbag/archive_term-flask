@@ -1,0 +1,90 @@
+{% extends "term/report/page.html" %}
+
+{% block content %}
+<h2 class="g-color-blue m-page-name">Счета</h2>
+<span ng-init="search.limit=20;search.action_type='get_grid_content'"></span>
+<div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
+    <section class="section active">
+        <p class="title">
+            <a>Список</a>
+        </p>
+        <div class="content">
+            <div class="content-row">
+                <p class="m-hint">На этой странице вы можете посмотреть   список счетов.</p>
+            </div>
+            <table class="m-spot-table" ng-controller="ReportController">
+                <thead>
+                    <tr>
+                        <th>Номер</th>
+                        <th>Дата выписки</th>
+                        <th>Сумма</th>
+                        <th>Оплачен</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr 
+                        ng-repeat="account in result">
+                        
+                        <td><a href="{[{account.filename}]}">{[{account.id}]}</a></td>
+                        <td><a href="{[{account.filename}]}">{[{account.generated_date}]}</a></td>
+                        <td><a href="{[{account.filename}]}">{[{account.summ}]}</a></td>
+                        <td><a href="{[{account.filename}]}">
+                            <span class="m-card-act g-round"
+                                ></span>
+                        </td></a>
+                        
+                    </tr>
+                    <tr class="m-table-bottom" ng-show="search.page_count">
+                        <td colspan="10">
+                            <ui-pagination
+                                cur="pagination.cur"
+                                total="pagination.total"
+                                display="{[{pagination.display}]}">
+                            </ui-pagination>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <section class="section active">
+        <p class="title">
+            <a>Настройка рассылки</a>
+        </p>
+        <div class="content" ng-controller="ReportController">
+            <div class="content-row">
+                <p class="m-hint">Здесь вы можете указать список адресов e-mail, на которые будет отправлен выставленный счет.</p>
+            </div>
+                <form class="custom" name="reportForm">
+                <div class="content-row">
+                    {% if account_email %}
+                    <span ng-init="initAccountEmails('{{account_email}}')"></span>
+                    {% endif %}
+                    <label for="add-email">E-mail*</label>
+                    <input id="add-email"
+                        type="email"
+                        placeholder="E-mail"
+                        class="left"
+                        ng-keypress="($event.keyCode == 13)?addAccountEmail():''"
+                        ng-model="new_account_email"
+                        ng-class="{error: error.account_email}"
+                        >
+                    <a class="f-spot-button"
+                        ng-click="addAccountEmail()">
+                        Добавить
+                    </a>
+                    <div class="f-select-email">
+                        <span class="f-email-case g-radius-main"
+                            ng-repeat="email in account_emails">{[{email}]}
+                            <i class="g-round" ng-click="removeAccountEmail($index, $event)"></i>
+                        </span>
+                    </div>
+                </div>
+                </form>
+            <div class="content-row">
+                <p class="m-hint"></p>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
