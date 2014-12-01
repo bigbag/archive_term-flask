@@ -14,14 +14,14 @@ from pytz import timezone
 from web import app
 
 
-def get_curent_date(format='%Y-%m-%d %H:%M:%S'):
+def get_current_date(format='%Y-%m-%d %H:%M:%S'):
     client_time = datetime.utcnow()
     if format:
         client_time = client_time.strftime(format)
     return client_time
 
 
-def get_curent_utc():
+def get_current_utc():
     return calendar.timegm(datetime.utcnow().utctimetuple())
 
 
@@ -69,25 +69,32 @@ def get_timezone(tzname):
     return "%s%s%s" % (tz.tzname(now, is_dst=False), sign, delta)
 
 
-def get_date_interval(search_date, period='day'):
-
+def get_date_interval(search_date, period='day', tz=app.config['TZ']):
     search_date = search_date.date()
-    start = search_date
-    stop = search_date + timedelta(days=1)
 
+    start = datetime(search_date.year, search_date.month,
+                     search_date.day, 0, 0, 0)
+    stop = datetime(search_date.year, search_date.month,
+                    search_date.day, 23, 59, 59)
     if period == 'week':
         day_of_week = search_date.weekday()
         start_delta = timedelta(days=day_of_week)
-        start = search_date - start_delta
-        stop_delta = timedelta(days=7 - day_of_week)
-        stop = search_date + stop_delta
+        start_date = search_date - start_delta
+        stop_delta = timedelta(days=6 - day_of_week)
+        stop_date = search_date + stop_delta
+
+        start = datetime(start_date.year, start_date.month,
+                         start_date.day, 0, 0, 0)
+        stop = datetime(stop_date.year, stop_date.month,
+                        stop_date.day, 23, 59, 59)
     elif period == 'month':
-        start = datetime(search_date.year, search_date.month, 1)
-        try:
-            stop = datetime(search_date.year, search_date.month + 1, 1)
-        except ValueError:
-            stop = datetime(search_date.year + 1, 1, 1)
-    return (start, stop)
+        last_day = calendar.monthrange(search_date.year, search_date.month)[1]
+        start = datetime(search_date.year, search_date.month,
+                         1, 0, 0, 0)
+        stop = datetime(search_date.year, search_date.month,
+                        last_day, 23, 59, 59)
+
+    return (to_utc(start, tz), to_utc(stop, tz))
 
 
 def validate_date(d, format):
@@ -96,30 +103,3 @@ def validate_date(d, format):
         return True
     except ValueError:
         return False
-
-
-def prev_month_begin(date):
-    date_pattern = '%Y-%m-%d %H:%M:%S'
-    begin_str = '%s-%s-01 00:00:00' % (date.year, (date.month - 1))
-
-    begin_date = convert_date_to_utc(
-        begin_str,
-        app.config['TZ'],
-        date_pattern,
-        date_pattern)
-
-    return begin_date
-
-
-def prev_month_end(date):
-    date_pattern = '%Y-%m-%d %H:%M:%S'
-    month_end = str(calendar.monthrange(date.year, (date.month - 1))[1])
-    end_str = '%s-%s-%s 23:59:59' % (date.year, (date.month - 1), month_end)
-
-    end_date = convert_date_to_utc(
-        end_str,
-        app.config['TZ'],
-        date_pattern,
-        date_pattern)
-
-    return end_date

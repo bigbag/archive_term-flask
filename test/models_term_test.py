@@ -93,7 +93,7 @@ class ModelsTermCase(unittest.TestCase):
             person_id=self.EVENT_ID,
             payment_id=self.FIRM_ID,
             firm_id=self.FIRM_ID,
-            creation_date=date_helper.get_curent_date(),
+            creation_date=date_helper.get_current_date(),
         )
         self.model_test(Report, data)
 

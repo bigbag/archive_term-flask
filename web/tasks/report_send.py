@@ -111,7 +111,7 @@ class ReportSenderTask (object):
         if task.interval == ReportStack.INTERVAL_ONCE:
             task.delete()
         else:
-            task.launch_date = date_helper.get_curent_date()
+            task.launch_date = date_helper.get_current_date()
             task.save()
 
         return True

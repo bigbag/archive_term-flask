@@ -69,7 +69,7 @@ class Spot(db.Model, BaseModel):
         self.status = self.STATUS_GENERATED
         self.type = self.TYPE_FULL
         self.hard_type = self.DEFAULT_HARD_TYPE
-        self.generated_date = date_helper.get_curent_date()
+        self.generated_date = date_helper.get_current_date()
 
     def __repr__(self):
         return '<discodes_id %r>' % (self.discodes_id)
@@ -147,11 +147,11 @@ class Spot(db.Model, BaseModel):
 
     def save(self):
         if not self.registered_date and self.status == self.STATUS_REGISTERED:
-            self.registered_date = date_helper.get_curent_date()
+            self.registered_date = date_helper.get_current_date()
 
         if not self.removed_date:
             if self.status == self.STATUS_REMOVED_USER or self.status == self.STATUS_REMOVED_SYS:
-                self.removed_date = date_helper.get_curent_date()
+                self.removed_date = date_helper.get_current_date()
 
         if not self.url:
             self.get_url()

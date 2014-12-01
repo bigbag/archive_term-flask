@@ -141,7 +141,7 @@ class SocSharingTask (object):
     def rechek_manager():
         loyalties_list = []
         loyalties = PaymentLoyalty.query.filter(
-            PaymentLoyalty.stop_date > date_helper.get_curent_date()).all()
+            PaymentLoyalty.stop_date > date_helper.get_current_date()).all()
 
         for loyalty in loyalties:
             if loyalty.id in loyalties_list:

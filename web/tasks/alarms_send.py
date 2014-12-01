@@ -27,7 +27,7 @@ def alarm_manager():
         if not term.config_date:
             continue
 
-        delta = date_helper.get_curent_date(format=False) - term.config_date
+        delta = date_helper.get_current_date(format=False) - term.config_date
         if delta.total_seconds() <= alarm.interval:
             continue
 

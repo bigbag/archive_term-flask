@@ -76,7 +76,7 @@ class ModelsPaymentCase(unittest.TestCase):
             person_id=self.PERSON_ID,
             payment_id=self.FIRM_ID,
             firm_id=self.FIRM_ID,
-            creation_date=date_helper.get_curent_date(),
+            creation_date=date_helper.get_current_date(),
         )
         report = Report()
         report.__dict__.update(data_report)

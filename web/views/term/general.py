@@ -45,7 +45,6 @@ def before_request():
     g.user = current_user
     g.firm_info = get_firm_name(request)
     g.token = hash_helper.get_user_token(request)
-    g.show_account = firm_has_account(request)
 
 
 @lm.unauthorized_handler
@@ -77,27 +76,10 @@ def get_firm_name(request):
 
         if firm:
             result = dict(name=firm.name, id=firm.id)
-            session['firm_info'] = result
-    return result
-
-
-def firm_has_account(request):
-    """Определяем необходимость страницы Счет"""
-
-    if 'firm_has_account' in session:
-        return session['firm_has_account']
-
-    result = False
-    headers = request.headers
-    if 'Host' in headers:
-        host = request.headers['Host']
-        host_name = host.split('.')
-        firm = Firm.get_by_sub_domain(host_name[0])
-
-        if firm:
             if firm.transaction_percent or firm.transaction_comission:
-                result = True
-            session['firm_has_account'] = result
+                result['has_account'] = True
+
+            session['firm_info'] = result
 
     return result
 

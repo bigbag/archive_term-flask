@@ -13,18 +13,18 @@
             ('/report/company', 'Корпоративные расходы'),
             ('/report/money', 'Личные расходы'),
             ('/report/list', 'Отчеты')]  %}
-    {% if g.show_account %}
+    {% if g.firm_info['has_account'] %}
         {% set nav_statistic = [
                 ('/report/company', 'Корпоративные расходы'),
                 ('/report/money', 'Личные расходы'),
                 ('/report/list', 'Отчеты'),
                 ('/report/account', 'Счета')]  %}
     {% endif %}
-    
+
     {% set nav = [dict(
                 title='Управление',
                 data=[
-                    ('/person', 'Люди'), 
+                    ('/person', 'Люди'),
                     ('/terminal', 'Терминалы')]),
             dict(
                 title='Статистика',
@@ -58,5 +58,5 @@
 {% endblock %}
 
 {% block footer_script %}
-<script type="text/javascript" src="/static/term/angular/term/controllers/general.js"></script> 
+<script type="text/javascript" src="/static/term/angular/term/controllers/general.js"></script>
 {% endblock %}

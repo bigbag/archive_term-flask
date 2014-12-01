@@ -33,7 +33,7 @@ class User(db.Model, BaseModel):
 
     def __init__(self):
         self.lang = "en"
-        self.creation_date = date_helper.get_curent_date()
+        self.creation_date = date_helper.get_current_date()
         self.status = self.STATUS_NOACTIVE
 
     def is_authenticated(self):

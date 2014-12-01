@@ -45,7 +45,7 @@ class Person(db.Model, BaseModel):
         self.status = self.STATUS_VALID
         self.wallet_status = self.STATUS_VALID
         self.type = self.TYPE_TIMEOUT
-        self.creation_date = date_helper.get_curent_date()
+        self.creation_date = date_helper.get_current_date()
         self.name = u'Пользователь'
 
     @staticmethod

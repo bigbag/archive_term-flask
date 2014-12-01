@@ -195,7 +195,7 @@ class Term(db.Model, BaseModel):
             seans_date = None
             seans_alarm = 0
             if term.config_date:
-                delta = date_helper.get_curent_date(
+                delta = date_helper.get_current_date(
                     format=False) - term.config_date
 
                 seans_alarm = delta.total_seconds() > Term.SEANS_ALARM

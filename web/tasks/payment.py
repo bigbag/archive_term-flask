@@ -79,7 +79,7 @@ class PaymentTask (object):
 
         algorithm = PaymentTask.get_fail_algorithm(Config.FAIL_PAYMENT_ALGORITHM)
         for payment in payments:
-            delta = date_helper.get_curent_utc() - payment.timestamp
+            delta = date_helper.get_current_utc() - payment.timestamp
             for row in algorithm:
                 if payment.count != row['count']:
                     continue
