@@ -45,7 +45,7 @@ class PaymentAccount(db.Model, BaseModel):
     filename = db.Column(db.String(128))
 
     def __init__(self):
-        self.generated_date = date_helper.get_curent_date()
+        self.generated_date = date_helper.get_current_date()
         self.status = self.STATUS_GENERATED
 
     def select_list(self, firm_id, **kwargs):
@@ -145,7 +145,7 @@ class PaymentAccount(db.Model, BaseModel):
         story.append(Paragraph(u'Корр. счет 30103.810.6.00000000793',
                                style))
 
-        story.append(Spacer(1,  inch))
+        story.append(Spacer(1, inch))
 
         style_header = styles['Heading1']
         style_header.fontName = "Arial"

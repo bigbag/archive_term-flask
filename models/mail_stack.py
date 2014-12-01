@@ -31,7 +31,7 @@ class MailStack(db.Model, BaseModel):
 
     def __init__(self):
         self.lock = self.LOCK_FREE
-        self.creation_date = date_helper.get_curent_date()
+        self.creation_date = date_helper.get_current_date()
 
     def get_json(self):
         self.senders = json.loads(self.senders)
