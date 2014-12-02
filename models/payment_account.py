@@ -92,7 +92,7 @@ class PaymentAccount(db.Model, BaseModel):
         if not firm:
             return False
 
-        pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf'))
+        pdfmetrics.registerFont(TTFont('PDFFont', './fonts/Ubuntu-L.ttf'))
 
         PAGE_HEIGHT = defaultPageSize[1]
         PAGE_WIDTH = defaultPageSize[0]
@@ -112,7 +112,7 @@ class PaymentAccount(db.Model, BaseModel):
             "%s/%s" % (app.config['PDF_FOLDER'], filename), pagesize=A4)
 
         style = styles['Normal']
-        style.fontName = "Arial"
+        style.fontName = "PDFFont"
         style.alignment = TA_LEFT
 
         story = []
@@ -148,7 +148,7 @@ class PaymentAccount(db.Model, BaseModel):
         story.append(Spacer(1, inch))
 
         style_header = styles['Heading1']
-        style_header.fontName = "Arial"
+        style_header.fontName = "PDFFont"
         style_header.fontSize = 16
         style_header.alignment = TA_CENTER
 
@@ -185,7 +185,7 @@ class PaymentAccount(db.Model, BaseModel):
         table_style = TableStyle(
             [('BACKGROUND', (0, 0), (4, 0), colors.Color(0.7, 0.7, 0.7))])
         table_style.add('GRID', (0, 0), (4, 0), 1, colors.Color(0.7, 0.7, 0.7))
-        table_style.add('FONTNAME', (0, 0), (4, 3), "Arial")
+        table_style.add('FONTNAME', (0, 0), (4, 3), "PDFFont")
         table_style.add('FONTSIZE', (1, 1), (1, 1), 9)
         table_style.add('GRID', (0, 1), (4, 3), 1, colors.gray)
         table_style.add('ALIGN', (0, 0), (4, 3), 'LEFT')
@@ -203,7 +203,7 @@ class PaymentAccount(db.Model, BaseModel):
             data = [
                 [u'  Генеральный директор', u'(%s)   ' % firm.general_manager]]
             table_manager = Table(data, colWidths=3.2 * inch)
-            table_style = TableStyle([('FONTNAME', (0, 0), (1, 0), "Arial")])
+            table_style = TableStyle([('FONTNAME', (0, 0), (1, 0), "PDFFont")])
             table_style.add('ALIGN', (0, 0), (0, 0), 'LEFT')
             table_style.add('ALIGN', (1, 0), (1, 0), 'RIGHT')
             table_manager.setStyle(table_style)
@@ -217,7 +217,7 @@ class PaymentAccount(db.Model, BaseModel):
             data = [
                 [u'  Главный бухгалтер', u'(%s)   ' % firm.chief_accountant]]
             table_manager = Table(data, colWidths=3.2 * inch)
-            table_style = TableStyle([('FONTNAME', (0, 0), (1, 0), "Arial")])
+            table_style = TableStyle([('FONTNAME', (0, 0), (1, 0), "PDFFont")])
             table_style.add('ALIGN', (0, 0), (0, 0), 'LEFT')
             table_style.add('ALIGN', (1, 0), (1, 0), 'RIGHT')
             table_manager.setStyle(table_style)
