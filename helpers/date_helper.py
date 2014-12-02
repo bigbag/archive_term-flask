@@ -14,14 +14,14 @@ from pytz import timezone
 from web import app
 
 
-def get_current_date(format='%Y-%m-%d %H:%M:%S'):
+def get_curent_date(format='%Y-%m-%d %H:%M:%S'):
     client_time = datetime.utcnow()
     if format:
         client_time = client_time.strftime(format)
     return client_time
 
 
-def get_current_utc():
+def get_curent_utc():
     return calendar.timegm(datetime.utcnow().utctimetuple())
 
 
@@ -94,7 +94,7 @@ def get_date_interval(search_date, period='day', tz=app.config['TZ']):
         stop = datetime(search_date.year, search_date.month,
                         last_day, 23, 59, 59)
 
-    return (to_utc(start, tz), to_utc(stop, tz))
+    return (to_utc(start, tz).replace(tzinfo=None), to_utc(stop, tz).replace(tzinfo=None))
 
 
 def validate_date(d, format):
