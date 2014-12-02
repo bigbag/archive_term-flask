@@ -45,6 +45,8 @@ class Config():
     MAIL_USERNAME = None
     MAIL_PASSWORD = None
     DEFAULT_MAIL_SENDER = None
+    
+    PDF_FONT = './fonts/Ubuntu-L.ttf'
 
     SQLALCHEMY_BINDS = {
         'term': 'mysql://user:pass@localhost/term?charset=utf8',
