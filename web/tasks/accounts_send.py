@@ -33,28 +33,29 @@ class AccountSenderTask (object):
     @celery.task
     def account_generate(firm_id):
         firm = Firm.query.get(firm_id)
+        if not firm:
+            return False
 
         search_date = datetime.utcnow() - timedelta(days=20)
         interval = date_helper.get_date_interval(search_date, 'month')
 
         query = Report.query.filter(Report.term_firm_id == firm.id)
-        query = query.filter(Report.status == 1)
+        query = query.filter(Report.status == Report.STATUS_COMPLETE)
         query = query.filter(
-            Report.creation_date.between(interval[1], interval[1]))
-
+            Report.creation_date.between(interval[0], interval[1]))
         reports = query.all()
 
         if not len(reports):
-            continue
+            return False
 
-        account_query = PaymentAccount().query.filter(
+        query = PaymentAccount.query.filter(
             PaymentAccount.firm_id == firm.id)
-        account_query = account_query.filter(
+        query = query.filter(
             PaymentAccount.status == PaymentAccount.STATUS_GENERATED)
-        account_query = account_query.filter(func.DATE(
+        query = query.filter(func.DATE(
             PaymentAccount.generated_date) == func.DATE(date_helper.get_current_date()))
 
-        account = account_query.first()
+        account = query.first()
         if not account:
             account = PaymentAccount()
             account.firm_id = firm.id
