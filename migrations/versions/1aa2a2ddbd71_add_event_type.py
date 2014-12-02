@@ -25,25 +25,26 @@ def downgrade(engine_name):
 
 def upgrade_term():
     op.create_table('event_type',
-        sa.Column('id', sa.Integer()),
-        sa.Column('term_type', sa.Integer(), nullable=False),
-        sa.Column('event_id', sa.Integer(), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        )
+                    sa.Column('id', sa.Integer()),
+                    sa.Column('term_type', sa.Integer(), nullable=False),
+                    sa.Column('event_id', sa.Integer(), nullable=False),
+                    sa.PrimaryKeyConstraint('id'),
+                    )
 
     event_type = table('event_type',
-        column('term_type', sa.Integer()),
-        column('event_id', sa.Integer()),
-    )
+                       column('term_type', sa.Integer()),
+                       column('event_id', sa.Integer()),
+                       )
 
     op.bulk_insert(event_type,
-        [
-            {'term_type': 0, 'event_id': 1},
-            {'term_type': 0, 'event_id': 2},
-            {'term_type': 0, 'event_id': 4},
-            {'term_type': 1, 'event_id': 6},
-        ]
-    )
+                   [
+                       {'term_type': 0, 'event_id': 1},
+                       {'term_type': 0, 'event_id': 2},
+                       {'term_type': 0, 'event_id': 4},
+                       {'term_type': 1, 'event_id': 6},
+                   ]
+                   )
+
 
 def downgrade_term():
     op.drop_table("event_type")
