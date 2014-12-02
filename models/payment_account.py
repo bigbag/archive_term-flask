@@ -92,7 +92,7 @@ class PaymentAccount(db.Model, BaseModel):
         if not firm:
             return False
 
-        pdfmetrics.registerFont(TTFont('PDFFont', './fonts/Ubuntu-L.ttf'))
+        pdfmetrics.registerFont(TTFont('PDFFont', app.config['PDF_FONT']))
 
         PAGE_HEIGHT = defaultPageSize[1]
         PAGE_WIDTH = defaultPageSize[0]
