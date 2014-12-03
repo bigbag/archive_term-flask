@@ -14,14 +14,14 @@ from pytz import timezone
 from web import app
 
 
-def get_curent_date(format='%Y-%m-%d %H:%M:%S'):
+def get_current_date(format='%Y-%m-%d %H:%M:%S'):
     client_time = datetime.utcnow()
     if format:
         client_time = client_time.strftime(format)
     return client_time
 
 
-def get_curent_utc():
+def get_current_utc():
     return calendar.timegm(datetime.utcnow().utctimetuple())
 
 
