@@ -26,17 +26,18 @@ class AccountSenderTask (object):
     def accounts_manager():
         firms = Firm.query.filter((Firm.transaction_percent > 0) | (Firm.transaction_comission > 0)).all()
 
+        search_date = datetime.utcnow() - timedelta(days=20)
+        
         for firm in firms:
-            AccountSenderTask.account_generate.delay(firm.id)
+            AccountSenderTask.account_generate.delay(firm.id, search_date)
 
     @staticmethod
     @celery.task
-    def account_generate(firm_id):
+    def account_generate(firm_id, search_date):
         firm = Firm.query.get(firm_id)
         if not firm:
             return False
 
-        search_date = datetime.utcnow() - timedelta(days=20)
         interval = date_helper.get_date_interval(search_date, 'month')
 
         query = Report.query.filter(Report.term_firm_id == firm.id)
