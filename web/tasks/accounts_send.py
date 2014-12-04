@@ -54,12 +54,13 @@ class AccountSenderTask (object):
         query = query.filter(
             PaymentAccount.status == PaymentAccount.STATUS_GENERATED)
         query = query.filter(func.DATE(
-            PaymentAccount.generated_date) == func.DATE(date_helper.get_current_date()))
+            PaymentAccount.generated_date) == func.DATE(search_date))
 
         account = query.first()
         if not account:
             account = PaymentAccount()
             account.firm_id = firm.id
+            account.generated_date = search_date
 
         account.items_count = len(reports)
         account.summ = 0
