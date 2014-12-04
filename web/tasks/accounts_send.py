@@ -61,7 +61,7 @@ class AccountSenderTask (object):
             account = PaymentAccount()
             account.firm_id = firm.id
 
-        account.items_count = query.count()
+        account.items_count = len(reports)
         account.summ = 0
 
         for report in reports:
