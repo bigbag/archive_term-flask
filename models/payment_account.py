@@ -107,7 +107,7 @@ class PaymentAccount(db.Model, BaseModel):
         data = '&'.join(data)
 
         filename = "account_%s_%s.pdf" % (
-            str(self.id), hash_helper.get_content_md5(data))
+            str(self.id), hash_helper.get_content_md5(data).replace('/', ''))
         doc = SimpleDocTemplate(
             "%s/%s" % (app.config['PDF_FOLDER'], filename), pagesize=A4)
 
