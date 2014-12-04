@@ -29,7 +29,6 @@ class Config():
     TMP_PACH = './tmp'
     REPORT_TMP_PACH = './%s/tmp' % TMP_PACH
     EXCEL_FOLDER = './%s/excel' % TMP_PACH
-    PDF_FOLDER = './%s/pdf' % TMP_PACH
     IMG_FOLDER = './%s/img' % TMP_PACH
     TERM_LOG_PATH = './logs/term'
     IMPORT_EXTENSIONS = set(['xls', 'xlsx'])
@@ -45,8 +44,14 @@ class Config():
     MAIL_USERNAME = None
     MAIL_PASSWORD = None
     DEFAULT_MAIL_SENDER = None
-    
-    PDF_FONT = './fonts/Ubuntu-L.ttf'
+
+    PDF_FOLDER = './%s/pdf' % TMP_PACH    
+    PDF_FONT = './account_data/fonts/Ubuntu-L.ttf'
+    PDF_GENERAL_MANAGER = u'Радаев И. Н.'
+    PDF_CHIEF_ACCOUNTANT = u'Радаев И. Н.'
+    PDF_GENERAL_MANAGER_SIGN = './account_data/img/general_manager_sign.jpg'
+    PDF_CHIEF_ACCOUNTANT_SIGN = './account_data/img/chief_accountant_sign.jpg'
+    PDF_STAMP = './account_data/img/mobispot_stamp.jpg'
 
     SQLALCHEMY_BINDS = {
         'term': 'mysql://user:pass@localhost/term?charset=utf8',

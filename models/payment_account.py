@@ -21,7 +21,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import inch
-from reportlab.platypus import Paragraph, Frame
+from reportlab.platypus import Paragraph, Frame, Image
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -107,7 +107,7 @@ class PaymentAccount(db.Model, BaseModel):
         data = '&'.join(data)
 
         filename = "account_%s_%s.pdf" % (
-            str(self.id), hash_helper.get_content_md5(data))
+            str(self.id), hash_helper.get_content_md5(data).replace('/', ''))
         doc = SimpleDocTemplate(
             "%s/%s" % (app.config['PDF_FOLDER'], filename), pagesize=A4)
 
@@ -125,7 +125,7 @@ class PaymentAccount(db.Model, BaseModel):
         story.append(Paragraph(u'140180, г.Москва ул.Сельскохозяйственная, д.11, корп. 3',
                                style))
 
-        story.append(Spacer(1, 1 * inch))
+        story.append(Spacer(1, 0.8 * inch))
 
         story.append(Paragraph(u'Получатель: ООО «МОБИСПОТ РУС»',
                                style))
@@ -145,7 +145,7 @@ class PaymentAccount(db.Model, BaseModel):
         story.append(Paragraph(u'Корр. счет 30103.810.6.00000000793',
                                style))
 
-        story.append(Spacer(1, inch))
+        story.append(Spacer(1, 0.8 * inch))
 
         style_header = styles['Heading1']
         style_header.fontName = "PDFFont"
@@ -198,34 +198,49 @@ class PaymentAccount(db.Model, BaseModel):
         story.append(Paragraph(u'НДС и налогом с продаж не облагается, согласно НК РФ глава 26.2, статья 346.11, п.2 "Упрощенная система налогооблажения"',
                                style))
 
-        story.append(Spacer(1, 1.2 * inch))
-        if (firm.general_manager):
+        if ('PDF_GENERAL_MANAGER' in app.config):
+            story.append(Spacer(1, 0.3 * inch))
+            sign = Image(app.config['PDF_GENERAL_MANAGER_SIGN'])
             data = [
-                [u'  Генеральный директор', u'(%s)   ' % firm.general_manager]]
-            table_manager = Table(data, colWidths=3.2 * inch)
-            table_style = TableStyle([('FONTNAME', (0, 0), (1, 0), "PDFFont")])
+                [u'  Генеральный директор', sign, u'(%s)   ' % app.config['PDF_GENERAL_MANAGER']]]
+            table_manager = Table(data, colWidths=2.1 * inch)
+            table_style = TableStyle([('FONTNAME', (0, 0), (2, 0), "PDFFont")])
+            table_style.add('VALIGN', (0, 0), (2, 0), 'MIDDLE')
             table_style.add('ALIGN', (0, 0), (0, 0), 'LEFT')
-            table_style.add('ALIGN', (1, 0), (1, 0), 'RIGHT')
+            table_style.add('ALIGN', (1, 0), (1, 0), 'CENTER')
+            table_style.add('ALIGN', (2, 0), (2, 0), 'RIGHT')
             table_manager.setStyle(table_style)
             story.append(table_manager)
+            story.append(Spacer(1, 0.2 * inch))
         else:
+            story.append(Spacer(1, 0.7 * inch))
             story.append(Paragraph(u'Генеральный директор',
                                    style))
+            story.append(Spacer(1, 0.6 * inch))
 
-        story.append(Spacer(1, 1.2 * inch))
-        if (firm.chief_accountant):
+        
+        if ('PDF_CHIEF_ACCOUNTANT' in app.config):
+            sign = Image(app.config['PDF_CHIEF_ACCOUNTANT_SIGN'])
+
             data = [
-                [u'  Главный бухгалтер', u'(%s)   ' % firm.chief_accountant]]
-            table_manager = Table(data, colWidths=3.2 * inch)
-            table_style = TableStyle([('FONTNAME', (0, 0), (1, 0), "PDFFont")])
+                [u'  Главный бухгалтер', sign, u'(%s)   ' % app.config['PDF_CHIEF_ACCOUNTANT']]]
+            table_manager = Table(data, colWidths=2.1 * inch)
+            table_style = TableStyle([('FONTNAME', (0, 0), (2, 0), "PDFFont")])
+            table_style.add('VALIGN', (0, 0), (2, 0), 'MIDDLE')
             table_style.add('ALIGN', (0, 0), (0, 0), 'LEFT')
-            table_style.add('ALIGN', (1, 0), (1, 0), 'RIGHT')
+            table_style.add('ALIGN', (1, 0), (1, 0), 'CENTER')
+            table_style.add('ALIGN', (2, 0), (2, 0), 'RIGHT')
             table_manager.setStyle(table_style)
             story.append(table_manager)
         else:
             story.append(Paragraph(u'Главный бухгалтер',
                                    style))
 
+        if ('PDF_STAMP' in app.config):
+            stamp = Image(app.config['PDF_STAMP'])
+            stamp.hAlign = 'LEFT'
+            story.append(stamp)
+    
         doc.build(story)
 
         return filename
