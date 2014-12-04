@@ -46,12 +46,12 @@ class Config():
     DEFAULT_MAIL_SENDER = None
 
     PDF_FOLDER = './%s/pdf' % TMP_PACH    
-    PDF_FONT = './account_data/fonts/Ubuntu-L.ttf'
+    PDF_FONT = './static/account_data/fonts/Ubuntu-L.ttf'
     PDF_GENERAL_MANAGER = u'Радаев И. Н.'
     PDF_CHIEF_ACCOUNTANT = u'Радаев И. Н.'
-    PDF_GENERAL_MANAGER_SIGN = './account_data/img/general_manager_sign.jpg'
-    PDF_CHIEF_ACCOUNTANT_SIGN = './account_data/img/chief_accountant_sign.jpg'
-    PDF_STAMP = './account_data/img/mobispot_stamp.jpg'
+    PDF_GENERAL_MANAGER_SIGN = './static/account_data/img/general_manager_sign.jpg'
+    PDF_CHIEF_ACCOUNTANT_SIGN = './static/account_data/img/chief_accountant_sign.jpg'
+    PDF_STAMP = './static/account_data/img/mobispot_stamp.jpg'
 
     SQLALCHEMY_BINDS = {
         'term': 'mysql://user:pass@localhost/term?charset=utf8',
