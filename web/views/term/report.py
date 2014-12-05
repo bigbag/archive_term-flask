@@ -5,9 +5,13 @@
     :copyright: (c) 2013 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+
 import json
+import os
 
 from web.views.term.general import *
+from web import app
+from flask import send_from_directory
 
 from models.report import Report
 from models.person import Person
@@ -250,3 +254,16 @@ def remove_account_email():
     answer['message'] = u'Операция успешно выполнена'
 
     return jsonify(answer)
+
+
+@mod.route('/report/account/pdf/<int:account_id>', methods=['GET'])
+@login_required
+def get_account_pdf(account_id):
+    account = PaymentAccount.query.get(account_id)
+
+    if not account.firm_id == g.firm_info['id']:
+        abort(403)
+
+    directory = '%s/%s' % (os.getcwd(), app.config['PDF_FOLDER'])
+
+    return send_from_directory(directory, account.filename)

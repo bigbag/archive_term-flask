@@ -257,4 +257,8 @@ angular.module('term').controller('ReportController',
     $scope.account_emails = angular.fromJson(json);
   };
   
+  $scope.accountPdf = function(account_id) {
+    window.location.pathname = window.location.pathname + '/pdf/' + account_id;
+  }
+  
 });

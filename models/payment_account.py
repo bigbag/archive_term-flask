@@ -71,8 +71,7 @@ class PaymentAccount(db.Model, BaseModel):
                     app.config['TZ']).strftime(date_pattern),
                 summ=float(account.summ) / 100,
                 items_count=account.items_count,
-                status=account.status,
-                filename=account.get_file_link()
+                status=account.status
             )
             result.append(data)
 
@@ -200,7 +199,7 @@ class PaymentAccount(db.Model, BaseModel):
 
         if ('PDF_GENERAL_MANAGER' in app.config):
             story.append(Spacer(1, 0.3 * inch))
-            sign = Image(app.config['PDF_GENERAL_MANAGER_SIGN'])
+            sign = Image(app.config['PDF_GENERAL_MANAGER_SIGN'], width=65, height=52)
             data = [
                 [u'  Генеральный директор', sign, u'(%s)   ' % app.config['PDF_GENERAL_MANAGER']]]
             table_manager = Table(data, colWidths=2.1 * inch)
@@ -220,7 +219,7 @@ class PaymentAccount(db.Model, BaseModel):
 
         
         if ('PDF_CHIEF_ACCOUNTANT' in app.config):
-            sign = Image(app.config['PDF_CHIEF_ACCOUNTANT_SIGN'])
+            sign = Image(app.config['PDF_CHIEF_ACCOUNTANT_SIGN'], width=65, height=52)
 
             data = [
                 [u'  Главный бухгалтер', sign, u'(%s)   ' % app.config['PDF_CHIEF_ACCOUNTANT']]]
@@ -237,7 +236,7 @@ class PaymentAccount(db.Model, BaseModel):
                                    style))
 
         if ('PDF_STAMP' in app.config):
-            stamp = Image(app.config['PDF_STAMP'])
+            stamp = Image(app.config['PDF_STAMP'], width=110, height=110)
             stamp.hAlign = 'LEFT'
             story.append(stamp)
     
