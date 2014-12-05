@@ -5,6 +5,8 @@
     :copyright: (c) 2014 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
+import os
+
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta
 from web import app
@@ -83,8 +85,7 @@ class AccountSenderTask (object):
             mail.send.delay(
                 AccountMessage,
                 to=email,
-                attach="%s/%s" % (app.config['PDF_FOLDER'],
-                                  account.filename),
+                attach='%s/%s/%s' % (os.getcwd(), app.config['PDF_FOLDER'], account.filename),
                 date_text=account.get_month_year())
 
         return True
