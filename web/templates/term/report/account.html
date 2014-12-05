@@ -23,15 +23,15 @@
                 </thead>
                 <tbody>
                     <tr 
-                        ng-repeat="account in result">
-                        
-                        <td><a href="{[{account.filename}]}">{[{account.id}]}</a></td>
-                        <td><a href="{[{account.filename}]}">{[{account.generated_date}]}</a></td>
-                        <td><a href="{[{account.filename}]}">{[{account.summ}]}</a></td>
-                        <td><a href="{[{account.filename}]}">
+                        ng-repeat="account in result"
+                        ng-click="accountPdf(account.id)">
+                        <td>{[{account.id}]}</td>
+                        <td>{[{account.generated_date}]}</td>
+                        <td>{[{account.summ}]}</td>
+                        <td>
                             <span class="m-card-act g-round"
                                 ></span>
-                        </td></a>
+                        </td>
                         
                     </tr>
                     <tr class="m-table-bottom" ng-show="search.page_count">
