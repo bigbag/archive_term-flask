@@ -71,8 +71,7 @@ class PaymentAccount(db.Model, BaseModel):
                     app.config['TZ']).strftime(date_pattern),
                 summ=float(account.summ) / 100,
                 items_count=account.items_count,
-                status=account.status,
-                filename=account.get_file_link()
+                status=account.status
             )
             result.append(data)
 
