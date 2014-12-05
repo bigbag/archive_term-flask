@@ -33,7 +33,6 @@ class ReportResult(object):
         self.all = dict(summ=0, count=0)
 
     def get_firm(self):
-        result = None
         if self.task and self.task.firm_id:
             firm = Firm.query.get(self.task.firm_id)
         return firm
@@ -66,12 +65,14 @@ class ReportResult(object):
         result['search'] = date_helper.get_date_interval(
             result['date'], result['meta'])
 
+        date_format = '%Y-%m-%d %H:%M:%S'
         if self.task.interval == ReportStack.INTERVAL_ONCE:
             details = self.task.details
             if details and 'period' in details:
                 details = self.task.decode_field(details)
                 interval = details['period']
-                result['search'] = (datetime.strptime(interval['start'], '%Y-%m-%d'), datetime.strptime(interval['end'], '%Y-%m-%d'))
+                result['search'] = (datetime.strptime(interval['start'], date_format),
+                                    datetime.strptime(interval['end'], date_format))
                 result['date'] = result['search']
 
         report = Report()
@@ -166,10 +167,6 @@ class ReportResult(object):
     def set_terms(self, term_id):
         terms = Term.select_name_dict()
         if term_id not in self.terms:
-            if term_id not in self.terms:
-                term_name = u'Не известно'
-            if term_id in terms:
-                term_name = terms[term_id]
 
             self.terms[term_id] = dict(
                 name=terms[term_id],
