@@ -208,9 +208,7 @@ def forgot_request():
         answer['content'] = u'Пользователь заблокирован'
         return jsonify(answer)
 
-    recovery_url = term_user.get_change_password_url(
-        request.headers.get('Origin'))
-
+    recovery_url = term_user.get_change_password_url(request.url_root)
     mail.send.delay(
         UserForgotPasswordMessage,
         to=term_user.email,
