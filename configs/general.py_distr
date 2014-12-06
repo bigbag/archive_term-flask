@@ -13,6 +13,9 @@ class Config():
     DEBUG = False
     TESTING = False
 
+    APP_IP = '127.0.0.1'
+    APP_PORT = '4001'
+
     ADMINS = frozenset([youremail@yourdomain.com])
 
     SECRET_KEY = SECRET_KEY_FOR_SESSION_SIGNING
