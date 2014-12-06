@@ -16,7 +16,7 @@ class Config():
     ADMINS = frozenset([youremail@yourdomain.com])
 
     SECRET_KEY = SECRET_KEY_FOR_SESSION_SIGNING
-    
+
     CSRF_ENABLED = True
     CSRF_SESSION_KEY = SOMETHING_IMPOSSIBLE_TO_GUEES
 
@@ -220,9 +220,11 @@ class Config():
 class ProductionConfig(Config):
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_RECORD_QUERIES = True
+    LOG_LEVEL = 'ERROR'
 
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_ECHO = True
     DEBUG = True
     SQLALCHEMY_RECORD_QUERIES = True
+    LOG_LEVEL = 'DEBUG'
