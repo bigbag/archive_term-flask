@@ -15,7 +15,10 @@ class Config():
 
     ADMINS = frozenset([youremail@yourdomain.com])
 
-    SECRET_KEY = 'test'
+    SECRET_KEY = SECRET_KEY_FOR_SESSION_SIGNING
+    
+    CSRF_ENABLED = True
+    CSRF_SESSION_KEY = SOMETHING_IMPOSSIBLE_TO_GUEES
 
     CACHE_TYPE = 'RedisCache'
     CACHE_REDIS_HOST = 'localhost'
