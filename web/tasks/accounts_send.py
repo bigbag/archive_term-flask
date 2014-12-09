@@ -5,6 +5,8 @@
     :copyright: (c) 2014 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
+import logging
+
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta
 from web import app
@@ -27,15 +29,18 @@ class AccountSenderTask (object):
         firms = Firm.query.filter((Firm.transaction_percent > 0) | (Firm.transaction_comission > 0)).all()
 
         search_date = datetime.utcnow() - timedelta(days=20)
-        
+
         for firm in firms:
             AccountSenderTask.account_generate.delay(firm.id, search_date)
 
     @staticmethod
     @celery.task
-    def account_generate(firm_id, search_date):
+    def account_generate(firm_id, search_date, send=True):
+        log = logging.getLogger('task')
+
         firm = Firm.query.get(firm_id)
         if not firm:
+            log.error('Not found firm with id %s' % firm_id)
             return False
 
         interval = date_helper.get_date_interval(search_date, 'month')
@@ -47,6 +52,8 @@ class AccountSenderTask (object):
         reports = query.all()
 
         if not len(reports):
+            log.debug('Empty report for firm id %s, date %s' %
+                      (firm_id, search_date))
             return False
 
         query = PaymentAccount.query.filter(
@@ -73,10 +80,15 @@ class AccountSenderTask (object):
             elif firm.transaction_comission > 0:
                 account.summ = account.summ + firm.transaction_comission
 
-        account.save()
-        account.filename = account.generate_pdf()
+        account.filename = PaymentAccount.get_filename(firm_id, search_date)
+        if not account.generate_pdf():
+            log.error('Not generate account for firm id %s, date %s' %
+                      (firm_id, search_date))
+            return False
 
         account.save()
+        if not send:
+            return True
 
         emails = firm.decode_field(firm.account_email)
         for email in emails:
