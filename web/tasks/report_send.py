@@ -42,10 +42,18 @@ class ReportSenderTask (object):
     @staticmethod
     @celery.task
     def lost_report_watcher(term_id, report_max_date):
-        report_max_date = datetime.strptime(report_max_date, '%Y-%m-%d %H:%M:%S')
+        full_format = '%Y-%m-%d %H:%M:%S'
+        short_format = '%Y-%m-%d'
+
+        report_max_date = datetime.strptime(report_max_date, full_format)
         details = date_helper.get_date_interval(report_max_date)
         details = map(lambda row: str(row), details)
-        details = {'period': {'start': details[0], 'end': details[0]}}
+
+        start = datetime.strptime(details[0], full_format)
+        end = datetime.strptime(details[1], full_format)
+        details = {'period': {
+            'start': start.strftime(short_format),
+            'end': end.strftime(short_format)}}
 
         firms = FirmTerm.get_list_by_term_id(term_id)
         for firm in firms:
