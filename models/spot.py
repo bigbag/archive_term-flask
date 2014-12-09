@@ -74,6 +74,11 @@ class Spot(db.Model, BaseModel):
     def __repr__(self):
         return '<discodes_id %r>' % (self.discodes_id)
 
+    @staticmethod
+    def check_activ(discodes_id):
+        spot = Spot.query.get(discodes_id)
+        return spot.status != Spot.STATUS_GENERATED
+
     def get_random_string(self, char=string.letters, size=CODE_SIZE):
         return ''.join(random.choice(char) for x in range(size))
 

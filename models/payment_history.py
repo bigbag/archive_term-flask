@@ -31,6 +31,9 @@ class PaymentHistory(db.Model, BaseModel):
 
     SYSTEM_PAYMENT = 100
 
+    SYSTEM_MPS = 0
+    SYSTEM_YANDEX = 1
+
     id = db.Column(db.Integer, primary_key=True)
     report_id = db.Column(db.Integer(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
@@ -44,11 +47,13 @@ class PaymentHistory(db.Model, BaseModel):
     request_id = db.Column(db.Text(), nullable=False)
     invoice_id = db.Column(db.Text())
     type = db.Column(db.Integer(), nullable=False, index=True)
+    system = db.Column(db.Integer(), nullable=False, index=True)
     status = db.Column(db.Integer(), nullable=False, index=True)
 
     def __init__(self):
         self.term_id = 0
         self.status = self.STATUS_NEW
+        self.system = self.SYSTEM_MPS
         self.type = self.TYPE_PAYMENT
         self.request_id = 0
         self.report_id = 0
@@ -101,8 +106,8 @@ class PaymentHistory(db.Model, BaseModel):
 
     @staticmethod
     def get_new_payment():
-        return PaymentHistory.query.filter(
-            PaymentHistory.report_id != 0).filter(
-                PaymentHistory.status == PaymentHistory.STATUS_NEW).filter(
-                    PaymentHistory.request_id != 0).all(
-        )
+        query = PaymentHistory.query.filter(PaymentHistory.report_id != 0)
+        query = query.filter((PaymentHistory.status == PaymentHistory.STATUS_NEW) |
+                             (PaymentHistory.status == PaymentHistory.STATUS_IN_PROGRESS))
+
+        return query.filter(PaymentHistory.request_id != 0).all()

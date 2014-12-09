@@ -29,6 +29,13 @@ class PaymentCard(db.Model, BaseModel):
 
     LINKING_AMOUNT = 1
 
+    TYPE_YM = 'Yandex'
+    TYPE_MC = 'MasterCard'
+    TYPE_VISA = 'VISA'
+
+    SYSTEM_MPS = 0
+    SYSTEM_YANDEX = 1
+
     MAX_LINKING_CARD_TIMEOUT = 60 * 60
 
     log = logging.getLogger('payment')
@@ -38,13 +45,21 @@ class PaymentCard(db.Model, BaseModel):
     user = db.relationship('User')
     wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'), index=True)
     wallet = db.relationship('PaymentWallet')
-    pan = db.Column(db.String(128), nullable=False)
+    pan = db.Column(db.String(128), nullable=True)
     token = db.Column(db.Text(), nullable=False)
     type = db.Column(db.String(128), nullable=False, index=True)
+    system = db.Column(db.Integer(), nullable=False, index=True)
     status = db.Column(db.Integer(), nullable=False, index=True)
 
     def __init__(self):
-        self.status = 0
+        self.system = self.SYSTEM_MPS
+        self.status = self.STATUS_ARCHIV
+
+    @staticmethod
+    def get_payment_card(wallet_id):
+        return PaymentCard.query.filter_by(
+            wallet_id=wallet_id,
+            status=PaymentCard.STATUS_PAYMENT).first()
 
     def get_linking_params(self, order_id=0, url=None):
         """Запрос параметров для привязки карты"""
@@ -87,9 +102,7 @@ class PaymentCard(db.Model, BaseModel):
     def linking_init(self, discodes_id, url=None):
         """Инициализируем привязку карты"""
 
-        wallet = PaymentWallet.query.filter(
-            PaymentWallet.discodes_id == discodes_id).filter(
-                PaymentWallet.user_id != 0).first()
+        wallet = PaymentWallet.get_valid_by_discodes_id(discodes_id)
         if not wallet:
             return False
 
@@ -118,6 +131,8 @@ class PaymentCard(db.Model, BaseModel):
 
     def linking_card(self, history_id):
         """Привязываем карту, получаем платежный токен"""
+
+        from web.tasks.payment import PaymentTask
 
         history = PaymentHistory.query.get(history_id)
         if not history:
@@ -151,7 +166,7 @@ class PaymentCard(db.Model, BaseModel):
         if result['status'] != 'success':
             return result
 
-        self.set_archiv(history.wallet_id)
+        PaymentCard.set_archiv(history.wallet_id)
 
         card = self.add_payment(history, result)
         if not card:
@@ -165,12 +180,15 @@ class PaymentCard(db.Model, BaseModel):
         if not card.save():
             return False
 
+        PaymentTask.restart_fail_algorithm.delay(history.wallet_id)
+
         wallet.blacklist = PaymentWallet.ACTIVE_ON
         wallet.save()
 
         return result
 
-    def set_archiv(self, wallet_id):
+    @staticmethod
+    def set_archiv(wallet_id):
         """Переводим все карты привязанные к кошельку в архивное состояние"""
 
         old_cards = PaymentCard.query.filter_by(
@@ -201,6 +219,20 @@ class PaymentCard(db.Model, BaseModel):
         card.token = status['money_source']['money_source_token']
         card.pan = status['money_source']['pan_fragment']
         card.type = status['money_source']['payment_card_type']
+        card.status = PaymentCard.STATUS_PAYMENT
+
+        return card
+
+    @staticmethod
+    def add_ym_wallet(wallet, token):
+        """ Добавляем кошелек яндекс"""
+
+        card = PaymentCard()
+        card.user_id = wallet.user_id
+        card.wallet_id = wallet.id
+        card.token = token
+        card.type = PaymentCard.TYPE_YM
+        card.system = PaymentCard.SYSTEM_YANDEX
         card.status = PaymentCard.STATUS_PAYMENT
 
         return card

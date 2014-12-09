@@ -7,4 +7,4 @@
 """
 from web import app
 app.config.from_object('configs.general.ProductionConfig')
-app.run(host='127.0.0.1', port=4001)
+app.run(host=app.config['APP_IP'], port=app.config['APP_PORT'])

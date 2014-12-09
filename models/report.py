@@ -189,10 +189,7 @@ class Report(db.Model, BaseModel):
         answer = {}
         self._get_search_params(**kwargs)
 
-        query = db.session.query(
-            Report.creation_date,
-            func.sum(Report.amount),
-            func.count(Report.id))
+        query = db.session.query(Report.creation_date)
 
         if self.person_id:
             query = query.filter(Report.person_id == self.person_id)
@@ -229,7 +226,7 @@ class Report(db.Model, BaseModel):
 
         return query.all()
 
-    @cache.cached(timeout=120, key_prefix='report_person')
+    #@cache.cached(timeout=30)
     def get_person_report(self, **kwargs):
 
         time_pattern = '%H:%M'
@@ -255,8 +252,8 @@ class Report(db.Model, BaseModel):
 
             data = dict(
                 creation_date=search_date.strftime(result_date_pattern),
-                amount=float(report[1]) / 100,
-                count=int(report[2])
+                amount=0,
+                count=0
             )
 
             data['page_dates'] = answer['page_dates']
@@ -283,6 +280,8 @@ class Report(db.Model, BaseModel):
                     amount=float(row.amount) / 100,
                     name=row.name,
                 )
+                data['count'] += 1
+                data['amount'] += detaled_data['amount']
                 data['detaled'].append(detaled_data)
 
             result.append(data)
@@ -297,11 +296,7 @@ class Report(db.Model, BaseModel):
         answer = {}
         self._get_search_params(**kwargs)
 
-        query = db.session.query(
-            Report.creation_date,
-            func.sum(Report.amount),
-            func.count(Report.id))
-
+        query = db.session.query(Report.creation_date)
         query = query.filter(Report.type == self.payment_type)
 
         query = Report()._set_firm_id_filter(
@@ -366,7 +361,7 @@ class Report(db.Model, BaseModel):
 
         return creation_date
 
-    #@cache.cached(timeout=120, key_prefix='report_interval')
+    @cache.cached(timeout=30)
     def get_term_report(self, **kwargs):
 
         self._get_search_params(**kwargs)
@@ -380,8 +375,8 @@ class Report(db.Model, BaseModel):
 
             data = dict(
                 creation_date=creation_date,
-                amount=float(report[1]) / 100,
-                count=int(report[2])
+                amount=0,
+                count=0
             )
 
             detaled_report = self.term_detaled_query(search_date)
@@ -396,6 +391,8 @@ class Report(db.Model, BaseModel):
                     amount=float(row[1]) / 100,
                     count=int(row[2])
                 )
+                data['count'] += detaled_data['count']
+                data['amount'] += detaled_data['amount']
                 data['detaled'].append(detaled_data)
 
             result.append(data)

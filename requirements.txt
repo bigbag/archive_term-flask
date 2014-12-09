@@ -19,4 +19,5 @@ Twython
 xlrd
 celery
 pycurl
+yandex-money-sdk
 reportlab
