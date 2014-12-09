@@ -14,15 +14,11 @@ from models.firm import Firm
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.rl_config import defaultPageSize
 from reportlab.lib.units import inch
 
-from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import inch
-from reportlab.platypus import Paragraph, Frame, Image
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Image
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.enums import TA_LEFT, TA_CENTER
@@ -52,8 +48,7 @@ class PaymentAccount(db.Model, BaseModel):
 
         date_pattern = '%d.%m.%Y'
 
-        order = kwargs[
-            'order'] if 'order' in kwargs else 'generated_date desc'
+        order = kwargs['order'] if 'order' in kwargs else 'generated_date desc'
         limit = kwargs['limit'] if 'limit' in kwargs else 10
         page = kwargs['page'] if 'page' in kwargs else 1
 
@@ -82,33 +77,26 @@ class PaymentAccount(db.Model, BaseModel):
 
         return value
 
+    @staticmethod
+    def get_filename(firm_id, search_date):
+        search_date = search_date.strftime('%m_%Y')
+        return "account_firm_%s_date_%s.pdf" % (firm_id, search_date)
+
     def generate_pdf(self):
         if not self.firm_id or not self.summ:
             return False
 
         firm = Firm.query.get(self.firm_id)
-
         if not firm:
             return False
 
         pdfmetrics.registerFont(TTFont('PDFFont', app.config['PDF_FONT']))
-
-        PAGE_HEIGHT = defaultPageSize[1]
-        PAGE_WIDTH = defaultPageSize[0]
         styles = getSampleStyleSheet()
-        Title = "Account %s" % str(self.id)
-        pageinfo = "Account"
-
-        data = [
-            str(self.firm_id),
-            str(self.summ),
-            str(self.generated_date)]
+        data = [str(self.firm_id), str(self.summ), str(self.generated_date)]
         data = '&'.join(data)
 
-        filename = "account_%s_%s.pdf" % (
-            str(self.id), hash_helper.get_content_md5(data).replace('/', ''))
         doc = SimpleDocTemplate(
-            "%s/%s" % (app.config['PDF_FOLDER'], filename), pagesize=A4)
+            "%s/%s" % (app.config['PDF_FOLDER'], self.filename), pagesize=A4)
 
         style = styles['Normal']
         style.fontName = "PDFFont"
@@ -116,7 +104,6 @@ class PaymentAccount(db.Model, BaseModel):
 
         story = []
         style.fontSize = 12
-
         story.append(Paragraph(u'ООО «МОБИСПОТ РУС»',
                                style))
 
@@ -125,7 +112,6 @@ class PaymentAccount(db.Model, BaseModel):
                                style))
 
         story.append(Spacer(1, 0.8 * inch))
-
         story.append(Paragraph(u'Получатель: ООО «МОБИСПОТ РУС»',
                                style))
         story.append(Paragraph(u'ИНН 7717770408 КПП 771701001',
@@ -217,7 +203,6 @@ class PaymentAccount(db.Model, BaseModel):
                                    style))
             story.append(Spacer(1, 0.6 * inch))
 
-        
         if ('PDF_CHIEF_ACCOUNTANT' in app.config):
             sign = Image(app.config['PDF_CHIEF_ACCOUNTANT_SIGN'], width=65, height=52)
 
@@ -239,10 +224,10 @@ class PaymentAccount(db.Model, BaseModel):
             stamp = Image(app.config['PDF_STAMP'], width=110, height=110)
             stamp.hAlign = 'LEFT'
             story.append(stamp)
-    
+
         doc.build(story)
 
-        return filename
+        return True
 
     def format_summ(self, summ):
         summ = int(round(summ))

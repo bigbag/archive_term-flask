@@ -43,7 +43,7 @@ def load_user(id):
 @mod.before_request
 def before_request():
     g.user = current_user
-    g.firm_info = get_firm_name(request)
+    g.firm_info = get_firm_info(request)
     g.token = hash_helper.get_user_token(request)
 
 
@@ -61,8 +61,8 @@ def get_post_arg(request, token=False):
     return arg
 
 
-def get_firm_name(request):
-    """Определяем название фирмы по субдомену"""
+def get_firm_info(request):
+    """Определяем информацию о фирме по субдомену"""
 
     if 'firm_info' in session:
         return session['firm_info']
@@ -208,9 +208,7 @@ def forgot_request():
         answer['content'] = u'Пользователь заблокирован'
         return jsonify(answer)
 
-    recovery_url = term_user.get_change_password_url(
-        request.headers.get('Origin'))
-
+    recovery_url = term_user.get_change_password_url(request.url_root)
     mail.send.delay(
         UserForgotPasswordMessage,
         to=term_user.email,

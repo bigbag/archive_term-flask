@@ -13,13 +13,20 @@ class Config():
     DEBUG = False
     TESTING = False
 
-    SECRET_KEY = 'F\x03Dk\x1f@\xaa_5{\xf5m\xf2\x99\x9e\x1c\n\xe7{\xfb\x8aQ\xdae'
+    APP_IP = '127.0.0.1'
+    APP_PORT = '4001'
+
+    ADMINS = frozenset([youremail@yourdomain.com])
+
+    SECRET_KEY = SECRET_KEY_FOR_SESSION_SIGNING
+
+    CSRF_ENABLED = True
+    CSRF_SESSION_KEY = SOMETHING_IMPOSSIBLE_TO_GUEES
 
     CACHE_TYPE = 'RedisCache'
     CACHE_REDIS_HOST = 'localhost'
     CACHE_REDIS_PORT = 6379
     CACHE_REDIS_DB = 1
-
     CACHE_DEFAULT_TIMEOUT = 50
     CACHE_THRESHOLD = 2048
 
@@ -27,11 +34,14 @@ class Config():
 
     ARCHIV_PATH = './archiv'
     TMP_PACH = './tmp'
+
+    IMPORT_EXTENSIONS = set(['xls', 'xlsx'])
+
     REPORT_TMP_PACH = './%s/tmp' % TMP_PACH
     EXCEL_FOLDER = './%s/excel' % TMP_PACH
-    IMG_FOLDER = './%s/img' % TMP_PACH
     TERM_LOG_PATH = './logs/term'
-    IMPORT_EXTENSIONS = set(['xls', 'xlsx'])
+
+    IMG_FOLDER = './%s/img' % TMP_PACH
     IMG_EXTENSIONS = set(['jpg', 'png'])
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
     MAX_IMG_LENGTH = 16 * 1024 * 1024
@@ -59,8 +69,6 @@ class Config():
         'payment': 'mysql://user:pass@localhost/payment?charset=utf8',
         'mobispot': 'mysql://user:pass@localhost/mobispot?charset=utf8'
     }
-
-    SECRET_KEY = 'test'
 
     LANGUAGES = {
         'en': 'English',
@@ -169,6 +177,8 @@ class Config():
              start_interval=30 * 24 * 60 * 60),
     ]
 
+    LOGGER_NAME = 'all'
+    
     LOG_PATH = './logs'
     LOG_ENABLE = True
     LOG_LEVEL = 'DEBUG'
@@ -215,9 +225,11 @@ class Config():
 class ProductionConfig(Config):
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_RECORD_QUERIES = True
+    LOG_LEVEL = 'ERROR'
 
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_ECHO = True
     DEBUG = True
     SQLALCHEMY_RECORD_QUERIES = True
+    LOG_LEVEL = 'DEBUG'

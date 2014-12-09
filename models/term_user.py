@@ -6,7 +6,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db
+from web import db, cache
 
 from models.base_model import BaseModel
 from helpers import date_helper, hash_helper
@@ -52,12 +52,15 @@ class TermUser(db.Model, BaseModel):
     def get_id(self):
         return self.id
 
+    @cache.cached(timeout=300)
     def get_by_api_key(self, api_key):
         return self.query.filter_by(api_key=api_key).first()
 
+    @cache.cached(timeout=60)
     def get_by_email(self, email):
         return self.query.filter_by(email=email).first()
 
+    @cache.cached(timeout=60)
     def get_by_id(self, id):
         return self.query.get(int(id))
 

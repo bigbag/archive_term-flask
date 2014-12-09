@@ -1,4 +1,4 @@
-"""empty message
+"""edit payment_card pan column
 
 Revision ID: 45422317ee1a
 Revises: 31c8c264892c
