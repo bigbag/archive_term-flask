@@ -65,14 +65,22 @@ class ReportResult(object):
         result['search'] = date_helper.get_date_interval(
             result['date'], result['meta'])
 
-        date_format = '%Y-%m-%d %H:%M:%S'
+        full_format = '%Y-%m-%d %H:%M:%S'
+        simple_format = '%Y-%m-%d'
         if self.task.interval == ReportStack.INTERVAL_ONCE:
             details = self.task.details
             if details and 'period' in details:
                 details = self.task.decode_field(details)
                 interval = details['period']
-                result['search'] = (datetime.strptime(interval['start'], date_format),
-                                    datetime.strptime(interval['end'], date_format))
+                try:
+                    result['search'] = (
+                        datetime.strptime(interval['start'], full_format),
+                        datetime.strptime(interval['end'], full_format))
+                except:
+                    result['search'] = (
+                        datetime.strptime(interval['start'], simple_format),
+                        datetime.strptime(interval['end'], simple_format))
+
                 result['date'] = result['search']
 
         report = Report()
