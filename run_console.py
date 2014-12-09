@@ -9,10 +9,12 @@
 from flask.ext.script import Manager
 from console import app
 from console.view.billing import Billing
+from console.view.report_parser import ReportParser
 from console.view.test import TestCommand
 
 manager = Manager(app)
 
+manager.add_command('report_parser', ReportParser())
 manager.add_command('billing', Billing())
 manager.add_command('test', TestCommand())
 manager.run()
