@@ -83,14 +83,16 @@ class AccountSenderTask (object):
                 account.summ = account.summ + firm.transaction_comission
 
         account.filename = PaymentAccount.get_filename(firm_id, search_date)
-        if not account.summ:
+        account.save()
+
+        if not account.generate_pdf():
             log.error('Not generate account for firm id %s, date %s' %
                       (firm_id, search_date))
+            account.delete()
             return False
 
         account.save()
-        account.generate_pdf()
-        
+
         if not send:
             return True
 

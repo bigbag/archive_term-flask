@@ -7,7 +7,7 @@
 """
 from web import app, db
 
-from helpers import date_helper, hash_helper
+from helpers import date_helper
 
 from models.base_model import BaseModel
 from models.firm import Firm
@@ -45,7 +45,6 @@ class PaymentAccount(db.Model, BaseModel):
         self.status = self.STATUS_GENERATED
 
     def select_list(self, firm_id, **kwargs):
-
         date_pattern = '%d.%m.%Y'
 
         order = kwargs['order'] if 'order' in kwargs else 'generated_date desc'
@@ -79,8 +78,9 @@ class PaymentAccount(db.Model, BaseModel):
 
     @staticmethod
     def get_filename(firm_id, search_date):
-        search_date = search_date.strftime('%m_%Y')
-        return "account_firm_%s_date_%s.pdf" % (firm_id, search_date)
+        return "account_firm_%s_date_%s.pdf" % (
+            firm_id,
+            search_date.strftime('%m_%Y'))
 
     def generate_pdf(self):
         if not self.firm_id or not self.summ:
@@ -143,10 +143,10 @@ class PaymentAccount(db.Model, BaseModel):
             app.config['TZ']).strftime(date_pattern)
         if self.id:
             story.append(Paragraph(u'Счет №%s от %s' % (self.id, date_pdf),
-                               style_header))
+                                   style_header))
         else:
             story.append(Paragraph(u'Счет от %s' % date_pdf,
-                               style_header))
+                                   style_header))
 
         if firm.legal_entity:
             story.append(Paragraph(u'Плательщик: %s' % firm.legal_entity,
@@ -154,13 +154,13 @@ class PaymentAccount(db.Model, BaseModel):
             story.append(Spacer(1, 0.1 * inch))
 
         data_count = 1
-        item_price = self.format_summ(self.summ)
+        item_price = PaymentAccount.format_summ(self.summ)
         if self.items_count and firm.transaction_comission:
             data_count = str(self.items_count)
             price = int(round(float(self.summ) / self.items_count))
-            item_price = self.format_summ(price)
+            item_price = PaymentAccount.format_summ(price)
 
-        data_summ = self.format_summ(self.summ)
+        data_summ = PaymentAccount.format_summ(self.summ)
 
         data = [
             [u'№', u'Наименование', u'Количество, шт.',
@@ -233,22 +233,12 @@ class PaymentAccount(db.Model, BaseModel):
 
         return True
 
-    def format_summ(self, summ):
+    @staticmethod
+    def format_summ(summ):
         summ = int(round(summ))
-        rub = str(summ / 100)
-        if summ / 100 < 10:
-            rub = '0%s' % rub
-        kopek = summ % 100
-        if summ % 100 < 10:
-            kopek = '0%s' % kopek
-
-        return '%s-%s' % (rub, kopek)
+        return "%02d-%02d" % (summ / 100, summ % 100)
 
     def get_month_year(self):
-        months = [u'январь', u'февраль', u'март', u'апрель', u'май', u'июнь',
-                  u'июль', u'август', u'сентябрь', u'октябрь', u'ноябрь', u'декабрь']
-
-        return '%s %s' % (months[self.generated_date.month - 2], self.generated_date.year)
-
-    def get_file_link(self):
-        return "%s/%s" % (app.config['PDF_FOLDER'].replace('./', '/').replace('//', '/'), self.filename)
+        months = date_helper.get_locale_months()
+        return '%s %s' % (months[self.generated_date.month - 2],
+                          self.generated_date.year)
