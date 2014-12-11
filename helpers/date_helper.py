@@ -14,6 +14,13 @@ from pytz import timezone
 from web import app
 
 
+def get_locale_months():
+    return [u'январь', u'февраль', u'март',
+            u'апрель', u'май', u'июнь',
+            u'июль', u'август', u'сентябрь',
+            u'октябрь', u'ноябрь', u'декабрь']
+
+
 def get_current_date(format='%Y-%m-%d %H:%M:%S'):
     client_time = datetime.utcnow()
     if format:
