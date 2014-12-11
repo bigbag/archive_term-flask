@@ -18,3 +18,4 @@ gunicorn.conf.py
 /node_modules/
 node_modules
 celerybeat-schedule
+/static/
