@@ -141,7 +141,11 @@ class PaymentAccount(db.Model, BaseModel):
         date_pdf = date_helper.from_utc(
             self.generated_date,
             app.config['TZ']).strftime(date_pattern)
-        story.append(Paragraph(u'Счет №%s от %s' % (self.id, date_pdf),
+        if self.id:
+            story.append(Paragraph(u'Счет №%s от %s' % (self.id, date_pdf),
+                               style_header))
+        else:
+            story.append(Paragraph(u'Счет от %s' % date_pdf,
                                style_header))
 
         if firm.legal_entity:
@@ -180,7 +184,7 @@ class PaymentAccount(db.Model, BaseModel):
         story.append(t)
 
         story.append(Spacer(1, 0.1 * inch))
-        story.append(Paragraph(u'НДС и налогом с продаж не облагается, согласно НК РФ глава 26.2, статья 346.11, п.2 "Упрощенная система налогооблажения"',
+        story.append(Paragraph(u'НДС и налогом с продаж не облагается, согласно НК РФ глава 26.2, статья 346.11, п.2 "Упрощенная система налогообложения"',
                                style))
 
         if ('PDF_GENERAL_MANAGER' in app.config):
