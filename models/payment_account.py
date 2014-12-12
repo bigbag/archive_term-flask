@@ -116,7 +116,7 @@ class PaymentAccount(db.Model, BaseModel):
                                style))
         story.append(Paragraph(u'ИНН 7717770408 КПП 771701001',
                                style))
-        story.append(Paragraph(u'Расчетный счет №40702.810.1.00000000914',
+        story.append(Paragraph(u'Расчетный счет №40702810100000000914',
                                style))
 
         story.append(Spacer(1, 0.4 * inch))
@@ -125,9 +125,9 @@ class PaymentAccount(db.Model, BaseModel):
         story.append(Paragraph(u'Банк получателя: РАСЧЕТНАЯ НЕБАНКОВСКАЯ КРЕДИТНАЯ ОРГАНИЗАЦИЯ «РИБ»',
                                style))
         style.fontSize = 11
-        story.append(Paragraph(u'БИК 44583793',
+        story.append(Paragraph(u'БИК 044583793',
                                style))
-        story.append(Paragraph(u'Корр. счет 30103.810.6.00000000793',
+        story.append(Paragraph(u'Корр. счет 30103810600000000793',
                                style))
 
         story.append(Spacer(1, 0.8 * inch))
