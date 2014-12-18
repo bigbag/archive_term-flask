@@ -7,7 +7,8 @@ angular.module('term').controller('GeneralController',
   $scope.pagination = {
       cur: 1,
       total: 7,
-      display: 12
+      display: 12,
+      saved:1
     };
 
   //Обнуление результата
@@ -35,7 +36,24 @@ angular.module('term').controller('GeneralController',
       $scope.pagination.total = Math.ceil(data.count/$scope.search.limit);
     });
   };
-
+  
+  //Тригер на сброс пагинации при поиске по фразе
+  $scope.$watch('search.request', function(newValue, oldValue) {
+    if (!oldValue && newValue) {
+      //начало поиска
+      //сохраняем номер страницы, установленный до начала поиска
+      $scope.pagination.saved = $scope.pagination.cur;
+      //и сбрасываем номер страницы для результата поиска
+      $scope.pagination.cur = 1;
+    } else if (oldValue && newValue) {
+      //в процессе поиска
+      $scope.pagination.cur = 1;
+    } else if (oldValue && !newValue) {
+      //выход из поиска
+      $scope.pagination.cur = $scope.pagination.saved;
+      $scope.pagination.saved = 1;
+    }
+  });
 
   //Тригер на запрос табличных данных по параметрам
   $scope.$watch('pagination.cur + search.period  + search.status + search.request + search.report_type', function() {
