@@ -30,10 +30,8 @@ class AccountSenderTask (object):
     def accounts_manager():
         firms = Firm.query.filter((Firm.transaction_percent > 0) | (Firm.transaction_comission > 0)).all()
 
-        search_date = datetime.utcnow() - timedelta(days=20)
-
         for firm in firms:
-            AccountSenderTask.account_generate.delay(firm.id, search_date)
+            AccountSenderTask.account_generate.delay(firm.id, datetime.utcnow())
 
     @staticmethod
     @celery.task
@@ -45,8 +43,9 @@ class AccountSenderTask (object):
             log.error('Not found firm with id %s' % firm_id)
             return False
 
-        interval = date_helper.get_date_interval(search_date, 'month')
-
+        interval_date = search_date - timedelta(days=20)
+        interval = date_helper.get_date_interval(interval_date, 'month')
+        
         query = Report.query.filter(Report.term_firm_id == firm.id)
         query = query.filter(Report.status == Report.STATUS_COMPLETE)
         query = query.filter(
