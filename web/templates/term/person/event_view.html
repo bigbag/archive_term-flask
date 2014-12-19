@@ -5,7 +5,7 @@
 <h2 class="g-color-blue m-page-name">
     №{{person_event.term.hard_id}}, {{person_event.term.name}}, {{person_event.event.name}}
     <div class="block-nav">
-        <a href="/person">Люди</a>
+        <a href="/person" ng-click="needRestoreList()">Люди</a>
         <a href="/person/{{person.id}}">{{person.name}}</a>
         <span>{{person_event.term.name}}, {{person_event.event.name}}</span>
     </div>
