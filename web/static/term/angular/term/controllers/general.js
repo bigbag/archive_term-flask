@@ -72,4 +72,31 @@ angular.module('term').controller('GeneralController',
       $scope.getGridContent(search);
     }
   });
+  
+  //восстановление положения таблицы
+  $scope.restoreList = function() {
+    var current_list = angular.fromJson($.cookie('current_list'));
+    
+    if (!current_list || !current_list.need_restore)
+      return false;
+    
+    $scope.pagination.cur = current_list.pagination_cur;
+    $scope.search.period = current_list.search_period;
+    $scope.search.status = current_list.search_status;
+    $scope.search.request = current_list.search_request;
+    $scope.search.report_type = current_list.search_report_type;
+    $.removeCookie('current_list');
+  }
+  
+  //поднять флаг на восстановление положения таблицы
+  $scope.needRestoreList = function() {
+    var current_list = angular.fromJson($.cookie('current_list'));
+    
+    if (!current_list)
+      return false;
+    
+    current_list.need_restore = true;
+    $.cookie('current_list', angular.toJson(current_list, false), 
+      {expires: 1, path:'/'});
+  }
 });
