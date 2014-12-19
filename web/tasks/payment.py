@@ -437,7 +437,7 @@ class PaymentTask(object):
         if not wallet:
             return False
 
-        reports = Report.queryfilter_by(status=Report.STATUS_FAIL).filter_by(
+        reports = Report.query.filter_by(status=Report.STATUS_FAIL).filter_by(
             payment_id=wallet.payment_id).all()
         if not reports:
             return False
