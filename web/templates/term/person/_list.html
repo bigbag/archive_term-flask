@@ -15,6 +15,7 @@
             ng-model="search.request"
             placeholder="Поиск по имени или карте">
     </div>
+    <span ng-init="restoreList()"></span>
     <table class="m-spot-table" ng-controller="PersonController">
         <thead>
             <tr>

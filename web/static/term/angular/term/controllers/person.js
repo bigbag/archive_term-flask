@@ -7,9 +7,21 @@ angular.module('term').controller('PersonController',
 
   //Переадресация на страницу информации о человеке
   $scope.getPersonView = function(person_id) {
+  
+    var current_list = {
+        pagination_cur: $scope.pagination.cur,
+        search_period: $scope.search.period, 
+        search_status: $scope.search.status, 
+        search_request: $scope.search.request,
+        search_report_type: $scope.search.report_type,
+        need_restore: false
+    };
+    $.cookie('current_list', angular.toJson(current_list, false), 
+        {expires: 1, path:'/'});
+
     $(location).attr('href','/person/' + person_id);
   };
-
+  
   //Тригер на изменение снятие ошибки при изменение полей
   $scope.$watch('person.card_code + person.name', function(user) {
     $scope.error.name = false;
