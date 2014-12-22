@@ -74,12 +74,16 @@ class ReportResult(object):
                 interval = details['period']
                 try:
                     result['search'] = (
-                        datetime.strptime(interval['start'], full_format),
-                        datetime.strptime(interval['end'], full_format))
+                        date_helper.to_utc(
+                            datetime.strptime(interval['start'], full_format), app.config['TZ']),
+                        date_helper.to_utc(
+                            datetime.strptime(interval['end'], full_format), app.config['TZ']))
                 except:
                     result['search'] = (
-                        datetime.strptime(interval['start'], simple_format),
-                        datetime.strptime(interval['end'], simple_format))
+                        date_helper.to_utc(
+                            datetime.strptime(interval['start'], simple_format), app.config['TZ']),
+                        date_helper.to_utc(
+                            datetime.strptime(interval['end'], simple_format), app.config['TZ']))
 
                 result['date'] = result['search']
 
