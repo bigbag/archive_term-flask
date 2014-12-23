@@ -15,11 +15,11 @@
             <table class="m-spot-table" ng-controller="TerminalController">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>SN</th>
-                        <th>Имя</th>
+                        <th ng-click="sortBy('id', true)">ID</th>
+                        <th ng-click="sortBy('hard_id', true)">SN</th>
+                        <th ng-click="sortBy('name', false)">Имя</th>
                         <th>Владелец</th>
-                        <th>Сеанс связи</th>
+                        <th ng-click="sortBy('config_date', true)">Сеанс связи</th>
                         <th>Статус</th>
                     </tr>
                 </thead>
