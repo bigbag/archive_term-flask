@@ -10,6 +10,11 @@ angular.module('term').controller('GeneralController',
       display: 12,
       saved:1
     };
+    
+  $scope.search = {
+    order:'',
+    order_desc:false,
+  }
 
   //Обнуление результата
   $scope.setEmptyResult = function() {
@@ -56,7 +61,7 @@ angular.module('term').controller('GeneralController',
   });
 
   //Тригер на запрос табличных данных по параметрам
-  $scope.$watch('pagination.cur + search.period  + search.status + search.request + search.report_type', function() {
+  $scope.$watch('pagination.cur + search.order + search.order_desc + search.period  + search.status + search.request + search.report_type', function() {
     if (!$scope.search) return false;
     var search = $scope.search;
     search.page = $scope.pagination.cur;
@@ -72,6 +77,15 @@ angular.module('term').controller('GeneralController',
       $scope.getGridContent(search);
     }
   });
+  
+  $scope.sortBy = function(order, desc) {
+    if ($scope.search.order != order) {
+      $scope.search.order_desc = desc;
+      $scope.search.order = order;
+    } else {
+      $scope.search.order_desc = !$scope.search.order_desc;
+    }
+  }
   
   //восстановление положения таблицы
   $scope.restoreList = function() {

@@ -8,6 +8,7 @@
 """
 from flask import g
 from web import app, db
+from sqlalchemy import desc
 
 from helpers import date_helper
 
@@ -178,7 +179,9 @@ class Term(db.Model, BaseModel):
         tz = app.config['TZ']
         date_pattern = '%H:%M %d.%m.%y'
 
-        order = kwargs['order'] if 'order' in kwargs else 'id desc'
+        order = kwargs['order'] if 'order' in kwargs and kwargs[
+            'order'] else 'config_date'
+        order_desc = kwargs['order_desc'] if 'order_desc' in kwargs else True
         limit = kwargs['limit'] if 'limit' in kwargs else 10
         page = kwargs['page'] if 'page' in kwargs else 1
 
@@ -186,6 +189,13 @@ class Term(db.Model, BaseModel):
         g.firm_term = firm_term
 
         query = Term.query.filter(Term.id.in_(firm_term))
+
+        if order:
+            if order_desc:
+                query = query.order_by(desc(order))
+            else:
+                query = query.order_by(order)
+
         terms = query.paginate(page, limit, False).items
 
         result = []

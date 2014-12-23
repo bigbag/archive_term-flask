@@ -156,15 +156,15 @@ angular.module('term').controller('PersonController',
 
     person_event.csrf_token = $scope.token;
     var url = '/person/' + person_event.person_id + '/event/' + person_event.id;
+    
     $http.post(url, person_event).success(function(data) {
-      contentService.scrollPage('.m-page-name');
+      //contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         contentService.setModal(data.message, 'error');
       } else {
         contentService.setModal(data.message, 'success');
-        setTimeout(function(){
-          $(location).attr('href','/person/' + person_event.person_id);
-        }, 2000);
+        var tbody = angular.element('#table_event tbody');
+        tbody.append($compile(data.content)($scope));
       }
     });
   };
