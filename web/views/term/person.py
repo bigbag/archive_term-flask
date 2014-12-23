@@ -27,7 +27,7 @@ from helpers import request_helper
 
 @mod.route('/person/<path:action>', methods=['GET'])
 @mod.route('/person', methods=['GET'])
-#@login_required
+@login_required
 def person_view(action=None):
     """Отображаем страницу со списком сотрудников, сам список получаем отдельным запросом"""
 
@@ -40,7 +40,7 @@ def person_view(action=None):
 
 @mod.route('/person/content/<path:action>', methods=['POST'])
 @mod.route('/person', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def get_person_list():
     """Получаем список сотрудников фирмы"""
@@ -52,7 +52,7 @@ def get_person_list():
 
 
 @mod.route('/person/search', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def get_person_search_result():
     """Поиск сотрудников по запросу"""
@@ -72,7 +72,7 @@ def get_person_search_result():
 
 
 @mod.route('/person/<int:person_id>', methods=['GET'])
-#@login_required
+@login_required
 def person_info(person_id):
     """Информация о сотруднике"""
 
@@ -107,7 +107,7 @@ def person_info(person_id):
 
 @mod.route('/person/<int:person_id>/add', methods=['POST'])
 @mod.route('/person/<int:person_id>/edit', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def person_save(person_id):
     """Добавляем или редактируем человека"""
@@ -150,7 +150,7 @@ def person_save(person_id):
 
 
 @mod.route('/person/parsexls', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def person_parse_xls():
     """Получение списка сотрудников из *.xls для импорта"""
@@ -177,7 +177,7 @@ def person_parse_xls():
 
 
 @mod.route('/person/import', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def person_import():
     """Импорт списка сотрудников из json"""
@@ -244,7 +244,7 @@ def person_import():
 
 
 @mod.route('/person/<int:person_id>/bind_card', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def person_bind_card(person_id):
     """Привязываем к человеку карту"""
@@ -303,7 +303,7 @@ def set_person_card(code):
 
 
 @mod.route('/person/<int:person_id>/unbind_card', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def person_unbind_card(person_id):
     """Отвязываем карту от человека"""
@@ -325,7 +325,7 @@ def person_unbind_card(person_id):
 
 
 @mod.route('/person/<int:person_id>/lock', methods=['POST'])
-#@login_required
+@login_required
 def person_lock(person_id):
     """Блокировка сотрудника"""
 
@@ -366,7 +366,7 @@ def person_lock(person_id):
 
 
 @mod.route('/person/<int:person_id>/remove', methods=['POST'])
-#@login_required
+@login_required
 def person_remove(person_id):
     """Удаление сотрудника"""
 
@@ -384,7 +384,7 @@ def person_remove(person_id):
 
 
 @mod.route('/person/<int:person_id>/event/<int:person_event_id>', methods=['GET'])
-#@login_required
+@login_required
 def person_event_info(person_id, person_event_id):
     """Информация о событии привязаном к человеку"""
 
@@ -411,7 +411,7 @@ def person_event_info(person_id, person_event_id):
 
 
 @mod.route('/person/<int:person_id>/event/<int:person_event_id>', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def person_event_save(person_id, person_event_id):
     """Сохраняем событие привязаное к человеку"""
@@ -477,7 +477,7 @@ def person_event_save(person_id, person_event_id):
 
 
 @mod.route('/person/<int:person_id>/event/<int:person_event_id>/delete', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def person_event_delete(person_id, person_event_id):
     """Удаляем событие привязаное к человеку"""
@@ -498,7 +498,7 @@ def person_event_delete(person_id, person_event_id):
 
 
 @mod.route('/person/<int:person_id>/wallet/save', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def person_save_corp_wallet(person_id):
     """Добавляем или редактируем корпоративный кошелёк"""
@@ -556,7 +556,7 @@ def person_save_corp_wallet(person_id):
 
 
 @mod.route('/person/<int:person_id>/wallet/remove', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def person_remove_corp_wallet(person_id):
     """Удаляем корпоративный кошелёк"""
@@ -588,7 +588,7 @@ def person_remove_corp_wallet(person_id):
 
 
 @mod.route('/person/<int:person_id>/report/', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def person_report(person_id):
     """Отчет по операциям человека"""
@@ -603,7 +603,7 @@ def person_report(person_id):
 
 
 @mod.route('/person/search/', methods=['POST'])
-#@login_required
+@login_required
 @json_headers
 def person_search():
     """Поиск человека"""
