@@ -264,3 +264,24 @@ span.ui-icon.ui-icon-closethick {
             border-radius: 5px;
 }
 /*end daterangepicker */
+
+
+.m-spot-table th.sortable span:after{
+    border: none;
+}
+
+.m-spot-table th.sortable.asc span:after{
+    border-left:6px solid transparent;
+    border-right:6px solid transparent;
+    border-top:6px solid #2f2f2f;
+}
+
+.m-spot-table th.sortable.desc span:after{
+    border-left:6px solid transparent;
+    border-right:6px solid transparent;
+    border-bottom:6px solid #2f2f2f;
+}
+
+.m-spot-table th.not-sortable {
+    cursor: default;
+}
