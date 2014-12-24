@@ -20,7 +20,6 @@
                         <th class="sortable" ng-click="sortBy('name', false, $event)"><span>Имя</span></th>
                         <th class="not-sortable">Владелец</th>
                         <th class="sortable desc" ng-click="sortBy('config_date', true, $event)"><span>Сеанс связи</span></th>
-                        <th class="not-sortable">Статус</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -33,11 +32,6 @@
                         <td>{[{term.firm}]}</td>
                         <td ng-class="(term.seans_alarm==1)?'g-color-red':''">
                             {[{term.seans_date}]}
-                        </td>
-
-                        <td>
-                            <span class="m-card-act g-round"
-                                ng-class="(term.status==1)?'active':''"></span>
                         </td>
                     </tr>
                     <tr class="m-table-bottom" ng-show="search.page_count">
