@@ -2,7 +2,7 @@
 
 {% block content %}
 <h2 class="g-color-blue m-page-name">Терминалы</h2>
-<span ng-init="search.limit=20;search.action_type='get_grid_content'"></span>
+<span ng-init="search.limit=20;search.action_type='get_grid_content';search.order='config_date';search.order_desc=true"></span>
 <div class="section-container section-container__main auto" data-section="" data-options="deep_linking: true;" style="">
     <section class="section active" style="padding-top: 49px;">
         <p class="title">
@@ -15,12 +15,12 @@
             <table class="m-spot-table" ng-controller="TerminalController">
                 <thead>
                     <tr>
-                        <th ng-click="sortBy('id', true)">ID</th>
-                        <th ng-click="sortBy('hard_id', true)">SN</th>
-                        <th ng-click="sortBy('name', false)">Имя</th>
-                        <th>Владелец</th>
-                        <th ng-click="sortBy('config_date', true)">Сеанс связи</th>
-                        <th>Статус</th>
+                        <th class="sortable" ng-click="sortBy('id', true, $event)"><span>ID</span></th>
+                        <th class="sortable" ng-click="sortBy('hard_id', true, $event)"><span>SN</span></th>
+                        <th class="sortable" ng-click="sortBy('name', false, $event)"><span>Имя</span></th>
+                        <th class="not-sortable">Владелец</th>
+                        <th class="sortable desc" ng-click="sortBy('config_date', true, $event)"><span>Сеанс связи</span></th>
+                        <th class="not-sortable">Статус</th>
                     </tr>
                 </thead>
                 <tbody>
