@@ -44,33 +44,6 @@ angular.module('term').controller('TerminalController',
     });
   };
 
-  //Блокируем и разблокируем терминал
-  $scope.lockingTerminal = function(term) {
-    var question = 'Заблокировать терминал<br>"' + term.hard_id +', ' + term.name +'"?';
-    if (term.status == 0)
-        question = 'Разблокировать терминал<br>"' + term.hard_id +', ' + term.name +'"?';
-    
-    dialogService.yesNoDialog(function(dialog_result) {
-      if (dialog_result != 'yes')
-        return false;
-      
-      term.csrf_token = $scope.token;
-      $http.post('/terminal/' + term.id + '/locking', term).success(function(data) {
-        if (data.error === 'no') {
-          if ($scope.term.status === 0) {
-            $scope.term.status = 1;
-          } else {
-            $scope.term.status = 0;
-          }
-          contentService.setModal(data.message, 'success');
-        }
-      });
-    },
-    question
-    );
-    
-  };
-
   //Переадресация на страницу редактирования привязанного события
   $scope.getTermEventEdit = function(term_id, term_event_id) {
     $(location).attr('href','/terminal/' + term_id + '/event/' + term_event_id);
@@ -253,3 +226,32 @@ angular.module('term').controller('TerminalController',
     });
   };
 });
+
+/*
+  //Блокируем и разблокируем терминал
+  $scope.lockingTerminal = function(term) {
+    var question = 'Заблокировать терминал<br>"' + term.hard_id +', ' + term.name +'"?';
+    if (term.status == 0)
+        question = 'Разблокировать терминал<br>"' + term.hard_id +', ' + term.name +'"?';
+    
+    dialogService.yesNoDialog(function(dialog_result) {
+      if (dialog_result != 'yes')
+        return false;
+      
+      term.csrf_token = $scope.token;
+      $http.post('/terminal/' + term.id + '/locking', term).success(function(data) {
+        if (data.error === 'no') {
+          if ($scope.term.status === 0) {
+            $scope.term.status = 1;
+          } else {
+            $scope.term.status = 0;
+          }
+          contentService.setModal(data.message, 'success');
+        }
+      });
+    },
+    question
+    );
+    
+  };
+*/

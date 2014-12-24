@@ -54,7 +54,7 @@
     </form>
 
     <div class="content-row g-clearfix">
-        <a ng-click="saveEventPerson(person_event, eventForm.$valid)"
+        <a ng-click="saveEventPerson(person_event, eventForm.$valid, person_event.id)"
             class="f-spot-button">
             <span ng-hide="person_event.id">Добавить</span>
             <span ng-show="person_event.id">Сохранить</span>
