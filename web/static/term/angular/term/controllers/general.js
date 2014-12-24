@@ -11,11 +11,6 @@ angular.module('term').controller('GeneralController',
       saved:1
     };
     
-  $scope.search = {
-    order:'',
-    order_desc:false,
-  }
-
   //Обнуление результата
   $scope.setEmptyResult = function() {
     $scope.result = {};
@@ -78,13 +73,22 @@ angular.module('term').controller('GeneralController',
     }
   });
   
-  $scope.sortBy = function(order, desc) {
+  $scope.sortBy = function(order, desc, e) {
     if ($scope.search.order != order) {
       $scope.search.order_desc = desc;
       $scope.search.order = order;
     } else {
       $scope.search.order_desc = !$scope.search.order_desc;
     }
+    
+    var current = angular.element(e.currentTarget);
+    var headers = current.parents('tr').children('.sortable');
+    headers.removeClass('asc').removeClass('desc');
+    
+    if ($scope.search.order_desc)
+      current.addClass('desc');
+    else 
+      current.addClass('asc');    
   }
   
   //восстановление положения таблицы
