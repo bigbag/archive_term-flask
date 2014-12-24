@@ -151,7 +151,7 @@ angular.module('term').controller('PersonController',
 
 
   //Привязываем новое событие к человеку или редактируем уже привязанное
-  $scope.saveEventPerson = function(person_event, valid){
+  $scope.saveEventPerson = function(person_event, valid, edit_event_id){
     if (!valid) return false;
 
     person_event.csrf_token = $scope.token;
@@ -163,8 +163,15 @@ angular.module('term').controller('PersonController',
         contentService.setModal(data.message, 'error');
       } else {
         contentService.setModal(data.message, 'success');
-        var tbody = angular.element('#table_event tbody');
-        tbody.append($compile(data.content)($scope));
+        if (edit_event_id) {
+          setTimeout(function(){
+            $(location).attr('href','/person/' + person_event.person_id);
+          }, 2000);
+        } else {
+          var tbody = angular.element('#table_event tbody');
+          tbody.append($compile(data.content)($scope));
+          contentService.scrollPage('.nav-footer');
+        }
       }
     });
   };
