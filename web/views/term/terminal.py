@@ -222,31 +222,31 @@ def terminal_save(term_id, action):
     return jsonify(answer)
 
 
-@mod.route('/terminal/<int:term_id>/locking', methods=['POST'])
-@login_required
-@json_headers
-def terminal_locking(term_id):
-    """Блокировка и разблокировка терминал"""
-
-    answer = dict(error='yes', message=u'Произошла ошибка')
-    arg = get_post_arg(request, True)
-
-    if 'status' not in arg or 'id' not in arg:
-        abort(400)
-
-    term = Term.query.get(term_id)
-    if not term:
-        abort(404)
-
-    if term.status == Term.STATUS_VALID:
-        term.status = Term.STATUS_BANNED
-    elif term.status == Term.STATUS_BANNED:
-        term.status = Term.STATUS_VALID
-    if term.save():
-        answer['error'] = 'no'
-        answer['message'] = u'Операция успешно выполнена'
-
-    return jsonify(answer)
+#@mod.route('/terminal/<int:term_id>/locking', methods=['POST'])
+#@login_required
+#@json_headers
+#def terminal_locking(term_id):
+#    """Блокировка и разблокировка терминал"""
+#
+#    answer = dict(error='yes', message=u'Произошла ошибка')
+#    arg = get_post_arg(request, True)
+#
+#    if 'status' not in arg or 'id' not in arg:
+#        abort(400)
+#
+#    term = Term.query.get(term_id)
+#    if not term:
+#        abort(404)
+#
+#    if term.status == Term.STATUS_VALID:
+#        term.status = Term.STATUS_BANNED
+#    elif term.status == Term.STATUS_BANNED:
+#        term.status = Term.STATUS_VALID
+#    if term.save():
+#        answer['error'] = 'no'
+#        answer['message'] = u'Операция успешно выполнена'
+#
+#    return jsonify(answer)
 
 
 @mod.route('/terminal/<int:term_id>/remove', methods=['POST'])
