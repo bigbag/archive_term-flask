@@ -27,6 +27,16 @@ angular.module('term').controller('PersonController',
     $scope.error.name = false;
     $scope.error.card_code = false;
   });
+  
+  $scope.persontTimeout = [];
+  
+  //Тригер, устанавливающий таймаут события по-умолчанию при выборе терминала
+  $scope.$watch('person_event.term_event_id', function(newValue, oldValue) {
+    if (!newValue || !oldValue || newValue == oldValue || !$scope.persontTimeout[newValue])
+      return false;
+      
+    $scope.person_event.timeout = $scope.persontTimeout[newValue];
+  });
 
 
   //Добавляем или редактируем человека
@@ -299,4 +309,10 @@ angular.module('term').controller('PersonController',
       });
     }
   };
+  
+  $scope.setPersonTimeout = function(timeout) {
+    $scope.person_event.timeout = timeout;
+    alert(timeout);
+  }
+  
 });
