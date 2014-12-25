@@ -30,7 +30,7 @@
                             {% if row.term.hard_id %}
                             <option
                                 {% if row.id == term_event.id %} selected {% endif %}
-                                value="{{row.id}}">
+                                value="{{row.id}}" ng-init="persontTimeout[{{row.id}}]={{row.timeout}}">
                                 №{{row.term.hard_id}}, {{row.term.name}}, {{row.event.name}}
                             </option>
                             {% endif %}
