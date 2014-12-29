@@ -32,7 +32,7 @@ angular.module('term').controller('PersonController',
   
   //Тригер, устанавливающий таймаут события по-умолчанию при выборе терминала
   $scope.$watch('person_event.term_event_id', function(newValue, oldValue) {
-    if (!newValue || !oldValue || newValue == oldValue || !$scope.persontTimeout[newValue])
+    if (!newValue || !oldValue || newValue == oldValue || angular.isUndefined($scope.persontTimeout[newValue]))
       return false;
       
     $scope.person_event.timeout = $scope.persontTimeout[newValue];
