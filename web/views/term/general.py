@@ -20,6 +20,7 @@ from decorators.header import *
 from models.term_user import TermUser
 from models.term_user_firm import TermUserFirm
 from models.firm import Firm
+from models.payment_account import PaymentAccount
 
 from web.tasks import mail
 from web.emails.term.user_forgot_password import UserForgotPasswordMessage
@@ -76,7 +77,7 @@ def get_firm_info(request):
 
         if firm:
             result = dict(name=firm.name, id=firm.id)
-            if firm.transaction_percent or firm.transaction_comission:
+            if PaymentAccount.firm_has_account(firm.id):
                 result['has_account'] = True
 
             session['firm_info'] = result
