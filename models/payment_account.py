@@ -232,6 +232,12 @@ class PaymentAccount(db.Model, BaseModel):
         doc.build(story)
 
         return True
+        
+    @staticmethod
+    def firm_has_account(id):
+        if PaymentAccount.query.filter_by(firm_id=id).count():
+            return True
+        return False
 
     @staticmethod
     def format_summ(summ):
