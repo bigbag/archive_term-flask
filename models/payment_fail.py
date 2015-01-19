@@ -22,6 +22,7 @@ class PaymentFail(db.Model, BaseModel):
     LOCK_SET = 1
 
     report_id = db.Column(db.Integer, primary_key=True)
+    wallet_id = db.Column(db.Integer, nullable=True)
     count = db.Column(db.Integer, nullable=False, index=True)
     timestamp = db.Column(db.Integer, nullable=False)
     lock = db.Column(db.Integer, index=True, nullable=False)
