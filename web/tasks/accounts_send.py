@@ -6,7 +6,6 @@
     :license: BSD, see LICENSE for more details.
 """
 
-import os
 import logging
 
 from sqlalchemy.sql import func
@@ -45,7 +44,7 @@ class AccountSenderTask (object):
 
         interval_date = search_date - timedelta(days=20)
         interval = date_helper.get_date_interval(interval_date, 'month')
-        
+
         query = Report.query.filter(Report.term_firm_id == firm.id)
         query = query.filter(Report.status == Report.STATUS_COMPLETE)
         query = query.filter(
