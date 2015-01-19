@@ -11,6 +11,7 @@ from helpers import date_helper
 
 from models.base_model import BaseModel
 from models.report import Report
+from models.payment_wallet import PaymentWallet
 
 
 class PaymentFail(db.Model, BaseModel):
@@ -38,13 +39,20 @@ class PaymentFail(db.Model, BaseModel):
     @staticmethod
     def add_or_update(report_id):
         payment = PaymentFail.query.get(report_id)
-        if not payment:
-            payment = PaymentFail(report_id)
+        if payment:
+            return payment.save()
 
-            report = Report.query.get(report_id)
-            if report:
-                report.status = Report.STATUS_FAIL
-                report.save()
+        payment = PaymentFail(report_id)
+
+        report = Report.query.get(report_id)
+        if report:
+            report.status = Report.STATUS_FAIL
+            report.save()
+
+            wallet = PaymentWallet.query.filter_by(
+                payment_id=report.payment_id).first()
+            if wallet:
+                payment.wallet_id = wallet.id
 
         return payment.save()
 
