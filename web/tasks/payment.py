@@ -88,6 +88,7 @@ class PaymentTask(object):
                     continue
 
                 PaymentFail.add_or_update(payment.report_id)
+                PaymentFail.blacklist_alert(payment.report_id)
                 PaymentTask.background_payment.delay(payment.report_id)
 
     @staticmethod
