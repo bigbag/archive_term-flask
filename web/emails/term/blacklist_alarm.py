@@ -17,20 +17,25 @@ class BlacklistAlarmMessage(Message):
         return 'blacklist alarm'
 
     def __init__(self, **kwargs):
-        required = ['to', 'lang', 'card_pan']
+        required = ['spot', 'user', 'amount', 'card_pan']
         for k in required:
             if not k in kwargs:
                 msg = "These values must be provided: %s" % ",".join(required)
                 raise KeyError(msg)
 
-        if kwargs['lang'] == 'ru':
+        spot = kwargs['spot']
+        user = kwargs['user']
+        if user.lang == 'ru':
             title = u'Спот заблокирован'
             template = 'term/emails/blacklist/ru_blacklist_alarm.html'
+            kwargs['username'] = u'Уважаемый пользователь'
         else:
             title = u'Spot blocked'
             template = 'term/emails/blacklist/en_blacklist_alarm.html'
+            kwargs['username'] = u'Dear user'
         Message.__init__(self, title)
 
-        self.add_recipient(kwargs['to'])
+        self.add_recipient(user.email)
 
         self.html = render_template(template, **kwargs)
+        
