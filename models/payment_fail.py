@@ -36,6 +36,7 @@ class PaymentFail(db.Model, BaseModel):
     count = db.Column(db.Integer, nullable=False, index=True)
     timestamp = db.Column(db.Integer, nullable=False)
     lock = db.Column(db.Integer, index=True, nullable=False)
+    payment_id = db.Column(db.String(20))
 
     def __init__(self, report_id):
         self.count = 0
@@ -82,22 +83,22 @@ class PaymentFail(db.Model, BaseModel):
         if not spot or not user or not card:
             return False
 
-        username = u'Dear user'
-        if user.lang == 'ru':
-            username = u'Уважаемый пользователь'
-
+        all_fails = PaymentFail.query.filter_by(payment_id=payment.payment_id).all()
+        
+        amount = 0
+        for fail in all_fails:
+            report = Report.query.get(fail.report_id)
+            amount += report.amount
+        
         user_profile = UserProfile.query.filter_by(
             user_id=user.id).first()
 
-        if user_profile and user_profile.name:
-            username = user_profile.name
-
         mail.send.delay(
             BlacklistAlarmMessage,
-            to=user.email,
-            lang=user.lang,
-            username=username,
-            spotname=spot.name,
+            user=user,
+            spot=spot,
+            user_profile=user_profile,
+            amount="%02d.%02d" % (amount / 100, amount % 100),
             card_pan=u'%s %s' % (card.type, card.pan)
         )
 
