@@ -58,6 +58,8 @@ class PaymentFail(db.Model, BaseModel):
         if report:
             report.status = Report.STATUS_FAIL
             report.save()
+            
+            payment.payment_id = report.payment_id
 
             wallet = PaymentWallet.query.filter_by(
                 payment_id=report.payment_id).first()
