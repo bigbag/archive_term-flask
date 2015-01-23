@@ -56,6 +56,7 @@ class PaymentTask(object):
     def set_fail(report_id, wallet):
         PaymentFail.add_or_update(report_id)
         wallet.add_to_blacklist()
+        PaymentFail.blacklist_alert(report_id)
 
     @staticmethod
     def set_success(report_id, wallet):
@@ -87,7 +88,6 @@ class PaymentTask(object):
                 if delta < row['delta']:
                     continue
 
-                PaymentFail.add_or_update(payment.report_id)
                 PaymentTask.background_payment.delay(payment.report_id)
 
     @staticmethod
