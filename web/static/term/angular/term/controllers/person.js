@@ -315,4 +315,13 @@ angular.module('term').controller('PersonController',
     alert(timeout);
   }
   
+  $scope.initFirstTimeout = function(row_id) {
+    var options = angular.element('#type-event option');
+    options.each(function(i, e) {
+      var option = angular.element(e);
+      if (!angular.isUndefined(option.attr('selected')) && option.attr('selected') == 'selected') {
+        $scope.person_event.timeout = $scope.persontTimeout[option.val()];
+      }
+    }); 
+  }
 });
