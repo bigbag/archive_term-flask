@@ -58,7 +58,7 @@ class PaymentFail(db.Model, BaseModel):
         if report:
             report.status = Report.STATUS_FAIL
             report.save()
-            
+
             payment.payment_id = report.payment_id
 
             wallet = PaymentWallet.query.filter_by(
@@ -86,12 +86,12 @@ class PaymentFail(db.Model, BaseModel):
             return False
 
         all_fails = PaymentFail.query.filter_by(payment_id=payment.payment_id).all()
-        
+
         amount = 0
         for fail in all_fails:
             report = Report.query.get(fail.report_id)
             amount += report.amount
-        
+
         user_profile = UserProfile.query.filter_by(
             user_id=user.id).first()
 

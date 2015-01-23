@@ -25,7 +25,7 @@ class ReportMessage(Message):
         title = u"Отчет"
         result = kwargs['result']
         if result.interval and result.firm.name:
-            title = 'Отчет, %s' % result.interval['templ_interval']
+            title = u'Отчет, %s' % result.interval['templ_interval']
         Message.__init__(self, title)
 
         result = kwargs['result']
