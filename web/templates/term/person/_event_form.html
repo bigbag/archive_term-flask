@@ -40,14 +40,14 @@
                 </div>
             </div>
         </div>
-        <div class="content-row g-clearfix"
-            ng-init="initFirstTimeout({{term_event.id}})">
+        <div class="content-row g-clearfix">
             <label for="time-out">Тайм-аут (в минутах)*</label>
             <input id="time-out"
                 class="f-input-small left"
                 minlength="1"
                 maxlength="5"
                 type="text"
+                ng-init="person_event.timeout=persontTimeout[person_event.term_event_id]"
                 ng-model="person_event.timeout"
                 required>
         </div>
