@@ -5,21 +5,6 @@
             <div class="large-8 columns">
                 <div class="content-row"
                     ng-init="person_event.term_event_id='{{term_event.id}}'">
-                    {% if person_event.id %}
-                    <p for="type-event">
-                        <label for="type-event">Событие*</label>
-                        <select id="type-event"
-                            class="large"
-                            min="1"
-                            ng-model="person_event.term_event_id"
-                            required>
-                                <option selected
-                                    value="{{term_event.id}}">
-                                    №{{term_event.term.hard_id}}, {{term_event.term.name}}, {{term_event.event.name}}
-                                </option>
-                        </select>
-                    </p>
-                    {% else %}
                     <label for="type-event">Событие*</label>
                     <select id="type-event"
                         class="large"
@@ -36,7 +21,6 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    {% endif %}
                 </div>
             </div>
         </div>
