@@ -33,6 +33,7 @@ class Term(db.Model, BaseModel):
     TYPE_VENDING = 1
 
     SEANS_ALARM = 86400
+    USED_LAST_MONTH = 1728000
 
     DEFAULT_FACTOR = 100
 
