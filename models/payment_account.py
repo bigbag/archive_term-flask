@@ -39,6 +39,8 @@ class PaymentAccount(db.Model, BaseModel):
     items_count = db.Column(db.Integer)
     status = db.Column(db.Integer, nullable=False, index=True)
     filename = db.Column(db.String(128))
+    item_price = db.Column(db.Integer)
+    gprs_terms_count = db.Column(db.Integer)
 
     def __init__(self):
         self.generated_date = date_helper.get_current_date()
@@ -130,7 +132,7 @@ class PaymentAccount(db.Model, BaseModel):
         story.append(Paragraph(u'Корр. счет 30103810600000000793',
                                style))
 
-        story.append(Spacer(1, 0.8 * inch))
+        story.append(Spacer(1, 0.5 * inch))
 
         style_header = styles['Heading1']
         style_header.fontName = "PDFFont"
@@ -153,32 +155,41 @@ class PaymentAccount(db.Model, BaseModel):
                                    style))
             story.append(Spacer(1, 0.1 * inch))
 
-        data_count = 1
-        item_price = PaymentAccount.format_summ(self.summ)
-        if self.items_count and firm.transaction_comission:
-            data_count = str(self.items_count)
-            price = int(round(float(self.summ) / self.items_count))
-            item_price = PaymentAccount.format_summ(price)
-
-        data_summ = PaymentAccount.format_summ(self.summ)
+        data_price = self.format_summ(self.item_price)
+        data_rows = 3
 
         data = [
-            [u'№', u'Наименование', u'Количество, шт.',
-                u'Цена, руб.', u'Сумма, руб.'],
-            ['1', u'Информационная\n услуга по учету',
-                data_count, item_price, data_summ],
-            ['', '', '', u'НДС не\n облагается', '-'],
-            ['', '', '', 'Всего к оплате:', data_summ]]
+            [u'№', u'Наименование', u'Количество, шт.', u'Цена, руб.', u'Сумма, руб.']]
+
+        if self.gprs_terms_count and firm.gprs_rate:
+            data_rows += 1
+            gprs_summ = self.gprs_terms_count * firm.gprs_rate
+            gprs_price = self.format_summ(firm.gprs_rate)
+            data_summ = self.format_summ(self.summ - gprs_summ)
+            data_gprs_summ = self.format_summ(gprs_summ)
+
+            data.append(['1', u'Информационная\n услуга по учету', str(
+                self.items_count), data_price, data_summ])
+            data.append(['2', u'Услуга\n GPRS связи', str(
+                self.gprs_terms_count), gprs_price, data_gprs_summ])
+        else:
+            data_summ = self.format_summ(self.summ)
+            data.append(['1', u'Информационная\n услуга по учету', str(
+                self.items_count), data_price, data_summ])
+
+        data.append(['', '', '', u'НДС не\n облагается', '-'])
+        data.append(
+            ['', '', '', 'Всего к оплате:', self.format_summ(self.summ)])
 
         t = Table(data, colWidths=1.21 * inch)
         table_style = TableStyle(
             [('BACKGROUND', (0, 0), (4, 0), colors.Color(0.7, 0.7, 0.7))])
         table_style.add('GRID', (0, 0), (4, 0), 1, colors.Color(0.7, 0.7, 0.7))
-        table_style.add('FONTNAME', (0, 0), (4, 3), "PDFFont")
+        table_style.add('FONTNAME', (0, 0), (4, data_rows), "PDFFont")
         table_style.add('FONTSIZE', (1, 1), (1, 1), 9)
-        table_style.add('GRID', (0, 1), (4, 3), 1, colors.gray)
-        table_style.add('ALIGN', (0, 0), (4, 3), 'LEFT')
-        table_style.add('VALIGN', (0, 0), (4, 3), 'TOP')
+        table_style.add('GRID', (0, 1), (4, data_rows), 1, colors.gray)
+        table_style.add('ALIGN', (0, 0), (4, data_rows), 'LEFT')
+        table_style.add('VALIGN', (0, 0), (4, data_rows), 'TOP')
 
         t.setStyle(table_style)
         story.append(t)
@@ -189,7 +200,8 @@ class PaymentAccount(db.Model, BaseModel):
 
         if ('PDF_GENERAL_MANAGER' in app.config):
             story.append(Spacer(1, 0.3 * inch))
-            sign = Image(app.config['PDF_GENERAL_MANAGER_SIGN'], width=65, height=52)
+            sign = Image(
+                app.config['PDF_GENERAL_MANAGER_SIGN'], width=65, height=52)
             data = [
                 [u'  Генеральный директор', sign, u'(%s)   ' % app.config['PDF_GENERAL_MANAGER']]]
             table_manager = Table(data, colWidths=2.1 * inch)
@@ -208,7 +220,8 @@ class PaymentAccount(db.Model, BaseModel):
             story.append(Spacer(1, 0.6 * inch))
 
         if ('PDF_CHIEF_ACCOUNTANT' in app.config):
-            sign = Image(app.config['PDF_CHIEF_ACCOUNTANT_SIGN'], width=65, height=52)
+            sign = Image(
+                app.config['PDF_CHIEF_ACCOUNTANT_SIGN'], width=65, height=52)
 
             data = [
                 [u'  Главный бухгалтер', sign, u'(%s)   ' % app.config['PDF_CHIEF_ACCOUNTANT']]]
@@ -232,7 +245,7 @@ class PaymentAccount(db.Model, BaseModel):
         doc.build(story)
 
         return True
-        
+
     @staticmethod
     def firm_has_account(id):
         if PaymentAccount.query.filter_by(firm_id=id).count():
