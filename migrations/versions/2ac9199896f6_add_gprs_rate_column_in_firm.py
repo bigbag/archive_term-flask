@@ -1,0 +1,5 @@
+"""add_gprs_rate_column_in_firm
+Revision ID: 2ac9199896f6Revises: 5ae21ae78a54Create Date: 2015-01-27 16:37:30.695000
+"""# revision identifiers, used by Alembic.revision = '2ac9199896f6'down_revision = '5ae21ae78a54'
+from alembic import opimport sqlalchemy as sa
+def upgrade(engine_name):    eval("upgrade_%s" % engine_name)()def downgrade(engine_name):    eval("downgrade_%s" % engine_name)()def upgrade_term():    op.add_column('firm', sa.Column(        'gprs_rate', sa.Integer(), nullable=True))def downgrade_term():    op.drop_column('firm', 'gprs_rate')def upgrade_stack():    passdef downgrade_stack():    passdef upgrade_payment():    op.add_column('account', sa.Column(        'gprs_terms_count', sa.Integer(), nullable=True))    op.add_column('account', sa.Column(        'item_price', sa.Integer(), nullable=True))def downgrade_payment():    op.drop_column('account', 'gprs_terms_count')    op.drop_column('account', 'item_price')def upgrade_mobispot():    passdef downgrade_mobispot():    pass

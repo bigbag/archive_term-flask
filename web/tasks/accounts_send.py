@@ -19,6 +19,8 @@ from helpers import date_helper
 
 from models.payment_account import PaymentAccount
 from models.firm import Firm
+from models.firm_term import FirmTerm
+from models.term import Term
 from models.report import Report
 
 
@@ -27,7 +29,8 @@ class AccountSenderTask (object):
     @staticmethod
     @celery.task
     def accounts_manager():
-        firms = Firm.query.filter((Firm.transaction_percent > 0) | (Firm.transaction_comission > 0)).all()
+        firms = Firm.query.filter(
+            (Firm.transaction_percent > 0) | (Firm.transaction_comission > 0)).all()
 
         for firm in firms:
             AccountSenderTask.account_generate.delay(firm.id, datetime.utcnow())
@@ -79,6 +82,34 @@ class AccountSenderTask (object):
                     (float(firm.transaction_percent) / 100 / 100)
             elif firm.transaction_comission > 0:
                 account.summ = account.summ + firm.transaction_comission
+
+        account.items_count = 1
+        account.item_price = account.summ
+        if firm.transaction_comission:
+            account.items_count = len(reports)
+            account.item_price = int(
+                round(float(account.summ) / account.items_count))
+
+        account.gprs_terms_count = 0
+
+        if firm.gprs_rate:
+            firm_term = FirmTerm.get_list_by_firm_id(firm.id, False)
+            terms_used = 0
+            gprs_summ = 0
+
+            for term_id in firm_term:
+                term = Term.query.get(term_id)
+                delta = account.generated_date - term.config_date
+                
+                if delta.total_seconds() > Term.USED_LAST_MONTH:
+                    continue
+
+                terms_used += 1
+                gprs_summ += firm.gprs_rate
+
+            if terms_used:
+                account.gprs_terms_count = terms_used
+                account.summ += gprs_summ
 
         account.filename = PaymentAccount.get_filename(firm_id, search_date)
         account.save()
