@@ -6,11 +6,15 @@
     :license: BSD, see LICENSE for more details.
 """
 import unittest
+import os
 from web import db, app
+
+from datetime import datetime
 
 from models.payment_history import PaymentHistory
 from models.payment_wallet import PaymentWallet
 from models.report import Report
+from models.payment_account import PaymentAccount
 
 from helpers import date_helper
 
@@ -36,6 +40,10 @@ class ModelsPaymentCase(unittest.TestCase):
     TERM_ID = 21
     PERSON_ID = 1
     FIRM_ID = 8
+    ACCOUNT_ID = 1
+    ACCOUNT_STATUS = 0
+    ACCOUNT_FILENAME = 'account_firm_8_date_08_2014.pdf'
+    ITEMS_COUNT = 100
 
     def model_test(self, Model, data):
         old = Model()
@@ -99,3 +107,43 @@ class ModelsPaymentCase(unittest.TestCase):
     def test_func_get_pid(self):
         wallet = PaymentWallet()
         wallet.get_pid(self.PIDS)
+
+    def test_payment_account(self):
+        data = dict(
+            id=self.ACCOUNT_ID,
+            firm_id=self.FIRM_ID,
+            generated_date=datetime.strptime(
+                self.TEST_DATE, "%Y-%m-%d %H:%M:%S"),
+            summ=self.AMOUNT,
+            items_count=self.ITEMS_COUNT,
+            status=self.ACCOUNT_STATUS,
+            filename=self.ACCOUNT_FILENAME,
+            item_price=self.AMOUNT,
+            gprs_terms_count=self.ITEMS_COUNT
+        )
+        self.model_test(PaymentAccount, data)
+
+    def test_pdf_generator(self):
+        data = dict(
+            id=self.ACCOUNT_ID,
+            firm_id=self.FIRM_ID,
+            generated_date=datetime.strptime(
+                self.TEST_DATE, "%Y-%m-%d %H:%M:%S"),
+            summ=self.AMOUNT,
+            items_count=self.ITEMS_COUNT,
+            status=self.ACCOUNT_STATUS,
+            filename=self.ACCOUNT_FILENAME,
+            item_price=self.AMOUNT,
+            gprs_terms_count=self.ITEMS_COUNT
+        )
+
+        account = PaymentAccount()
+        account.__dict__.update(data)
+        account.generate_pdf()
+        filepath = "%s/%s" % (app.config['PDF_FOLDER'], account.filename)
+        if not os.path.isfile("%s/%s" % (app.config['PDF_FOLDER'], account.filename)):
+            assert False
+
+        os.remove("%s/%s" % (app.config['PDF_FOLDER'], account.filename))
+
+        assert True
