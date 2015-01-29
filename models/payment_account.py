@@ -5,6 +5,7 @@
     :copyright: (c) 2014 by Denis Amelin.
     :license: BSD, see LICENSE for more details.
 """
+import os
 from web import app, db
 
 from helpers import date_helper
@@ -45,6 +46,12 @@ class PaymentAccount(db.Model, BaseModel):
     def __init__(self):
         self.generated_date = date_helper.get_current_date()
         self.status = self.STATUS_GENERATED
+        
+    def delete(self):
+        if self.filename and os.path.isfile("%s/%s" % (app.config['PDF_FOLDER'], self.filename)):
+            os.remove("%s/%s" % (app.config['PDF_FOLDER'], self.filename))
+        db.session.delete(self)
+        db.session.commit()
 
     def select_list(self, firm_id, **kwargs):
         date_pattern = '%d.%m.%Y'
