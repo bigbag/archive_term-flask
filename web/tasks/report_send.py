@@ -15,6 +15,7 @@ from web.celery import celery
 
 from models.person import Person
 from models.firm_term import FirmTerm
+from models.firm import Firm
 from models.report_stack import ReportStack
 from models.report_result import ReportResult
 from models.term_corp_wallet import TermCorpWallet
@@ -198,6 +199,87 @@ class ReportSenderTask (object):
 
         return file_name
 
+    def _get_term(self, result):
+        '''Формируем отчет по терминалам'''
+
+        result.col_keys = ReportResult.get_term_keys()
+        result.col_name = ReportResult.get_term_col_name()
+
+        firm_dict = Firm.select_name_dict()
+
+        term_list = []
+        for row in result.report:
+            result.set_terms(row[0])
+            if row[0] not in term_list:
+                term_list.append(row[0])
+
+            if row[0] not in result.data:
+                result.data[row[0]] = {}
+
+            amount = row[3] / 100
+            result.data[row[0]][row[1]] = {
+                'term_name': result.terms[row[0]]['name'],
+                'firm_name': firm_dict[row[1]],
+                'amount': amount,
+                'count': row[2]
+            }
+
+            result.all['count'] += row[2]
+            result.all['summ'] += amount
+        result.terms = term_list
+
+        return result
+
+    def _get_term_xls(self, result):
+        log = logging.getLogger('task')
+
+        file_name = result.get_report_file()
+        if not file_name:
+            log.error('Not found excel file %s' % file_name)
+            return False
+
+        workbook = xlsxwriter.Workbook(file_name)
+        worksheet = workbook.add_worksheet()
+
+        bold = workbook.add_format({'bold': 1})
+        border = workbook.add_format({'border': 1})
+        border_bold = workbook.add_format({'bold': 1, 'border': 1})
+
+        worksheet.set_column(0, 1, 25)
+        worksheet.set_column(1, len(result.col_keys), 13)
+
+        # Шапка таблицы
+        worksheet.write(0, 0, result.firm.name, bold)
+        worksheet.write(1, 0, result.type['templ_name'], bold)
+        worksheet.write(
+            2, 0, u'%s отчет' %
+            result.interval['templ_name'], bold)
+        worksheet.write(2, 1, result.interval['templ_interval'], bold)
+
+        row = 3
+        col = 0
+        # Заголовки столбцов
+        for key in result.col_keys:
+            worksheet.write(row, col, result.col_name[key], border_bold)
+            col += 1
+
+        row = 4
+        # Блок информации о оборотах с разбивкой по терминалам
+        for term in result.terms:
+            for firm_id in result.data[term]:
+                col = 0
+                for key in result.col_keys:
+                    worksheet.write(row, col, result.data[term][firm_id][key], border)
+                    col += 1
+
+                row += 1
+
+        worksheet.write(row, 0, u'Итого', bold)
+        worksheet.write(row, 2, result.all['count'], bold)
+        worksheet.write(row, 3, result.all['summ'], bold)
+
+        return file_name
+
     def _get_corp(self, result):
         '''Формируем отчет по пользователям с корпоративными кошельками'''
 
@@ -217,12 +299,12 @@ class ReportSenderTask (object):
                 tabel_id = persons[row[0]]['tabel_id'] or ''
                 card = persons[row[0]]['card'] or ''
 
-                result.data[row[0]] = dict(
-                    amount=0,
-                    name=persons[row[0]]['name'],
-                    tabel_id=tabel_id,
-                    card=card
-                )
+                result.data[row[0]] = {
+                    'amount': 0,
+                    'name': persons[row[0]]['name'],
+                    'tabel_id': tabel_id,
+                    'card': card
+                }
 
             data = result.data[row[0]]
             if row[0] in corp_wallets:
@@ -336,19 +418,19 @@ class ReportSenderTask (object):
 
             if row[0] not in result.data:
                 if row[0] in persons:
-                    result.data[row[0]] = dict(
-                        amount=0,
-                        name=persons[row[0]]['name'],
-                        tabel_id=persons[row[0]]['tabel_id'],
-                        card=persons[row[0]]['card']
-                    )
+                    result.data[row[0]] = {
+                        'amount': 0,
+                        'name': persons[row[0]]['name'],
+                        'tabel_id': persons[row[0]]['tabel_id'],
+                        'card': persons[row[0]]['card']
+                    }
                 else:
-                    result.data[row[0]] = dict(
-                        amount=0,
-                        name=row[3],
-                        tabel_id=0,
-                        card=0
-                    )
+                    result.data[row[0]] = {
+                        'amount': 0,
+                        'name': row[3],
+                        'tabel_id': 0,
+                        'card': 0
+                    }
 
             data = result.data[row[0]]
 
@@ -369,10 +451,3 @@ class ReportSenderTask (object):
 
     def _get_person_xls(self, result):
         return self._get_corp_xls(result)
-
-    def _get_term(self, result):
-        '''Формируем отчет по терминалам'''
-        return self._get_money(result)
-
-    def _get_term_xls(self, result):
-        return self._get_money_xls(result)

@@ -176,6 +176,23 @@ class ReportResult(object):
             amount=u'Итого, руб.',
         )
 
+    @staticmethod
+    def get_term_keys():
+        return (
+            'term_name',
+            'firm_name',
+            'count',
+            'amount')
+
+    @staticmethod
+    def get_term_col_name():
+        return dict(
+            term_name=u'Терминал',
+            firm_name=u'Фирма',
+            count=u'Количество',
+            amount=u'Итого, руб.',
+        )
+
     def set_terms(self, term_id):
         terms = Term.select_name_dict()
         if term_id not in self.terms:

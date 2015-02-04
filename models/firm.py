@@ -5,7 +5,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db
+from web import db, cache
 
 from models.base_model import BaseModel
 
@@ -33,3 +33,14 @@ class Firm(db.Model, BaseModel):
     @staticmethod
     def get_by_sub_domain(sub_domain):
         return Firm.query.filter_by(sub_domain=sub_domain).first()
+
+    @staticmethod
+    @cache.cached(timeout=3600, key_prefix='all_firms_type_dict')
+    def select_name_dict():
+        firms = Firm.query.all()
+
+        result = {}
+        for firm in firms:
+            result[firm.id] = firm.name
+
+        return result
