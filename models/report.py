@@ -407,6 +407,7 @@ class Report(db.Model, BaseModel):
     def term_query(self, interval):
         query = db.session.query(
             Report.term_id,
+            Report.person_firm_id,
             func.count(Report.id),
             func.sum(Report.amount).label("summ1"))
 
@@ -416,8 +417,9 @@ class Report(db.Model, BaseModel):
         query = query.filter(
             Report.creation_date.between(interval[0], interval[1]))
 
-        query = query.group_by(Report.term_id)
+        query = query.group_by(Report.term_id, Report.person_firm_id)
         query = query.order_by('summ1 desc')
+
         return query
 
     def corp_query(self, interval):
@@ -466,9 +468,7 @@ class Report(db.Model, BaseModel):
             Report.creation_date.between(interval[0], interval[1]))
 
         query = self._set_period_group(query, self.period)
-        query = query.group_by(
-
-            Report.term_id)
+        query = query.group_by(Report.term_id)
         query = query.order_by('summ1 desc')
 
         return query
