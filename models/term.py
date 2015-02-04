@@ -7,7 +7,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask import g
-from web import app, db
+from web import app, db, cache
 from sqlalchemy import desc
 
 from helpers import date_helper
@@ -166,6 +166,7 @@ class Term(db.Model, BaseModel):
         return self
 
     @staticmethod
+    @cache.cached(timeout=3600, key_prefix='all_terms_type_dict')
     def select_name_dict():
         terms = Term.query.all()
 
