@@ -177,7 +177,7 @@ def report_remove(report_id):
 @mod.route('/report/account', methods=['GET'])
 @login_required
 def account_page():
-    """страница счетов"""
+    """Страница счетов"""
 
     firm = Firm.query.get(g.firm_info['id'])
 
@@ -190,7 +190,7 @@ def account_page():
 @mod.route('/report/account', methods=['POST'])
 @login_required
 def account_list():
-    """список счетов"""
+    """Список счетов"""
 
     arg = json.loads(request.stream.read())
     answer = PaymentAccount().select_list(g.firm_info['id'], **arg)
