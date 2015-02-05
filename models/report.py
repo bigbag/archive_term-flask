@@ -12,6 +12,7 @@ from helpers import date_helper
 
 from models.base_model import BaseModel
 from models.term import Term
+from models.firm import Firm
 from models.person import Person
 from models.event import Event
 
@@ -316,6 +317,7 @@ class Report(db.Model, BaseModel):
 
         query = db.session.query(
             Report.term_id,
+            Report.person_firm_id,
             func.sum(Report.amount),
             func.count(Report.id))
         query = query.filter(Report.type == self.payment_type)
@@ -324,7 +326,7 @@ class Report(db.Model, BaseModel):
 
         query = Report()._set_firm_id_filter(
             query, self.firm_id, self.payment_type)
-        query = query.group_by('term_id').order_by('amount')
+        query = query.group_by('term_id', 'person_firm_id').order_by('amount')
 
         return query.all()
 
@@ -368,32 +370,48 @@ class Report(db.Model, BaseModel):
         answer = self.term_general_query(**kwargs)
 
         result = []
-        term_name_dict = Term.select_name_dict()
+        terms_name = Term.select_name_dict()
+        firms_name = Firm.select_name_dict()
         for report in answer['reports']:
             search_date = date_helper.from_utc(report[0], self.tz)
             creation_date = self.format_search_date(search_date)
 
-            data = dict(
-                creation_date=creation_date,
-                amount=0,
-                count=0
-            )
+            data = {
+                'creation_date': creation_date,
+                'amount': 0,
+                'count': 0
+            }
 
             detaled_report = self.term_detaled_query(search_date)
-            data['detaled'] = []
-
+            data['term'] = {}
             for row in detaled_report:
-                term_name = 'Empty'
-                if row[0] in term_name_dict:
-                    term_name = term_name_dict[row[0]]
-                detaled_data = dict(
-                    term=term_name,
-                    amount=float(row[1]) / 100,
-                    count=int(row[2])
+                term_name = terms_name[row[0]] if row[0] in terms_name else 'Empty'
+                firm_name = firms_name[row[1]] if row[1] in firms_name else 'Empty'
+
+                amount = float(row[2]) / 100
+                count = int(row[3])
+
+                if row[0] not in data['term']:
+                    data['term'][row[0]] = {
+                        'name': term_name,
+                        'amount': 0,
+                        'count': 0,
+                        'firm': []
+                    }
+
+                data['term'][row[0]]['amount'] += amount
+                data['term'][row[0]]['count'] += count
+
+                data['term'][row[0]]['firm'].append(
+                    {
+                        'name': firm_name,
+                        'amount': amount,
+                        'count': count
+                    }
                 )
-                data['count'] += detaled_data['count']
-                data['amount'] += detaled_data['amount']
-                data['detaled'].append(detaled_data)
+
+                data['count'] += count
+                data['amount'] += amount
 
             result.append(data)
 
