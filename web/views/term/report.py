@@ -96,13 +96,6 @@ def report_create_new():
     for key in arg:
         setattr(report_stack, key, arg[key])
 
-    old_report_stack = ReportStack.query.filter_by(
-        check_summ=report_stack.set_check_summ()).first()
-
-    if old_report_stack and not report_stack.id:
-        answer['message'] = u'Такой отчет уже есть в списке активных'
-        return jsonify(answer)
-
     if report_stack.save():
         answer['error'] = 'no'
         answer['message'] = u'Отчет сохранен'
