@@ -43,7 +43,6 @@ class ReportStack(db.Model, BaseModel):
     interval = db.Column(db.Integer, nullable=False)
     details = db.Column(db.Text)
     launch_date = db.Column(db.DateTime)
-    check_summ = db.Column(db.Text, nullable=False)
     lock = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
@@ -170,7 +169,6 @@ class ReportStack(db.Model, BaseModel):
         fields.remove('id')
         fields.remove('_sa_instance_state')
         fields.remove('launch_date')
-        fields.remove('check_summ')
 
         stack = ReportStack()
         map(lambda field: setattr(stack, field, getattr(self, field)), fields)
