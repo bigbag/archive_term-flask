@@ -11,8 +11,6 @@ from web import db
 
 from models.base_model import BaseModel
 
-from helpers import hash_helper
-
 
 class ReportStack(db.Model, BaseModel):
 
@@ -179,22 +177,7 @@ class ReportStack(db.Model, BaseModel):
 
         return stack
 
-    def set_check_summ(self):
-        data = [
-            str(self.firm_id),
-            str(self.emails),
-            str(self.excel),
-            str(self.details),
-            str(self.type),
-            str(self.interval)]
-
-        data = '&'.join(data)
-        return hash_helper.get_content_md5(data)
-
     def save(self):
-        if not self.check_summ:
-            self.check_summ = self.set_check_summ()
-
         if not self.name:
             self.name = 'empty'
 
