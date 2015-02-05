@@ -15,38 +15,50 @@
         </div>
         <div class="block-table">
             <div class="row block-table_title">
-                <div class="large-2 columns">
-                    <ul class="small-block-grid-1">
-                        <li class="text-center">Дата</li>
-                    </ul>
-                </div>
-                <div class="large-10 columns">
-                    <ul class="small-block-grid-3">
+                <div class="large-12 columns">
+                    <ul class="small-block-grid-4">
                         <li class="active">Терминал</li>
+                        <li>Фирма</li>
                         <li class="text-right">Количество</li>
                         <li class="text-right">Сумма</li>
                     </ul>
                 </div>
             </div>
             <div class="row block-table_content" ng-repeat="report in result">
-                <div class="large-2 columns report-date">
-                    <ul class="small-block-grid-1">
-                        <li class="text-center">{[{report.creation_date}]}</li>
+                <div class="large-12 columns">
+                    <ul class="large-block-grid-1">
+                        <li class="text-center"><h4>{[{report.creation_date}]}</h4></li>
                     </ul>
                 </div>
-                <div class="large-10 columns">
-                    <ul class="small-block-grid-3" 
-                        ng-repeat="row in report.detaled | orderBy:'amount'">
-                        <li class="ng-binding">{[{row.term}]}</li>
-                        <li class="report-date-count text-right">
-                            {[{row.count}]}
-                        </li>
-                        <li class="report-date-amount text-right">
-                            {[{row.amount}]}
-                        </li>
-                    </ul>
-                    <ul class="small-block-grid-3 report-content-result">
+                <div class="large-12 columns">
+                    <span span ng-repeat="term in report.term | orderBy:'amount'">
+                        <ul class="small-block-grid-4">
+                            <li class="ng-binding"><strong>{[{term.name}]}</strong></li>
+                            <li></li>
+                            <li class="report-date-count text-right">
+                                <strong>{[{term.count}]}</strong>
+                            </li>
+                            <li class="report-date-amount text-right">
+                                <strong>{[{term.amount}]}</strong>
+                            </li>
+                        </ul>
+                        <ul class="small-block-grid-4" 
+                            ng-repeat="firm in term.firm">
+                            <li></li>
+                            <li class="ng-binding">{[{firm.name}]}</li>
+                            <li class="report-date-count text-right">
+                                {[{firm.count}]}
+                            </li>
+                            <li class="report-date-amount text-right">
+                                {[{firm.amount}]}
+                            </li>
+                        </ul>
+                        <br />
+                    </span>
+                    <br />
+                    <ul class="small-block-grid-4 report-content-result">
                         <li><strong>Всего</strong></li>
+                        <li></li>
                         <li class="report-date-count text-right">
                             <strong>{[{report.count}]}</strong>
                         </li>
