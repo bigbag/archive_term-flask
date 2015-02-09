@@ -11,8 +11,6 @@ from web import db
 
 from models.base_model import BaseModel
 
-from helpers import hash_helper
-
 
 class ReportStack(db.Model, BaseModel):
 
@@ -45,7 +43,6 @@ class ReportStack(db.Model, BaseModel):
     interval = db.Column(db.Integer, nullable=False)
     details = db.Column(db.Text)
     launch_date = db.Column(db.DateTime)
-    check_summ = db.Column(db.Text, nullable=False)
     lock = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
@@ -172,29 +169,13 @@ class ReportStack(db.Model, BaseModel):
         fields.remove('id')
         fields.remove('_sa_instance_state')
         fields.remove('launch_date')
-        fields.remove('check_summ')
 
         stack = ReportStack()
         map(lambda field: setattr(stack, field, getattr(self, field)), fields)
 
         return stack
 
-    def set_check_summ(self):
-        data = [
-            str(self.firm_id),
-            str(self.emails),
-            str(self.excel),
-            str(self.details),
-            str(self.type),
-            str(self.interval)]
-
-        data = '&'.join(data)
-        return hash_helper.get_content_md5(data)
-
     def save(self):
-        if not self.check_summ:
-            self.check_summ = self.set_check_summ()
-
         if not self.name:
             self.name = 'empty'
 

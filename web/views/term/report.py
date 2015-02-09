@@ -96,13 +96,6 @@ def report_create_new():
     for key in arg:
         setattr(report_stack, key, arg[key])
 
-    old_report_stack = ReportStack.query.filter_by(
-        check_summ=report_stack.set_check_summ()).first()
-
-    if old_report_stack and not report_stack.id:
-        answer['message'] = u'Такой отчет уже есть в списке активных'
-        return jsonify(answer)
-
     if report_stack.save():
         answer['error'] = 'no'
         answer['message'] = u'Отчет сохранен'
@@ -177,7 +170,7 @@ def report_remove(report_id):
 @mod.route('/report/account', methods=['GET'])
 @login_required
 def account_page():
-    """страница счетов"""
+    """Страница счетов"""
 
     firm = Firm.query.get(g.firm_info['id'])
 
@@ -190,7 +183,7 @@ def account_page():
 @mod.route('/report/account', methods=['POST'])
 @login_required
 def account_list():
-    """список счетов"""
+    """Список счетов"""
 
     arg = json.loads(request.stream.read())
     answer = PaymentAccount().select_list(g.firm_info['id'], **arg)
