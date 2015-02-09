@@ -8,6 +8,8 @@
 
 from web.views.term.general import *
 
+from helpers import date_helper
+
 from web.form.term.term import TermAddForm, TermAlarmForm
 from web.form.term.event import TermEventAddForm
 
@@ -60,7 +62,8 @@ def terminal_info(term_id):
     if not term:
         abort(404)
 
-    term_access = term_id in FirmTerm.get_list_by_firm_id(g.firm_info['id'], False)
+    term_access = term_id in FirmTerm.get_list_by_firm_id(
+        g.firm_info['id'], False)
     term_events = TermEvent().get_by_term_id(term_id)
     alarm = AlarmStack(
         firm_id=g.firm_info['id'],
@@ -225,7 +228,7 @@ def terminal_save(term_id, action):
 #@mod.route('/terminal/<int:term_id>/locking', methods=['POST'])
 #@login_required
 #@json_headers
-#def terminal_locking(term_id):
+# def terminal_locking(term_id):
 #    """Блокировка и разблокировка терминал"""
 #
 #    answer = dict(error='yes', message=u'Произошла ошибка')
@@ -328,13 +331,15 @@ def terminal_event_save(term_id, term_event_id):
         return jsonify(answer)
 
     form.populate_obj(term_event)
-    term_event_old = TermEvent.query.filter_by(
-        term_id=term.id, event_id=term_event.event_id).first()
+    term_events_old = TermEvent.query.filter_by(
+        term_id=term.id, event_id=term_event.event_id).all()
 
-    if term_event_old and (term_event.id != term_event_old.id):
-        answer['message'] = u"""Такое событие уже есть,
-                                удалите старое или измените тип нового"""
-        return jsonify(answer)
+    for event_old in term_events_old:
+        if term_event.id != event_old.id and date_helper.isStrIntervalsIntersect(
+                event_old.start, event_old.stop, term_event.start, term_event.stop):
+            answer['message'] = u"""Такое событие уже есть,
+                                    удалите старое или измените тип нового"""
+            return jsonify(answer)
 
     if term_event.save():
         answer['error'] = 'no'
