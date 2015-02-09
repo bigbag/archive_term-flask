@@ -42,13 +42,13 @@
                     </div>
                     <div class="large-10 columns">
                         <ul class="small-block-grid-3"
-                            ng-repeat="row in report.detaled | orderBy:'amount'">
-                            <li>{[{row.term}]}</li>
+                            ng-repeat="term in report.term | orderBy:'amount'">
+                            <li>{[{term.name}]}</li>
                             <li class="report-date-amount text-right">
-                                {[{row.count}]}
+                                {[{term.count}]}
                             </li>
                             <li class="report-date-amount text-right">
-                                {[{row.amount}]}
+                                {[{term.amount}]}
                             </li>
                         </ul>
                         <ul class="small-block-grid-3 report-content-result">
