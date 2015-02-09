@@ -335,7 +335,8 @@ def terminal_event_save(term_id, term_event_id):
         term_id=term.id, event_id=term_event.event_id).all()
 
     for event_old in term_events_old:
-        if term_event.id != event_old.id and date_helper.isStrIntervalsIntersect(
+        if term_event.id != event_old.id and \
+            date_helper.check_for_intersection(
                 event_old.start, event_old.stop, term_event.start, term_event.stop):
             answer['message'] = u"""Такое событие уже есть,
                                     удалите старое или измените тип нового"""
