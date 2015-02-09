@@ -110,3 +110,28 @@ def validate_date(d, format):
         return True
     except ValueError:
         return False
+
+
+def isStrTimeLater(time1, time2):
+    hours1 = int(time1[:2])
+    minutes1 = int(time1[3:])
+    hours2 = int(time2[:2])
+    minutes2 = int(time2[3:])
+
+    if hours2 > hours1:
+        return True
+    elif hours2 < hours1:
+        return False
+    elif minutes2 > minutes1:
+        return True
+
+    return False
+
+
+def isStrIntervalsIntersect(begin1, end1, begin2, end2):
+    if isStrTimeLater(end1, begin2):
+        return False
+    elif isStrTimeLater(end2, begin1):
+        return False
+
+    return True
