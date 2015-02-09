@@ -79,9 +79,11 @@ def get_timezone(tzname):
 def get_date_interval(search_date, period='day', tz=app.config['TZ']):
     search_date = search_date.date()
 
-    start = datetime(search_date.year, search_date.month,
+    start = datetime(search_date.year,
+                     search_date.month,
                      search_date.day, 0, 0, 0)
-    stop = datetime(search_date.year, search_date.month,
+    stop = datetime(search_date.year,
+                    search_date.month,
                     search_date.day, 23, 59, 59)
     if period == 'week':
         day_of_week = search_date.weekday()
@@ -90,18 +92,22 @@ def get_date_interval(search_date, period='day', tz=app.config['TZ']):
         stop_delta = timedelta(days=6 - day_of_week)
         stop_date = search_date + stop_delta
 
-        start = datetime(start_date.year, start_date.month,
+        start = datetime(start_date.year,
+                         start_date.month,
                          start_date.day, 0, 0, 0)
-        stop = datetime(stop_date.year, stop_date.month,
+        stop = datetime(stop_date.year,
+                        stop_date.month,
                         stop_date.day, 23, 59, 59)
     elif period == 'month':
         last_day = calendar.monthrange(search_date.year, search_date.month)[1]
-        start = datetime(search_date.year, search_date.month,
+        start = datetime(search_date.year,
+                         search_date.month,
                          1, 0, 0, 0)
         stop = datetime(search_date.year, search_date.month,
                         last_day, 23, 59, 59)
 
-    return (to_utc(start, tz).replace(tzinfo=None), to_utc(stop, tz).replace(tzinfo=None))
+    return (to_utc(start, tz).replace(tzinfo=None),
+            to_utc(stop, tz).replace(tzinfo=None))
 
 
 def validate_date(d, format):
@@ -112,26 +118,12 @@ def validate_date(d, format):
         return False
 
 
-def isStrTimeLater(time1, time2):
-    hours1 = int(time1[:2])
-    minutes1 = int(time1[3:])
-    hours2 = int(time2[:2])
-    minutes2 = int(time2[3:])
+def check_for_intersection(begin1, end1, begin2, end2):
+    # Input format time string "hh:mm"
 
-    if hours2 > hours1:
-        return True
-    elif hours2 < hours1:
+    if ''.join(begin2.split(':')) > ''.join(end1.split(':')):
         return False
-    elif minutes2 > minutes1:
-        return True
-
-    return False
-
-
-def isStrIntervalsIntersect(begin1, end1, begin2, end2):
-    if isStrTimeLater(end1, begin2):
-        return False
-    elif isStrTimeLater(end2, begin1):
+    elif ''.join(begin1.split(':')) > ''.join(end2.split(':')):
         return False
 
     return True
