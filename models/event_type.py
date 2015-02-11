@@ -29,7 +29,6 @@ class EventType(db.Model, BaseModel):
         return EventType.query.filter_by(term_type=term_type).all()
 
     @staticmethod
-    @cache.cached(timeout=600, key_prefix='all_events_type_dict')
     def get_dict(term_type=False):
         from models.event import Event
 
