@@ -74,11 +74,12 @@ class PaymentTask(object):
     @staticmethod
     @celery.task
     def fail_payment_manager():
-        payments = PaymentFail.query.all()
+        payments = PaymentFail.get_payments()
         if not payments:
             return False
 
-        algorithm = PaymentTask.get_fail_algorithm(Config.FAIL_PAYMENT_ALGORITHM)
+        algorithm = PaymentTask.get_fail_algorithm(
+            Config.FAIL_PAYMENT_ALGORITHM)
         for payment in payments:
             delta = date_helper.get_current_utc() - payment.timestamp
             for row in algorithm:
@@ -212,6 +213,9 @@ class PaymentTask(object):
             message = 'Payment: Not found report with id %s' % report_id
             log.error(message)
             return message
+
+        if report.isPaymentBusy():
+            return False
 
         wallet = PaymentWallet.get_by_payment_id(report.payment_id)
         if not wallet:

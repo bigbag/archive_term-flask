@@ -15,6 +15,7 @@ from models.term import Term
 from models.firm import Firm
 from models.person import Person
 from models.event import Event
+from models.payment_history import PaymentHistory
 
 
 class Report(db.Model, BaseModel):
@@ -113,9 +114,20 @@ class Report(db.Model, BaseModel):
 
     @staticmethod
     def get_new_payment():
-        return Report.query.filter_by(
+        new_reports = Report.query.filter_by(
             type=Report.TYPE_PAYMENT,
-            status=Report.STATUS_NEW).all()
+            status=Report.STATUS_NEW).order_by(Report.id).all()
+
+        reports_list = []
+        payments_list = []
+
+        for report in new_reports:
+            if report.payment_id in payments_list:
+                continue
+            reports_list.append(report.id)
+            payments_list.append(report.payment_id)
+
+        return Report.query.filter(Report.id.in_(reports_list)).all()
 
     @staticmethod
     def get_fail_payment():
@@ -130,7 +142,8 @@ class Report(db.Model, BaseModel):
         fields.remove('amount')
 
         new_report = Report()
-        map(lambda field: setattr(new_report, field, getattr(self, field)), fields)
+        map(lambda field: setattr(
+            new_report, field, getattr(self, field)), fields)
         new_report.status = Report.STATUS_NEW
 
         if new_balance:
@@ -385,8 +398,10 @@ class Report(db.Model, BaseModel):
             detaled_report = self.term_detaled_query(search_date)
             data['term'] = {}
             for row in detaled_report:
-                term_name = terms_name[row[0]] if row[0] in terms_name else 'Empty'
-                firm_name = firms_name[row[1]] if row[1] in firms_name else 'Empty'
+                term_name = terms_name[row[0]] if row[
+                    0] in terms_name else 'Empty'
+                firm_name = firms_name[row[1]] if row[
+                    1] in firms_name else 'Empty'
 
                 amount = float(row[2]) / 100
                 count = int(row[3])
@@ -490,3 +505,21 @@ class Report(db.Model, BaseModel):
         query = query.order_by('summ1 desc')
 
         return query
+
+    def isPaymentBusy(self):
+        """Проверка, запущена ли уже оплата с таким же payment_id"""
+        reports = Report.query.filter(Report.payment_id == self.payment_id, Report.type == self.TYPE_PAYMENT, Report.status.__ne__(
+            self.STATUS_COMPLETE), Report.id.__ne__(self.id)).all()
+
+        status_busy = [
+            PaymentHistory.STATUS_NEW, PaymentHistory.STATUS_IN_PROGRESS]
+
+        for report in reports:
+            history = PaymentHistory.query.filter_by(
+                report_id=report.id).first()
+            if not history:
+                continue
+            if history.status in status_busy:
+                return True
+
+        return False
