@@ -506,7 +506,7 @@ class Report(db.Model, BaseModel):
 
         return query
 
-    def isPaymentBusy(self):
+    def is_payment_busy(self):
         """Проверка, запущена ли уже оплата с таким же payment_id"""
         reports = Report.query.filter(Report.payment_id == self.payment_id, Report.type == self.TYPE_PAYMENT, Report.status.__ne__(
             self.STATUS_COMPLETE), Report.id.__ne__(self.id)).all()
