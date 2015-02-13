@@ -85,7 +85,8 @@ class PaymentFail(db.Model, BaseModel):
         if not spot or not user or not card:
             return False
 
-        all_fails = PaymentFail.query.filter_by(payment_id=payment.payment_id).all()
+        all_fails = PaymentFail.query.filter_by(
+            payment_id=payment.payment_id).all()
 
         amount = 0
         for fail in all_fails:
@@ -110,3 +111,18 @@ class PaymentFail(db.Model, BaseModel):
         self.count += 1
         self.timestamp = date_helper.get_current_utc()
         return BaseModel.save(self)
+
+    @staticmethod
+    def get_payments():
+        fails = PaymentFail.query.order_by(PaymentFail.report_id).all()
+
+        fails_list = []
+        payments_list = []
+
+        for fail in fails:
+            if fail.payment_id in payments_list:
+                continue
+            fails_list.append(fail.report_id)
+            payments_list.append(fail.payment_id)
+
+        return PaymentFail.query.filter(PaymentFail.report_id.in_(fails_list)).all()
