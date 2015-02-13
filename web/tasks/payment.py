@@ -214,7 +214,7 @@ class PaymentTask(object):
             log.error(message)
             return message
 
-        if report.isPaymentBusy():
+        if report.is_payment_busy():
             return False
 
         wallet = PaymentWallet.get_by_payment_id(report.payment_id)
