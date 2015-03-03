@@ -32,6 +32,8 @@ class Spot(db.Model, BaseModel):
     STATUS_REMOVED_USER = 4
     STATUS_REMOVED_SYS = 5
     STATUS_INVISIBLE = 6
+    
+    VALID_STATUS = [1, 2, 3]
 
     TYPE_DEMO = 0
     TYPE_FULL = 3
@@ -149,7 +151,7 @@ class Spot(db.Model, BaseModel):
         return Spot.query.filter(
             Spot.code == code).filter(
                 Spot.status.in_(valid_status)).first()
-
+                
     def save(self):
         if not self.registered_date and self.status == self.STATUS_REGISTERED:
             self.registered_date = date_helper.get_current_date()
