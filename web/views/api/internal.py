@@ -16,6 +16,8 @@ from helpers.error_json_helper import *
 
 from models.payment_card import PaymentCard
 from models.payment_wallet import PaymentWallet
+from models.spot import Spot
+from models.spot_phone import SpotPhone
 
 from web.tasks.payment import PaymentTask
 
@@ -87,6 +89,36 @@ def api_internal_yandex_get_token(discodes_id, code):
         return make_response(jsonify(result))
 
     PaymentTask.get_ym_token.delay(discodes_id, code, url)
+    result['error'] = 0
+
+    return make_response(jsonify(result))
+
+
+@mod.route('/spot/transport_phone/<int:hard_id>/<code128>', methods=['GET'])
+@json_headers
+def api_internal_get_transport_phone(hard_id=False, code128=False):
+
+    result = {'error': 1, 'phones': []}
+
+    spot = Spot.query.filter(
+        Spot.barcode == hard_id).filter(
+        Spot.status.in_(Spot.VALID_STATUS)).first()
+
+    if not spot:
+        spot = Spot.query.filter(
+            Spot.code128 == code128).filter(
+                Spot.status.in_(Spot.VALID_STATUS)).first()
+
+    if not spot:
+        return make_response(jsonify(result))
+
+    phones = SpotPhone.query.filter(
+        SpotPhone.discodes_id == spot.discodes_id).filter(
+            SpotPhone.school_sms == SpotPhone.SERVICE_ENABLED).all()
+
+    for phone in phones:
+        result['phones'].append(phone.phone)
+
     result['error'] = 0
 
     return make_response(jsonify(result))
