@@ -44,7 +44,7 @@ def upgrade_payment():
         sa.Column('id', sa.Integer()),
         sa.Column('payment_id', sa.Integer(), nullable=False),
         sa.Column('hard_id', sa.Integer()),
-        sa.Column('name', sa.String(150), nullable=False, server_default=u'My Spot]'),
+        sa.Column('name', sa.String(150), nullable=False, server_default=u'My Spot'),
         sa.Column('user_id', sa.Integer(), nullable=False, index=True, server_default='0'),
         sa.Column('discodes_id', sa.Integer(), nullable=False, server_default='0'),
         sa.Column('creation_date', sa.DateTime(), nullable=False),
