@@ -6,7 +6,7 @@
     :copyright: (c) 2014 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
-from web import db
+from web import app, db
 
 from models.base_model import BaseModel
 from models.term import Term
@@ -68,7 +68,6 @@ class PaymentHistory(db.Model, BaseModel):
         history.report_id = report.id
         history.wallet_id = wallet.id
         history.term_id = report.term_id
-        history.creation_date = report.creation_date
         history.report_id = report.id
 
         if not history.save():
@@ -94,7 +93,6 @@ class PaymentHistory(db.Model, BaseModel):
         self.user_id = wallet.user_id
         self.wallet_id = wallet.id
         self.term_id = report.term.id
-        self.creation_date = report.creation_date
         self.amount = report.amount
         self.type = PaymentHistory.TYPE_PAYMENT
         self.status = PaymentHistory.STATUS_COMPLETE
@@ -111,3 +109,21 @@ class PaymentHistory(db.Model, BaseModel):
                              (PaymentHistory.status == PaymentHistory.STATUS_IN_PROGRESS))
 
         return query.filter(PaymentHistory.request_id != 0).all()
+
+    @staticmethod
+    def remove_braked(report_id):
+        query = PaymentHistory.query.filter(
+            PaymentHistory.report_id == report_id)
+        query = query.filter(
+            PaymentHistory.status == PaymentHistory.STATUS_NEW)
+        query = query.filter(PaymentHistory.creation_date <
+                             date_helper.get_delta_date(-app.config['HISTORY_BRAKED_TIME']))
+
+        history_braked = query.first()
+
+        if not history_braked:
+            return False
+
+        history_braked.delete()
+
+        return True
