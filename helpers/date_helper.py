@@ -28,6 +28,13 @@ def get_current_date(format='%Y-%m-%d %H:%M:%S'):
     return client_time
 
 
+def get_delta_date(delta_sec, format='%Y-%m-%d %H:%M:%S'):
+    date_delta = datetime.utcnow() + timedelta(seconds=delta_sec)
+    if format:
+        date_delta = date_delta.strftime(format)
+    return date_delta
+
+
 def get_current_utc():
     return calendar.timegm(datetime.utcnow().utctimetuple())
 
