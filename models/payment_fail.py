@@ -95,12 +95,19 @@ class PaymentFail(db.Model, BaseModel):
 
         user_profile = UserProfile.query.filter_by(
             user_id=user.id).first()
-
+            
+        username = u'Dear user'  
+        if user_profile and user_profile.name:
+            username = user_profile.name
+        elif user.lang == 'ru':
+            username = u'Уважаемый пользователь'
+            
         mail.send.delay(
             BlacklistAlarmMessage,
-            user=user,
-            spot=spot,
-            user_profile=user_profile,
+            to=user.email,
+            lang=user.lang,
+            spotname=spot.name,
+            username=username,
             amount="%02d.%02d" % (amount / 100, amount % 100),
             card_pan=u'%s %s' % (card.type, card.pan)
         )
