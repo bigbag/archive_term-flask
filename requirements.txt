@@ -21,3 +21,4 @@ celery
 pycurl
 yandex-money-sdk
 reportlab
+requests
