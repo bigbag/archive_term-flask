@@ -81,6 +81,7 @@ class Config():
     SESSION_PROTECTION = "strong"
     REMEMBER_COOKIE_NAME = ""
 
+    # CELERY
     USE_CELERY = True
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
@@ -179,6 +180,12 @@ class Config():
     
     BLACKLIST_ALARM_LIMIT = 3
 
+    # API
+    TROIKA_URL = ''
+    TROIKA_USER = ''
+    TROIKA_PASSWORD = ""
+
+    # LOGGER
     LOGGER_NAME = 'all'
     
     LOG_PATH = './logs'
