@@ -2,7 +2,6 @@ import time
 import logging
 import requests
 
-from requests.auth import HTTPBasicAuth
 
 __all__ = (
     'api_request',
@@ -27,7 +26,7 @@ def api_request(method, url, timeout=DEFAULT_TIMEOUT, auth=None, params=None, da
             url,
             data=data if data else None,
             params=params if params else None,
-            auth=HTTPBasicAuth(auth) if auth else None,
+            auth=auth if auth else None,
             timeout=timeout)
         response_data = response.json()
     except Exception:
