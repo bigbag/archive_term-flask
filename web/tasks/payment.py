@@ -222,7 +222,8 @@ class PaymentTask(object):
             message = 'Payment: Not found wallet with pid %s' % report.payment_id
             log.error(message)
             return message
-
+        
+        PaymentHistory.remove_braked(report.id)
         history = PaymentHistory.query.filter_by(report_id=report.id).first()
         if history:
             return False
