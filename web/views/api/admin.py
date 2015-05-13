@@ -17,6 +17,9 @@ from models.spot_hard import SpotHard
 from models.spot_hard_type import SpotHardType
 from models.spot_dis import SpotDis
 from models.payment_wallet import PaymentWallet
+from models.spot_troika import SpotTroika
+
+from external_services import troika
 
 from external_services import troika
 
@@ -116,6 +119,10 @@ def api_admin_linking_spot():
     troika_info = troika.release_card(hid)
     if troika_info:
         spot.user_id = troika_info['user_id']
+
+        spot_troika = SpotTroika()
+        spot_troika.discodes_id = spot.discodes_id
+        spot_troika.save()
 
     wallet = PaymentWallet.query.filter(
         (PaymentWallet.hard_id == hid) |
