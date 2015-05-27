@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="windows-1251"?>
-<config mode="{{ term.type }}" blacklist="0">
+<config auth="pid" blacklist="0" mode="{{ term.type }}">
     <ntp>
         <server>pool.ntp.org</server>
         <timezone>{{ term.tz }}</timezone>
