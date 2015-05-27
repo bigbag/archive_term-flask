@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="windows-1251"?>
-<config mode="{{ term.type }}" blacklist="{{ term.blacklist }}">
+<config auth="{{ term.auth }}" blacklist="{{ term.blacklist }}" mode="{{ term.type }}">
     <ntp>
         <server>pool.ntp.org</server>
         <timezone>{{ term.tz }}</timezone>
@@ -80,13 +80,19 @@
         {% for person_event in person_events %}
             {% if person_event.event_id == term_event.event_id %}
             {% set payment_id = person_event.person.payment_id %}
+            {% set hard_id = person_event.person.hard_id %}
                 {% if person_event.status == 1 %}
-                {% if person_event.person.wallet_status == 1 %}
-                {% if payment_id %}
-                <card timeout="{{person_event.timeout*60}}">
-                {{ payment_id }}</card>
-                {% endif %}
-                {% endif %}
+                    {% if person_event.person.wallet_status == 1 %}
+                        {% if term.auth == "uid" %}
+                            {% if hard_id %}
+                                <card timeout="{{person_event.timeout*60}}">{{ hard_id }}</card>
+                            {% endif %}
+                        {% else %}
+                            {% if payment_id %}
+                                <card timeout="{{person_event.timeout*60}}">{{ payment_id }}</card>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
                 {% endif %}
             {% endif %}
         {% endfor %}
