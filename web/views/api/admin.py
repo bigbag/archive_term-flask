@@ -21,6 +21,8 @@ from models.spot_troika import SpotTroika
 
 from external_services import troika
 
+from external_services import troika
+
 from web.views.api import base
 
 
