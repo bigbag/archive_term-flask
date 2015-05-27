@@ -168,15 +168,16 @@ class ReportParserTask (object):
             report.term_id = term.id
             report.event_id = event.id
             report.type = payment['type']
-            report.payment_id = payment['card']
+            report.payment_id = None
             report.amount = payment['amount'] * int(term.factor)
 
             real_person = None
             for row in firm_terms:
                 report.term_firm_id = row.firm_id
-                person = Person.query.filter(
-                    Person.payment_id == report.payment_id).filter(
-                        Person.firm_id == row.child_firm_id).first()
+                query = Person.query
+                query = query.filter((Person.payment_id == payment['card']) |
+                                     (Person.hard_id == int(payment['card'])))
+                person = query.filter(Person.firm_id == row.child_firm_id).first()
                 if not person:
                     continue
                 real_person = person
@@ -185,6 +186,10 @@ class ReportParserTask (object):
                 report.name = real_person.name
                 report.person_id = real_person.id
                 report.person_firm_id = real_person.firm_id
+
+                report.payment_id = real_person.payment_id
+            else:
+                report.payment_id = payment['card']
 
             date_pattern = '%Y-%m-%d %H:%M:%S'
             date_time_utc = date_helper.convert_date_to_utc(

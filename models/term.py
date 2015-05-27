@@ -3,7 +3,7 @@
     Модель для платежных и вендинговых терминалов
 
 
-    :copyright: (c) 2014 by Pavel Lyashkov.
+    :copyright: (c) 2015 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 from flask import g
@@ -32,6 +32,9 @@ class Term(db.Model, BaseModel):
     TYPE_POS = 0
     TYPE_VENDING = 1
 
+    AUTH_PID = 'pid'
+    AUTH_HID = 'uid'
+
     SEANS_ALARM = 86400
     USED_LAST_MONTH = 1728000
 
@@ -43,6 +46,7 @@ class Term(db.Model, BaseModel):
     name = db.Column(db.String(300), nullable=False)
     tz = db.Column(db.String(300), nullable=False)
     blacklist = db.Column(db.Integer)
+    auth = db.Column(db.String(16))
     settings_id = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Integer, index=True)
     report_date = db.Column(db.DateTime)
@@ -68,10 +72,17 @@ class Term(db.Model, BaseModel):
         self.download_period = 5
         self.tz = app.config['TZ']
         self.blacklist = self.BLACKLIST_OFF
+        self.auth = self.AUTH_PID
         self.settings_id = 1
         self.factor = 1
         self.update_qid = 1
         self.status = self.STATUS_VALID
+
+    def save(self):
+        if self.auth == self.AUTH_HID:
+            self.blacklist = self.BLACKLIST_OFF
+
+        return BaseModel.save(self)
 
     def term_add(self, firm_id):
         result = False
@@ -103,6 +114,12 @@ class Term(db.Model, BaseModel):
         return [
             {'id': 1, 'name': u"Копейки"},
             {'id': 100, 'name': u"Рубли"}
+        ]
+
+    def get_auth_list(self):
+        return [
+            {'id': self.AUTH_PID, 'name': u"По pid карты"},
+            {'id': self.AUTH_HID, 'name': u"По uid карты"}
         ]
 
     def get_blacklist_list(self):

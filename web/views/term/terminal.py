@@ -2,13 +2,12 @@
 """
     Веб интерфейс терминального проекта, терминалы фасад
 
-    :copyright: (c) 2013 by Pavel Lyashkov.
+    :copyright: (c) 2015 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
 
 from web.views.term.general import *
 
-from helpers import date_helper
 
 from web.form.term.term import TermAddForm, TermAlarmForm
 from web.form.term.event import TermEventAddForm
@@ -78,6 +77,7 @@ def terminal_info(term_id):
         term_access=term_access,
         term_types=Term().get_type_list(),
         term_factors=Term().get_factor_list(),
+        term_auth=Term().get_auth_list(),
         term_blacklist=Term().get_blacklist_list(),
         alarm_stack=alarm
     )
