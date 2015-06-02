@@ -29,6 +29,21 @@
         </div>
     </div>
     <div class="content-row g-clear-b"
+        ng-init="term.auth={{term.auth}}">
+        <label for="add-auth">Способ аутентификации карт</label>
+        <select id="add-auth"
+            class="medium"
+            name="auth"
+            ng-model="term.auth">
+            {% for auth in term_auth %}
+            <option {% if auth['id'] == term.auth %} selected {% endif %}
+                value="{{auth['id']}}">
+                    {{auth['name']}}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="content-row g-clear-b"
         ng-init="term.blacklist={{term.blacklist}}">
         <label for="add-type">Средства платежа</label>
         <select id="add-type"

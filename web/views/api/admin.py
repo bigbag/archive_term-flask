@@ -17,6 +17,11 @@ from models.spot_hard import SpotHard
 from models.spot_hard_type import SpotHardType
 from models.spot_dis import SpotDis
 from models.payment_wallet import PaymentWallet
+from models.spot_troika import SpotTroika
+
+from external_services import troika
+
+from external_services import troika
 
 from web.views.api import base
 
@@ -111,6 +116,14 @@ def api_admin_linking_spot():
 
     spot.hard_type = hard_type
 
+    troika_info = troika.release_card(hid)
+    if troika_info:
+        spot.user_id = troika_info['user_id']
+
+        spot_troika = SpotTroika()
+        spot_troika.discodes_id = spot.discodes_id
+        spot_troika.save()
+
     wallet = PaymentWallet.query.filter(
         (PaymentWallet.hard_id == hid) |
         (PaymentWallet.discodes_id == spot.discodes_id)).first()
@@ -125,8 +138,16 @@ def api_admin_linking_spot():
             wallet.type = PaymentWallet.TYPE_DEMO
             spot.spot_type_id = Spot.TYPE_DEMO
 
+        if troika_info:
+            wallet.user_id = troika_info['user_id']
+            wallet.status = PaymentWallet.STATUS_ACTIVE
+
         if wallet.save():
             spot.status = Spot.STATUS_ACTIVATED
+
+            if troika_info:
+                spot.status = Spot.STATUS_REGISTERED
+
             if not spot.save():
                 abort(400)
 
@@ -191,6 +212,7 @@ def api_admin_get_info(hid=False, ean=False, code128=False):
         'api/admin/spot_info.xml',
         spot=spot,
         wallet=wallet,
+        troika=troika.get_card_by_hard_id(wallet.hard_id),
     ).encode('cp1251')
     response = make_response(info_xml)
 
