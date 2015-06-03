@@ -44,6 +44,29 @@ def api_internal_yandex_linking(discodes_id):
     return make_response(jsonify(result))
 
 
+@mod.route('/yandex/pay/<order_id>', methods=['POST'])
+@json_headers
+def api_internal_yandex_pay(order_id):
+    result = {'error': 1}
+
+    success_uri = request.form.get('success_uri')
+    fail_uri = request.form.get('fail_uri')
+    amount = request.form.get('amount')
+    type = request.form.get('type')
+
+    if not success_uri or not fail_uri or not amount:
+        return make_response(jsonify(result))
+
+    result = PaymentCard().get_ym_params(amount,
+                                         YandexMoneyConfig.PAYMENT_PATTERN_ID,
+                                         order_id,
+                                         success_uri,
+                                         fail_uri,
+                                         type)
+
+    return make_response(jsonify(result))
+
+
 @mod.route('/yandex/get_auth_url/<int:discodes_id>', methods=['GET'])
 @json_headers
 def api_internal_yandex_get_auth_url(discodes_id):
