@@ -10,6 +10,8 @@
 import logging
 from web import db
 
+from yandex_money.api import Wallet, ExternalPayment
+
 from configs.yandex import YandexMoneyConfig
 from libs.ya_money import YaMoneyApi
 
@@ -32,6 +34,9 @@ class PaymentCard(db.Model, BaseModel):
     TYPE_YM = 'Yandex'
     TYPE_MC = 'MasterCard'
     TYPE_VISA = 'VISA'
+
+    PAYMENT_BY_CARD = 'AC'
+    PAYMENT_BY_YM = 'PC'
 
     SYSTEM_MPS = 0
     SYSTEM_YANDEX = 1
@@ -61,43 +66,50 @@ class PaymentCard(db.Model, BaseModel):
             wallet_id=wallet_id,
             status=PaymentCard.STATUS_PAYMENT).first()
 
+    def get_ym_params(self, amount, pattern, order_id, success_uri, fail_uri, type=PAYMENT_BY_CARD):
+        """Запрос параметров от ym"""
+
+        request_options = {
+            "pattern_id": pattern,
+            "sum": amount,
+            "customerNumber": order_id,
+        }
+
+        if type == PaymentCard.PAYMENT_BY_CARD:
+            ym = ExternalPayment(YandexMoneyConfig.INSTANCE_ID)
+            payment = ym.request(request_options)
+        elif type == PaymentCard.PAYMENT_BY_YM:
+            return False
+        else:
+            return False
+
+        if payment['status'] == "success":
+            request_id = payment['request_id']
+        else:
+            return False
+
+        process_options = {
+            "request_id": request_id,
+            'ext_auth_success_uri': success_uri,
+            'ext_auth_fail_uri': fail_uri
+        }
+        result = ym.process(process_options)
+
+        return dict(
+            url=result['acs_uri'],
+            params=result['acs_params']
+        )
+
     def get_linking_params(self, order_id=0, url=None):
         """Запрос параметров для привязки карты"""
 
         ym = YaMoneyApi(YandexMoneyConfig)
-        payment = ym.get_request_payment_to_shop(
-            self.LINKING_AMOUNT, ym.const.CARD_PATTERN_ID, order_id)
-        if not payment:
-            return False
-
-        if not 'request_id' in payment:
-            self.log.error(
-                'Linking card: yandex api error - %s' % payment['error'])
-            return False
-
-        if url:
-            ym.success_uri = url
-            ym.fail_uri = url
-
-        status = ym.get_process_external_payment(payment['request_id'])
-        if not 'status' in status:
-            self.log.error('Linking card: Not found field status')
-            return False
-
-        if status['status'] != 'ext_auth_required':
-            return False
-
-        if not 'acs_uri' in status or not 'acs_params' in status:
-            self.log.error(
-                'Linking card: Not found fields acs_uri or acs_params')
-            return False
-
-        result = dict(
-            url=status['acs_uri'],
-            params=status['acs_params']
-        )
-
-        return result
+        return self.get_ym_params(self.LINKING_AMOUNT,
+                                  ym.const.CARD_PATTERN_ID,
+                                  order_id,
+                                  url,
+                                  url,
+                                  self.PAYMENT_BY_CARD)
 
     def linking_init(self, discodes_id, url=None):
         """Инициализируем привязку карты"""
