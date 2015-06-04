@@ -114,7 +114,7 @@ def api_admin_linking_spot():
 
     spot.hard_type = hard_type
 
-    troika_info = troika.release_card(hid)
+    troika_info = troika_api.release_card(hid)
     if troika_info:
         spot.user_id = troika_info['user_id']
 
@@ -205,15 +205,16 @@ def api_admin_get_info(hid=False, ean=False, code128=False):
 
         wallet = PaymentWallet.query.filter_by(
             discodes_id=spot.discodes_id).first()
-        troika = None
+
+        troika_info = None
         if wallet:
-            troika = troika_api.get_card_by_hard_id(wallet.hard_id)
+            troika_info = troika_api.get_card_by_hard_id(wallet.hard_id)
 
     info_xml = render_template(
         'api/admin/spot_info.xml',
         spot=spot,
         wallet=wallet,
-        troika=troika,
+        troika=troika_info,
     ).encode('cp1251')
     response = make_response(info_xml)
 
