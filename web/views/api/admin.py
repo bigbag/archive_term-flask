@@ -19,7 +19,7 @@ from models.spot_dis import SpotDis
 from models.payment_wallet import PaymentWallet
 from models.spot_troika import SpotTroika
 
-from external_services import troika_api
+from external_services import troika as troika_api
 
 from web.views.api import base
 
