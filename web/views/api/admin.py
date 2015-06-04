@@ -19,9 +19,7 @@ from models.spot_dis import SpotDis
 from models.payment_wallet import PaymentWallet
 from models.spot_troika import SpotTroika
 
-from external_services import troika
-
-from external_services import troika
+from external_services import troika_api
 
 from web.views.api import base
 
@@ -207,12 +205,15 @@ def api_admin_get_info(hid=False, ean=False, code128=False):
 
         wallet = PaymentWallet.query.filter_by(
             discodes_id=spot.discodes_id).first()
+        troika = None
+        if wallet:
+            troika = troika_api.get_card_by_hard_id(wallet.hard_id)
 
     info_xml = render_template(
         'api/admin/spot_info.xml',
         spot=spot,
         wallet=wallet,
-        troika=troika.get_card_by_hard_id(wallet.hard_id),
+        troika=troika,
     ).encode('cp1251')
     response = make_response(info_xml)
 
