@@ -19,6 +19,10 @@ from models.firm import Firm
 from models.firm_term import FirmTerm
 from models.term_event import TermEvent
 from models.alarm_stack import AlarmStack
+from models.payment_history import PaymentHistory
+from models.payment_fail import PaymentFail
+from models.firm_term import FirmTerm
+from models.term_event import TermEvent
 
 
 @mod.route('/terminal', methods=['GET'])
@@ -255,20 +259,44 @@ def terminal_save(term_id, action):
 @login_required
 @json_headers
 def terminal_remove(term_id):
-    """Удаление терминала"""
+    """Удаление терминала вместе с историей"""
 
     answer = dict(error='yes', message=u'Произошла ошибка')
 
     term = Term.get_info_by_id(term_id)
     if not term:
         abort(404)
+        
+    term_events = TermEvent.query.filter_by(term_id=term.id).all()
+    for event in term_events:
+        event.delete()
 
-    report = Report.query.filter_by(term_id=term.id).first()
+    reports = Report.query.filter_by(term_id=term.id).all()
+    
+    report_list = []
+    for report in reports:
+        if report.id in report_list:
+            continue
+        report_list.append(report.id)
 
-    if report:
-        answer['message'] = u"""Невозможно удалить.
-            По терминалу была совершена операция."""
-        return jsonify(answer)
+    query = PaymentHistory.query.filter(PaymentHistory.report_id.in_(report_list))
+    histories = query.all()
+    
+    for history in histories:
+        history.delete()
+        
+    fails_query = PaymentFail.query.filter(PaymentFail.report_id.in_(report_list))
+    fails = fails_query.all()
+    
+    for fail in fails:
+        fail.delete()
+        
+    for report in reports:
+        report.delete()
+        
+    firm_terms = FirmTerm.query.filter_by(term_id=term.id).all()
+    for firm_term in firm_terms:
+        firm_term.delete()
 
     if term.term_remove():
         answer['error'] = 'no'
