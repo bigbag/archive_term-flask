@@ -225,8 +225,30 @@ angular.module('term').controller('TerminalController',
         }
     });
   };
-});
 
+  //удаление терминала
+  $scope.removeTerminal = function(term) {
+    dialogService.yesNoDialog(function(dialog_result) {
+      if (dialog_result != 'yes')
+        return false;
+    
+      $http.post('/terminal/' + term.id + '/remove').success(function(data) {
+        if (data.error === 'yes') {
+            contentService.setModal(data.message, 'error');
+        } else {
+          contentService.setModal(data.message, 'none');
+          setTimeout(function(){
+            $(location).attr('href','/terminal');
+          }, 2000);
+        }
+      });
+    },
+    'Терминал ' + term.hard_id + ', ' + term.name + ' и вся история операций по этому терминалу будет удалена. Вы уверены?'
+    );    
+  }
+
+});
+  
 /*
   //Блокируем и разблокируем терминал
   $scope.lockingTerminal = function(term) {
