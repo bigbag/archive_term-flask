@@ -17,9 +17,10 @@ class BaseModel(object):
     def __repr__(self):
         return '<id %r>' % (self.id)
 
-    def delete(self):
+    def delete(self, commit=True):
         db.session.delete(self)
-        db.session.commit()
+        if commit:
+            db.session.commit()
 
     def update(self):
         db.session.commit()
