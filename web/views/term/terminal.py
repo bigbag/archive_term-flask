@@ -8,21 +8,15 @@
 
 from web.views.term.general import *
 
-
 from web.form.term.term import TermAddForm, TermAlarmForm
 from web.form.term.event import TermEventAddForm
 
 from models.term import Term
-from models.report import Report
 from models.event_type import EventType
 from models.firm import Firm
 from models.firm_term import FirmTerm
 from models.term_event import TermEvent
 from models.alarm_stack import AlarmStack
-from models.payment_history import PaymentHistory
-from models.payment_fail import PaymentFail
-from models.firm_term import FirmTerm
-from models.term_event import TermEvent
 
 
 @mod.route('/terminal', methods=['GET'])
@@ -228,33 +222,6 @@ def terminal_save(term_id, action):
     return jsonify(answer)
 
 
-#@mod.route('/terminal/<int:term_id>/locking', methods=['POST'])
-#@login_required
-#@json_headers
-# def terminal_locking(term_id):
-#    """Блокировка и разблокировка терминал"""
-#
-#    answer = dict(error='yes', message=u'Произошла ошибка')
-#    arg = get_post_arg(request, True)
-#
-#    if 'status' not in arg or 'id' not in arg:
-#        abort(400)
-#
-#    term = Term.query.get(term_id)
-#    if not term:
-#        abort(404)
-#
-#    if term.status == Term.STATUS_VALID:
-#        term.status = Term.STATUS_BANNED
-#    elif term.status == Term.STATUS_BANNED:
-#        term.status = Term.STATUS_VALID
-#    if term.save():
-#        answer['error'] = 'no'
-#        answer['message'] = u'Операция успешно выполнена'
-#
-#    return jsonify(answer)
-
-
 @mod.route('/terminal/<int:term_id>/remove', methods=['POST'])
 @login_required
 @json_headers
@@ -266,37 +233,6 @@ def terminal_remove(term_id):
     term = Term.get_info_by_id(term_id)
     if not term:
         abort(404)
-        
-    term_events = TermEvent.query.filter_by(term_id=term.id).all()
-    for event in term_events:
-        event.delete()
-
-    reports = Report.query.filter_by(term_id=term.id).all()
-    
-    report_list = []
-    for report in reports:
-        if report.id in report_list:
-            continue
-        report_list.append(report.id)
-
-    query = PaymentHistory.query.filter(PaymentHistory.report_id.in_(report_list))
-    histories = query.all()
-    
-    for history in histories:
-        history.delete()
-        
-    fails_query = PaymentFail.query.filter(PaymentFail.report_id.in_(report_list))
-    fails = fails_query.all()
-    
-    for fail in fails:
-        fail.delete()
-        
-    for report in reports:
-        report.delete()
-        
-    firm_terms = FirmTerm.query.filter_by(term_id=term.id).all()
-    for firm_term in firm_terms:
-        firm_term.delete()
 
     if term.term_remove():
         answer['error'] = 'no'
