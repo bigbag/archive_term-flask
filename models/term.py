@@ -6,6 +6,7 @@
     :copyright: (c) 2015 by Pavel Lyashkov.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from flask import g
 from web import app, db, cache
 from sqlalchemy import desc
@@ -39,6 +40,8 @@ class Term(db.Model, BaseModel):
     USED_LAST_MONTH = 1728000
 
     DEFAULT_FACTOR = 100
+
+    log = logging.getLogger('model')
 
     id = db.Column(db.Integer, primary_key=True)
     hard_id = db.Column(db.Integer, unique=True)
@@ -97,12 +100,34 @@ class Term(db.Model, BaseModel):
         return result
 
     def term_remove(self):
-        FirmTerm.query.filter_by(term_id=self.id).delete()
-        TermEvent.query.filter_by(term_id=self.id).delete()
-        PersonEvent.query.filter_by(term_id=self.id).delete()
-        self.delete()
+        from models.payment_history import PaymentHistory
+        from models.payment_fail import PaymentFail
+        from models.report import Report
 
-        return True
+        try:
+            FirmTerm.query.filter_by(term_id=self.id).delete(False)
+            TermEvent.query.filter_by(term_id=self.id).delete(False)
+            PersonEvent.query.filter_by(term_id=self.id).delete(False)
+
+            reports = Report.query.filter_by(term_id=self.id).all()
+            reports_id = list(set([report.id for report in reports]))
+            Report.query.filter_by(term_id=self.id).delete(False)
+
+            if reports_id:
+                PaymentHistory.query.filter(
+                    PaymentHistory.report_id.in_(reports_id)).delete(False)
+                PaymentFail.query.filter(
+                    PaymentFail.report_id.in_(reports_id)).delete(False)
+
+            self.delete(False)
+
+            db.session.commit()
+        except Exception as e:
+            self.log.error(e)
+            db.session.rollback()
+            return False
+        else:
+            return True
 
     def get_type_list(self):
         return [
