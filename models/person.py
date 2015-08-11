@@ -79,8 +79,10 @@ class Person(db.Model, BaseModel):
         return query.limit(limit).all()
 
     @staticmethod
-    @cache.cached(timeout=30)
+    @cache.cached(timeout=5)
     def select_list(firm_id, **kwargs):
+        from models.person_event import PersonEvent
+
         order = kwargs[
             'order'] if 'order' in kwargs else 'name asc'
         limit = kwargs['limit'] if 'limit' in kwargs else 10
@@ -102,11 +104,13 @@ class Person(db.Model, BaseModel):
 
         result = []
         for person in persons:
+            person_event = PersonEvent.get_by_person_id(person.id)
             data = dict(
                 id=person.id,
                 name=person.name,
                 card=person.card,
                 wallet_status=int(person.wallet_status == Person.STATUS_VALID),
+                event_count=len(person_event),
                 hard_id=int(person.payment_id) if person.payment_id else 0,
             )
             result.append(data)

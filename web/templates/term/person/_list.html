@@ -21,23 +21,32 @@
             <tr>
                 <th><span >Имя</span></th>
                 <th>Номер карты</th>
-                <th>Карта</th>
+                <th>События</th>
                 <th>Статус</th>
+                <th>Карта</th>
             </tr>
         </thead>
         <tbody>
             <tr ng-click="getPersonView(person.id)"
                 ng-repeat="person in result"
                 class="m-t-cont-row">
-                <td>{[{person.name}]}</td>
-                <td>{[{person.card}]}</td>
+                <td>{[{::person.name}]}</td>
+                <td>{[{::person.card}]}</td>
                 <td>
-                    <span class="m-card-act g-round"
-                        ng-class="(person.hard_id==0)?'':'active'"></span>
+                    <span class="m-event g-round"
+                        ng-class="(person.event_count==0)?'m-event-error':'m-event-normal'">
+                        {[{(person.event_count==0)?'':person.event_count}]}
+                    </span>
                 </td>
                 <td>
                     <span class="m-card-act g-round"
-                        ng-class="(person.wallet_status==1)?'active':''"></span>
+                        ng-class="(person.hard_id==0)?'':'active'">
+                    </span>
+                </td>
+                <td>
+                    <span class="m-card-act g-round"
+                        ng-class="(person.wallet_status==1)?'active':''">
+                    </span>
                 </td>
             </tr>
             <tr class="m-table-bottom" ng-show="search.page_count">
@@ -45,7 +54,7 @@
                     <ui-pagination
                         cur="pagination.cur"
                         total="pagination.total"
-                        display="{[{pagination.display}]}">
+                        display="{[{::pagination.display}]}">
                     </ui-pagination>
                 </td>
             </tr>
