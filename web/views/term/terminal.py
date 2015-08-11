@@ -8,12 +8,10 @@
 
 from web.views.term.general import *
 
-
 from web.form.term.term import TermAddForm, TermAlarmForm
 from web.form.term.event import TermEventAddForm
 
 from models.term import Term
-from models.report import Report
 from models.event_type import EventType
 from models.firm import Firm
 from models.firm_term import FirmTerm
@@ -224,51 +222,17 @@ def terminal_save(term_id, action):
     return jsonify(answer)
 
 
-#@mod.route('/terminal/<int:term_id>/locking', methods=['POST'])
-#@login_required
-#@json_headers
-# def terminal_locking(term_id):
-#    """Блокировка и разблокировка терминал"""
-#
-#    answer = dict(error='yes', message=u'Произошла ошибка')
-#    arg = get_post_arg(request, True)
-#
-#    if 'status' not in arg or 'id' not in arg:
-#        abort(400)
-#
-#    term = Term.query.get(term_id)
-#    if not term:
-#        abort(404)
-#
-#    if term.status == Term.STATUS_VALID:
-#        term.status = Term.STATUS_BANNED
-#    elif term.status == Term.STATUS_BANNED:
-#        term.status = Term.STATUS_VALID
-#    if term.save():
-#        answer['error'] = 'no'
-#        answer['message'] = u'Операция успешно выполнена'
-#
-#    return jsonify(answer)
-
-
 @mod.route('/terminal/<int:term_id>/remove', methods=['POST'])
 @login_required
 @json_headers
 def terminal_remove(term_id):
-    """Удаление терминала"""
+    """Удаление терминала вместе с историей"""
 
     answer = dict(error='yes', message=u'Произошла ошибка')
 
     term = Term.get_info_by_id(term_id)
     if not term:
         abort(404)
-
-    report = Report.query.filter_by(term_id=term.id).first()
-
-    if report:
-        answer['message'] = u"""Невозможно удалить.
-            По терминалу была совершена операция."""
-        return jsonify(answer)
 
     if term.term_remove():
         answer['error'] = 'no'
