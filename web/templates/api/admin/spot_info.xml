@@ -20,6 +20,6 @@
         <troika_id>{{ troika.troika_id }}</troika_id>
         <status>{{ troika.status }}</status>
         <troika_state>{{ troika.troika_state }}</troika_state>
-    <troika>
+    </troika>
     {% endif %}
 </info>
