@@ -19,10 +19,10 @@
     <table class="m-spot-table" ng-controller="PersonController">
         <thead>
             <tr>
-                <th><span >Имя</span></th>
+                <th class="sortable asc" ng-click="sortBy('name', true, $event)"><span>Имя</span></th>
                 <th>Номер карты</th>
                 <th>События</th>
-                <th>Статус</th>
+                <th class="sortable" ng-click="sortBy('hard_id', false, $event)"><span>Статус</span></th>
                 <th>Карта</th>
             </tr>
         </thead>
