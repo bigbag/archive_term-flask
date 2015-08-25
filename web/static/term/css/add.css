@@ -285,3 +285,41 @@ span.ui-icon.ui-icon-closethick {
 .m-spot-table th.not-sortable {
     cursor: default;
 }
+
+.hint:after, [data-hint]:after {
+    border-radius:10px;
+    padding:16px 20px;
+    font-size: 14px;
+    font-weight: normal;
+    font-style: normal;
+    font-family: Arial;
+}
+
+.hint--info:after {
+    background-color: #cfdbe7;
+    text-shadow: none;
+    color: black;
+    box-shadow:none;
+}
+
+.hint--info.hint--top:before {
+    border-top-color: #cfdbe7;
+}
+
+.hint:before, [data-hint]:before {
+    border: 8px solid transparent;
+    top:10px;
+}
+
+.hint--top:after, .hint--top:before {
+    left: 23%;
+    bottom: 80%;
+}
+
+.hint--bottom:after, .hint--top:after {
+    margin-left: -128px;
+}
+
+th[data-hint] {
+    display:table-cell;
+}
