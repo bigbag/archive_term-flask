@@ -323,3 +323,21 @@ span.ui-icon.ui-icon-closethick {
 th[data-hint] {
     display:table-cell;
 }
+
+.time-options {
+    position:relative;
+    top:17px;
+}
+
+.time-options a {
+    cursor:pointer;
+}
+
+.time-options a.selected {
+    color: #0061FF;
+}
+
+.time-options span {
+    display:inline-block;
+    border-bottom:1px dashed #000;
+}
