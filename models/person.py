@@ -8,6 +8,7 @@
 import os
 import xlrd
 from werkzeug.utils import secure_filename
+from sqlalchemy.sql import func, outerjoin
 
 from web import app, db, cache
 
@@ -95,24 +96,30 @@ class Person(db.Model, BaseModel):
 
         query = Person.query.filter(Person.firm_id == firm_id)
         query = query.filter(Person.status == status)
-        query = query.order_by(order)
 
         if search_request:
             query = query.filter(
                 Person.name.like('%' + search_request + '%') |
                 Person.card.like('%' + search_request + '%'))
+                
+        query = query.outerjoin(PersonEvent, Person.id == PersonEvent.person_id)
+        query = query.group_by(Person);
+        query = query.add_columns(func.count(PersonEvent).label('event_count'))
+        
+        query = query.order_by(order)
 
         persons = query.paginate(page, limit, False).items
 
         result = []
-        for person in persons:
-            person_event = PersonEvent.get_by_person_id(person.id)
+        for item in persons:
+            person = item[0]
+            event_count = item[1]
             data = dict(
                 id=person.id,
                 name=person.name,
                 card=person.card,
                 wallet_status=int(person.wallet_status == Person.STATUS_VALID),
-                event_count=len(person_event),
+                event_count=event_count,
                 hard_id=int(person.payment_id) if person.payment_id else 0,
             )
             result.append(data)
