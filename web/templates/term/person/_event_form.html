@@ -34,6 +34,15 @@
                 ng-init="person_event.timeout=persontTimeout[person_event.term_event_id]"
                 ng-model="person_event.timeout"
                 required>
+            <div class="time-options left">
+                &larr;
+                <span>
+                    <a ng-click="person_event.timeout=240" ng-class="{selected: person_event.timeout==240}">4 часа</a> / 
+                    <a ng-click="person_event.timeout=480" ng-class="{selected: person_event.timeout==480}">8 часов</a> / 
+                    <a ng-click="person_event.timeout=720" ng-class="{selected: person_event.timeout==720}">12 часов</a> / 
+                    <a ng-click="person_event.timeout=1440" ng-class="{selected: person_event.timeout==1440}">Сутки</a>
+                </span>
+            </div>
         </div>
     </form>
 
