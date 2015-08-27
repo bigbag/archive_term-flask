@@ -104,7 +104,7 @@ class Person(db.Model, BaseModel):
                 
         query = query.outerjoin(PersonEvent, Person.id == PersonEvent.person_id)
         query = query.group_by(Person);
-        query = query.add_columns(func.count(PersonEvent).label('event_count'))
+        query = query.add_columns(func.count(PersonEvent.id).label('event_count'))
         
         query = query.order_by(order)
 
