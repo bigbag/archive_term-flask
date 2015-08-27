@@ -190,6 +190,7 @@ def api_admin_get_info(hid=False, ean=False, code128=False):
         spot = Spot.query.filter_by(
             discodes_id=wallet.discodes_id).first()
 
+    troika_info = None
     if ean or code128:
         if ean and not len(str(ean)) == 13:
             abort(400)
@@ -205,8 +206,6 @@ def api_admin_get_info(hid=False, ean=False, code128=False):
 
         wallet = PaymentWallet.query.filter_by(
             discodes_id=spot.discodes_id).first()
-
-        troika_info = None
         if wallet:
             troika_info = troika_api.get_card_by_hard_id(wallet.hard_id)
 
