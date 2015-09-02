@@ -181,6 +181,7 @@ def api_admin_get_info(hid=False, ean=False, code128=False):
     except:
         abort(405)
 
+    wallet = None
     if hid:
         wallet = PaymentWallet.query.filter_by(
             hard_id=hid).first()
@@ -206,9 +207,9 @@ def api_admin_get_info(hid=False, ean=False, code128=False):
         wallet = PaymentWallet.query.filter_by(
             discodes_id=spot.discodes_id).first()
 
-        troika_info = None
-        if wallet:
-            troika_info = troika_api.get_card_by_hard_id(wallet.hard_id)
+    troika_info = None
+    if wallet:
+        troika_info = troika_api.get_card_by_hard_id(wallet.hard_id)
 
     info_xml = render_template(
         'api/admin/spot_info.xml',
