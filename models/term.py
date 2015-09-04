@@ -65,6 +65,7 @@ class Term(db.Model, BaseModel):
     update_qid = db.Column(db.String(128))
     keyload_qid = db.Column(db.String(128))
     has_gprs = db.Column(db.Integer)
+    has_comission = db.Column(db.Integer)
 
     def __init__(self):
         self.type = self.TYPE_VENDING
@@ -82,6 +83,7 @@ class Term(db.Model, BaseModel):
         self.update_qid = 1
         self.status = self.STATUS_VALID
         self.has_gprs = 1
+        self.has_comission = 1
 
     def save(self):
         if self.auth == self.AUTH_HID:
