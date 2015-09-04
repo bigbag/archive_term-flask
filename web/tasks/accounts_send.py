@@ -44,12 +44,23 @@ class AccountSenderTask (object):
         if not firm:
             log.error('Not found firm with id %s' % firm_id)
             return False
-
+            
+        firm_term = FirmTerm.get_list_by_firm_id(firm.id, False)
+        leased_term = FirmTerm.get_list_by_firm_id(firm.id, True)
+        comission_terms = []
+        
+        for term_id in (firm_term | leased_term):
+            term = Term.query.get(term_id)
+            if not term.has_comission:
+                continue
+            comission_terms.append(term.id)
+            
         interval_date = search_date - timedelta(days=20)
         interval = date_helper.get_date_interval(interval_date, 'month')
 
         query = Report.query.filter(Report.term_firm_id == firm.id)
         query = query.filter(Report.status == Report.STATUS_COMPLETE)
+        query = query.filter(Report.term_id.in_(comission_terms))
         query = query.filter(
             Report.creation_date.between(interval[0], interval[1]))
         reports = query.all()
@@ -93,7 +104,6 @@ class AccountSenderTask (object):
         account.gprs_terms_count = 0
 
         if firm.gprs_rate:
-            firm_term = FirmTerm.get_list_by_firm_id(firm.id, False)
             terms_used = 0
             gprs_summ = 0
 
