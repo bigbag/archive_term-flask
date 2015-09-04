@@ -101,6 +101,9 @@ class AccountSenderTask (object):
                 term = Term.query.get(term_id)
                 delta = account.generated_date - term.config_date
                 
+                if not term.has_gprs:
+                    continue
+                
                 if delta.total_seconds() > Term.USED_LAST_MONTH:
                     continue
 
