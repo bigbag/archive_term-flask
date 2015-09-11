@@ -29,12 +29,12 @@
         <qid>{{term.keyload_qid}}</qid>
     </keyload>
     {% endif %}
-    {% if term.update_qid %}
-    <update force_on_restart="1">
-        <period>1440</period>
-        <qid>{{term.update_qid}}</qid>
+    
+    <update force_on_restart="{{term.update_force_on_restart}}">
+        <period>{{term.update_period}}</period>
+        {% if term.update_qid %}<qid>{{term.update_qid}}</qid>{% endif %}
     </update>
-    {% endif %}
+    
     {% if config.download_status == 1 %}
     <server goal="download">
         <ip>{{ config.download_ip }}</ip>

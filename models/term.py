@@ -63,6 +63,8 @@ class Term(db.Model, BaseModel):
     download_period = db.Column(db.Integer, nullable=False)
     factor = db.Column(db.Integer)
     update_qid = db.Column(db.String(128))
+    update_period = db.Column(db.Integer, nullable=False)
+    update_force_on_restart = db.Column(db.Integer, nullable=False)
     keyload_qid = db.Column(db.String(128))
     has_gprs = db.Column(db.Integer)
     has_comission = db.Column(db.Integer)
@@ -72,6 +74,8 @@ class Term(db.Model, BaseModel):
         self.upload_start = "00:01"
         self.upload_stop = "23:59"
         self.upload_period = 5
+        self.update_period = 999999999
+        self.update_force_on_restart = 0
         self.download_start = "00:01"
         self.download_stop = "23:59"
         self.download_period = 5
