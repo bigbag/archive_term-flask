@@ -56,7 +56,7 @@ angular.module('term').controller('GeneralController',
   });
 
   //Тригер на запрос табличных данных по параметрам
-  $scope.$watch('pagination.cur + search.order + search.order_desc + search.period  + search.status + search.request + search.report_type', function() {
+  $scope.$watch('pagination.cur + search.order + search.order_desc + search.period  + search.status + search.request + search.report_type + search.scope', function() {
     if (!$scope.search) return false;
     var search = $scope.search;
     search.page = $scope.pagination.cur;

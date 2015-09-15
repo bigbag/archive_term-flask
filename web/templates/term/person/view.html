@@ -1,7 +1,7 @@
 {% extends "term/person/page.html" %}
 
 {% block content %}
-<span ng-init="person.id={{person.id}};person.status={{person.status}}"></span>
+<span ng-init="person.id={{person.id}};person.status={{person.status}};person.manually_blocked={{person.manually_blocked}}"></span>
 <h2 class="g-color-blue m-page-name" ng-controller="PersonController">
     {{person.name}}
     <div class="right">
@@ -15,12 +15,12 @@
             class="f-spot-button bg-red small">
             Удалить
         </a>
-        <a ng-show="person.status"
+        <a ng-show="person.manually_blocked"
             ng-click="lockPerson(person)"
             class="f-spot-button bg-red small">
             Заблокировать
         </a>
-        <a ng-hide="person.status"
+        <a ng-hide="person.manually_blocked"
             ng-click="lockPerson(person)"
             class="f-spot-button bg-red small">
             Разблокировать
