@@ -22,8 +22,7 @@
                 <th class="sortable asc" ng-click="sortBy('name', true, $event)"><span>Имя</span></th>
                 <th>Номер карты</th>
                 <th class="sortable hint--top hint--info" data-hint="Количество событий у сотрудника" ng-click="sortBy('event_count', false, $event)"><span>События</span></th>
-                <th class="sortable hint--top hint--info" ng-click="sortBy('hard_id', false, $event)" data-hint="Платежеспособность сотрудника"><span>Статус</span></th>
-                <th>Карта</th>
+                <th class="sortable hint--top hint--info hint--lefted" ng-click="sortBy('person.status', false, $event)" data-hint="Платежеспособность сотрудника"><span>Статус</span></th>
             </tr>
         </thead>
         <tbody>
@@ -40,12 +39,7 @@
                 </td>
                 <td>
                     <span class="m-card-act g-round"
-                        ng-class="(person.hard_id==0)?'':'active'">
-                    </span>
-                </td>
-                <td>
-                    <span class="m-card-act g-round"
-                        ng-class="(person.wallet_status==1)?'active':''">
+                        ng-class="(person.status==1)?'active':''">
                     </span>
                 </td>
             </tr>

@@ -8,6 +8,7 @@
 import os
 import xlrd
 from werkzeug.utils import secure_filename
+from sqlalchemy import or_
 from sqlalchemy.sql import func, outerjoin
 
 from web import app, db, cache
@@ -28,6 +29,9 @@ class Person(db.Model, BaseModel):
     TYPE_TIMEOUT = 0
     TYPE_WALLET = 1
 
+    SCOPE_ACTIVE = 'active'
+    SCOPE_BLOCKED = 'blocked'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     tabel_id = db.Column(db.String(150))
@@ -41,6 +45,7 @@ class Person(db.Model, BaseModel):
     status = db.Column(db.Integer, nullable=False, index=True)
     wallet_status = db.Column(db.Integer, nullable=False, index=True)
     type = db.Column(db.Integer, nullable=False, index=True)
+    manually_blocked = db.Column(db.Integer)
 
     def __init__(self):
         self.status = self.STATUS_VALID
@@ -48,6 +53,7 @@ class Person(db.Model, BaseModel):
         self.type = self.TYPE_TIMEOUT
         self.creation_date = date_helper.get_current_date()
         self.name = u'Пользователь'
+        self.manually_blocked = self.STATUS_VALID
 
     @staticmethod
     def get_dict_by_firm_id(firm_id):
@@ -90,22 +96,34 @@ class Person(db.Model, BaseModel):
                           'order_desc'] else '')
         limit = kwargs['limit'] if 'limit' in kwargs else 10
         page = kwargs['page'] if 'page' in kwargs else 1
-        status = kwargs['status'] if 'status' in kwargs else 1
+
         search_request = kwargs[
             'request'] if 'request' in kwargs else False
 
         query = Person.query.filter(Person.firm_id == firm_id)
-        query = query.filter(Person.status == status)
 
         if search_request:
             query = query.filter(
                 Person.name.like('%' + search_request + '%') |
                 Person.card.like('%' + search_request + '%'))
-                
-        query = query.outerjoin(PersonEvent, Person.id == PersonEvent.person_id)
-        query = query.group_by(Person);
-        query = query.add_columns(func.count(PersonEvent.id).label('event_count'))
-        
+
+        if 'scope' in kwargs:
+            if kwargs['scope'] == Person.SCOPE_ACTIVE:
+                query = query.filter(
+                    Person.manually_blocked == Person.STATUS_VALID)
+                query = query.filter(
+                    Person.wallet_status == Person.STATUS_VALID)
+
+            elif kwargs['scope'] == Person.SCOPE_BLOCKED:
+                query = query.filter(or_(
+                    Person.manually_blocked == Person.STATUS_BANNED, Person.wallet_status == Person.STATUS_BANNED))
+
+        query = query.outerjoin(
+            PersonEvent, Person.id == PersonEvent.person_id)
+        query = query.group_by(Person)
+        query = query.add_columns(
+            func.count(PersonEvent.id).label('event_count'))
+
         query = query.order_by(order)
 
         persons = query.paginate(page, limit, False).items
@@ -119,8 +137,10 @@ class Person(db.Model, BaseModel):
                 name=person.name,
                 card=person.card,
                 wallet_status=int(person.wallet_status == Person.STATUS_VALID),
+                status=person.status,
                 event_count=event_count,
                 hard_id=int(person.payment_id) if person.payment_id else 0,
+                manually_blocked=person.manually_blocked,
             )
             result.append(data)
 
@@ -136,6 +156,34 @@ class Person(db.Model, BaseModel):
         TermCorpWallet.query.filter_by(person_id=self.id).delete()
         self.delete()
         return True
+
+    def get_status(self):
+        from models.payment_wallet import PaymentWallet
+        from models.person_event import PersonEvent
+        from models.term_corp_wallet import TermCorpWallet
+
+        if not self.payment_id:
+            return self.STATUS_BANNED
+
+        wallet = PaymentWallet.query.filter(
+            PaymentWallet.payment_id == self.payment_id).first()
+
+        if not wallet:
+            return self.STATUS_BANNED
+
+        person_event = PersonEvent.query.filter(
+            PersonEvent.person_id == self.id).first()
+
+        if not person_event:
+            return self.STATUS_BANNED
+
+        corp_wallet = TermCorpWallet.query.filter(
+            TermCorpWallet.person_id == self.id).first()
+
+        if corp_wallet and corp_wallet.balance < TermCorpWallet.BALANCE_MIN:
+            return self.STATUS_BANNED
+
+        return self.STATUS_VALID
 
     @staticmethod
     def save_import_file(request):
@@ -187,3 +235,7 @@ class Person(db.Model, BaseModel):
             new_employers.append(employer)
 
         return new_employers
+
+    def save(self):
+        self.status = self.get_status()
+        return BaseModel.save(self)
