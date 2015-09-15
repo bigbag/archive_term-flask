@@ -114,7 +114,7 @@ angular.module('term').controller('PersonController',
   //Блокируем или разблокируем пользователя
   $scope.lockPerson = function(person) {
     var question = 'Заблокировать пользователя<br>"' + person.name +'"?';
-    if (person.status == 0)
+    if (person.manually_blocked == 0)
         question = 'Разблокировать пользователя<br>"' + person.name +'"?';
     
     dialogService.yesNoDialog(function(dialog_result) {
@@ -124,10 +124,10 @@ angular.module('term').controller('PersonController',
       person.csrf_token = $scope.token;
       $http.post('/person/' + person.id + '/lock', person).success(function(data) {
         if (data.error === 'no') {
-          if ($scope.person.status === 0) {
-            $scope.person.status = 1;
+          if ($scope.person.manually_blocked === 0) {
+            $scope.person.manually_blocked = 1;
           } else {
-            $scope.person.status = 0;
+            $scope.person.manually_blocked = 0;
           }
           contentService.setModal(data.message, 'success');
         }
@@ -241,7 +241,27 @@ angular.module('term').controller('PersonController',
 
   //Удаляем корпоративный кошелёк
   $scope.removeCorpWallet = function(corp_wallet){
+    var unblock = false;
+    if ($scope.person.manually_blocked == 1) {
+      $scope.postRemoveWallet(corp_wallet, unblock);
+    }
+    else {
+      dialogService.yesNoDialog(function(dialog_result){
+        if (dialog_result == 'yes')
+          unblock = true;
+        else
+          unblock = false;
+      
+        $scope.postRemoveWallet(corp_wallet, unblock);
+      },
+      'Сотрудник заблокирован вручную. Вы хотели бы его разблокировать?'
+      );
+    }
+  };
+  
+  $scope.postRemoveWallet = function(corp_wallet, unblock) {
     corp_wallet.csrf_token = $scope.token;
+    corp_wallet.unblock = unblock;
     var url = '/person/' + corp_wallet.person_id + '/wallet/remove';
     $http.post(url, corp_wallet).success(function(data) {
       if (data.error === 'yes') {
@@ -250,8 +270,10 @@ angular.module('term').controller('PersonController',
         contentService.setModal(data.message, 'success');
         $scope.person.type = 0;
         $scope.corp_wallet.id = 0;
+        if (data.manually_blocked == 1 || data.manually_blocked == 0)
+          $scope.person.manually_blocked = data.manually_blocked;
       }
-    });
+    });      
   };
 
   $scope.import_stage = 0;
