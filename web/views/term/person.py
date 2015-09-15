@@ -268,7 +268,6 @@ def person_bind_card(person_id):
     wallet = bind_card['wallet']
     person.payment_id = wallet.payment_id
     person.hard_id = wallet.hard_id
-    person.status = Person.STATUS_VALID
     if person.save():
         answer['error'] = 'no'
         answer['message'] = u'Карта успешно привязана'
@@ -316,7 +315,6 @@ def person_unbind_card(person_id):
 
     person.payment_id = None
     person.hard_id = None
-    person.status = Person.STATUS_BANNED
     if person.save():
         answer['error'] = 'no'
         answer['message'] = u'Карта успешно отвязана'
@@ -332,7 +330,7 @@ def person_lock(person_id):
     answer = dict(error='yes', message='Произошла ошибка', status=False)
     arg = get_post_arg(request, True)
 
-    if 'status' not in arg or 'id' not in arg:
+    if 'manually_blocked' not in arg or 'id' not in arg:
         abort(400)
 
     person = Person.query.get(person_id)
@@ -341,20 +339,18 @@ def person_lock(person_id):
 
     corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id).first()
     if corp_wallet:
-        if person.status == Person.STATUS_VALID:
+        if person.manually_blocked == Person.STATUS_VALID:
             corp_wallet.status = TermCorpWallet.STATUS_BANNED
-        elif person.status == Person.STATUS_BANNED:
+        elif person.manually_blocked == Person.STATUS_BANNED:
             corp_wallet.status = TermCorpWallet.STATUS_ACTIVE
 
-    if person.status == Person.STATUS_VALID:
-        person.status = Person.STATUS_BANNED
-        PersonEvent.set_status_by_person_id(
-            person_id, PersonEvent.STATUS_BANNED)
+    if person.manually_blocked == Person.STATUS_VALID:
+        person.manually_blocked = Person.STATUS_BANNED
+        person.wallet_status = Person.STATUS_BANNED
 
-    elif person.status == Person.STATUS_BANNED:
-        person.status = Person.STATUS_VALID
-        PersonEvent.set_status_by_person_id(
-            person_id, PersonEvent.STATUS_ACTIVE)
+    elif person.manually_blocked == Person.STATUS_BANNED:
+        person.manually_blocked = Person.STATUS_VALID
+        person.wallet_status = Person.STATUS_VALID
 
     if person.save():
         if corp_wallet:
@@ -461,7 +457,7 @@ def person_event_save(person_id, person_event_id):
                                 удалите старое или измените тип нового"""
         return jsonify(answer)
 
-    if person_event.save():
+    if person_event.save() and person.save():
         answer['error'] = 'no'
         answer['message'] = u'Данные сохранены'
 
@@ -490,7 +486,12 @@ def person_event_delete(person_id, person_event_id):
     if not person_event:
         abort(404)
 
+    person = Person.query.get(person_id)
+    if not person:
+        abort(404)
+
     person_event.delete()
+    person.save()
     answer['error'] = 'no'
     answer['message'] = u'Событие удалено'
 
@@ -543,7 +544,7 @@ def person_save_corp_wallet(person_id):
         person_event.timeout = 0
         person_event.save()
 
-    if person.save() and corp_wallet.save():
+    if corp_wallet.save() and person.save():
         answer['error'] = 'no'
         answer['message'] = u'Операция выполнена'
         answer['corp_wallet'] = corp_wallet.to_json()
@@ -561,7 +562,8 @@ def person_save_corp_wallet(person_id):
 def person_remove_corp_wallet(person_id):
     """Удаляем корпоративный кошелёк"""
 
-    answer = dict(error='yes', message='Произошла ошибка')
+    answer = dict(
+        error='yes', message='Произошла ошибка', manually_blocked=None)
     arg = get_post_arg(request, True)
 
     wallet_id = arg['id'] if 'id' in arg else False
@@ -575,14 +577,20 @@ def person_remove_corp_wallet(person_id):
 
     if person.type == Person.TYPE_WALLET:
         person.type = Person.TYPE_TIMEOUT
-        person.wallet_status = Person.STATUS_VALID
+        if 'unblock' in arg and arg['unblock']:
+            person.manually_blocked = Person.STATUS_VALID
+            person.wallet_status = Person.STATUS_VALID
+        elif person.manually_blocked == Person.STATUS_VALID:
+            person.wallet_status = Person.STATUS_VALID
 
     corp_wallet = TermCorpWallet.query.get(wallet_id)
     if corp_wallet:
         corp_wallet.delete()
+
         if person.save():
             answer['error'] = 'no'
             answer['message'] = u'Корпоративный кошелек удален'
+            answer['manually_blocked'] = person.manually_blocked
 
     return jsonify(answer)
 
