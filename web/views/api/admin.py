@@ -18,6 +18,7 @@ from models.spot_hard_type import SpotHardType
 from models.spot_dis import SpotDis
 from models.payment_wallet import PaymentWallet
 from models.spot_troika import SpotTroika
+from models.report import Report
 
 from external_services import troika as troika_api
 
@@ -257,6 +258,12 @@ def api_admin_spot_unlink():
         hard_id=hid, user_id=0).first()
     if not wallet:
         abort(404)
+        
+    report = Report.query.filter_by(
+        payment_id=wallet.payment_id).first()
+        
+    if report:
+        abort(400)
 
     spot = Spot.query.filter_by(
         discodes_id=wallet.discodes_id).first()
