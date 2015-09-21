@@ -7,6 +7,7 @@
     	<hard_id>{{row.hard_id}}</hard_id>
     	<color_id>{{row.color_id}}</color_id>
     	<pattern_id>{{row.pattern_id}}</pattern_id>
+        <sort>{{row.sort}}</sort>
     </type>
     {% endfor %}
 </info>
