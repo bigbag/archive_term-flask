@@ -357,7 +357,7 @@ def api_admin_spot_hard_type():
     """Возвращает информацию о типах спотов"""
 
     base._api_access(request)
-    query = SpotHardType.query
+    query = SpotHardType.query.order_by('sort asc')
 
     args = request.args
     if 'show' in args:
