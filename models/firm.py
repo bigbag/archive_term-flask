@@ -23,7 +23,7 @@ class Firm(db.Model, BaseModel):
     logo = db.Column(db.Text())
     address = db.Column(db.Text())
     account_email = db.Column(db.Text())
-    transaction_percent = db.Column(db.Integer())
+    transaction_percent = db.Column(db.Integer()) # до сотых долей процента, 1% = 100
     transaction_comission = db.Column(db.Integer())
     legal_entity = db.Column(db.String(256))
     general_manager = db.Column(db.String(128))
