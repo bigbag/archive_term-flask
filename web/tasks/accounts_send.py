@@ -33,7 +33,8 @@ class AccountSenderTask (object):
             (Firm.transaction_percent > 0) | (Firm.transaction_comission > 0)).all()
 
         for firm in firms:
-            AccountSenderTask.account_generate.delay(firm.id, datetime.utcnow())
+            AccountSenderTask.account_generate.delay(
+                firm.id, datetime.utcnow())
 
     @staticmethod
     @celery.task
@@ -44,17 +45,17 @@ class AccountSenderTask (object):
         if not firm:
             log.error('Not found firm with id %s' % firm_id)
             return False
-            
+
         firm_term = FirmTerm.get_list_by_firm_id(firm.id, False)
         leased_term = FirmTerm.get_list_by_firm_id(firm.id, True)
         comission_terms = []
-        
+
         for term_id in (firm_term | leased_term):
             term = Term.query.get(term_id)
             if not term.has_comission:
                 continue
             comission_terms.append(term.id)
-            
+
         interval_date = search_date - timedelta(days=20)
         interval = date_helper.get_date_interval(interval_date, 'month')
 
@@ -88,15 +89,18 @@ class AccountSenderTask (object):
 
         for report in reports:
             if firm.transaction_percent > 0:
-                account.summ = account.summ + \
-                    float(report.amount) * \
+                comission = float(report.amount) * \
                     (float(firm.transaction_percent) / 100 / 100)
+                if firm.transaction_comission > 0 and comission < firm.transaction_comission:
+                    comission = firm.transaction_comission
+
+                account.summ = account.summ + comission
             elif firm.transaction_comission > 0:
                 account.summ = account.summ + firm.transaction_comission
 
         account.items_count = 1
         account.item_price = account.summ
-        if firm.transaction_comission:
+        if firm.transaction_comission and not firm.transaction_percent:
             account.items_count = len(reports)
             account.item_price = int(
                 round(float(account.summ) / account.items_count))
@@ -110,10 +114,10 @@ class AccountSenderTask (object):
             for term_id in firm_term:
                 term = Term.query.get(term_id)
                 delta = account.generated_date - term.config_date
-                
+
                 if not term.has_gprs:
                     continue
-                
+
                 if delta.total_seconds() > Term.USED_LAST_MONTH:
                     continue
 
