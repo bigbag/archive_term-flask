@@ -46,7 +46,7 @@ class PaymentAccount(db.Model, BaseModel):
     def __init__(self):
         self.generated_date = date_helper.get_current_date()
         self.status = self.STATUS_GENERATED
-        
+
     def delete(self):
         if self.filename and os.path.isfile("%s/%s" % (app.config['PDF_FOLDER'], self.filename)):
             os.remove("%s/%s" % (app.config['PDF_FOLDER'], self.filename))
@@ -165,8 +165,13 @@ class PaymentAccount(db.Model, BaseModel):
         data_price = self.format_summ(self.item_price)
         data_rows = 3
 
+        price_header = u'Цена, руб.'
+        if firm.transaction_percent:
+            price_header = u'Цена, %'
+            data_price = str(float(firm.transaction_percent) / 100) + '%'
+
         data = [
-            [u'№', u'Наименование', u'Количество, шт.', u'Цена, руб.', u'Сумма, руб.']]
+            [u'№', u'Наименование', u'Количество, шт.', price_header, u'Сумма, руб.']]
 
         if self.gprs_terms_count and firm.gprs_rate:
             data_rows += 1

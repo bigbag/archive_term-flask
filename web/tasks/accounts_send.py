@@ -98,12 +98,9 @@ class AccountSenderTask (object):
             elif firm.transaction_comission > 0:
                 account.summ = account.summ + firm.transaction_comission
 
-        account.items_count = 1
-        account.item_price = account.summ
-        if firm.transaction_comission and not firm.transaction_percent:
-            account.items_count = len(reports)
-            account.item_price = int(
-                round(float(account.summ) / account.items_count))
+        account.items_count = len(reports)
+        account.item_price = int(
+            round(float(account.summ) / account.items_count))
 
         account.gprs_terms_count = 0
 
