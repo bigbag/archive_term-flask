@@ -84,28 +84,24 @@ class Report(db.Model, BaseModel):
         if int(self.type) == self.TYPE_PAYMENT:
             self.status = self.STATUS_NEW
 
+        if not self.person_id or int(self.type) != Report.TYPE_WHITE:
+            if not self.save():
+                error = True
+            return error
+
+        person = Person.query.get(self.person_id)
+        corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id).first()
+        if corp_wallet and person.type == Person.TYPE_WALLET:
+            self.corp_type = self.CORP_TYPE_ON
+
         # Если операция по белому списку и есть корп кошелек, меняем его баланс
-        if self.person_id and int(self.type) == Report.TYPE_WHITE:
-            person = Person.query.get(self.person_id)
-
-            if person.wallet_status == Person.STATUS_VALID and person.type == Person.TYPE_WALLET:
-
-                self.corp_type = self.CORP_TYPE_ON
-                corp_wallet = TermCorpWallet.query.filter_by(
-                    person_id=person.id).first()
-
-                if not corp_wallet:
-                    return error
-
-                corp_wallet.balance = int(
-                    corp_wallet.balance) - int(
-                        self.amount)
-                corp_wallet.save()
+            corp_wallet.balance = int(corp_wallet.balance) - int(self.amount)
+            corp_wallet.save()
 
         # Блокируем возможность платежей через корпоративный кошелек
-                if corp_wallet.balance < TermCorpWallet.BALANCE_MIN:
-                    person.wallet_status = Person.STATUS_BANNED
-                    person.save()
+            if corp_wallet.balance < TermCorpWallet.BALANCE_MIN:
+                person.wallet_status = Person.STATUS_BANNED
+                person.save()
 
         if not self.save():
             error = True
