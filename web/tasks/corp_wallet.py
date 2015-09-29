@@ -34,7 +34,8 @@ def recovery_limit(interval):
             log.error(message)
             continue
 
-        person.wallet_status = Person.STATUS_VALID
+        if person.manually_blocked == Person.STATUS_VALID:
+            person.wallet_status = Person.STATUS_VALID
         if person.save():
             result = True
     return result

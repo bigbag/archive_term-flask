@@ -18,6 +18,7 @@ from models.base_model import BaseModel
 
 from models.user import User
 from models.soc_token import SocToken
+from models.spot_content import SpotContent
 
 
 class Spot(db.Model, BaseModel):
@@ -186,3 +187,18 @@ class Spot(db.Model, BaseModel):
             answer.append(item)
 
         return answer
+        
+    def clear(self):
+        self.status = self.STATUS_GENERATED
+        self.user_id = None
+        self.registered_date = None
+        
+        content = SpotContent.query.filter(SpotContent.discodes_id == self.discodes_id).first()
+        
+        if content:
+            content.delete()
+        
+        if self.save():
+            return True
+            
+        return False

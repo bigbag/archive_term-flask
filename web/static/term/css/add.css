@@ -341,3 +341,12 @@ th[data-hint] {
     display:inline-block;
     border-bottom:1px dashed #000;
 }
+
+.hint--top.hint--lefted:after, .hint--top.hint--lefted:before {
+    left: -20px;
+    bottom: 80%;
+}
+
+.hint--lefted[data-hint]:before {
+    margin-left: 40px;
+}

@@ -18,6 +18,7 @@ from models.spot_hard_type import SpotHardType
 from models.spot_dis import SpotDis
 from models.payment_wallet import PaymentWallet
 from models.spot_troika import SpotTroika
+from models.report import Report
 
 from external_services import troika as troika_api
 
@@ -243,10 +244,10 @@ def api_admin_get_free():
     return response
 
 
-@mod.route('/spot/delete', methods=['POST'])
+@mod.route('/spot/unlink', methods=['POST'])
 @xml_headers
-def api_admin_spot_delete():
-    """Удаление спотов"""
+def api_admin_spot_unlink():
+    """Удаление кошелька, очистка спота"""
 
     base._api_access(request)
     hid = request.form['hid']
@@ -257,18 +258,49 @@ def api_admin_spot_delete():
         hard_id=hid, user_id=0).first()
     if not wallet:
         abort(404)
+        
+    report = Report.query.filter_by(
+        payment_id=wallet.payment_id).first()
+        
+    if report:
+        abort(400)
 
     spot = Spot.query.filter_by(
         discodes_id=wallet.discodes_id).first()
     if not spot:
         abort(404)
 
-    spot.status = Spot.STATUS_GENERATED
-    if not spot.save():
+    if not spot.clear():
         abort(500)
 
+    wallet.delete()
+
+    return set_message('success', 'Success', 201)
+
+
+@mod.route('/spot/delete', methods=['POST'])
+@xml_headers
+def api_admin_spot_delete():
+    """Удаление спотов"""
+    base._api_access(request)
+    code128 = request.form['code128']
+    if not code128:
+        abort(400)
+
+    spot = Spot.query.filter_by(
+        code128=code128).first()
+    if not spot or spot.user_id:
+        abort(404)
+
+    wallet = PaymentWallet.query.filter_by(
+        discodes_id=spot.discodes_id).first()
     if wallet:
-        wallet.delete()
+        abort(400)
+
+    if not spot.clear():
+        abort(500)
+
+    spot.delete()
 
     return set_message('success', 'Success', 201)
 
@@ -326,7 +358,7 @@ def api_admin_spot_hard_type():
     """Возвращает информацию о типах спотов"""
 
     base._api_access(request)
-    query = SpotHardType.query
+    query = SpotHardType.query.order_by('sort asc')
 
     args = request.args
     if 'show' in args:
