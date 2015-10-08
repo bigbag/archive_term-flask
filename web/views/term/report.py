@@ -260,3 +260,23 @@ def get_account_pdf(account_id):
     directory = '%s/%s' % (os.getcwd(), app.config['PDF_FOLDER'])
 
     return send_from_directory(directory, account.filename)
+
+
+@mod.route('/report/act/pdf/<int:account_id>', methods=['GET'])
+@login_required
+def get_act_pdf(account_id):
+    account = PaymentAccount.query.get(account_id)
+
+    if not account.firm_id == g.firm_info['id']:
+        abort(403)
+
+    if not account.status == PaymentAccount.STATUS_PAID or not account.generated_date:
+        abort(404)
+
+    directory = '%s/%s' % (os.getcwd(), app.config['PDF_FOLDER'])
+
+    if not os.path.exists('%s/%s' % (directory, account.get_act_filename(account.firm_id, account.generated_date))):
+        if not account.generate_act():
+            abort(404)
+
+    return send_from_directory(directory, account.get_act_filename(account.firm_id, account.generated_date))

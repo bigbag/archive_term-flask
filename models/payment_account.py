@@ -6,6 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
+import copy
 from web import app, db
 
 from helpers import date_helper
@@ -14,7 +15,7 @@ from models.base_model import BaseModel
 from models.firm import Firm
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 
 from reportlab.lib import colors
@@ -22,7 +23,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.platypus import Image
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.enums import TA_LEFT, TA_CENTER
+from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 
 
 class PaymentAccount(db.Model, BaseModel):
@@ -31,7 +32,7 @@ class PaymentAccount(db.Model, BaseModel):
     __tablename__ = 'account'
 
     STATUS_GENERATED = 0
-    STATUS_PAID = 3
+    STATUS_PAID = 1
 
     id = db.Column(db.Integer, primary_key=True)
     firm_id = db.Column(db.Integer, nullable=False, index=True)
@@ -88,6 +89,12 @@ class PaymentAccount(db.Model, BaseModel):
     @staticmethod
     def get_filename(firm_id, search_date):
         return "account_firm_%s_date_%s.pdf" % (
+            firm_id,
+            search_date.strftime('%m_%Y'))
+
+    @staticmethod
+    def get_act_filename(firm_id, search_date):
+        return "act_firm_%s_date_%s.pdf" % (
             firm_id,
             search_date.strftime('%m_%Y'))
 
@@ -269,7 +276,168 @@ class PaymentAccount(db.Model, BaseModel):
         summ = int(round(summ))
         return "%02d-%02d" % (summ / 100, summ % 100)
 
+    @staticmethod
+    def summ_comma(summ):
+        summ = int(round(summ))
+        return "%02d,%02d" % (summ / 100, summ % 100)
+
+    @staticmethod
+    def get_underline():
+        styles = getSampleStyleSheet()
+        style = styles['Normal']
+        style.fontName = "PDFFont"
+        style.alignment = TA_CENTER
+        style.fontSize = 2
+
+        line = Paragraph(
+            u'<u>_______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________<u>', style)
+
+        return line
+
     def get_month_year(self):
         months = date_helper.get_locale_months()
         return '%s %s' % (months[self.generated_date.month - 2],
                           self.generated_date.year)
+
+    def generate_act(self):
+        if not self.firm_id or not self.summ or not self.generated_date:
+            return False
+
+        firm = Firm.query.get(self.firm_id)
+        if not firm:
+            return False
+
+        story = []
+        fontSize = 9
+        pdfmetrics.registerFont(TTFont('PDFFont', app.config['PDF_FONT']))
+        styles = getSampleStyleSheet()
+        data = [str(self.firm_id), str(self.summ), str(self.generated_date)]
+        data = '&'.join(data)
+
+        doc = SimpleDocTemplate(
+            "%s/%s" % (app.config['PDF_FOLDER'], self.get_act_filename(firm.id, self.generated_date)), pagesize=A4)
+
+        style = styles['Normal']
+        style.fontName = "PDFFont"
+        style.fontSize = fontSize
+        style.alignment = TA_CENTER
+
+        story.append(Spacer(1, 0.3 * inch))
+
+        months_in_genitive = date_helper.get_locale_months_in_genitive()
+        story.append(Paragraph(u'Акт № <font color="gray">MBS-%07d</font> от <font color="gray">%02d %s %s</font>' %
+                               (self.id, self.generated_date.day, months_in_genitive[self.generated_date.month], self.generated_date.year), style))
+
+        story.append(self.get_underline())
+
+        linestyle = copy.copy(style)
+
+        linestyle.alignment = TA_LEFT
+        linestyle.leftIndent = 10
+        linestyle.spaceBefore = 18
+
+        story.append(Paragraph(
+            u'Исполнитель:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ООО "МОБИСПОТ РУС"', linestyle))
+
+        story.append(Spacer(1, 0.2 * inch))
+
+        if firm.legal_entity:
+            story.append(Paragraph(
+                u'Заказчик:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray">%s</font>' % firm.legal_entity, linestyle))
+
+        story.append(Spacer(1, 0.3 * inch))
+
+        months = date_helper.get_locale_months()
+        linestyle = copy.copy(style)
+        linestyle.alignment = TA_CENTER
+        product = Paragraph(u'Информационно-технололгические услуги за <font color="gray">%s %s</font>' %
+                            (months[self.generated_date.month - 1], self.generated_date.year), linestyle)
+
+        linestyle = copy.copy(style)
+        linestyle.alignment = TA_RIGHT
+        summ = Paragraph(u'<font color="gray">%s</font>' %
+                         self.summ_comma(self.summ), linestyle)
+
+        data = [
+            [u'№', u'Товар', u'Кол-во', u'Ед.', u'Цена', u'Сумма'],
+            [u'1', product, u'1', u'шт.', summ, summ]]
+
+        t = Table(data, rowHeights=[0.6 * inch, 0.4 * inch], colWidths=[
+                  0.4 * inch, None, 0.6 * inch, 0.4 * inch, 0.9 * inch, 0.9 * inch])
+
+        table_style = TableStyle()
+        table_style.add('INNERGRID', (0, 0), (5, 1), 0.5, colors.black)
+        table_style.add('BOX', (0, 0), (5, 1), 1, colors.black)
+        table_style.add('FONTNAME', (0, 0), (5, 1), "PDFFont")
+        table_style.add('FONTSIZE', (0, 0), (5, 1), fontSize)
+        table_style.add('FONTCOLOR', (4, 1), (5, 1), colors.gray)
+        table_style.add('ALIGN', (0, 0), (5, 0), 'CENTER')
+        table_style.add('ALIGN', (0, 1), (1, 1), 'CENTER')
+        table_style.add('ALIGN', (2, 1), (2, 1), 'RIGHT')
+        table_style.add('ALIGN', (3, 1), (3, 1), 'CENTER')
+        table_style.add('ALIGN', (4, 1), (5, 1), 'RIGHT')
+        table_style.add('VALIGN', (0, 0), (5, 0), 'MIDDLE')
+        table_style.add('VALIGN', (0, 1), (5, 1), 'TOP')
+
+        t.setStyle(table_style)
+        story.append(t)
+
+        story.append(Spacer(1, 0.2 * inch))
+
+        data = [
+            ['', u'Итого:', summ],
+            ['', u'В том числе НДС', '']]
+
+        t = Table(data, colWidths=[4.1 * inch, 1.2 * inch, 0.8 * inch])
+        table_style = TableStyle([('FONTNAME', (0, 0), (2, 1), "PDFFont")])
+        table_style.add('ALIGN', (0, 0), (2, 1), 'RIGHT')
+        table_style.add('FONTSIZE', (0, 0), (2, 1), fontSize)
+        t.setStyle(table_style)
+        story.append(t)
+
+        story.append(Spacer(1, 0.3 * inch))
+
+        linestyle = copy.copy(style)
+        story.append(Paragraph(u'Всего оказано услуг 1, на сумму <font color="gray">%s руб.</font>' %
+                               self.summ_comma(self.summ), linestyle))
+        story.append(Paragraph(
+            u'НДС и налогом с продаж не облагается, согласно НК РФ глава 26.2, статья 346.11, ', linestyle))
+        story.append(
+            Paragraph(u'п.2 "Упрощенная система налогообложения"', linestyle))
+
+        story.append(Spacer(1, 0.6 * inch))
+
+        linestyle = copy.copy(linestyle)
+        linestyle.leftIndent = 10
+        linestyle.rightIndent = 10
+        story.append(Paragraph(
+            u'Вышеперечисленные услуги выполнены полностью и в срок. Заказчик претензий по объему, качеству и срокам оказания услуг не имеет.', linestyle))
+
+        story.append(Spacer(1, 0.3 * inch))
+        story.append(self.get_underline())
+
+        stamp = Image(
+            './static/account_data/img/stamp_and_sign.jpg', width=137, height=160)
+        img_underline = Image(
+            './static/account_data/img/underline.jpg', width=137, height=35)
+
+        data = [
+            [u'Исполнитель', stamp, u'Заказчик', img_underline]]
+
+        t = Table(data)
+
+        table_style = TableStyle()
+        table_style.add('FONTNAME', (0, 0), (3, 0), "PDFFont")
+        table_style.add('FONTSIZE', (0, 0), (3, 0), fontSize)
+        table_style.add('VALIGN', (0, 0), (3, 0), 'TOP')
+        table_style.add('TOPPADDING', (0, 0), (0, 0), 25)
+        table_style.add('RIGHTPADDING', (0, 0), (0, 0), 0)
+        table_style.add('TOPPADDING', (2, 0), (2, 0), 25)
+        table_style.add('RIGHTPADDING', (2, 0), (2, 0), 0)
+
+        t.setStyle(table_style)
+        story.append(t)
+
+        doc.build(story)
+
+        return True
