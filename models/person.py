@@ -164,6 +164,9 @@ class Person(db.Model, BaseModel):
 
         if not self.payment_id:
             return self.STATUS_BANNED
+            
+        if self.manually_blocked == self.STATUS_BANNED:
+            return self.STATUS_BANNED
 
         wallet = PaymentWallet.query.filter(
             PaymentWallet.payment_id == self.payment_id).first()
