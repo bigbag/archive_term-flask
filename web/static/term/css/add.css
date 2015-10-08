@@ -350,3 +350,11 @@ th[data-hint] {
 .hint--lefted[data-hint]:before {
     margin-left: 40px;
 }
+
+.cursor_default {
+    cursor: default;
+}
+
+td span.disabled {
+    color: #E9EDF2;
+}

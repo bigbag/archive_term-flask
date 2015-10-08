@@ -20,6 +20,13 @@ def get_locale_months():
             u'июль', u'август', u'сентябрь',
             u'октябрь', u'ноябрь', u'декабрь']
 
+            
+def get_locale_months_in_genitive():
+    return [u'января', u'февраля', u'марта',
+            u'апреля', u'мая', u'июня',
+            u'июля', u'августа', u'сентября',
+            u'октября', u'ноября', u'декабря']
+            
 
 def get_current_date(format='%Y-%m-%d %H:%M:%S'):
     client_time = datetime.utcnow()
