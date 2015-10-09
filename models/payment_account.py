@@ -283,14 +283,16 @@ class PaymentAccount(db.Model, BaseModel):
 
     @staticmethod
     def get_underline():
-        styles = getSampleStyleSheet()
-        style = styles['Normal']
-        style.fontName = "PDFFont"
-        style.alignment = TA_CENTER
-        style.fontSize = 2
+        data = [[None], [None]]
 
-        line = Paragraph(
-            u'<u>_______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________<u>', style)
+        line = Table(
+            data, \
+            colWidths=[6.2 * inch], \
+            rowHeights=[0.03 * inch, 0.14 * inch])
+
+        table_style = TableStyle()
+        table_style.add('LINEBELOW', (0, 0), (0, 0), 1, colors.black)
+        line.setStyle(table_style)
 
         return line
 
