@@ -328,7 +328,7 @@ class PaymentAccount(db.Model, BaseModel):
 
         months_in_genitive = date_helper.get_locale_months_in_genitive()
         story.append(Paragraph(u'Акт № <font color="gray">MBS-%07d</font> от <font color="gray">%02d %s %s</font>' %
-                               (self.id, self.generated_date.day, months_in_genitive[self.generated_date.month], self.generated_date.year), style))
+                               (self.id, self.generated_date.day, months_in_genitive[self.generated_date.month - 1], self.generated_date.year), style))
 
         story.append(self.get_underline())
 
@@ -353,7 +353,7 @@ class PaymentAccount(db.Model, BaseModel):
         linestyle = copy.copy(style)
         linestyle.alignment = TA_CENTER
         product = Paragraph(u'Информационно-технололгические услуги за <font color="gray">%s %s</font>' %
-                            (months[self.generated_date.month - 1], self.generated_date.year), linestyle)
+                            (months[self.generated_date.month - 2], self.generated_date.year), linestyle)
 
         linestyle = copy.copy(style)
         linestyle.alignment = TA_RIGHT
