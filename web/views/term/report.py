@@ -262,10 +262,17 @@ def get_account_pdf(account_id):
     return send_from_directory(directory, account.filename)
 
 
-@mod.route('/report/act/pdf/<int:account_id>', methods=['GET'])
+@mod.route('/report/act/pdf/<act_name>', methods=['GET'])
 @login_required
-def get_act_pdf(account_id):
+def get_act_pdf(act_name):
+    pos = act_name.find('.pdf')
+    if not pos:
+        abort(404)
+    
+    account_id = int(act_name[:pos])
     account = PaymentAccount.query.get(account_id)
+    if not account:
+        abort(404)
 
     if not account.firm_id == g.firm_info['id']:
         abort(403)
