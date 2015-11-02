@@ -164,14 +164,8 @@ class Person(db.Model, BaseModel):
 
         if not self.payment_id:
             return self.STATUS_BANNED
-            
+
         if self.manually_blocked == self.STATUS_BANNED:
-            return self.STATUS_BANNED
-
-        wallet = PaymentWallet.query.filter(
-            PaymentWallet.payment_id == self.payment_id).first()
-
-        if not wallet:
             return self.STATUS_BANNED
 
         person_event = PersonEvent.query.filter(
@@ -183,7 +177,10 @@ class Person(db.Model, BaseModel):
         corp_wallet = TermCorpWallet.query.filter(
             TermCorpWallet.person_id == self.id).first()
 
-        if corp_wallet and corp_wallet.balance < TermCorpWallet.BALANCE_MIN:
+        if self.type == self.TYPE_WALLET and not corp_wallet:
+            return self.STATUS_BANNED
+
+        if self.type == self.TYPE_WALLET and corp_wallet.balance < TermCorpWallet.BALANCE_MIN:
             return self.STATUS_BANNED
 
         return self.STATUS_VALID
