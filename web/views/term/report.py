@@ -271,14 +271,11 @@ def get_act_pdf(act_name):
     
     account_id = int(act_name[:pos])
     account = PaymentAccount.query.get(account_id)
-    if not account:
+    if not account or not account.generated_date:
         abort(404)
 
     if not account.firm_id == g.firm_info['id']:
         abort(403)
-
-    if not account.status == PaymentAccount.STATUS_PAID or not account.generated_date:
-        abort(404)
 
     directory = '%s/%s' % (os.getcwd(), app.config['PDF_FOLDER'])
 
