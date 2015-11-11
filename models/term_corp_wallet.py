@@ -56,10 +56,10 @@ class TermCorpWallet(db.Model, BaseModel):
 
     def get_max_limit_dict(self):
         return {
-            self.INTERVAL_ONCE: 9999,
+            self.INTERVAL_ONCE: 100000,
             self.INTERVAL_DAY: 1000,
             self.INTERVAL_WEEK: 2500,
-            self.INTERVAL_MONTH: 9999
+            self.INTERVAL_MONTH: 100000
         }
 
     @cache.cached(timeout=120, key_prefix='corp_wallet')
