@@ -18,6 +18,9 @@ from models.payment_card import PaymentCard
 from models.payment_wallet import PaymentWallet
 from models.spot import Spot
 from models.spot_phone import SpotPhone
+from models.person import Person
+from models.term_corp_wallet import TermCorpWallet
+from models.firm import Firm
 
 from web.tasks.payment import PaymentTask
 
@@ -114,6 +117,36 @@ def api_internal_yandex_get_token(discodes_id, code):
     PaymentTask.get_ym_token.delay(discodes_id, code, url)
     result['error'] = 0
 
+    return make_response(jsonify(result))
+
+
+@mod.route('/corp_wallet/<hard_id>', methods=['GET'])
+@json_headers
+def api_internal_get_corp_wallet(hard_id=False):
+    result = {'error': 1}
+    
+    person = Person.query.filter_by(hard_id=hard_id).first()
+    if not person:
+        return make_response(jsonify(result))
+        
+    corp_wallet = TermCorpWallet.query.filter_by(person_id=person.id).first()
+    if not corp_wallet:
+        return make_response(jsonify(result))
+        
+    firm = Firm.query.get(person.firm_id)
+    if not firm:
+        return make_response(jsonify(result))
+        
+    corp_wallet_interval = TermCorpWallet().get_interval_list()
+    result['id'] = corp_wallet.id
+    result['balance'] = corp_wallet.balance / 100
+    result['limit'] = corp_wallet.limit / 100
+    result['interval'] = corp_wallet.interval
+    result['interval_name'] = corp_wallet_interval[corp_wallet.interval]['name']
+    result['firm_name'] = firm.legal_entity
+    result['manually_blocked'] = person.manually_blocked
+    result['error'] = 0
+    
     return make_response(jsonify(result))
 
 
