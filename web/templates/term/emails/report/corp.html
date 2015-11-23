@@ -6,19 +6,38 @@
             {% for key in result.col_keys %}
             <th>{{ result.col_name[key] }}</th>
             {% endfor %}
+            {% for term in result.terms %}
+                {% if 'name' in result.terms[term]: %}
+                    <th>{{ result.terms[term]['name'] }}</th>
+                {% else %}    
+                    <th>{{ term }}</th>
+                {% endif %}
+            {% endfor %}
         </tr>
     </thead>
     <tbody>
-        {% for key in  result.persons %}
+        {% for key in result.persons %}
         <tr>
             {% for col_key in result.col_keys %}
             <td>{{ data[key][col_key] }}</td>
+            {% endfor %}
+            {% for term in result.terms %}
+                {% if term in data[key]['term'] %}
+                    <td>{{ data[key]['term'][term] }}</td>
+                {% else %}
+                    <td>0</td>
+                {% endif %}
             {% endfor %}
         </tr>
         {% endfor %}
         <tr>
             <td colspan="{{ result.col_keys|length - 1 }}"><strong>Итого</strong></td>
             <td><strong>{{ result.all['summ'] }}</strong></td>
+            {% for term in result.terms %}
+                {% if 'amount' in result.terms[term]: %}
+                    <td>{{ result.terms[term]['amount'] }}</td>
+                {% endif %}
+            {% endfor %}
         </tr>
     </tbody>
 </table>
