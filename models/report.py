@@ -265,6 +265,7 @@ class Report(db.Model, BaseModel):
                 amount=0,
                 count=0
             )
+            summ_kop = 0
 
             data['page_dates'] = answer['page_dates']
             data['detaled'] = []
@@ -291,9 +292,13 @@ class Report(db.Model, BaseModel):
                     name=row.name,
                 )
                 data['count'] += 1
-                data['amount'] += detaled_data['amount']
+                summ_kop += row.amount
                 data['detaled'].append(detaled_data)
 
+            if summ_kop % 100:
+                data['amount'] = "%d.%02d" % (summ_kop / 100, summ_kop % 100)
+            else:
+                data['amount'] = "%d" % (summ_kop / 100)
             result.append(data)
 
         value = dict(
