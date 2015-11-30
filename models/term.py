@@ -229,8 +229,19 @@ class Term(db.Model, BaseModel):
         return result
 
     @staticmethod
+    @cache.cached(timeout=3600, key_prefix='terms_tz_type_dict')
+    def select_tz_dict():
+        terms = Term.query.all()
+
+        result = {}
+        for term in terms:
+            result[term.id] = term.tz
+
+        return result
+        
+        
+    @staticmethod
     def select_term_list(firm_id, **kwargs):
-        tz = app.config['TZ']
         date_pattern = '%H:%M %d.%m.%y'
 
         order = kwargs['order'] if 'order' in kwargs and kwargs[
@@ -264,7 +275,7 @@ class Term(db.Model, BaseModel):
 
                 seans_alarm = delta.total_seconds() > Term.SEANS_ALARM
 
-                seans_date = date_helper.from_utc(term.config_date, tz)
+                seans_date = date_helper.from_utc(term.config_date, term.tz)
                 seans_date = seans_date.strftime(date_pattern)
             data = dict(
                 id=term.id,

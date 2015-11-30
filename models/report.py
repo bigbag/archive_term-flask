@@ -254,6 +254,7 @@ class Report(db.Model, BaseModel):
         result = []
         events = Event.get_dict()
         term_name_dict = Term.select_name_dict()
+        term_tz_dict = Term.select_tz_dict()
         for report in answer['reports']:
             search_date = date_helper.from_utc(
                 report[0],
@@ -272,13 +273,17 @@ class Report(db.Model, BaseModel):
             detaled_reports = self.person_detaled_query(search_date)
             for row in detaled_reports:
 
-                creation_date = date_helper.from_utc(
-                    row.creation_date,
-                    self.tz)
-
                 term_name = 'Empty'
                 if row.term_id in term_name_dict:
                     term_name = term_name_dict[row.term_id]
+                    
+                tz = self.tz
+                if row.term_id in term_tz_dict:
+                    tz = term_tz_dict[row.term_id]
+                    
+                creation_date = date_helper.from_utc(
+                    row.creation_date,
+                    tz)
 
                 detaled_data = dict(
                     id=row.id,
