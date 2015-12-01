@@ -20,6 +20,7 @@
                         <th class="sortable" ng-click="sortBy('name', false, $event)"><span>Имя</span></th>
                         <th class="not-sortable">Владелец</th>
                         <th class="sortable desc" ng-click="sortBy('config_date', true, $event)"><span>Сеанс связи</span></th>
+                        <th>Часовой пояс</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -33,6 +34,7 @@
                         <td ng-class="(term.seans_alarm==1)?'g-color-red':''">
                             {[{term.seans_date}]}
                         </td>
+                        <td>{[{term.tz}]}</td>
                     </tr>
                     <tr class="m-table-bottom" ng-show="search.page_count">
                         <td colspan="10">

@@ -285,6 +285,7 @@ class Term(db.Model, BaseModel):
                 status=int(term.status == Term.STATUS_VALID),
                 seans_date=seans_date,
                 seans_alarm=int(seans_alarm),
+                tz=term.tz,
             )
 
             result.append(data)
