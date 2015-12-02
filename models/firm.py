@@ -29,6 +29,7 @@ class Firm(db.Model, BaseModel):
     general_manager = db.Column(db.String(128))
     chief_accountant = db.Column(db.String(128))
     gprs_rate = db.Column(db.Integer())
+    contract = db.Column(db.String(256))
 
     @staticmethod
     def get_by_sub_domain(sub_domain):

@@ -150,15 +150,18 @@ class PaymentAccount(db.Model, BaseModel):
 
         style_header = styles['Heading1']
         style_header.fontName = "PDFFont"
-        style_header.fontSize = 16
+        style_header.fontSize = 13
         style_header.alignment = TA_CENTER
 
         date_pattern = '%d.%m.%Y'
         date_pdf = date_helper.from_utc(
             self.generated_date,
             app.config['TZ']).strftime(date_pattern)
+        contract = u''
+        if firm.contract:
+            contract = u' к договору №%s' % firm.contract
         if self.id:
-            story.append(Paragraph(u'Счет №%s от %s' % (self.id, date_pdf),
+            story.append(Paragraph(u'Счет №%s от %s%s' % (self.id, date_pdf, contract),
                                    style_header))
         else:
             story.append(Paragraph(u'Счет от %s' % date_pdf,
@@ -169,23 +172,25 @@ class PaymentAccount(db.Model, BaseModel):
                                    style))
             story.append(Spacer(1, 0.1 * inch))
 
-        data_price = self.format_summ(self.item_price)
+        data_price = u'%s руб.' % self.format_summ(self.item_price)
         data_rows = 3
 
-        price_header = u'Цена, руб.'
-        if firm.transaction_percent:
-            price_header = u'Цена, %'
-            data_price = str(float(firm.transaction_percent) / 100) + '%'
-
         data = [
-            [u'№', u'Наименование', u'Количество, шт.', price_header, u'Сумма, руб.']]
+            [u'№', u'Наименование', u'Количество, шт.', u'Цена', u'Сумма, руб.']]
 
         if self.gprs_terms_count and firm.gprs_rate:
             data_rows += 1
             gprs_summ = self.gprs_terms_count * firm.gprs_rate
-            gprs_price = self.format_summ(firm.gprs_rate)
+            gprs_price = u'%s руб.' % self.format_summ(firm.gprs_rate)
             data_summ = self.format_summ(self.summ - gprs_summ)
             data_gprs_summ = self.format_summ(gprs_summ)
+
+            if firm.transaction_percent:
+                full_transaction_summ = 100 * \
+                    (self.summ - gprs_summ) / \
+                    (float(firm.transaction_percent) / 100)
+                data_price = u'%s от общей\n суммы транзакций\n (от %s руб. )' % (
+                    str(float(firm.transaction_percent) / 100) + '%', self.format_summ(full_transaction_summ))
 
             data.append(['1', u'Информационная\n услуга по учету', str(
                 self.items_count), data_price, data_summ])
@@ -206,6 +211,8 @@ class PaymentAccount(db.Model, BaseModel):
         table_style.add('GRID', (0, 0), (4, 0), 1, colors.Color(0.7, 0.7, 0.7))
         table_style.add('FONTNAME', (0, 0), (4, data_rows), "PDFFont")
         table_style.add('FONTSIZE', (1, 1), (1, 1), 9)
+        if firm.transaction_percent:
+            table_style.add('FONTSIZE', (3, 1), (3, 1), 8)
         table_style.add('GRID', (0, 1), (4, data_rows), 1, colors.gray)
         table_style.add('ALIGN', (0, 0), (4, data_rows), 'LEFT')
         table_style.add('VALIGN', (0, 0), (4, data_rows), 'TOP')
@@ -279,15 +286,15 @@ class PaymentAccount(db.Model, BaseModel):
     @staticmethod
     def summ_comma(summ):
         summ = int(round(summ))
-        return "%02d,%02d" % (summ / 100, summ % 100)
+        return "%01d,%02d" % (summ / 100, summ % 100)
 
     @staticmethod
     def get_underline():
         data = [[None], [None]]
 
         line = Table(
-            data, \
-            colWidths=[6.2 * inch], \
+            data,
+            colWidths=[6.2 * inch],
             rowHeights=[0.03 * inch, 0.14 * inch])
 
         table_style = TableStyle()
@@ -326,9 +333,13 @@ class PaymentAccount(db.Model, BaseModel):
 
         story.append(Spacer(1, 0.3 * inch))
 
+        contract = u''
+        if firm.contract:
+            contract = u' к договору № <font color="gray">%s</font>' % firm.contract
+
         months_in_genitive = date_helper.get_locale_months_in_genitive()
-        story.append(Paragraph(u'Акт № <font color="gray">MBS-%07d</font> от <font color="gray">%02d %s %s</font>' %
-                               (self.id, self.generated_date.day, months_in_genitive[self.generated_date.month - 1], self.generated_date.year), style))
+        story.append(Paragraph(u'Акт № <font color="gray">MBS-%07d</font> от <font color="gray">%02d %s %s</font>%s' %
+                               (self.id, self.generated_date.day, months_in_genitive[self.generated_date.month - 1], self.generated_date.year, contract), style))
 
         story.append(self.get_underline())
 
@@ -360,26 +371,53 @@ class PaymentAccount(db.Model, BaseModel):
         summ = Paragraph(u'<font color="gray">%s</font>' %
                          self.summ_comma(self.summ), linestyle)
 
-        data = [
-            [u'№', u'Товар', u'Кол-во', u'Ед.', u'Цена', u'Сумма'],
-            [u'1', product, u'1', u'шт.', summ, summ]]
+        gprs_summ = self.gprs_terms_count * firm.gprs_rate
+        gprs_price = self.summ_comma(firm.gprs_rate)
+        transactions_summ = self.summ - gprs_summ
 
-        t = Table(data, rowHeights=[0.6 * inch, 0.4 * inch], colWidths=[
-                  0.4 * inch, None, 0.6 * inch, 0.4 * inch, 0.9 * inch, 0.9 * inch])
+        transactions = Paragraph(
+            u'<font color="gray">%s</font>\n транзакций' % self.items_count, linestyle)
+        transaction_price = u'%s руб.' % self.summ_comma(self.item_price)
+
+        if firm.transaction_percent:
+            full_transaction_summ = 100 * transactions_summ / \
+                (float(firm.transaction_percent) / 100)
+            transaction_price = u'%s от общей\n суммы транзакций\n (от %s руб.)' % (
+                str(float(firm.transaction_percent) / 100) + '%', self.summ_comma(full_transaction_summ))
+
+        data = [
+            [u'№', u'Товар', u'Кол-во', u'Цена', u'Сумма, руб.'],
+            [u'1', product, transactions, transaction_price, Paragraph(u'<font color="gray">%s</font>' % self.summ_comma(transactions_summ), linestyle)]]
+        rowHeights = [0.6 * inch, 0.4 * inch]
+        rows = 1
+
+        if firm.transaction_percent:
+            rowHeights = [0.6 * inch, 0.6 * inch]
+
+        if firm.gprs_rate and self.gprs_terms_count:
+            gprs_count = Paragraph(
+                u'<font color="gray">%s</font> шт.' % self.gprs_terms_count, linestyle)
+
+            data.append([u'2', u'Оплата GPRS-траффика платежных терминалов', gprs_count, u'%s руб.' % (firm.gprs_rate /
+                                                                                                       100), Paragraph(u'<font color="gray">%s</font>' % (gprs_summ / 100), linestyle)])
+            rowHeights.append(0.4 * inch)
+            rows = 2
+
+        t = Table(data, rowHeights=rowHeights, colWidths=[
+                  0.4 * inch, None, 0.9 * inch, 1.2 * inch, 0.9 * inch])
 
         table_style = TableStyle()
-        table_style.add('INNERGRID', (0, 0), (5, 1), 0.5, colors.black)
-        table_style.add('BOX', (0, 0), (5, 1), 1, colors.black)
-        table_style.add('FONTNAME', (0, 0), (5, 1), "PDFFont")
-        table_style.add('FONTSIZE', (0, 0), (5, 1), fontSize)
-        table_style.add('FONTCOLOR', (4, 1), (5, 1), colors.gray)
-        table_style.add('ALIGN', (0, 0), (5, 0), 'CENTER')
-        table_style.add('ALIGN', (0, 1), (1, 1), 'CENTER')
-        table_style.add('ALIGN', (2, 1), (2, 1), 'RIGHT')
-        table_style.add('ALIGN', (3, 1), (3, 1), 'CENTER')
-        table_style.add('ALIGN', (4, 1), (5, 1), 'RIGHT')
-        table_style.add('VALIGN', (0, 0), (5, 0), 'MIDDLE')
-        table_style.add('VALIGN', (0, 1), (5, 1), 'TOP')
+        table_style.add('INNERGRID', (0, 0), (4, rows), 0.5, colors.black)
+        table_style.add('BOX', (0, 0), (4, rows), 1, colors.black)
+        table_style.add('FONTNAME', (0, 0), (4, rows), "PDFFont")
+        table_style.add('FONTSIZE', (0, 0), (4, rows), fontSize)
+        table_style.add('ALIGN', (0, 0), (4, 0), 'CENTER')
+        table_style.add('ALIGN', (0, 1), (1, rows), 'CENTER')
+        table_style.add('ALIGN', (2, 1), (4, rows), 'RIGHT')
+        table_style.add('VALIGN', (0, 0), (4, 0), 'MIDDLE')
+        table_style.add('VALIGN', (0, 1), (4, rows), 'TOP')
+        if firm.transaction_percent:
+            table_style.add('FONTSIZE', (3, 1), (3, 1), 8)
 
         t.setStyle(table_style)
         story.append(t)
