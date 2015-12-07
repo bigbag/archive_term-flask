@@ -127,7 +127,7 @@ class PaymentAccount(db.Model, BaseModel):
         story.append(Paragraph(u'140180, г.Москва ул.Сельскохозяйственная, д.11, корп. 3',
                                style))
 
-        story.append(Spacer(1, 0.8 * inch))
+        story.append(Spacer(1, 0.4 * inch))
         story.append(Paragraph(u'Получатель: ООО «МОБИСПОТ РУС»',
                                style))
         story.append(Paragraph(u'ИНН 7717770408 КПП 771701001',
