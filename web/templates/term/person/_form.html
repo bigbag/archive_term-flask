@@ -21,20 +21,36 @@
         </div>
     </div>
     {% if not person.hard_id %}
-    <div class="content-row g-clearfix">
-        <label for="add-card-code">
-            Код активации карты (6 цифр и 4 буквы)
-        </label>
-        <input id="add-card-code" 
-            name="card_code"
-            maxlength="10"
-            minlength="10"
-            ng-minlength="10"
-            ng-maxlength="10"
-            type="text"
-            ng-class="{error: error.card_code}"
-            ng-model="person.card_code">
-    </div>
+        <div class="content-row g-clearfix">
+            <label for="add-card-code">
+                Код активации карты (6 цифр и 4 буквы)
+            </label>
+            <input id="add-card-code" 
+                name="card_code"
+                maxlength="10"
+                minlength="10"
+                ng-minlength="10"
+                ng-maxlength="10"
+                type="text"
+                ng-class="{error: error.card_code}"
+                ng-model="person.card_code">
+        </div>
+        {% if g.user.group == 1 %}
+            <div class="content-row g-clearfix">
+                <label for="add-card-hard-id">
+                    HID
+                </label>
+                <input id="add-card-hard-id" 
+                    name="card_hard_id"
+                    maxlength="32"
+                    minlength="5"
+                    ng-minlength="5"
+                    ng-maxlength="32"
+                    type="text"
+                    ng-class="{error: error.card_hard_id}"
+                    ng-model="person.card_hard_id">
+            </div>
+        {% endif %} 
     {% endif %} 
     <div class="content-row g-clearfix">
         <label for="add-tnumber"

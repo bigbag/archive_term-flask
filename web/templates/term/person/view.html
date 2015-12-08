@@ -106,8 +106,24 @@
                         type="text"
                         ng-model="person.card_code"
                         ng-class="{error: error.card_code}"
-                        required>
+                        >
                 </div>
+                {% if g.user.group == 1 %}
+                <div class="content-row g-clearfix">
+                    <label for="add-card-hard-id">
+                        HID
+                    </label>
+                    <input id="add-card-hard-id" 
+                        name="card_hard_id"
+                        maxlength="32"
+                        minlength="5"
+                        ng-minlength="5"
+                        ng-maxlength="32"
+                        type="text"
+                        ng-class="{error: error.card_hard_id}"
+                        ng-model="person.card_hard_id">
+                </div>
+                {% endif %} 
                 <div class="content-row g-clearfix">
                     <a ng-click="bindCard(person, cardForm.$valid)"
                         class="f-spot-button">
