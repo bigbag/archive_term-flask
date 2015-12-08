@@ -23,9 +23,10 @@ angular.module('term').controller('PersonController',
   };
   
   //Тригер на изменение снятие ошибки при изменение полей
-  $scope.$watch('person.card_code + person.name', function(user) {
+  $scope.$watch('person.card_code + person.name + person.card_hard_id', function(user) {
     $scope.error.name = false;
     $scope.error.card_code = false;
+    $scope.error.card_hard_id = false;
   });
   
   $scope.persontTimeout = [];
@@ -54,6 +55,7 @@ angular.module('term').controller('PersonController',
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         $scope.error.card_code = true;
+        $scope.error.card_hard_id = true;  
         contentService.setModal(data.message, 'error');
       } else {
         contentService.setModal(data.message, 'success');
@@ -68,6 +70,7 @@ angular.module('term').controller('PersonController',
   $scope.bindCard = function(person, valid) {
     if (!valid) {
       $scope.error.card_code = true;
+      $scope.error.card_hard_id = true;
       return false;
     }
     person.action = 'bind_card';
@@ -78,6 +81,7 @@ angular.module('term').controller('PersonController',
       contentService.scrollPage('.m-page-name');
       if (data.error === 'yes') {
         $scope.error.card_code = true;
+        $scope.error.card_hard_id = true;
         contentService.setModal(data.message, 'error');
       } else {
         contentService.setModal(data.message, 'success');
