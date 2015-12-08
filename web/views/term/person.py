@@ -118,17 +118,23 @@ def person_save(person_id):
 
     if person_id == 0:
         code = arg['card_code'] if 'card_code' in arg else False
+        card_hard_id = arg['card_hard_id'] if 'card_hard_id' in arg else False
         person = Person()
 
-        if code:
-            bind_card = set_person_card(code)
+        if code or card_hard_id:
+            if code:
+                bind_card = set_person_card(code)
+            else:
+                bind_card = set_person_card_by_hid(card_hard_id)
+                
             if not bind_card['wallet']:
                 answer['message'] = bind_card['message']
                 return jsonify(answer)
             else:
                 wallet = bind_card['wallet']
-                person.payment_id = wallet.payment_id
                 person.hard_id = wallet.hard_id
+                person.payment_id = bind_card['payment_id']
+                
     else:
         person = Person.query.get(person_id)
         if not person:
@@ -253,20 +259,28 @@ def person_bind_card(person_id):
     arg = json.loads(request.stream.read())
 
     code = arg['card_code'] if 'card_code' in arg else False
-    if not code:
-        abort(400)
+    card_hard_id = arg['card_hard_id'] if 'card_hard_id' in arg else False
+    if not code and not card_hard_id:
+        answer['message'] = u'Укажите код активации'
+        if g.user.group == 1:
+            answer['message'] = u'Укажите код активации или HID'
+        return jsonify(answer)
 
     person = Person.query.get(person_id)
     if not person:
         abort(404)
 
-    bind_card = set_person_card(code)
+    if code:
+        bind_card = set_person_card(code)
+    else:
+        bind_card = set_person_card_by_hid(card_hard_id)
+    
     if not bind_card['wallet']:
         answer['message'] = bind_card['message']
         return jsonify(answer)
 
     wallet = bind_card['wallet']
-    person.payment_id = wallet.payment_id
+    person.payment_id = bind_card['payment_id']
     person.hard_id = wallet.hard_id
     if person.save():
         answer['error'] = 'no'
@@ -276,7 +290,7 @@ def person_bind_card(person_id):
 
 
 def set_person_card(code):
-    answer = dict(error='yes', message=u'Произошла ошибка', wallet=False)
+    answer = dict(error='yes', message=u'Произошла ошибка', wallet=False, payment_id=False)
 
     spot = Spot().get_valid_by_code(code)
     if not spot:
@@ -298,9 +312,44 @@ def set_person_card(code):
         return answer
 
     answer['wallet'] = wallet
+    answer['payment_id'] = wallet.payment_id
     return answer
 
+    
+def set_person_card_by_hid(hard_id):
+    answer = dict(error='yes', message=u'Произошла ошибка', wallet=False, payment_id=False)
 
+    person = Person.query.filter_by(
+        hard_id=hard_id, firm_id=g.firm_info['id']).first()
+
+    if person:
+        answer['message'] = u'Данная карта уже привязана'
+        return answer
+
+    wallet = PaymentWallet.query.filter_by(
+        hard_id=hard_id).first()
+
+    if not wallet:
+        answer['message'] = u'Привязываемая карта отсутсвует'
+        return answer
+        
+    valid_status = [
+        Spot.STATUS_ACTIVATED,
+        Spot.STATUS_REGISTERED,
+        Spot.STATUS_CLONES
+    ]
+    spot = Spot.query.filter(
+            Spot.discodes_id == wallet.discodes_id).filter(
+                Spot.status.in_(valid_status)).first()
+    if not spot:
+        answer['message'] = u'Привязываемая карта отсутсвует'
+        return answer
+
+    answer['wallet'] = wallet
+    answer['payment_id'] = wallet.hard_id
+    return answer
+    
+    
 @mod.route('/person/<int:person_id>/unbind_card', methods=['POST'])
 @login_required
 @json_headers
