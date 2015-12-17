@@ -38,7 +38,7 @@ class Person(db.Model, BaseModel):
     birthday = db.Column(db.Date())
     firm_id = db.Column(db.Integer, db.ForeignKey('firm.id'))
     firm = db.relationship('Firm')
-    card = db.Column(db.String(8))
+    card = db.Column(db.String(12))
     payment_id = db.Column(db.String(20), nullable=False, index=True)
     hard_id = db.Column(db.String(128), nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
