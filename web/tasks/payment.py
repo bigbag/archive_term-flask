@@ -32,7 +32,7 @@ class PaymentTask(object):
 
         def condition_generator(interval, start_interval, start, count):
             condition = [dict(count=i + start, delta=i * interval + start_interval)
-                         for i in xrange(1, 1 + count)]
+                         for i in xrange(0, 1 + count)]
 
             return dict(condition=condition, start=start + count)
 
